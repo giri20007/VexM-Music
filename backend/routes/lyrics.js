@@ -32,7 +32,7 @@ router.get('/:id', async (req, res) => {
           );
 
           if (extracted && extracted.raw) {
-            lyrics = setLyrics(id, extracted.raw, extracted.type, 'embedded');
+            lyrics = setLyrics(id, extracted.raw, extracted.type, 'embedded', extracted.language);
           }
         }
       }
@@ -60,6 +60,7 @@ router.get('/:id', async (req, res) => {
     artist: track?.artist || '',
     type: lyrics.type,
     source: lyrics.source || 'admin',
+    language: lyrics.language || '',
     raw: lyrics.raw,
     lines: lyrics.lines,
     updatedAt: lyrics.updatedAt,

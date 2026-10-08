@@ -56,19 +56,18 @@ export function Sidebar({ currentRoute, onNavigate }) {
       <div className="flex items-center justify-between p-5 pb-4">
         <div
           onClick={() => onNavigate('home')}
-          className="flex items-center gap-3 cursor-pointer group"
+          className="brand-neon-container flex items-center gap-3 cursor-pointer group"
         >
-          <div className="relative w-9 h-9 rounded-xl bg-gradient-to-tr from-accent via-[#ff6b6b] to-[#f43f5e] flex items-center justify-center text-bg-primary shadow-lg shadow-accent/25 group-hover:scale-105 group-hover:shadow-accent/40 transition-all duration-300">
+          <div className="brand-icon-box w-9 h-9 rounded-xl flex items-center justify-center text-bg-primary flex-shrink-0">
             <Music2 className="w-5 h-5 fill-bg-primary stroke-bg-primary" />
-            <div className="absolute inset-0 rounded-xl bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
           </div>
           {!collapsed && (
             <div className="flex flex-col">
               <div className="flex items-center gap-1.5">
-                <span className="font-black text-base tracking-tight bg-gradient-to-r from-warm-white via-white to-[#ffa198] bg-clip-text text-transparent">
-                  SPiDEY<span className="text-accent drop-shadow-[0_0_8px_rgba(255,123,114,0.6)]">x</span>FLASH
+                <span className="brand-text-neon text-base tracking-tight select-none">
+                  SPiDEY<span className="brand-x-neon">x</span>FLASH
                 </span>
-                <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.2 rounded bg-accent/15 text-accent border border-accent/20">
+                <span className="brand-tag-neon text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md">
                   PRO
                 </span>
               </div>

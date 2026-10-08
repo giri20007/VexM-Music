@@ -56,7 +56,8 @@ export const useSettingsStore = create(
       syncLyrics: true,
       autoScroll: true,
       lyricsFontSize: 18,
-      lyricsOffsetMs: 0,
+      // Visualizer
+      visualizerMode: 'orbital', // spectrum | wave | orbital
 
       // Equalizer
       eqEnabled: false,
@@ -108,6 +109,9 @@ export const useSettingsStore = create(
       setLyricsOffsetMs: lyricsOffsetMs => set({ lyricsOffsetMs }),
       adjustLyricsOffset: delta =>
         set(s => ({ lyricsOffsetMs: Math.max(-5000, Math.min(5000, s.lyricsOffsetMs + delta)) })),
+
+      // Visualizer Actions
+      setVisualizerMode: visualizerMode => set({ visualizerMode }),
 
       // Equalizer Actions
       setEqEnabled: eqEnabled => set({ eqEnabled }),

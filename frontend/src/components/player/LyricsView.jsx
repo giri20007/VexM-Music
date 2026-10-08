@@ -119,10 +119,16 @@ export function LyricsView({ track }) {
               </span>
             )}
 
+            {lyricsData?.language && (
+              <span className="px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-semibold text-warm-muted uppercase tracking-wider">
+                {lyricsData.language}
+              </span>
+            )}
+
             {/* Copy button */}
             <button
               onClick={handleCopyLyrics}
-              className="flex items-center gap-1 px-2 py-0.5 rounded-md hover:bg-white/5 text-warm-muted hover:text-white text-[11px] transition"
+              className="flex items-center gap-1 px-2.5 py-0.5 rounded-md hover:bg-white/10 text-warm-muted hover:text-white text-[11px] transition"
               title="Copy lyrics to clipboard"
             >
               {copied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
@@ -171,7 +177,7 @@ export function LyricsView({ track }) {
       {/* Lyrics Content Container */}
       <div
         ref={containerRef}
-        className="flex-1 overflow-y-auto pr-2 space-y-4 no-scrollbar scroll-smooth antialiased"
+        className="flex-1 overflow-y-auto pr-2 space-y-3 no-scrollbar scroll-smooth antialiased"
         style={{ fontSize: `${fontSize}px` }}
       >
         {loading ? (
@@ -198,8 +204,12 @@ export function LyricsView({ track }) {
             );
           })
         ) : lyricsData?.raw ? (
-          <div className="whitespace-pre-line text-warm-white/80 leading-relaxed font-medium break-words">
-            {lyricsData.raw}
+          <div className="space-y-2 py-2">
+            {lyricsData.raw.split('\n').map((line, i) => (
+              <p key={i} className="text-warm-white/90 leading-relaxed font-semibold text-sm sm:text-base break-words">
+                {line.trim() || '\u00A0'}
+              </p>
+            ))}
           </div>
         ) : (
           <div className="h-full flex flex-col items-center justify-center py-12 text-warm-muted/60 text-center">

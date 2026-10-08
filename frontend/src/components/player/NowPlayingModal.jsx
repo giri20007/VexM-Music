@@ -25,7 +25,8 @@ import { formatDuration, formatQualityBadge } from '../../utils/formatters';
 import { getArtworkSrc, getTrackArtworkUrl } from '../../utils/artworkGenerator';
 import { LyricsView } from './LyricsView';
 import { TrackDetails } from './TrackDetails';
-import { AudioVisualizer } from './AudioVisualizer';
+import { AudioVisualizer, MiniBeatVisualizer } from './AudioVisualizer';
+import { FullscreenVisualizerModal } from './FullscreenVisualizerModal';
 
 // Isolated Scrubber component to prevent full modal re-renders during playback timeupdates
 const ModalScrubber = memo(function ModalScrubber() {
@@ -79,6 +80,8 @@ export function NowPlayingModal() {
 
   const [activeTab, setActiveTab] = useState('lyrics'); // lyrics | upnext | details
   const [imgError, setImgError] = useState(false);
+  const [isVisualizerExpanded, setIsVisualizerExpanded] = useState(false);
+  const [isFullscreenVisualizerOpen, setIsFullscreenVisualizerOpen] = useState(false);
 
   if (!isNowPlayingOpen || !currentTrack) return null;
 
@@ -131,23 +134,44 @@ export function NowPlayingModal() {
 
       {/* Main Dual-Column Content */}
       <main className="flex-1 max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-8 p-6 lg:p-10 items-center">
-        {/* Left Column: Artwork, Track Info, Scrubber, Controls */}
+        {/* Left Column: Artwork or Large Audio Visualizer, Track Info, Scrubber, Controls */}
         <div className="lg:col-span-6 flex flex-col justify-center max-w-lg mx-auto w-full space-y-6">
-          {/* Large Square Artwork */}
-          <div className="relative aspect-square w-full rounded-3xl overflow-hidden bg-bg-card shadow-2xl border border-white/10 group">
-            <img
-              src={coverSrc}
-              alt={currentTrack.title}
-              onError={() => setImgError(true)}
-              className="w-full h-full object-cover shadow-inner transition-transform duration-500 group-hover:scale-102"
-            />
-            {currentTrack.artworkConfidence >= 60 && (
+          {/* Large Square Display: Album Artwork OR Large Audio Visualizer with smooth transition */}
+          <div className="relative aspect-square w-full rounded-3xl overflow-hidden bg-bg-card shadow-2xl border border-white/10 group transition-all duration-500">
+            {!isVisualizerExpanded ? (
               <div
-                className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10 flex items-center gap-1.5 text-[11px] font-bold text-accent"
-                title="Verified Telegram Cover Artwork"
+                onClick={() => setIsVisualizerExpanded(true)}
+                className="relative w-full h-full cursor-pointer group animate-fade-in"
+                title="Click to open Audio Visualizer"
               >
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>Telegram Cover</span>
+                <img
+                  src={coverSrc}
+                  alt={currentTrack.title}
+                  onError={() => setImgError(true)}
+                  className="w-full h-full object-cover shadow-inner transition-transform duration-500 group-hover:scale-102"
+                />
+                {currentTrack.artworkConfidence >= 60 && (
+                  <div
+                    className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10 flex items-center gap-1.5 text-[11px] font-bold text-accent"
+                    title="Verified Telegram Cover Artwork"
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>Telegram Cover</span>
+                  </div>
+                )}
+
+                {/* Subtle Hover Visualizer Badge */}
+                <div className="absolute bottom-3 right-3 px-3 py-1.5 rounded-full bg-black/70 backdrop-blur-md border border-white/15 text-[11px] font-bold text-accent flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-xl group-hover:translate-y-0 translate-y-1">
+                  <Sparkles className="w-3.5 h-3.5 animate-pulse" />
+                  <span>Open Visualizer</span>
+                </div>
+              </div>
+            ) : (
+              <div className="w-full h-full animate-fade-in">
+                <AudioVisualizer
+                  onToggleFullscreen={() => setIsFullscreenVisualizerOpen(true)}
+                  onCollapse={() => setIsVisualizerExpanded(false)}
+                />
               </div>
             )}
           </div>
@@ -241,9 +265,18 @@ export function NowPlayingModal() {
             </button>
           </div>
 
-          {/* Web Audio Real-Time Visualizer */}
+          {/* Audio-Reactive Beat Visualizer (Underneath Controls) */}
           <div className="flex items-center justify-center pt-1">
-            <AudioVisualizer width={220} height={22} barCount={24} color="#ff7b72" />
+            {!isVisualizerExpanded ? (
+              <MiniBeatVisualizer onExpand={() => setIsVisualizerExpanded(true)} />
+            ) : (
+              <button
+                onClick={() => setIsVisualizerExpanded(false)}
+                className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-warm-muted hover:text-white transition"
+              >
+                <span>View Album Artwork</span>
+              </button>
+            )}
           </div>
 
           {/* Volume Control */}
@@ -377,6 +410,12 @@ export function NowPlayingModal() {
           </div>
         </div>
       </main>
+
+      {/* Fullscreen / Immersive Visualizer Modal */}
+      <FullscreenVisualizerModal
+        isOpen={isFullscreenVisualizerOpen}
+        onClose={() => setIsFullscreenVisualizerOpen(false)}
+      />
     </div>
   );
 }

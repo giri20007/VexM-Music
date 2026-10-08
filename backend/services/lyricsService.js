@@ -93,7 +93,7 @@ function setNegativeCached(trackId) {
   negativeCache.set(String(trackId), Date.now());
 }
 
-function setLyrics(trackId, rawContent, type = 'auto', source = 'admin') {
+function setLyrics(trackId, rawContent, type = 'auto', source = 'admin', language = '') {
   const id = String(trackId);
   negativeCache.delete(id);
 
@@ -110,6 +110,7 @@ function setLyrics(trackId, rawContent, type = 'auto', source = 'admin') {
   const entry = {
     type: isSynced ? 'synced' : 'plain',
     source: source || 'admin',
+    language: language || '',
     raw: rawContent.trim(),
     lines: isSynced ? parsedLines : [],
     updatedAt: new Date().toISOString(),
