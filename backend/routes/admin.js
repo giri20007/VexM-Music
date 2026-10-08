@@ -10,6 +10,7 @@ const { loginLimiter, adminApiLimiter } = require('../middleware/rateLimiter');
 const {
   getAllItems,
   getItem,
+  addItemToMemory,
   updateItemInMemory,
   removeItemFromMemory,
   forceSyncLibrary,
@@ -200,13 +201,60 @@ router.get('/tracks/:id', (req, res) => {
   res.json({ track: item, lyrics });
 });
 
+// 8b. Create / Add New Track to Library
+router.post('/tracks', (req, res) => {
+  const { title, artist, audioUrl, artworkUrl, genre, album, albumArtist, year, duration } = req.body || {};
+
+  if (!title || !artist) {
+    return res.status(400).json({ error: true, code: 'MISSING_FIELDS', message: 'Track title and artist are required' });
+  }
+
+  const trackId = `track_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`;
+  const newTrack = {
+    id: trackId,
+    title: String(title).trim(),
+    artist: String(artist).trim(),
+    album: album ? String(album).trim() : 'Singles',
+    albumArtist: albumArtist ? String(albumArtist).trim() : String(artist).trim(),
+    genre: genre ? String(genre).trim() : 'Various',
+    year: year ? Number(year) : new Date().getFullYear(),
+    duration: duration ? Number(duration) : 210,
+    audioUrl: audioUrl ? String(audioUrl).trim() : '',
+    streamUrl: audioUrl ? String(audioUrl).trim() : '',
+    thumbnail: artworkUrl ? String(artworkUrl).trim() : '',
+    date: Date.now(),
+    format: (audioUrl && audioUrl.toLowerCase().endsWith('.flac')) ? 'FLAC' : 'MP3',
+  };
+
+  const added = addItemToMemory(newTrack);
+  if (artworkUrl) {
+    setArtwork(trackId, String(artworkUrl).trim());
+  }
+  setOverride(trackId, {
+    title: newTrack.title,
+    artist: newTrack.artist,
+    album: newTrack.album,
+    genre: newTrack.genre,
+    year: newTrack.year,
+    audioUrl: newTrack.audioUrl,
+  });
+
+  logActivity('TRACK_CREATED_MANUALLY', { trackId, title: newTrack.title, artist: newTrack.artist });
+
+  res.status(201).json({
+    success: true,
+    message: 'Track added to library successfully',
+    track: added || newTrack,
+  });
+});
+
 // 9. Update Track Metadata
 router.patch('/tracks/:id', (req, res) => {
   const { id } = req.params;
   const existing = getItem(id);
   if (!existing) return res.status(404).json({ error: true, code: 'TRACK_NOT_FOUND', message: 'Track not found' });
 
-  const { title, artist, album, albumArtist, genre, year, trackNumber, discNumber, language } = req.body;
+  const { title, artist, album, albumArtist, genre, year, trackNumber, discNumber, language, audioUrl, artworkUrl } = req.body;
   const updates = {};
   if (typeof title === 'string') updates.title = title.trim();
   if (typeof artist === 'string') updates.artist = artist.trim();
@@ -214,12 +262,22 @@ router.patch('/tracks/:id', (req, res) => {
   if (typeof albumArtist === 'string') updates.albumArtist = albumArtist.trim();
   if (typeof genre === 'string') updates.genre = genre.trim();
   if (typeof language === 'string') updates.language = language.trim();
+  if (typeof audioUrl === 'string') {
+    updates.audioUrl = audioUrl.trim();
+    updates.streamUrl = audioUrl.trim();
+  }
+  if (typeof artworkUrl === 'string') {
+    updates.thumbnail = artworkUrl.trim();
+    setArtwork(id, artworkUrl.trim());
+  }
   if (year !== undefined) updates.year = year ? Number(year) : null;
   if (trackNumber !== undefined) updates.trackNumber = trackNumber ? Number(trackNumber) : null;
   if (discNumber !== undefined) updates.discNumber = discNumber ? Number(discNumber) : null;
 
   setOverride(id, updates);
   const updatedTrack = updateItemInMemory(id, updates);
+
+  logActivity('TRACK_UPDATED', { trackId: id, updates });
 
   res.json({
     success: true,

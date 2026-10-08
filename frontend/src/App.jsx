@@ -6,7 +6,7 @@ import { MobileNav } from './components/layout/MobileNav';
 import { GlobalSearchModal } from './components/layout/GlobalSearchModal';
 import { LivelyBackground } from './components/layout/LivelyBackground';
 import { NewTracksBanner } from './components/layout/NewTracksBanner';
-import { TelegramAuthScreen } from './components/auth/TelegramAuthScreen';
+import { AuthScreen } from './components/auth/AuthScreen';
 
 import { NowPlayingModal } from './components/player/NowPlayingModal';
 import { QueueDrawer } from './components/player/QueueDrawer';
@@ -88,20 +88,21 @@ export default function App() {
         </div>
         <div className="flex items-center gap-2 text-xs font-semibold text-warm-muted">
           <RefreshCw className="w-4 h-4 animate-spin text-accent" />
-          <span>Verifying session with backend...</span>
+          <span>Verifying SPiDEYxFLASH session...</span>
         </div>
       </div>
     );
   }
 
-  // 2. Telegram Authentication First Screen
+  // 2. Authentication First Screen (Sign In & Sign Up)
   if (!isAuthenticated) {
-    return <TelegramAuthScreen />;
+    return <AuthScreen />;
   }
 
   // 3. Admin Route Protection
+  const isAdmin = user?.isAdmin || user?.role === 'ADMIN' || user?.role === 'admin' || user?.username?.toLowerCase() === 'spidey';
   if (currentRoute === 'admin') {
-    if (!user?.isAdmin) {
+    if (!isAdmin) {
       return (
         <div className="min-h-screen flex items-center justify-center p-6 bg-bg-primary text-warm-white select-none">
           <div className="max-w-md w-full p-8 rounded-3xl bg-bg-secondary border border-red-500/20 text-center space-y-4 shadow-2xl">
@@ -110,7 +111,7 @@ export default function App() {
             </div>
             <h2 className="text-xl font-black text-warm-white">Access Denied (403)</h2>
             <p className="text-xs text-warm-muted leading-relaxed">
-              Admin privileges are restricted to authorized Telegram accounts. User ID <span className="font-mono text-warm-white">{user?.telegramId || user?.id}</span> is not an administrator.
+              Admin privileges require administrator credentials (<span className="font-mono text-warm-white font-semibold">Spidey</span>). You are currently logged in as a standard listener.
             </p>
             <button
               onClick={() => navigate('home')}

@@ -12,9 +12,13 @@ import {
   ExternalLink,
   Sparkles,
   Layers,
+  Plus,
+  Music,
+  Link2,
 } from 'lucide-react';
 import {
   adminGetLibrary,
+  adminCreateTrack,
   adminUpdateTrack,
   adminRemoveTrack,
   adminSaveArtwork,
@@ -33,6 +37,19 @@ export function AdminLibrary() {
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // Add New Track Modal State
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [addForm, setAddForm] = useState({
+    title: '',
+    artist: '',
+    audioUrl: '',
+    artworkUrl: '',
+    genre: 'Pop',
+    album: '',
+    year: new Date().getFullYear().toString(),
+  });
+  const [isCreatingTrack, setIsCreatingTrack] = useState(false);
+
   // Edit Modal State
   const [editingTrack, setEditingTrack] = useState(null);
   const [editForm, setEditForm] = useState({
@@ -43,6 +60,7 @@ export function AdminLibrary() {
     genre: '',
     year: '',
     trackNumber: '',
+    audioUrl: '',
     artworkUrl: '',
   });
   const [savingEdit, setSavingEdit] = useState(false);
@@ -130,6 +148,44 @@ export function AdminLibrary() {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
+  const handleCreateTrack = async e => {
+    e.preventDefault();
+    if (!addForm.title.trim() || !addForm.artist.trim()) {
+      showToast('Track title and artist are required', 'error');
+      return;
+    }
+
+    setIsCreatingTrack(true);
+    try {
+      await adminCreateTrack({
+        title: addForm.title.trim(),
+        artist: addForm.artist.trim(),
+        audioUrl: addForm.audioUrl.trim(),
+        artworkUrl: addForm.artworkUrl.trim(),
+        genre: addForm.genre.trim(),
+        album: addForm.album.trim(),
+        year: addForm.year ? Number(addForm.year) : undefined,
+      });
+
+      showToast(`Track "${addForm.title}" added to library!`, 'success');
+      setIsAddModalOpen(false);
+      setAddForm({
+        title: '',
+        artist: '',
+        audioUrl: '',
+        artworkUrl: '',
+        genre: 'Pop',
+        album: '',
+        year: new Date().getFullYear().toString(),
+      });
+      fetchLibraryData(1, searchQuery);
+    } catch (err) {
+      showToast(err.message || 'Failed to create track', 'error');
+    } finally {
+      setIsCreatingTrack(false);
+    }
+  };
+
   const handleOpenEdit = track => {
     setEditingTrack(track);
     setEditForm({
@@ -141,6 +197,7 @@ export function AdminLibrary() {
       language: track.language || '',
       year: track.year ? String(track.year) : '',
       trackNumber: track.trackNumber ? String(track.trackNumber) : '',
+      audioUrl: track.audioUrl || track.streamUrl || '',
       artworkUrl: track.thumbnail && !track.thumbnail.startsWith('/api/artwork') ? track.thumbnail : '',
     });
   };
@@ -159,6 +216,20 @@ export function AdminLibrary() {
     reader.readAsDataURL(file);
   };
 
+  const handleAddArtworkFileUpload = e => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      showToast('Please select a valid image file (JPG, PNG, WebP)', 'error');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = ev => {
+      setAddForm(prev => ({ ...prev, artworkUrl: ev.target?.result || '' }));
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleSaveEdit = async e => {
     e.preventDefault();
     if (!editingTrack) return;
@@ -172,6 +243,7 @@ export function AdminLibrary() {
         albumArtist: editForm.albumArtist,
         genre: editForm.genre,
         language: editForm.language,
+        audioUrl: editForm.audioUrl,
         year: editForm.year ? Number(editForm.year) : null,
         trackNumber: editForm.trackNumber ? Number(editForm.trackNumber) : null,
       };
@@ -195,7 +267,7 @@ export function AdminLibrary() {
 
     try {
       await adminRemoveTrack(deletingTrack.id);
-      showToast('Track removed from library (Telegram file preserved)', 'info');
+      showToast('Track removed from library catalog', 'info');
       setDeletingTrack(null);
       fetchLibraryData(page, searchQuery);
     } catch (err) {
@@ -218,8 +290,16 @@ export function AdminLibrary() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
-          <div className="relative w-full sm:w-64">
+        <div className="flex items-center gap-2 flex-wrap">
+          <button
+            onClick={() => setIsAddModalOpen(true)}
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-accent text-bg-primary font-bold text-xs shadow-md shadow-accent/20 hover:scale-105 transition flex-shrink-0"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Add Track</span>
+          </button>
+
+          <div className="relative w-full sm:w-60">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-warm-muted" />
             <input
               type="search"
@@ -458,6 +538,21 @@ export function AdminLibrary() {
                 </div>
               </div>
 
+              {/* Audio Stream Link / Direct URL */}
+              <div className="space-y-1">
+                <label className="font-semibold text-warm-muted flex items-center gap-1.5">
+                  <Link2 className="w-3.5 h-3.5 text-accent" />
+                  <span>Audio Stream Link / Direct File URL</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="https://... / audio stream link"
+                  value={editForm.audioUrl}
+                  onChange={e => setEditForm({ ...editForm, audioUrl: e.target.value })}
+                  className="w-full px-3 py-2 rounded-xl bg-bg-card border border-white/10 text-warm-white focus:outline-none focus:border-accent font-mono text-xs"
+                />
+              </div>
+
               {/* Artwork Management: URL or Local File Upload + Live Preview */}
               <div className="space-y-2 p-3 rounded-2xl bg-bg-secondary/70 border border-white/5">
                 <div className="flex items-center justify-between">
@@ -468,7 +563,7 @@ export function AdminLibrary() {
                       onClick={() => setEditForm({ ...editForm, artworkUrl: '' })}
                       className="text-[11px] text-red-400 hover:underline"
                     >
-                      Revert to Telegram Artwork
+                      Clear Custom Cover
                     </button>
                   )}
                 </div>
@@ -531,6 +626,185 @@ export function AdminLibrary() {
                   className="px-5 py-2 rounded-xl bg-accent text-bg-primary font-bold shadow-md shadow-accent/25 hover:scale-105 transition disabled:opacity-50"
                 >
                   {savingEdit ? 'Saving...' : 'Save Metadata'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* CREATE / ADD NEW TRACK MODAL */}
+      {isAddModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-fade-in"
+          onClick={() => setIsAddModalOpen(false)}
+        >
+          <div
+            className="w-full max-w-lg rounded-3xl bg-bg-secondary border border-white/10 p-6 shadow-2xl space-y-4 animate-scale-up"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between pb-3 border-b border-white/5">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-accent/20 flex items-center justify-center text-accent">
+                  <Plus className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-warm-white">
+                    Add New Track to Library
+                  </h3>
+                  <p className="text-[11px] text-warm-muted">
+                    Publish music with direct audio links, cover art, and genre classification
+                  </p>
+                </div>
+              </div>
+              <button onClick={() => setIsAddModalOpen(false)} className="text-warm-muted hover:text-white">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateTrack} className="space-y-3.5 text-xs">
+              <div className="space-y-1">
+                <label className="font-semibold text-warm-muted">
+                  Track Title <span className="text-accent">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Starboy / Bohemian Rhapsody"
+                  value={addForm.title}
+                  onChange={e => setAddForm({ ...addForm, title: e.target.value })}
+                  className="w-full px-3 py-2.5 rounded-xl bg-bg-card border border-white/10 text-warm-white placeholder:text-warm-muted/50 focus:outline-none focus:border-accent"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="font-semibold text-warm-muted">
+                    Artist <span className="text-accent">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. The Weeknd"
+                    value={addForm.artist}
+                    onChange={e => setAddForm({ ...addForm, artist: e.target.value })}
+                    className="w-full px-3 py-2.5 rounded-xl bg-bg-card border border-white/10 text-warm-white placeholder:text-warm-muted/50 focus:outline-none focus:border-accent"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="font-semibold text-warm-muted">Category / Genre</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Pop, Hip-Hop, Rock, OST"
+                    value={addForm.genre}
+                    onChange={e => setAddForm({ ...addForm, genre: e.target.value })}
+                    className="w-full px-3 py-2.5 rounded-xl bg-bg-card border border-white/10 text-warm-white placeholder:text-warm-muted/50 focus:outline-none focus:border-accent"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="font-semibold text-warm-muted flex items-center gap-1.5">
+                  <Link2 className="w-3.5 h-3.5 text-accent" />
+                  <span>Audio URL / Stream Link</span>
+                </label>
+                <input
+                  type="url"
+                  placeholder="https://example.com/audio.mp3 (Direct streaming link or MP3/FLAC/AAC URL)"
+                  value={addForm.audioUrl}
+                  onChange={e => setAddForm({ ...addForm, audioUrl: e.target.value })}
+                  className="w-full px-3 py-2.5 rounded-xl bg-bg-card border border-white/10 text-warm-white placeholder:text-warm-muted/50 focus:outline-none focus:border-accent font-mono text-xs"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="font-semibold text-warm-muted">Album (Optional)</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Singles / Greatest Hits"
+                    value={addForm.album}
+                    onChange={e => setAddForm({ ...addForm, album: e.target.value })}
+                    className="w-full px-3 py-2.5 rounded-xl bg-bg-card border border-white/10 text-warm-white placeholder:text-warm-muted/50 focus:outline-none focus:border-accent"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="font-semibold text-warm-muted">Release Year</label>
+                  <input
+                    type="number"
+                    placeholder="2026"
+                    value={addForm.year}
+                    onChange={e => setAddForm({ ...addForm, year: e.target.value })}
+                    className="w-full px-3 py-2.5 rounded-xl bg-bg-card border border-white/10 text-warm-white placeholder:text-warm-muted/50 focus:outline-none focus:border-accent"
+                  />
+                </div>
+              </div>
+
+              {/* Cover Image URL / Custom File Upload */}
+              <div className="space-y-2 p-3 rounded-2xl bg-bg-secondary/70 border border-white/5">
+                <label className="font-semibold text-warm-muted block">Cover Image Artwork</label>
+                <div className="flex items-center gap-3">
+                  <div className="w-14 h-14 rounded-xl overflow-hidden bg-black/40 border border-white/10 flex-shrink-0 flex items-center justify-center">
+                    {addForm.artworkUrl ? (
+                      <img src={addForm.artworkUrl} alt="Cover Preview" className="w-full h-full object-cover" />
+                    ) : (
+                      <Music className="w-6 h-6 text-warm-muted/40" />
+                    )}
+                  </div>
+
+                  <div className="flex-1 space-y-1.5">
+                    <input
+                      type="url"
+                      placeholder="Paste Image URL (https://...)"
+                      value={addForm.artworkUrl}
+                      onChange={e => setAddForm({ ...addForm, artworkUrl: e.target.value })}
+                      className="w-full px-3 py-1.5 rounded-xl bg-bg-card border border-white/10 text-xs text-warm-white focus:outline-none focus:border-accent"
+                    />
+
+                    <div className="flex items-center gap-2">
+                      <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-[11px] font-semibold text-warm-white transition border border-white/10">
+                        <span>Upload Custom Cover</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleAddArtworkFileUpload}
+                          className="hidden"
+                        />
+                      </label>
+                      <span className="text-[10px] text-warm-muted/60">
+                        {addForm.artworkUrl?.startsWith('data:image') ? '✓ Custom file attached' : 'JPG, PNG, WebP'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-white/5">
+                <button
+                  type="button"
+                  onClick={() => setIsAddModalOpen(false)}
+                  className="px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-warm-white font-semibold transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isCreatingTrack}
+                  className="px-6 py-2.5 rounded-xl bg-accent text-bg-primary font-bold shadow-lg shadow-accent/25 hover:scale-105 transition disabled:opacity-50 flex items-center gap-1.5"
+                >
+                  {isCreatingTrack ? (
+                    <>
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                      <span>Adding Track...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>Publish to Library</span>
+                    </>
+                  )}
                 </button>
               </div>
             </form>

@@ -153,17 +153,17 @@ export function NowPlayingModal() {
                 {currentTrack.artworkConfidence >= 60 && (
                   <div
                     className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10 flex items-center gap-1.5 text-[11px] font-bold text-accent"
-                    title="Verified Telegram Cover Artwork"
+                    title="Verified Cover Artwork"
                   >
                     <Sparkles className="w-3.5 h-3.5" />
-                    <span>Telegram Cover</span>
+                    <span>Verified Cover</span>
                   </div>
                 )}
 
                 {/* Subtle Hover Visualizer Badge */}
                 <div className="absolute bottom-3 right-3 px-3 py-1.5 rounded-full bg-black/70 backdrop-blur-md border border-white/15 text-[11px] font-bold text-accent flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-xl group-hover:translate-y-0 translate-y-1">
                   <Sparkles className="w-3.5 h-3.5 animate-pulse" />
-                  <span>Open Visualizer</span>
+                  <span>360° Round VFX</span>
                 </div>
               </div>
             ) : (

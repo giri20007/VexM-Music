@@ -228,68 +228,146 @@ export function AudioVisualizer({
         });
       }
 
-      // MODE 3: ORBITAL (Circular Radial Spectrum, Bass Pulsing Core & Particles)
+      // MODE 3: ROUND VFX / ORBITAL (360° Radial Spectrum, Spinning Vinyl, SPiDEYxFLASH Typography & Ambient Glow)
       else {
-        rotationRef.current += 0.003 + bass * 0.008;
+        if (isPlaying) {
+          rotationRef.current += 0.004 + bass * 0.01;
+        }
         const rot = rotationRef.current;
         const dpr = window.devicePixelRatio || 1;
+        const minDim = Math.min(width, height);
 
         particlesRef.current.forEach(p => {
-          p.update(width, height, isLiveAudio ? bass : 0);
+          p.update(width, height, isLiveAudio ? bass : 0.01);
           p.draw(ctx, cx, cy);
         });
 
-        const coreRadius = Math.min(width, height) * 0.16 * (1 + bass * 0.25);
-        const coreGrad = ctx.createRadialGradient(cx, cy, coreRadius * 0.2, cx, cy, coreRadius);
-        coreGrad.addColorStop(0, '#ff7b72');
-        coreGrad.addColorStop(0.5, '#f43f5e');
-        coreGrad.addColorStop(0.9, '#3b1219');
-        coreGrad.addColorStop(1, '#1a090d');
+        // 1. Central Disc Geometry
+        const discRadius = minDim * 0.22 * (1 + bass * 0.12);
+        const ringOuterRadius = discRadius + 16 * dpr;
 
-        ctx.fillStyle = coreGrad;
-        ctx.beginPath();
-        ctx.arc(cx, cy, coreRadius, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.strokeStyle = `rgba(255, 255, 255, ${0.4 + bass * 0.5})`;
-        ctx.lineWidth = 2 * dpr;
-        ctx.shadowColor = '#ff7b72';
-        ctx.shadowBlur = 16 * bass;
-        ctx.stroke();
-        ctx.shadowBlur = 0;
-
-        ctx.fillStyle = '#130c0a';
-        ctx.beginPath();
-        ctx.arc(cx, cy, coreRadius * 0.35, 0, Math.PI * 2);
-        ctx.fill();
-
-        const rayCount = 56;
-        const baseRadius = coreRadius + 6 * dpr;
+        // 2. 360° Radial Frequency Spectrum Equalizer Bars
+        const rayCount = 64;
+        const rayBaseRadius = ringOuterRadius + 4 * dpr;
 
         for (let i = 0; i < rayCount; i++) {
           const angle = (i / rayCount) * Math.PI * 2 + rot;
-          const binIdx = Math.floor((Math.abs(i - rayCount / 2) / (rayCount / 2)) * 48);
-          const val = isLiveAudio ? smoothData[binIdx] : 0.05;
-          const rayLen = Math.max(4 * dpr, val * Math.min(width, height) * 0.28);
+          const binIdx = Math.floor((Math.abs(i - rayCount / 2) / (rayCount / 2)) * 52);
+          const val = isLiveAudio ? smoothData[binIdx] : 0.06;
+          const rayLen = Math.max(4 * dpr, val * minDim * 0.23 * (1 + bass * 0.3));
 
-          const x1 = cx + Math.cos(angle) * baseRadius;
-          const y1 = cy + Math.sin(angle) * baseRadius;
-          const x2 = cx + Math.cos(angle) * (baseRadius + rayLen);
-          const y2 = cy + Math.sin(angle) * (baseRadius + rayLen);
+          const x1 = cx + Math.cos(angle) * rayBaseRadius;
+          const y1 = cy + Math.sin(angle) * rayBaseRadius;
+          const x2 = cx + Math.cos(angle) * (rayBaseRadius + rayLen);
+          const y2 = cy + Math.sin(angle) * (rayBaseRadius + rayLen);
 
           const rayGrad = ctx.createLinearGradient(x1, y1, x2, y2);
-          rayGrad.addColorStop(0, '#ff7b72');
-          rayGrad.addColorStop(0.7, '#f43f5e');
+          rayGrad.addColorStop(0, '#ff6b6b');
+          rayGrad.addColorStop(0.5, '#f43f5e');
           rayGrad.addColorStop(1, '#c084fc');
 
           ctx.strokeStyle = rayGrad;
-          ctx.lineWidth = 3 * dpr;
+          ctx.lineWidth = 3.2 * dpr;
           ctx.lineCap = 'round';
           ctx.beginPath();
           ctx.moveTo(x1, y1);
           ctx.lineTo(x2, y2);
           ctx.stroke();
+
+          if (val > 0.45) {
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(x2, y2, 2 * dpr, 0, Math.PI * 2);
+            ctx.fill();
+          }
         }
+
+        // 3. Outer Neon Perimeter Ring with coral glow
+        ctx.strokeStyle = `rgba(255, 107, 107, ${0.5 + bass * 0.5})`;
+        ctx.lineWidth = 2.2 * dpr;
+        ctx.shadowColor = '#ff6b6b';
+        ctx.shadowBlur = 14 * (0.6 + bass * 0.8);
+        ctx.beginPath();
+        ctx.arc(cx, cy, ringOuterRadius, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+
+        // 4. Curved Circular Typography: "✦ SPiDEYxFLASH • HIGH FIDELITY • AUDIO LAB ✦"
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(rot * 0.65);
+
+        const textRadius = (discRadius + ringOuterRadius) / 2;
+        const brandString = '✦  SPiDEYxFLASH  •  HIGH FIDELITY  •  360° AUDIO LAB  ✦  ';
+        const textLen = brandString.length;
+        ctx.font = `bold ${Math.max(8, 9.5 * dpr)}px sans-serif`;
+        ctx.fillStyle = `rgba(255, 255, 255, ${0.75 + bass * 0.25})`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        for (let i = 0; i < textLen; i++) {
+          const char = brandString[i];
+          const charAngle = (i / textLen) * Math.PI * 2;
+          ctx.save();
+          ctx.rotate(charAngle);
+          ctx.translate(0, -textRadius);
+          ctx.fillText(char, 0, 0);
+          ctx.restore();
+        }
+        ctx.restore();
+
+        // 5. Concentric Vinyl Grooves
+        const grooveCounts = [0.88, 0.74, 0.6, 0.46];
+        grooveCounts.forEach(factor => {
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.07)';
+          ctx.lineWidth = 1 * dpr;
+          ctx.beginPath();
+          ctx.arc(cx, cy, discRadius * factor, 0, Math.PI * 2);
+          ctx.stroke();
+        });
+
+        // 6. Vinyl Disc Center Core Body
+        const vinylCoreGrad = ctx.createRadialGradient(cx, cy, 5, cx, cy, discRadius);
+        vinylCoreGrad.addColorStop(0, '#2d0f17');
+        vinylCoreGrad.addColorStop(0.5, '#190a0f');
+        vinylCoreGrad.addColorStop(0.9, '#0d0507');
+        vinylCoreGrad.addColorStop(1, '#050203');
+
+        ctx.fillStyle = vinylCoreGrad;
+        ctx.beginPath();
+        ctx.arc(cx, cy, discRadius, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = `rgba(244, 63, 94, ${0.4 + bass * 0.4})`;
+        ctx.lineWidth = 1.6 * dpr;
+        ctx.stroke();
+
+        // 7. Center Spindle Disc Badge
+        const spindleRadius = discRadius * 0.38;
+        const spindleGrad = ctx.createLinearGradient(
+          cx - spindleRadius,
+          cy - spindleRadius,
+          cx + spindleRadius,
+          cy + spindleRadius
+        );
+        spindleGrad.addColorStop(0, '#ff6b6b');
+        spindleGrad.addColorStop(0.6, '#f43f5e');
+        spindleGrad.addColorStop(1, '#8b5cf6');
+
+        ctx.fillStyle = spindleGrad;
+        ctx.beginPath();
+        ctx.arc(cx, cy, spindleRadius, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Center Spindle Hole
+        ctx.fillStyle = '#050203';
+        ctx.beginPath();
+        ctx.arc(cx, cy, spindleRadius * 0.28, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+        ctx.lineWidth = 1.2 * dpr;
+        ctx.stroke();
       }
 
       animationId = requestAnimationFrame(render);
@@ -321,15 +399,15 @@ export function AudioVisualizer({
             <button
               onClick={() => setVisualizerMode('orbital')}
               className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold transition ${
-                activeMode === 'orbital'
+                activeMode === 'orbital' || activeMode === 'round_vfx'
                   ? 'bg-accent text-bg-primary shadow'
                   : 'text-warm-muted hover:text-white hover:bg-white/10'
               }`}
-              title="Orbital mode"
-              aria-label="Orbital visualizer mode"
+              title="Round VFX mode"
+              aria-label="Round VFX visualizer mode"
             >
               <Radio className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Orbital</span>
+              <span className="hidden sm:inline">Round VFX</span>
             </button>
 
             <button

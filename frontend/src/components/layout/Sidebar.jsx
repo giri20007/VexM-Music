@@ -242,12 +242,12 @@ export function Sidebar({ currentRoute, onNavigate }) {
                   <img src={user.photoUrl} alt={user.firstName} className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-[10px] font-bold text-accent">
-                    {(user.firstName?.[0] || 'U').toUpperCase()}
+                    {(user.displayName?.[0] || user.username?.[0] || 'U').toUpperCase()}
                   </div>
                 )}
               </div>
               <span className="truncate text-[11px] text-warm-muted font-medium">
-                {user.firstName || user.username || 'Telegram User'}
+                {user.displayName || user.username || 'Listener'}
               </span>
             </div>
             <button

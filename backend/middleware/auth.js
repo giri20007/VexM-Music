@@ -1,33 +1,15 @@
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'spidey_x_flash_super_secret_jwt_key_2026';
-const ADMIN_TELEGRAM_ID = process.env.ADMIN_TELEGRAM_ID || '5216415651';
-const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'spidey';
-
-// Cache computed hash for fallback dev password
-let computedHash = null;
-function getAdminPasswordHash() {
-  if (process.env.ADMIN_PASSWORD_HASH) {
-    return process.env.ADMIN_PASSWORD_HASH;
-  }
-  if (process.env.ADMIN_PASSWORD) {
-    if (!computedHash) {
-      computedHash = bcrypt.hashSync(process.env.ADMIN_PASSWORD, 10);
-    }
-    return computedHash;
-  }
-  if (!computedHash) {
-    computedHash = bcrypt.hashSync('admin', 10);
-  }
-  return computedHash;
-}
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'Spidey';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'MS710924';
 
 async function verifyCredentials(username, password) {
   if (!username || !password) return false;
-  if (username !== ADMIN_USERNAME) return false;
-  const hash = getAdminPasswordHash();
-  return bcrypt.compare(password, hash);
+  return (
+    (username === ADMIN_USERNAME || username.toLowerCase() === ADMIN_USERNAME.toLowerCase()) &&
+    password === ADMIN_PASSWORD
+  );
 }
 
 function generateToken(payload) {
@@ -69,7 +51,7 @@ function requireAuth(req, res, next) {
     return res.status(401).json({
       error: true,
       code: 'UNAUTHORIZED',
-      message: 'Authentication required. Please log in with Telegram.',
+      message: 'Authentication required. Please sign in.',
     });
   }
 
@@ -78,28 +60,30 @@ function requireAuth(req, res, next) {
     return res.status(401).json({
       error: true,
       code: 'INVALID_SESSION',
-      message: 'Session is invalid or has expired. Please log in again.',
+      message: 'Session is invalid or has expired. Please sign in again.',
     });
   }
 
-  const isAdmin = String(decoded.telegramId || decoded.id) === String(ADMIN_TELEGRAM_ID) || decoded.role === 'admin';
+  const isAdmin =
+    decoded.role === 'ADMIN' ||
+    decoded.role === 'admin' ||
+    decoded.username?.toLowerCase() === ADMIN_USERNAME.toLowerCase();
 
   req.user = {
     ...decoded,
     isAdmin,
-    role: isAdmin ? 'admin' : (decoded.role || 'user'),
+    role: isAdmin ? 'ADMIN' : (decoded.role || 'user'),
   };
-  req.adminUser = req.user; // Compatibility
+  req.adminUser = req.user;
 
   next();
 }
 
 /**
- * Middleware: Strictly requires Admin privileges (Telegram User ID 5216415651)
+ * Middleware: Strictly requires Admin privileges (Spidey / MS710924)
  */
 function requireAdmin(req, res, next) {
   if (!req.user) {
-    // If requireAuth hasn't run yet, run it
     return requireAuth(req, res, () => {
       checkAdminPermission(req, res, next);
     });
@@ -111,14 +95,16 @@ function checkAdminPermission(req, res, next) {
   const user = req.user;
   const isAuthorizedAdmin =
     user &&
-    (String(user.telegramId || user.id) === String(ADMIN_TELEGRAM_ID) ||
-      (user.role === 'admin' && (user.username === ADMIN_USERNAME || String(user.telegramId) === String(ADMIN_TELEGRAM_ID))));
+    (user.role === 'ADMIN' ||
+      user.role === 'admin' ||
+      user.isAdmin === true ||
+      user.username?.toLowerCase() === ADMIN_USERNAME.toLowerCase());
 
   if (!isAuthorizedAdmin) {
     return res.status(403).json({
       error: true,
       code: 'FORBIDDEN',
-      message: 'Access Denied: Admin privileges are strictly restricted to authorized Telegram accounts.',
+      message: 'Access Denied: Admin privileges are required.',
     });
   }
 
@@ -126,7 +112,6 @@ function checkAdminPermission(req, res, next) {
   next();
 }
 
-// Backward compatibility alias for authenticateAdmin
 const authenticateAdmin = requireAdmin;
 
 module.exports = {
@@ -136,6 +121,6 @@ module.exports = {
   verifyCredentials,
   generateToken,
   verifyToken,
-  ADMIN_TELEGRAM_ID,
   ADMIN_USERNAME,
+  ADMIN_PASSWORD,
 };

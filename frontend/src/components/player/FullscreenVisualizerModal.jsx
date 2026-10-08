@@ -124,7 +124,7 @@ export function FullscreenVisualizerModal({ isOpen, onClose }) {
             }`}
           >
             <Radio className="w-3.5 h-3.5" />
-            <span>Orbital</span>
+            <span>Round VFX</span>
           </button>
 
           <button

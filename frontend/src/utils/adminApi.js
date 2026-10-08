@@ -72,6 +72,11 @@ export const adminGetLibrary = ({ q = '', sort = 'recent', page = 1, limit = 50 
 };
 export const adminSyncLibrary = () => adminRequest('/api/admin/library/sync', { method: 'POST' });
 export const adminRefreshLibrary = () => adminRequest('/api/admin/library/refresh', { method: 'POST' });
+export const adminCreateTrack = trackData =>
+  adminRequest('/api/admin/tracks', {
+    method: 'POST',
+    body: JSON.stringify(trackData),
+  });
 export const adminUpdateTrack = (id, updates) =>
   adminRequest(`/api/admin/tracks/${encodeURIComponent(id)}`, {
     method: 'PATCH',

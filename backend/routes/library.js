@@ -120,7 +120,13 @@ module.exports = {
     const it = items.get(String(id));
     return it ? applyOverrides(it) : null;
   },
-  getAllItems: () => [...items.values()].filter(i => !removedIds.has(i.id)).map(applyOverrides),
+  addItemToMemory: item => {
+    const sId = String(item.id || Date.now());
+    removedIds.delete(sId);
+    const processed = applyOverrides({ ...item, id: sId });
+    items.set(sId, processed);
+    return processed;
+  },
   updateItemInMemory: (id, updates) => {
     const sId = String(id);
     if (removedIds.has(sId)) return null;

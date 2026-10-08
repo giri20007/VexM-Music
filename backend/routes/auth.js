@@ -1,195 +1,188 @@
 const router = require('express').Router();
-const crypto = require('crypto');
-const { generateToken, verifyToken, ADMIN_TELEGRAM_ID } = require('../middleware/auth');
+const fs = require('fs');
+const path = require('path');
+const { generateToken, verifyToken, ADMIN_USERNAME, ADMIN_PASSWORD } = require('../middleware/auth');
 const { logActivity } = require('../services/activityLog');
 
-const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '';
-let cachedBotUsername = process.env.TELEGRAM_BOT_USERNAME || '';
+const USERS_FILE = path.join(__dirname, '../data/users.json');
 
-// Fetch and cache Bot username on first request
-async function getBotUsername() {
-  if (cachedBotUsername) return cachedBotUsername;
-  if (!BOT_TOKEN) return '';
+// In-memory / persistent user cache
+function getRegisteredUsers() {
   try {
-    const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getMe`);
-    if (res.ok) {
-      const data = await res.json();
-      if (data.result && data.result.username) {
-        cachedBotUsername = data.result.username;
-        return cachedBotUsername;
-      }
+    if (fs.existsSync(USERS_FILE)) {
+      const data = fs.readFileSync(USERS_FILE, 'utf8');
+      return JSON.parse(data);
     }
-  } catch (err) {
-    console.warn('Could not fetch bot username from Telegram API:', err.message);
+  } catch {
+    // ignore
   }
-  return '';
+  return [];
 }
 
-// 1. Get Public Auth Configuration (Bot Username for Telegram Login Widget)
-router.get('/config', async (_req, res) => {
-  const botUsername = await getBotUsername();
-  res.json({
-    botUsername,
-    hasBotToken: Boolean(BOT_TOKEN),
+function saveRegisteredUsers(users) {
+  try {
+    const dir = path.dirname(USERS_FILE);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), 'utf8');
+  } catch (err) {
+    console.error('Could not persist users:', err.message);
+  }
+}
+
+// 1. Sign In / Login Endpoint (Supports Admin Spidey/MS710924 & Standard Users)
+router.post('/login', async (req, res) => {
+  const { username, password } = req.body || {};
+
+  if (!username || !password) {
+    return res.status(400).json({
+      error: true,
+      code: 'MISSING_CREDENTIALS',
+      message: 'Username and password required',
+    });
+  }
+
+  const cleanUser = String(username).trim();
+  const cleanPass = String(password);
+
+  // Check Hardcoded Admin Access (Spidey / MS710924)
+  if (
+    (cleanUser === ADMIN_USERNAME || cleanUser.toLowerCase() === ADMIN_USERNAME.toLowerCase()) &&
+    cleanPass === ADMIN_PASSWORD
+  ) {
+    const adminPayload = {
+      id: 'admin_spidey',
+      username: 'Spidey',
+      displayName: 'Spidey (Admin)',
+      role: 'ADMIN',
+      isAdmin: true,
+    };
+
+    const token = generateToken(adminPayload);
+    const isProd = process.env.NODE_ENV === 'production';
+
+    res.cookie('spx_session_token', token, {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: isProd ? 'none' : 'lax',
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+      path: '/',
+    });
+    res.cookie('spx_admin_token', token, {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: isProd ? 'none' : 'lax',
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+      path: '/',
+    });
+
+    logActivity('ADMIN_LOGIN_SUCCESS', { username: 'Spidey' }, req.ip);
+
+    return res.json({
+      success: true,
+      token,
+      user: adminPayload,
+    });
+  }
+
+  // Standard User Login
+  const users = getRegisteredUsers();
+  const matched = users.find(
+    u => u.username.toLowerCase() === cleanUser.toLowerCase() && u.password === cleanPass
+  );
+
+  if (matched) {
+    const userPayload = {
+      id: matched.id,
+      username: matched.username,
+      displayName: matched.displayName || matched.username,
+      role: 'user',
+      isAdmin: false,
+    };
+
+    const token = generateToken(userPayload);
+    const isProd = process.env.NODE_ENV === 'production';
+
+    res.cookie('spx_session_token', token, {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: isProd ? 'none' : 'lax',
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+      path: '/',
+    });
+
+    logActivity('USER_LOGIN_SUCCESS', { username: matched.username }, req.ip);
+
+    return res.json({
+      success: true,
+      token,
+      user: userPayload,
+    });
+  }
+
+  logActivity('AUTH_FAILED', { username: cleanUser }, req.ip);
+  return res.status(401).json({
+    error: true,
+    code: 'INVALID_CREDENTIALS',
+    message: 'Invalid username or password',
   });
 });
 
-/**
- * Verify Telegram Login Widget authentication payload
- * Data format: { id, first_name, last_name, username, photo_url, auth_date, hash }
- */
-function verifyTelegramWidgetAuth(data) {
-  if (!data || !data.hash || !data.id || !data.auth_date) {
-    return { valid: false, reason: 'Missing required Telegram auth fields' };
-  }
+// 2. Sign Up / Register Endpoint
+router.post('/signup', async (req, res) => {
+  const { username, password, displayName } = req.body || {};
 
-  if (!BOT_TOKEN) {
-    return { valid: false, reason: 'TELEGRAM_BOT_TOKEN is not configured on server' };
-  }
-
-  // Check auth_date not older than 24 hours (86400 seconds)
-  const now = Math.floor(Date.now() / 1000);
-  if (now - Number(data.auth_date) > 86400) {
-    return { valid: false, reason: 'Telegram authentication data has expired' };
-  }
-
-  // 1. Generate secret key: SHA256(BOT_TOKEN)
-  const secret = crypto.createHash('sha256').update(BOT_TOKEN).digest();
-
-  // 2. Build data_check_string from all fields except 'hash', sorted alphabetically
-  const dataCheckArr = [];
-  for (const [key, value] of Object.entries(data)) {
-    if (key !== 'hash' && value !== undefined && value !== null) {
-      dataCheckArr.push(`${key}=${value}`);
-    }
-  }
-  dataCheckArr.sort();
-  const dataCheckString = dataCheckArr.join('\n');
-
-  // 3. Compute HMAC-SHA256
-  const hmac = crypto.createHmac('sha256', secret).update(dataCheckString).digest('hex');
-
-  if (hmac !== data.hash) {
-    return { valid: false, reason: 'Invalid Telegram cryptographic signature' };
-  }
-
-  return { valid: true };
-}
-
-/**
- * Verify Telegram WebApp initData authentication payload
- */
-function verifyTelegramWebAppAuth(initData) {
-  if (!initData || typeof initData !== 'string') {
-    return { valid: false, reason: 'Missing initData string' };
-  }
-  if (!BOT_TOKEN) {
-    return { valid: false, reason: 'TELEGRAM_BOT_TOKEN is not configured on server' };
-  }
-
-  const urlParams = new URLSearchParams(initData);
-  const hash = urlParams.get('hash');
-  if (!hash) {
-    return { valid: false, reason: 'Missing hash in initData' };
-  }
-
-  urlParams.delete('hash');
-  const dataCheckArr = [];
-  for (const [key, value] of urlParams.entries()) {
-    dataCheckArr.push(`${key}=${value}`);
-  }
-  dataCheckArr.sort();
-  const dataCheckString = dataCheckArr.join('\n');
-
-  // Secret key for WebApp initData is HMAC-SHA256("WebAppData", BOT_TOKEN)
-  const secret = crypto.createHmac('sha256', 'WebAppData').update(BOT_TOKEN).digest();
-  const hmac = crypto.createHmac('sha256', secret).update(dataCheckString).digest('hex');
-
-  if (hmac !== hash) {
-    return { valid: false, reason: 'Invalid WebApp signature' };
-  }
-
-  let user = null;
-  const userStr = urlParams.get('user');
-  if (userStr) {
-    try {
-      user = JSON.parse(userStr);
-    } catch { /* ignore */ }
-  }
-
-  return { valid: true, user, authDate: urlParams.get('auth_date') };
-}
-
-// 2. Authenticate with Telegram (Widget or WebApp)
-router.post('/telegram', async (req, res) => {
-  const body = req.body || {};
-  let telegramUser = null;
-
-  if (body.initData) {
-    // WebApp flow
-    const verification = verifyTelegramWebAppAuth(body.initData);
-    if (!verification.valid) {
-      logActivity('AUTH_FAILED', { reason: verification.reason }, req.ip);
-      return res.status(401).json({
-        error: true,
-        code: 'INVALID_TELEGRAM_AUTH',
-        message: verification.reason,
-      });
-    }
-    telegramUser = verification.user;
-  } else if (body.hash && body.id) {
-    // Widget flow
-    const verification = verifyTelegramWidgetAuth(body);
-    if (!verification.valid) {
-      logActivity('AUTH_FAILED', { reason: verification.reason }, req.ip);
-      return res.status(401).json({
-        error: true,
-        code: 'INVALID_TELEGRAM_AUTH',
-        message: verification.reason,
-      });
-    }
-    telegramUser = {
-      id: body.id,
-      first_name: body.first_name,
-      last_name: body.last_name,
-      username: body.username,
-      photo_url: body.photo_url,
-    };
-  } else {
+  if (!username || !password) {
     return res.status(400).json({
       error: true,
-      code: 'MISSING_AUTH_DATA',
-      message: 'Telegram authentication data required',
+      code: 'MISSING_FIELDS',
+      message: 'Username and password required',
     });
   }
 
-  if (!telegramUser || !telegramUser.id) {
+  const cleanUser = String(username).trim();
+  const cleanPass = String(password);
+  const cleanName = displayName ? String(displayName).trim() : cleanUser;
+
+  if (cleanUser.toLowerCase() === ADMIN_USERNAME.toLowerCase()) {
     return res.status(400).json({
       error: true,
-      code: 'INVALID_USER_DATA',
-      message: 'Could not extract Telegram user details',
+      code: 'RESERVED_USERNAME',
+      message: 'This username is reserved. Please sign in as administrator.',
     });
   }
 
-  const telegramIdStr = String(telegramUser.id);
-  const isAdmin = telegramIdStr === String(ADMIN_TELEGRAM_ID);
-  const role = isAdmin ? 'admin' : 'user';
+  const users = getRegisteredUsers();
+  if (users.some(u => u.username.toLowerCase() === cleanUser.toLowerCase())) {
+    return res.status(409).json({
+      error: true,
+      code: 'USERNAME_EXISTS',
+      message: 'Username is already taken',
+    });
+  }
+
+  const newUser = {
+    id: `user_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
+    username: cleanUser,
+    password: cleanPass,
+    displayName: cleanName,
+    role: 'user',
+    createdAt: Date.now(),
+  };
+
+  users.push(newUser);
+  saveRegisteredUsers(users);
 
   const userPayload = {
-    id: telegramUser.id,
-    telegramId: telegramIdStr,
-    firstName: telegramUser.first_name || '',
-    lastName: telegramUser.last_name || '',
-    username: telegramUser.username || '',
-    photoUrl: telegramUser.photo_url || '',
-    role,
-    isAdmin,
+    id: newUser.id,
+    username: newUser.username,
+    displayName: newUser.displayName,
+    role: 'user',
+    isAdmin: false,
   };
 
   const token = generateToken(userPayload);
   const isProd = process.env.NODE_ENV === 'production';
 
-  // Set secure HTTP-Only cookie for 30 days
   res.cookie('spx_session_token', token, {
     httpOnly: true,
     secure: isProd,
@@ -198,15 +191,11 @@ router.post('/telegram', async (req, res) => {
     path: '/',
   });
 
-  logActivity('USER_LOGIN_SUCCESS', {
-    telegramId: telegramIdStr,
-    username: telegramUser.username,
-    isAdmin,
-  }, req.ip);
+  logActivity('USER_SIGNUP_SUCCESS', { username: cleanUser }, req.ip);
 
   res.json({
     success: true,
-    token, // For Authorization header fallback
+    token,
     user: userPayload,
   });
 });
@@ -245,15 +234,17 @@ router.get('/me', (req, res) => {
     });
   }
 
-  // Re-verify admin status dynamically
-  const isAdmin = String(decoded.telegramId || decoded.id) === String(ADMIN_TELEGRAM_ID) || decoded.role === 'admin';
+  const isAdmin =
+    decoded.role === 'ADMIN' ||
+    decoded.role === 'admin' ||
+    decoded.username?.toLowerCase() === ADMIN_USERNAME.toLowerCase();
 
   res.json({
     authenticated: true,
     user: {
       ...decoded,
       isAdmin,
-      role: isAdmin ? 'admin' : (decoded.role || 'user'),
+      role: isAdmin ? 'ADMIN' : (decoded.role || 'user'),
     },
   });
 });
