@@ -1,4 +1,4 @@
-import React, { useEffect, memo } from 'react';
+import React, { useEffect, useState, memo } from 'react';
 import {
   X,
   Play,
@@ -16,6 +16,7 @@ import {
   Sparkles,
   Heart,
   Minimize2,
+  Mic2,
 } from 'lucide-react';
 import { useAudioStore } from '../../store/useAudioStore';
 import { useSettingsStore } from '../../store/useSettingsStore';
@@ -23,13 +24,14 @@ import { seek } from '../../hooks/usePlayer';
 import { formatDuration, formatQualityBadge } from '../../utils/formatters';
 import { getArtworkSrc } from '../../utils/artworkGenerator';
 import { AudioVisualizer } from './AudioVisualizer';
+import { LyricsView } from './LyricsView';
 
 const FullscreenScrubber = memo(function FullscreenScrubber() {
   const currentTime = useAudioStore(s => s.currentTime);
   const duration = useAudioStore(s => s.duration);
 
   return (
-    <div className="w-full max-w-xl mx-auto space-y-1 select-none">
+    <div className="w-full max-w-2xl mx-auto space-y-1 select-none">
       <input
         type="range"
         min="0"
@@ -69,6 +71,9 @@ export function FullscreenVisualizerModal({ isOpen, onClose }) {
   const visualizerMode = useSettingsStore(s => s.visualizerMode);
   const setVisualizerMode = useSettingsStore(s => s.setVisualizerMode);
 
+  // Mobile active tab: 'visualizer' | 'lyrics'
+  const [mobileTab, setMobileTab] = useState('visualizer');
+
   useEffect(() => {
     if (!isOpen) return;
     const handleKeyDown = e => {
@@ -84,10 +89,10 @@ export function FullscreenVisualizerModal({ isOpen, onClose }) {
 
   const isLiked = likedTrackIds.includes(String(currentTrack.id));
   const quality = formatQualityBadge(currentTrack);
-  const coverSrc = getArtworkSrc(currentTrack, 300);
+  const coverSrc = getArtworkSrc(currentTrack, 400);
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-[#0b0608] text-warm-white animate-fade-in select-none overflow-hidden">
+    <div className="fixed inset-0 z-50 flex flex-col bg-[#080507] text-warm-white animate-fade-in select-none overflow-hidden font-sans">
       {/* Dynamic Background Blur Layer */}
       <div
         className="absolute inset-0 opacity-15 filter blur-3xl pointer-events-none -z-10 bg-cover bg-center scale-125"
@@ -103,13 +108,13 @@ export function FullscreenVisualizerModal({ isOpen, onClose }) {
               SPiDEY<span className="brand-x-neon">x</span>FLASH
             </span>
             <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-accent/15 border border-accent/30 text-accent">
-              Live Visualizer
+              Immersive Mode
             </span>
           </div>
         </div>
 
         {/* Center: Mode Switcher */}
-        <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-black/60 backdrop-blur-md border border-white/10 shadow-lg">
+        <div className="hidden sm:flex items-center gap-1.5 p-1 rounded-2xl bg-black/60 backdrop-blur-md border border-white/10 shadow-lg">
           <button
             onClick={() => setVisualizerMode('orbital')}
             className={`flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold transition ${
@@ -147,6 +152,26 @@ export function FullscreenVisualizerModal({ isOpen, onClose }) {
           </button>
         </div>
 
+        {/* Mobile Tab Switcher */}
+        <div className="flex sm:hidden items-center gap-1 p-1 rounded-xl bg-black/60 border border-white/10">
+          <button
+            onClick={() => setMobileTab('visualizer')}
+            className={`px-3 py-1 rounded-lg text-xs font-bold transition ${
+              mobileTab === 'visualizer' ? 'bg-accent text-bg-primary' : 'text-warm-muted'
+            }`}
+          >
+            Visualizer
+          </button>
+          <button
+            onClick={() => setMobileTab('lyrics')}
+            className={`px-3 py-1 rounded-lg text-xs font-bold transition ${
+              mobileTab === 'lyrics' ? 'bg-accent text-bg-primary' : 'text-warm-muted'
+            }`}
+          >
+            Lyrics
+          </button>
+        </div>
+
         {/* Right: Minimize / Close Button */}
         <button
           onClick={onClose}
@@ -158,13 +183,39 @@ export function FullscreenVisualizerModal({ isOpen, onClose }) {
         </button>
       </header>
 
-      {/* Main Center Visualization Canvas Area */}
-      <main className="flex-1 relative flex items-center justify-center p-4 sm:p-8 overflow-hidden">
-        <AudioVisualizer
-          mode={visualizerMode}
-          interactive={false}
-          className="w-full h-full border-none bg-transparent shadow-none"
-        />
+      {/* Main Content Area: Split Dual-Panel on Desktop (Visualizer Left, Synced Lyrics Right) */}
+      <main className="flex-1 max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-6 p-4 sm:p-8 items-center overflow-hidden">
+        {/* Left Column: Audio Visualizer */}
+        <div
+          className={`lg:col-span-6 h-full flex flex-col items-center justify-center relative overflow-hidden rounded-3xl bg-black/40 border border-white/5 backdrop-blur-md shadow-2xl p-4 ${
+            mobileTab !== 'visualizer' ? 'hidden lg:flex' : 'flex'
+          }`}
+        >
+          <AudioVisualizer
+            mode={visualizerMode}
+            interactive={false}
+            className="w-full h-full border-none bg-transparent shadow-none"
+          />
+        </div>
+
+        {/* Right Column: Synchronized Lyrics Panel */}
+        <div
+          className={`lg:col-span-6 h-full flex flex-col rounded-3xl bg-bg-secondary/60 border border-white/10 backdrop-blur-xl p-6 shadow-2xl overflow-hidden ${
+            mobileTab !== 'lyrics' ? 'hidden lg:flex' : 'flex'
+          }`}
+        >
+          <div className="flex items-center justify-between pb-3 border-b border-white/5 mb-3">
+            <div className="flex items-center gap-2 text-xs font-bold text-warm-muted">
+              <Mic2 className="w-4 h-4 text-accent" />
+              <span>Synchronized Lyrics</span>
+            </div>
+            <span className="text-[11px] text-warm-muted/60">Click any line to seek</span>
+          </div>
+
+          <div className="flex-1 overflow-hidden">
+            <LyricsView track={currentTrack} />
+          </div>
+        </div>
       </main>
 
       {/* Bottom Floating Player Controls Bar */}
@@ -172,7 +223,7 @@ export function FullscreenVisualizerModal({ isOpen, onClose }) {
         {/* Scrubber */}
         <FullscreenScrubber />
 
-        {/* Bottom Dual Bar: Track Info + Playback Controls + Volume */}
+        {/* Bottom Bar: Track Info + Playback Controls + Volume */}
         <div className="max-w-7xl mx-auto w-full flex items-center justify-between gap-4">
           {/* Left: Floating Track Pill with Thumbnail */}
           <div className="flex items-center gap-3 min-w-0 max-w-xs">

@@ -32,7 +32,14 @@ router.get('/:id', async (req, res) => {
           );
 
           if (extracted && extracted.raw) {
-            lyrics = setLyrics(id, extracted.raw, extracted.type, 'embedded', extracted.language);
+            lyrics = setLyrics(
+              id,
+              extracted.raw,
+              extracted.type,
+              'embedded',
+              extracted.language,
+              track?.duration || 0
+            );
           }
         }
       }
@@ -49,20 +56,25 @@ router.get('/:id', async (req, res) => {
   if (!lyrics) {
     return res.status(404).json({
       error: true,
+      available: false,
       code: 'LYRICS_NOT_FOUND',
       message: 'Lyrics unavailable for this track',
     });
   }
 
+  const isSynced = lyrics.type === 'synced' || (lyrics.lines && lyrics.lines.length > 0);
+
   res.set('Cache-Control', 'public, max-age=3600').json({
+    available: true,
     trackId: id,
     title: track?.title || '',
     artist: track?.artist || '',
-    type: lyrics.type,
-    source: lyrics.source || 'admin',
+    type: isSynced ? 'synced' : 'plain',
+    synced: isSynced,
+    source: lyrics.source || 'embedded',
     language: lyrics.language || '',
+    lines: isSynced ? lyrics.lines : [],
     raw: lyrics.raw,
-    lines: lyrics.lines,
     updatedAt: lyrics.updatedAt,
   });
 });

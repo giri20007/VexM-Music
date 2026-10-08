@@ -5,12 +5,15 @@ const { logActivity } = require('./activityLog');
 const DATA_DIR = path.join(__dirname, '..', 'data');
 const LYRICS_FILE = path.join(DATA_DIR, 'lyrics_cache.json');
 
-let lyricsStore = new Map(); // trackId -> { type: 'synced'|'plain', source: 'embedded'|'admin', raw: string, lines: Array<{time: number, text: string}>, updatedAt: string }
+let lyricsStore = new Map(); // trackId -> { type: 'synced'|'plain', source: 'embedded'|'admin', raw: string, lines: Array<{start: number, end: number, time: number, text: string}>, language: string, updatedAt: string }
 const negativeCache = new Map(); // trackId -> timestamp checked
 
-function parseLRC(rawLrc) {
+/**
+ * Parse LRC / SRT-style timestamped lyrics and normalize start & end times
+ */
+function parseLRC(rawLrc, trackDuration = 0) {
   if (!rawLrc || typeof rawLrc !== 'string') return [];
-  const lines = [];
+  const rawEntries = [];
   const timeRegex = /\[(\d{1,2}):(\d{2})(?:[.:](\d{2,3}))?\]/g;
   let globalOffsetMs = 0;
 
@@ -43,13 +46,36 @@ function parseLRC(rawLrc) {
         }
         let totalSecs = mins * 60 + secs + (ms / 1000) + (globalOffsetMs / 1000);
         if (totalSecs < 0) totalSecs = 0;
-        lines.push({ time: Number(totalSecs.toFixed(3)), text: text || '♪' });
+        rawEntries.push({
+          start: Number(totalSecs.toFixed(3)),
+          text: text || '♪',
+        });
       }
     }
   }
 
-  lines.sort((a, b) => a.time - b.time);
-  return lines;
+  rawEntries.sort((a, b) => a.start - b.start);
+
+  // Calculate duration-bounded end times
+  const normalizedLines = [];
+  for (let i = 0; i < rawEntries.length; i++) {
+    const current = rawEntries[i];
+    let end = 0;
+    if (i < rawEntries.length - 1) {
+      end = rawEntries[i + 1].start;
+    } else {
+      end = trackDuration > current.start ? trackDuration : current.start + 5.0;
+    }
+
+    normalizedLines.push({
+      start: current.start,
+      end: Number(end.toFixed(3)),
+      time: current.start, // backward compatibility
+      text: current.text,
+    });
+  }
+
+  return normalizedLines;
 }
 
 function loadLyricsData() {
@@ -93,7 +119,7 @@ function setNegativeCached(trackId) {
   negativeCache.set(String(trackId), Date.now());
 }
 
-function setLyrics(trackId, rawContent, type = 'auto', source = 'admin', language = '') {
+function setLyrics(trackId, rawContent, type = 'auto', source = 'admin', language = '', trackDuration = 0) {
   const id = String(trackId);
   negativeCache.delete(id);
 
@@ -104,11 +130,13 @@ function setLyrics(trackId, rawContent, type = 'auto', source = 'admin', languag
     return null;
   }
 
-  const parsedLines = parseLRC(rawContent);
+  const parsedLines = parseLRC(rawContent, trackDuration);
   const isSynced = type === 'synced' || (type === 'auto' && parsedLines.length > 0);
 
   const entry = {
+    available: true,
     type: isSynced ? 'synced' : 'plain',
+    synced: isSynced,
     source: source || 'admin',
     language: language || '',
     raw: rawContent.trim(),

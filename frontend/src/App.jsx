@@ -6,6 +6,7 @@ import { MobileNav } from './components/layout/MobileNav';
 import { GlobalSearchModal } from './components/layout/GlobalSearchModal';
 import { LivelyBackground } from './components/layout/LivelyBackground';
 import { NewTracksBanner } from './components/layout/NewTracksBanner';
+import { TelegramAuthScreen } from './components/auth/TelegramAuthScreen';
 
 import { NowPlayingModal } from './components/player/NowPlayingModal';
 import { QueueDrawer } from './components/player/QueueDrawer';
@@ -27,8 +28,15 @@ import { usePlayer } from './hooks/usePlayer';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useSettingsStore } from './store/useSettingsStore';
 import { useAudioStore } from './store/useAudioStore';
+import { useAuthStore } from './store/useAuthStore';
+import { Radio, RefreshCw, ShieldAlert, ArrowLeft } from 'lucide-react';
 
 export default function App() {
+  const isAuthenticated = useAuthStore(s => s.isAuthenticated);
+  const isCheckingAuth = useAuthStore(s => s.isCheckingAuth);
+  const user = useAuthStore(s => s.user);
+  const checkAuth = useAuthStore(s => s.checkAuth);
+
   usePlayer();
   useKeyboardShortcuts();
   const lib = useLibrary();
@@ -49,6 +57,7 @@ export default function App() {
   useEffect(() => {
     setTheme(theme);
     setAccentColor(accentColor);
+    checkAuth();
   }, []);
 
   // Handle URL hash routing if user enters /#admin or /#settings
@@ -70,8 +79,51 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // If in Admin route, render dedicated Admin Panel
+  // 1. Loading screen while validating initial session
+  if (isCheckingAuth) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-bg-primary text-warm-white space-y-4">
+        <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-accent to-[#f43f5e] flex items-center justify-center text-bg-primary shadow-xl shadow-accent/20 animate-pulse">
+          <Radio className="w-7 h-7 fill-bg-primary stroke-bg-primary" />
+        </div>
+        <div className="flex items-center gap-2 text-xs font-semibold text-warm-muted">
+          <RefreshCw className="w-4 h-4 animate-spin text-accent" />
+          <span>Verifying session with backend...</span>
+        </div>
+      </div>
+    );
+  }
+
+  // 2. Telegram Authentication First Screen
+  if (!isAuthenticated) {
+    return <TelegramAuthScreen />;
+  }
+
+  // 3. Admin Route Protection
   if (currentRoute === 'admin') {
+    if (!user?.isAdmin) {
+      return (
+        <div className="min-h-screen flex items-center justify-center p-6 bg-bg-primary text-warm-white select-none">
+          <div className="max-w-md w-full p-8 rounded-3xl bg-bg-secondary border border-red-500/20 text-center space-y-4 shadow-2xl">
+            <div className="w-12 h-12 rounded-2xl bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-400 mx-auto">
+              <ShieldAlert className="w-6 h-6" />
+            </div>
+            <h2 className="text-xl font-black text-warm-white">Access Denied (403)</h2>
+            <p className="text-xs text-warm-muted leading-relaxed">
+              Admin privileges are restricted to authorized Telegram accounts. User ID <span className="font-mono text-warm-white">{user?.telegramId || user?.id}</span> is not an administrator.
+            </p>
+            <button
+              onClick={() => navigate('home')}
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-accent text-bg-primary font-bold text-xs shadow-lg shadow-accent/20 hover:scale-105 transition"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>Return to Player</span>
+            </button>
+          </div>
+        </div>
+      );
+    }
+
     return <AdminPage onBackToApp={() => navigate('home')} />;
   }
 

@@ -98,10 +98,25 @@ export function AdminLibrary() {
       album: track.album && track.album !== 'Unknown Album' ? track.album : '',
       albumArtist: track.albumArtist && track.albumArtist !== 'Unknown Artist' ? track.albumArtist : '',
       genre: track.genre || '',
+      language: track.language || '',
       year: track.year ? String(track.year) : '',
       trackNumber: track.trackNumber ? String(track.trackNumber) : '',
       artworkUrl: track.thumbnail && !track.thumbnail.startsWith('/api/artwork') ? track.thumbnail : '',
     });
+  };
+
+  const handleArtworkFileUpload = e => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      showToast('Please select a valid image file (JPG, PNG, WebP)', 'error');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = ev => {
+      setEditForm(prev => ({ ...prev, artworkUrl: ev.target?.result || '' }));
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleSaveEdit = async e => {
@@ -116,16 +131,15 @@ export function AdminLibrary() {
         album: editForm.album,
         albumArtist: editForm.albumArtist,
         genre: editForm.genre,
+        language: editForm.language,
         year: editForm.year ? Number(editForm.year) : null,
         trackNumber: editForm.trackNumber ? Number(editForm.trackNumber) : null,
       };
 
       await adminUpdateTrack(editingTrack.id, updates);
-      if (editForm.artworkUrl) {
-        await adminSaveArtwork(editingTrack.id, editForm.artworkUrl);
-      }
+      await adminSaveArtwork(editingTrack.id, editForm.artworkUrl || null);
 
-      showToast('Track metadata updated successfully', 'success');
+      showToast('Track metadata and artwork updated successfully', 'success');
       setEditingTrack(null);
       fetchLibraryData(page, searchQuery);
     } catch (err) {
@@ -354,13 +368,24 @@ export function AdminLibrary() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-4 gap-3">
                 <div className="space-y-1">
                   <label className="font-semibold text-warm-muted">Genre</label>
                   <input
                     type="text"
                     value={editForm.genre}
                     onChange={e => setEditForm({ ...editForm, genre: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl bg-bg-card border border-white/10 text-warm-white focus:outline-none focus:border-accent"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="font-semibold text-warm-muted">Language</label>
+                  <input
+                    type="text"
+                    placeholder="Tamil, English..."
+                    value={editForm.language}
+                    onChange={e => setEditForm({ ...editForm, language: e.target.value })}
                     className="w-full px-3 py-2 rounded-xl bg-bg-card border border-white/10 text-warm-white focus:outline-none focus:border-accent"
                   />
                 </div>
@@ -386,15 +411,55 @@ export function AdminLibrary() {
                 </div>
               </div>
 
-              <div className="space-y-1">
-                <label className="font-semibold text-warm-muted">Custom Artwork URL</label>
-                <input
-                  type="url"
-                  placeholder="https://... (or leave empty for Telegram artwork)"
-                  value={editForm.artworkUrl}
-                  onChange={e => setEditForm({ ...editForm, artworkUrl: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl bg-bg-card border border-white/10 text-warm-white focus:outline-none focus:border-accent"
-                />
+              {/* Artwork Management: URL or Local File Upload + Live Preview */}
+              <div className="space-y-2 p-3 rounded-2xl bg-bg-secondary/70 border border-white/5">
+                <div className="flex items-center justify-between">
+                  <label className="font-semibold text-warm-muted">Cover Artwork</label>
+                  {editForm.artworkUrl && (
+                    <button
+                      type="button"
+                      onClick={() => setEditForm({ ...editForm, artworkUrl: '' })}
+                      className="text-[11px] text-red-400 hover:underline"
+                    >
+                      Revert to Telegram Artwork
+                    </button>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <div className="w-14 h-14 rounded-xl overflow-hidden bg-black/40 border border-white/10 flex-shrink-0 flex items-center justify-center">
+                    {editForm.artworkUrl ? (
+                      <img src={editForm.artworkUrl} alt="Cover Preview" className="w-full h-full object-cover" />
+                    ) : (
+                      <img src={artworkUrl(editingTrack.id, editingTrack.title)} alt="Current" className="w-full h-full object-cover" />
+                    )}
+                  </div>
+
+                  <div className="flex-1 space-y-1.5">
+                    <input
+                      type="url"
+                      placeholder="Paste Image URL (https://...)"
+                      value={editForm.artworkUrl}
+                      onChange={e => setEditForm({ ...editForm, artworkUrl: e.target.value })}
+                      className="w-full px-3 py-1.5 rounded-xl bg-bg-card border border-white/10 text-xs text-warm-white focus:outline-none focus:border-accent"
+                    />
+
+                    <div className="flex items-center gap-2">
+                      <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-[11px] font-semibold text-warm-white transition border border-white/10">
+                        <span>Upload Custom Cover</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleArtworkFileUpload}
+                          className="hidden"
+                        />
+                      </label>
+                      <span className="text-[10px] text-warm-muted/60">
+                        {editForm.artworkUrl?.startsWith('data:image') ? '✓ Custom file attached' : 'JPG, PNG, WebP'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <div className="flex items-center justify-end gap-2 pt-3">

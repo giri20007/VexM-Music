@@ -63,6 +63,7 @@ app.get('/api/health', (_req, res) => res.json({
 }));
 
 // Route Handlers
+app.use('/api/auth', require('./routes/auth'));
 app.use('/api/library', require('./routes/library').router);
 app.use('/api/metadata', require('./routes/metadata'));
 app.use('/api/stream', require('./routes/stream'));

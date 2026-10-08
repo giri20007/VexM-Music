@@ -1,7 +1,7 @@
-export function parseLrc(lrcContent) {
+export function parseLrc(lrcContent, trackDuration = 0) {
   if (!lrcContent || typeof lrcContent !== 'string') return [];
-  const lines = [];
-  const timeRegex = /\[(\d{1,2}):(\d{2})(?:\.(\d{2,3}))?\]/g;
+  const rawEntries = [];
+  const timeRegex = /\[(\d{1,2}):(\d{2})(?:[.:](\d{2,3}))?\]/g;
 
   const rawLines = lrcContent.split('\n');
   for (let i = 0; i < rawLines.length; i++) {
@@ -16,12 +16,29 @@ export function parseLrc(lrcContent) {
         const secs = parseInt(m[2], 10);
         const ms = m[3] ? (m[3].length === 2 ? parseInt(m[3], 10) * 10 : parseInt(m[3], 10)) : 0;
         const totalSecs = mins * 60 + secs + ms / 1000;
-        lines.push({ id: `line_${i}_${totalSecs}`, time: totalSecs, text });
+        rawEntries.push({ id: `line_${i}_${totalSecs}`, start: totalSecs, time: totalSecs, text: text || '♪' });
       }
     }
   }
 
-  lines.sort((a, b) => a.time - b.time);
+  rawEntries.sort((a, b) => a.start - b.start);
+
+  // Compute end timestamps
+  const lines = [];
+  for (let i = 0; i < rawEntries.length; i++) {
+    const cur = rawEntries[i];
+    let end = 0;
+    if (i < rawEntries.length - 1) {
+      end = rawEntries[i + 1].start;
+    } else {
+      end = trackDuration > cur.start ? trackDuration : cur.start + 5.0;
+    }
+    lines.push({
+      ...cur,
+      end: Number(end.toFixed(3)),
+    });
+  }
+
   return lines;
 }
 
@@ -31,7 +48,8 @@ export function findActiveLyricIndex(lines, currentTime, offsetMs = 0) {
 
   let activeIndex = -1;
   for (let i = 0; i < lines.length; i++) {
-    if (lines[i].time <= adjustedTime) {
+    const lineStart = lines[i].start !== undefined ? lines[i].start : lines[i].time;
+    if (lineStart <= adjustedTime) {
       activeIndex = i;
     } else {
       break;

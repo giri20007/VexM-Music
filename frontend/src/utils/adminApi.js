@@ -1,28 +1,32 @@
 import { BASE_URL } from './api';
 
-let adminTokenCache = localStorage.getItem('spx_admin_jwt') || '';
+export function getAdminToken() {
+  return (
+    localStorage.getItem('spx_user_token') ||
+    localStorage.getItem('spx_admin_jwt') ||
+    ''
+  );
+}
 
 export function setAdminToken(token) {
-  adminTokenCache = token || '';
   if (token) {
     localStorage.setItem('spx_admin_jwt', token);
+    localStorage.setItem('spx_user_token', token);
   } else {
     localStorage.removeItem('spx_admin_jwt');
+    localStorage.removeItem('spx_user_token');
   }
 }
 
-export function getAdminToken() {
-  return adminTokenCache;
-}
-
 async function adminRequest(path, options = {}) {
+  const token = getAdminToken();
   const headers = {
     'Content-Type': 'application/json',
     ...(options.headers || {}),
   };
 
-  if (adminTokenCache) {
-    headers['Authorization'] = `Bearer ${adminTokenCache}`;
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
   }
 
   const res = await fetch(`${BASE_URL}${path}`, {
@@ -77,10 +81,10 @@ export const adminRemoveTrack = id =>
   adminRequest(`/api/admin/tracks/${encodeURIComponent(id)}`, { method: 'DELETE' });
 
 export const adminGetLyrics = id => adminRequest(`/api/admin/tracks/${encodeURIComponent(id)}/lyrics`);
-export const adminSaveLyrics = (id, content, type = 'auto') =>
+export const adminSaveLyrics = (id, content, type = 'auto', language = '') =>
   adminRequest(`/api/admin/tracks/${encodeURIComponent(id)}/lyrics`, {
     method: 'POST',
-    body: JSON.stringify({ content, type }),
+    body: JSON.stringify({ content, type, language }),
   });
 export const adminDeleteLyrics = id =>
   adminRequest(`/api/admin/tracks/${encodeURIComponent(id)}/lyrics`, { method: 'DELETE' });
@@ -122,4 +126,3 @@ export const adminOverrideArtwork = (id, coverType, coverSource) =>
     method: 'POST',
     body: JSON.stringify({ coverType, coverSource }),
   });
-

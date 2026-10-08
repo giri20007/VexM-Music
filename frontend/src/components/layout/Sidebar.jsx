@@ -9,14 +9,16 @@ import {
   Heart,
   Plus,
   Settings,
-  ShieldAlert,
+  Shield,
   Music2,
   ChevronLeft,
   ChevronRight,
   ListMusic,
+  LogOut,
+  Sparkles,
 } from 'lucide-react';
 import { useAudioStore } from '../../store/useAudioStore';
-import { useAdminStore } from '../../store/useAdminStore';
+import { useAuthStore } from '../../store/useAuthStore';
 
 export function Sidebar({ currentRoute, onNavigate }) {
   const [collapsed, setCollapsed] = useState(false);
@@ -26,7 +28,8 @@ export function Sidebar({ currentRoute, onNavigate }) {
   const likedTrackIds = useAudioStore(s => s.likedTrackIds);
   const playlists = useAudioStore(s => s.playlists);
   const createPlaylist = useAudioStore(s => s.createPlaylist);
-  const isAuthenticated = useAdminStore(s => s.isAuthenticated);
+  const user = useAuthStore(s => s.user);
+  const logout = useAuthStore(s => s.logout);
 
   const handleCreatePlaylist = e => {
     e.preventDefault();
@@ -67,9 +70,15 @@ export function Sidebar({ currentRoute, onNavigate }) {
                 <span className="brand-text-neon text-base tracking-tight select-none">
                   SPiDEY<span className="brand-x-neon">x</span>FLASH
                 </span>
-                <span className="brand-tag-neon text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md">
-                  PRO
-                </span>
+                {user?.isAdmin ? (
+                  <span className="brand-tag-neon text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-accent/25 border border-accent/40 text-accent">
+                    ADMIN
+                  </span>
+                ) : (
+                  <span className="brand-tag-neon text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md">
+                    PRO
+                  </span>
+                )}
               </div>
             </div>
           )}
@@ -129,7 +138,7 @@ export function Sidebar({ currentRoute, onNavigate }) {
         {/* Liked Songs Entry */}
         <button
           onClick={() => onNavigate('liked')}
-          className={`w-full flex items-center gap-3.5 px-3 py-2.5 rounded-xl text-sm transition-all duration-150 ${
+          className={`w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-sm transition-all duration-150 ${
             currentRoute === 'liked'
               ? 'bg-bg-active text-warm-white font-semibold'
               : 'text-warm-muted hover:text-warm-white hover:bg-white/5'
@@ -193,8 +202,24 @@ export function Sidebar({ currentRoute, onNavigate }) {
         )}
       </div>
 
-      {/* Bottom Footer Section: Settings & Admin */}
+      {/* Bottom Footer Section: Settings & (Admin Only) */}
       <div className="p-3 border-t border-white/5 space-y-1">
+        {/* Admin Dashboard Entry: Only visible to authenticated Admin User (ID 5216415651) */}
+        {user?.isAdmin && (
+          <button
+            onClick={() => onNavigate('admin')}
+            className={`w-full flex items-center gap-3.5 px-3.5 py-2 rounded-xl text-xs font-semibold transition ${
+              currentRoute === 'admin'
+                ? 'bg-accent text-bg-primary shadow-md'
+                : 'bg-accent/10 border border-accent/20 text-accent hover:bg-accent/20'
+            }`}
+            title={collapsed ? 'Admin Panel' : undefined}
+          >
+            <Shield className="w-4 h-4 flex-shrink-0" />
+            {!collapsed && <span>Admin Dashboard</span>}
+          </button>
+        )}
+
         <button
           onClick={() => onNavigate('settings')}
           className={`w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-sm font-medium transition ${
@@ -208,19 +233,33 @@ export function Sidebar({ currentRoute, onNavigate }) {
           {!collapsed && <span>Settings</span>}
         </button>
 
-        {/* Admin Dashboard Entry */}
-        <button
-          onClick={() => onNavigate('admin')}
-          className={`w-full flex items-center gap-3.5 px-3.5 py-2 rounded-xl text-xs font-medium transition ${
-            currentRoute === 'admin'
-              ? 'bg-bg-active text-accent font-semibold'
-              : 'text-warm-muted/60 hover:text-warm-white hover:bg-white/5'
-          }`}
-          title={collapsed ? 'Admin Panel' : undefined}
-        >
-          <ShieldAlert className="w-4 h-4 flex-shrink-0" />
-          {!collapsed && <span>{isAuthenticated ? 'Admin Panel' : 'Owner Access'}</span>}
-        </button>
+        {/* User profile / Logout snippet */}
+        {!collapsed && user && (
+          <div className="pt-2 mt-1 border-t border-white/5 flex items-center justify-between px-2 text-xs">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="w-6 h-6 rounded-full overflow-hidden bg-accent/20 border border-white/10 flex-shrink-0">
+                {user.photoUrl ? (
+                  <img src={user.photoUrl} alt={user.firstName} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-[10px] font-bold text-accent">
+                    {(user.firstName?.[0] || 'U').toUpperCase()}
+                  </div>
+                )}
+              </div>
+              <span className="truncate text-[11px] text-warm-muted font-medium">
+                {user.firstName || user.username || 'Telegram User'}
+              </span>
+            </div>
+            <button
+              onClick={logout}
+              className="p-1 rounded text-warm-muted/60 hover:text-red-400 transition"
+              title="Sign Out"
+              aria-label="Sign out"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        )}
       </div>
     </aside>
   );

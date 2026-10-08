@@ -202,13 +202,14 @@ router.patch('/tracks/:id', (req, res) => {
   const existing = getItem(id);
   if (!existing) return res.status(404).json({ error: true, code: 'TRACK_NOT_FOUND', message: 'Track not found' });
 
-  const { title, artist, album, albumArtist, genre, year, trackNumber, discNumber } = req.body;
+  const { title, artist, album, albumArtist, genre, year, trackNumber, discNumber, language } = req.body;
   const updates = {};
   if (typeof title === 'string') updates.title = title.trim();
   if (typeof artist === 'string') updates.artist = artist.trim();
   if (typeof album === 'string') updates.album = album.trim();
   if (typeof albumArtist === 'string') updates.albumArtist = albumArtist.trim();
   if (typeof genre === 'string') updates.genre = genre.trim();
+  if (typeof language === 'string') updates.language = language.trim();
   if (year !== undefined) updates.year = year ? Number(year) : null;
   if (trackNumber !== undefined) updates.trackNumber = trackNumber ? Number(trackNumber) : null;
   if (discNumber !== undefined) updates.discNumber = discNumber ? Number(discNumber) : null;
@@ -242,8 +243,9 @@ router.get('/tracks/:id/lyrics', (req, res) => {
 
 router.post('/tracks/:id/lyrics', (req, res) => {
   const { id } = req.params;
-  const { content, type } = req.body || {};
-  const lyrics = setLyrics(id, content, type);
+  const { content, type, language } = req.body || {};
+  const track = getItem(id);
+  const lyrics = setLyrics(id, content, type, 'admin', language || '', track?.duration || 0);
   res.json({ success: true, lyrics });
 });
 
