@@ -252,12 +252,49 @@ router.delete('/tracks/:id/lyrics', (req, res) => {
   res.json({ success: true, message: 'Lyrics deleted' });
 });
 
-// 12. Custom Artwork
+// 12. Custom Artwork & Artwork Management
 router.post('/tracks/:id/artwork', (req, res) => {
   const { id } = req.params;
   const { artworkUrl } = req.body || {};
   setArtwork(id, artworkUrl || null);
   res.json({ success: true, artworkUrl: artworkUrl || null });
+});
+
+router.get('/artwork/health', (req, res) => {
+  const { CoverDetector } = require('../utils/telegramApi');
+  const items = getAllItems();
+  const health = CoverDetector ? CoverDetector.getArtworkHealth(items) : { totalTracks: items.length };
+  res.json(health);
+});
+
+router.get('/artwork/diagnostics/:id', (req, res) => {
+  const { CoverDetector } = require('../utils/telegramApi');
+  const diagnostics = CoverDetector ? CoverDetector.getArtworkDiagnostics(req.params.id) : { trackId: req.params.id, confidence: 0 };
+  res.json(diagnostics);
+});
+
+router.post('/artwork/rescan', async (req, res, next) => {
+  try {
+    const { rescanArtwork } = require('../utils/telegramApi');
+    const items = getAllItems();
+    const result = await rescanArtwork(items);
+    logActivity('ARTWORK_RESCAN_COMPLETED', { updatedCount: result.updatedCount });
+    res.json(result);
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post('/artwork/override/:id', (req, res) => {
+  const { id } = req.params;
+  const { source, customUrl } = req.body || {};
+  if (source === 'custom' && customUrl) {
+    setArtwork(id, customUrl);
+  } else if (source === 'automatic') {
+    setArtwork(id, null);
+  }
+  logActivity('ARTWORK_OVERRIDE_SET', { trackId: id, source, customUrl });
+  res.json({ success: true, message: `Artwork source updated to ${source}` });
 });
 
 // 13. Telegram Diagnostics & Connection Tester

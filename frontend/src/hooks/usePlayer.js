@@ -21,6 +21,11 @@ let audioCtx = null;
 let sourceNode = null;
 let eqFilters = [];
 let gainNode = null;
+let analyserNode = null;
+let preloadAudio = typeof Audio !== 'undefined' ? new Audio() : null;
+if (preloadAudio) {
+  preloadAudio.preload = 'none';
+}
 
 function setupWebAudio() {
   if (audioCtx || !audio) return;
@@ -30,6 +35,9 @@ function setupWebAudio() {
     audioCtx = new AudioContext();
     sourceNode = audioCtx.createMediaElementSource(audio);
     gainNode = audioCtx.createGain();
+    analyserNode = audioCtx.createAnalyser();
+    analyserNode.fftSize = 256;
+    analyserNode.smoothingTimeConstant = 0.8;
 
     // Create 10-band peaking equalizer filters
     eqFilters = EQ_FREQUENCIES.map((freq, idx) => {
@@ -47,16 +55,20 @@ function setupWebAudio() {
       return filter;
     });
 
-    // Chain: source -> eq0 -> eq1 ... eq9 -> gain -> destination
+    // Chain: source -> eq0 -> eq1 ... eq9 -> gain -> analyser -> destination
     let lastNode = sourceNode;
     eqFilters.forEach(f => {
       lastNode.connect(f);
       lastNode = f;
     });
     lastNode.connect(gainNode);
-    gainNode.connect(audioCtx.destination);
+    gainNode.connect(analyserNode);
+    analyserNode.connect(audioCtx.destination);
+
+    window.__SPX_ANALYSER__ = analyserNode;
+    window.__SPX_AUDIO_CTX__ = audioCtx;
   } catch (err) {
-    console.warn('Web Audio Equalizer initialization skipped:', err.message);
+    console.warn('Web Audio initialization skipped:', err.message);
   }
 }
 
@@ -73,6 +85,8 @@ export function usePlayer() {
   const volumeNormalization = useSettingsStore(s => s.volumeNormalization);
 
   const isFirstPlay = useRef(true);
+  const playLoggedRef = useRef(false);
+  const preloadedTrackIdRef = useRef(null);
 
   // 1. One-time Event Wiring
   useEffect(() => {
@@ -82,7 +96,29 @@ export function usePlayer() {
     const S = () => useAudioStore.getState();
 
     const onTimeUpdate = () => {
-      S().set({ currentTime: audio.currentTime });
+      const cur = audio.currentTime;
+      S().set({ currentTime: cur });
+
+      // 30s playback tracking threshold
+      const dur = audio.duration || S().currentTrack?.duration || 0;
+      if (!playLoggedRef.current && (cur >= 30 || (dur > 0 && cur >= dur * 0.5))) {
+        playLoggedRef.current = true;
+        if (S().currentTrack) {
+          S().recordPlay(S().currentTrack);
+        }
+      }
+
+      // Gapless Preloading for next track (15 seconds before track end)
+      if (dur > 20 && cur > dur - 15 && preloadAudio) {
+        const queue = S().queue;
+        const currentIdx = queue.findIndex(t => t.id === S().currentTrack?.id);
+        const nextTrack = currentIdx >= 0 && currentIdx < queue.length - 1 ? queue[currentIdx + 1] : null;
+        if (nextTrack && preloadedTrackIdRef.current !== nextTrack.id) {
+          preloadedTrackIdRef.current = nextTrack.id;
+          preloadAudio.src = streamUrl(nextTrack.id);
+          preloadAudio.load();
+        }
+      }
     };
 
     const onLoadedMetadata = () => {
@@ -107,12 +143,20 @@ export function usePlayer() {
     };
 
     const onEnded = () => {
-      const mode = S().repeatMode;
+      const state = S();
+      // Check Sleep Timer "End of track" mode
+      if (state.sleepTimer?.mode === 'end_of_track') {
+        audio.pause();
+        state.set({ isPlaying: false, sleepTimer: null });
+        return;
+      }
+
+      const mode = state.repeatMode;
       if (mode === 'one') {
         audio.currentTime = 0;
         audio.play().catch(() => {});
       } else {
-        S().next();
+        state.next();
       }
     };
 
@@ -146,9 +190,30 @@ export function usePlayer() {
     };
   }, []);
 
+  // Sleep Timer Countdown Ticker (1 second interval)
+  useEffect(() => {
+    const timerInterval = setInterval(() => {
+      const state = useAudioStore.getState();
+      const st = state.sleepTimer;
+      if (st && st.mode === 'time' && st.endsAt) {
+        const remaining = Math.max(0, Math.ceil((st.endsAt - Date.now()) / 1000));
+        if (remaining <= 0) {
+          if (audio) audio.pause();
+          state.set({ isPlaying: false, sleepTimer: null });
+        } else if (remaining !== st.remaining) {
+          state.set({ sleepTimer: { ...st, remaining } });
+        }
+      }
+    }, 1000);
+
+    return () => clearInterval(timerInterval);
+  }, []);
+
   // 2. Track Change Wiring
   useEffect(() => {
     if (!audio || !track) return;
+    playLoggedRef.current = false;
+    preloadedTrackIdRef.current = null;
 
     if (isFirstPlay.current) {
       setupWebAudio();

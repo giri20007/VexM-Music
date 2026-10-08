@@ -10,6 +10,7 @@ import { NewTracksBanner } from './components/layout/NewTracksBanner';
 import { NowPlayingModal } from './components/player/NowPlayingModal';
 import { QueueDrawer } from './components/player/QueueDrawer';
 import { EqualizerModal } from './components/player/EqualizerModal';
+import { SleepTimerModal } from './components/player/SleepTimerModal';
 
 import { HomePage } from './pages/HomePage';
 import { LibraryPage } from './pages/LibraryPage';
@@ -25,11 +26,15 @@ import { useLibrary } from './hooks/useLibrary';
 import { usePlayer } from './hooks/usePlayer';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useSettingsStore } from './store/useSettingsStore';
+import { useAudioStore } from './store/useAudioStore';
 
 export default function App() {
   usePlayer();
   useKeyboardShortcuts();
   const lib = useLibrary();
+
+  const isSleepTimerOpen = useAudioStore(s => s.isSleepTimerOpen);
+  const setSleepTimerOpen = useAudioStore(s => s.setSleepTimerOpen);
 
   // Route state (e.g. 'home', 'library', 'search', 'albums', 'artists', 'liked', 'album:Name', 'artist:Name', 'playlist:id', 'settings:account', 'admin')
   const [currentRoute, setCurrentRoute] = useState('home');
@@ -190,6 +195,12 @@ export default function App() {
 
       {/* Audio Equalizer Modal */}
       <EqualizerModal />
+
+      {/* Sleep Timer Modal */}
+      <SleepTimerModal
+        isOpen={isSleepTimerOpen}
+        onClose={() => setSleepTimerOpen(false)}
+      />
 
       {/* Global Search Command Palette (Ctrl+K / Cmd+K) */}
       <GlobalSearchModal

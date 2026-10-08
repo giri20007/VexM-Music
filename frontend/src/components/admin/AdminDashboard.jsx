@@ -13,7 +13,12 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { useAdminStore } from '../../store/useAdminStore';
-import { adminSyncLibrary, adminRefreshLibrary, adminTestTelegram } from '../../utils/adminApi';
+import {
+  adminSyncLibrary,
+  adminRefreshLibrary,
+  adminTestTelegram,
+  adminRescanArtwork,
+} from '../../utils/adminApi';
 import { formatDuration, formatFileSize, formatDate } from '../../utils/formatters';
 
 export function AdminDashboard({ onNavigateTab }) {
@@ -200,15 +205,27 @@ export function AdminDashboard({ onNavigateTab }) {
         </div>
       </div>
 
-      {/* System Health Status Details */}
+      {/* System Health Status Details & Telegram Cover Telemetry */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <div className="lg:col-span-8 p-6 rounded-3xl bg-bg-card border border-white/5 space-y-4">
-          <h3 className="text-base font-bold text-warm-white flex items-center gap-2">
-            <Activity className="w-4 h-4 text-accent" />
-            <span>Infrastructure Health</span>
-          </h3>
+          <div className="flex items-center justify-between">
+            <h3 className="text-base font-bold text-warm-white flex items-center gap-2">
+              <Activity className="w-4 h-4 text-accent" />
+              <span>Infrastructure Health & Telegram Pipeline</span>
+            </h3>
+          </div>
 
           <div className="space-y-2.5 text-xs">
+            <div className="flex items-center justify-between p-3 rounded-xl bg-bg-secondary border border-white/5">
+              <div className="flex items-center gap-2.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                <span className="font-semibold text-warm-white">Telegram Artwork Match Pipeline</span>
+              </div>
+              <span className="text-accent font-semibold">
+                Multi-pass association & Disk Cache active
+              </span>
+            </div>
+
             <div className="flex items-center justify-between p-3 rounded-xl bg-bg-secondary border border-white/5">
               <div className="flex items-center gap-2.5">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400" />
@@ -242,6 +259,23 @@ export function AdminDashboard({ onNavigateTab }) {
           <h3 className="text-base font-bold text-warm-white">Quick Actions</h3>
 
           <div className="space-y-2">
+            <button
+              onClick={async () => {
+                try {
+                  showToast('Rescanning Telegram covers for all tracks...', 'info');
+                  const res = await adminRescanArtwork();
+                  showToast(`Artwork scan complete! Telegram covers: ${res.realTelegramCovers}/${res.totalTracks}`, 'success');
+                  fetchStats();
+                } catch (err) {
+                  showToast(err.message || 'Artwork rescan failed', 'error');
+                }
+              }}
+              className="w-full flex items-center justify-between p-3 rounded-xl bg-bg-secondary hover:bg-bg-active border border-white/5 text-xs text-warm-white transition font-medium"
+            >
+              <span>Rescan Telegram Artwork</span>
+              <RefreshCw className="w-3.5 h-3.5 text-accent" />
+            </button>
+
             <button
               onClick={handleTestTg}
               className="w-full flex items-center justify-between p-3 rounded-xl bg-bg-secondary hover:bg-bg-active border border-white/5 text-xs text-warm-white transition font-medium"

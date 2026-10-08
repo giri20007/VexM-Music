@@ -15,6 +15,7 @@ import {
   Mic2,
   ListMusic,
   Info,
+  Moon,
 } from 'lucide-react';
 import { useAudioStore } from '../../store/useAudioStore';
 import { seek } from '../../hooks/usePlayer';
@@ -22,6 +23,7 @@ import { formatDuration, formatQualityBadge } from '../../utils/formatters';
 import { getArtworkSrc, getTrackArtworkUrl } from '../../utils/artworkGenerator';
 import { LyricsView } from './LyricsView';
 import { TrackDetails } from './TrackDetails';
+import { AudioVisualizer } from './AudioVisualizer';
 
 // Isolated Scrubber component to prevent full modal re-renders during playback timeupdates
 const ModalScrubber = memo(function ModalScrubber() {
@@ -51,6 +53,8 @@ const ModalScrubber = memo(function ModalScrubber() {
 export function NowPlayingModal() {
   const isNowPlayingOpen = useAudioStore(s => s.isNowPlayingOpen);
   const setNowPlayingOpen = useAudioStore(s => s.setNowPlayingOpen);
+  const setSleepTimerOpen = useAudioStore(s => s.setSleepTimerOpen);
+  const sleepTimer = useAudioStore(s => s.sleepTimer);
   const currentTrack = useAudioStore(s => s.currentTrack);
   const isPlaying = useAudioStore(s => s.isPlaying);
   const volume = useAudioStore(s => s.volume);
@@ -78,7 +82,7 @@ export function NowPlayingModal() {
 
   const isLiked = likedTrackIds.includes(String(currentTrack.id));
   const quality = formatQualityBadge(currentTrack);
-  const coverSrc = !imgError ? getArtworkSrc(currentTrack) : getTrackArtworkUrl(currentTrack, 600);
+  const coverSrc = !imgError ? getArtworkSrc(currentTrack, 600) : getTrackArtworkUrl(currentTrack, 600);
   const upNextTracks = queue.filter(t => t.id !== currentTrack.id);
 
   return (
@@ -106,12 +110,19 @@ export function NowPlayingModal() {
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Sleep Timer Toggle Button */}
           <button
-            onClick={() => setNowPlayingOpen(false)}
-            className="p-2 rounded-full hover:bg-white/10 text-warm-muted hover:text-white transition"
-            aria-label="Options"
+            onClick={() => setSleepTimerOpen(true)}
+            className={`p-2 rounded-full hover:bg-white/10 transition relative ${
+              sleepTimer ? 'text-accent bg-accent/15' : 'text-warm-muted hover:text-white'
+            }`}
+            title="Sleep Timer"
+            aria-label="Sleep timer"
           >
-            <MoreHorizontal className="w-5 h-5" />
+            <Moon className="w-5 h-5" />
+            {sleepTimer && (
+              <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-accent animate-ping" />
+            )}
           </button>
         </div>
       </header>
@@ -219,8 +230,13 @@ export function NowPlayingModal() {
             </button>
           </div>
 
+          {/* Web Audio Real-Time Visualizer */}
+          <div className="flex items-center justify-center pt-1">
+            <AudioVisualizer width={220} height={22} barCount={24} color="#ff7b72" />
+          </div>
+
           {/* Volume Control */}
-          <div className="flex items-center gap-3 pt-2">
+          <div className="flex items-center gap-3 pt-1">
             <button
               onClick={toggleMute}
               className="text-warm-muted hover:text-white transition"

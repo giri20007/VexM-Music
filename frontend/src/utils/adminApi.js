@@ -111,3 +111,15 @@ export const adminImportMetadata = data =>
     method: 'POST',
     body: JSON.stringify(data),
   });
+
+// Section 100-110: Telegram Artwork Diagnostic & Pipeline Admin API
+export const adminGetArtworkHealth = () => adminRequest('/api/admin/artwork/health');
+export const adminRescanArtwork = () => adminRequest('/api/admin/artwork/rescan', { method: 'POST' });
+export const adminGetArtworkDiagnostics = id =>
+  adminRequest(`/api/admin/artwork/diagnostics/${encodeURIComponent(id)}`);
+export const adminOverrideArtwork = (id, coverType, coverSource) =>
+  adminRequest(`/api/admin/artwork/override/${encodeURIComponent(id)}`, {
+    method: 'POST',
+    body: JSON.stringify({ coverType, coverSource }),
+  });
+

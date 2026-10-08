@@ -14,22 +14,24 @@ const PALETTES = [
   { from: '#ff7b72', to: '#ffa198', bg: '#2e1512', accent: '#ffdcd7' }, // Spidey Coral
 ];
 
-export function getArtworkSrc(track) {
+export function getArtworkSrc(track, size = null) {
   if (!track) return '';
+  const sizeParam = size ? `?size=${size}` : '';
   const thumb = track.thumbnail;
   if (thumb) {
     if (thumb.startsWith('http://') || thumb.startsWith('https://') || thumb.startsWith('data:')) {
       return thumb;
     }
     if (thumb.startsWith('/')) {
-      return `${BASE_URL}${thumb}`;
+      const sep = thumb.includes('?') ? '&' : '?';
+      return `${BASE_URL}${thumb}${size ? `${sep}size=${size}` : ''}`;
     }
-    return `${BASE_URL}/api/artwork/${track.id}`;
+    return `${BASE_URL}/api/artwork/${track.id}${sizeParam}`;
   }
   if (track.id) {
-    return `${BASE_URL}/api/artwork/${track.id}`;
+    return `${BASE_URL}/api/artwork/${track.id}${sizeParam}`;
   }
-  return getTrackArtworkUrl(track);
+  return getTrackArtworkUrl(track, size || 400);
 }
 
 function stringHash(str = '') {

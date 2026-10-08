@@ -36,8 +36,16 @@ export function SearchPage({ lib, onNavigate }) {
           placeholder="Search tracks, albums, artists..."
           value={searchQuery}
           onChange={e => setSearchQuery(e.target.value)}
-          className="w-full pl-12 pr-4 py-3 rounded-2xl bg-bg-card border border-white/5 text-sm sm:text-base text-warm-white placeholder:text-warm-muted/70 focus:outline-none focus:ring-1 focus:ring-accent/50 shadow-lg"
+          className="w-full pl-12 pr-10 py-3 rounded-2xl bg-bg-card border border-white/5 text-sm sm:text-base text-warm-white placeholder:text-warm-muted/70 focus:outline-none focus:ring-1 focus:ring-accent/50 shadow-lg"
         />
+        {searchQuery && (
+          <button
+            onClick={() => setSearchQuery('')}
+            className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 rounded-full text-warm-muted hover:text-white hover:bg-white/10 transition"
+          >
+            ✕
+          </button>
+        )}
       </div>
 
       {!clean ? (

@@ -94,34 +94,45 @@ export function LibraryPage({ lib, onNavigate }) {
           <div className="flex flex-wrap items-center gap-3">
             <input
               type="search"
-              placeholder="Filter current view..."
+              placeholder="Filter by title, artist, album, genre..."
               value={lib.query}
               onChange={e => lib.setQuery(e.target.value)}
-              className="flex-1 min-w-[200px] text-xs px-3.5 py-2 rounded-xl bg-bg-card border border-white/5 text-warm-white placeholder:text-warm-muted/60 focus:outline-none"
+              className="flex-1 min-w-[200px] text-xs px-3.5 py-2.5 rounded-xl bg-bg-card border border-white/5 text-warm-white placeholder:text-warm-muted/60 focus:outline-none focus:ring-1 focus:ring-accent/50"
             />
+
+            {/* Quick Format Filter Pills */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+              {[
+                { id: 'all', label: 'All' },
+                { id: 'flac', label: 'FLAC' },
+                { id: 'mp3', label: 'MP3' },
+                { id: 'aac', label: 'AAC' },
+                { id: 'wav', label: 'WAV' },
+              ].map(fmt => (
+                <button
+                  key={fmt.id}
+                  onClick={() => lib.setFilterFormat(fmt.id)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+                    lib.filterFormat === fmt.id
+                      ? 'bg-accent text-bg-primary shadow-sm'
+                      : 'bg-bg-card hover:bg-bg-cardHover text-warm-muted hover:text-white border border-white/5'
+                  }`}
+                >
+                  {fmt.label}
+                </button>
+              ))}
+            </div>
 
             <select
               value={lib.sort}
               onChange={e => lib.setSort(e.target.value)}
-              className="text-xs px-3 py-2 rounded-xl bg-bg-card border border-white/5 text-warm-white focus:outline-none cursor-pointer"
+              className="text-xs px-3 py-2.5 rounded-xl bg-bg-card border border-white/5 text-warm-white focus:outline-none cursor-pointer"
             >
               <option value="recent">Recently Added</option>
               <option value="alpha">Title (A–Z)</option>
               <option value="artist">Artist</option>
               <option value="duration">Duration</option>
               <option value="size">File Size</option>
-            </select>
-
-            <select
-              value={lib.filterFormat}
-              onChange={e => lib.setFilterFormat(e.target.value)}
-              className="text-xs px-3 py-2 rounded-xl bg-bg-card border border-white/5 text-warm-white focus:outline-none cursor-pointer"
-            >
-              <option value="all">All Formats</option>
-              <option value="flac">FLAC Lossless</option>
-              <option value="mp3">MP3</option>
-              <option value="aac">AAC / M4A</option>
-              <option value="opus">OPUS</option>
             </select>
           </div>
 

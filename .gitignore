@@ -27,6 +27,10 @@ tmp/
 *.tmp
 data/spx-session.txt
 backend/data/spx-session.txt
+backend/data/artwork_cache/
+backend/data/cache/
+backend/data/*.json
+backend/data/*.txt
 .DS_Store
 Thumbs.db
 .vscode/

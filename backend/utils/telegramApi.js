@@ -221,20 +221,7 @@ function parseAlbumCaption(caption = '') {
   };
 }
 
-// Check if message is a cover photo / image document
-function isImageMessage(m) {
-  if (!m || !m.media) return false;
-  if (m.media.photo) return true;
-  const doc = m.media.document;
-  if (doc) {
-    const mime = doc.mimeType || '';
-    const fn = doc.attributes?.find(a => a.className === 'DocumentAttributeFilename')?.fileName || '';
-    if (mime.startsWith('image/') || /\.(png|jpe?g|webp)$/i.test(fn)) {
-      return true;
-    }
-  }
-  return false;
-}
+const { CoverDetector, isImageMessage, isAudioMessage } = require('./coverDetector');
 
 function toItem(m, currentCover = null) {
   const doc = m.media?.document;
@@ -245,19 +232,13 @@ function toItem(m, currentCover = null) {
   const mime = doc.mimeType || '';
 
   // Only consider audio files (ignore images/videos/generic docs)
-  if (!au && !mime.startsWith('audio/') && !/\.(mp3|flac|m4a|aac|wav|ogg|opus|wma|alac|aiff|ape|dsf|dff)$/i.test(fileName)) {
+  if (!isAudioMessage(m)) {
     return null;
   }
 
   const id = String(m.id);
   const fileSize = Number(doc.size) || 0;
   const quality = formatQuality(mime, fileName, au, fileSize);
-
-  // Extract thumbnail if embedded in audio document
-  let hasThumbnail = false;
-  if (doc.thumbs && doc.thumbs.length > 0) {
-    hasThumbnail = true;
-  }
 
   // Derive album and artist
   let artist = au?.performer || '';
@@ -283,17 +264,6 @@ function toItem(m, currentCover = null) {
     album = currentCover.album;
   }
 
-  // Cover image URL: embedded thumbnail or paired album cover photo
-  let artworkEndpoint = null;
-  if (hasThumbnail) {
-    artworkEndpoint = `/api/artwork/${id}`;
-  } else if (currentCover?.photoMsgId) {
-    artworkEndpoint = `/api/artwork/msg_${currentCover.photoMsgId}`;
-    trackToPhotoMap.set(id, currentCover.photoMsgId);
-  } else {
-    artworkEndpoint = `/api/artwork/${id}`;
-  }
-
   const rawItem = {
     id,
     messageId: m.id,
@@ -311,10 +281,18 @@ function toItem(m, currentCover = null) {
     sampleRate: quality.sampleRate,
     bitDepth: quality.bitDepth,
     isLossless: quality.isLossless,
-    thumbnail: artworkEndpoint,
     date: m.date,
     hasTelegramDoc: true,
   };
+
+  // Determine most confident Telegram artwork
+  const artworkMeta = CoverDetector.determineArtwork(rawItem, doc, m);
+  rawItem.artwork = artworkMeta;
+  rawItem.thumbnail = artworkMeta.artworkUrl || `/api/artwork/${id}`;
+
+  if (artworkMeta.photoMsgId) {
+    trackToPhotoMap.set(id, artworkMeta.photoMsgId);
+  }
 
   // Merge admin overrides if any
   const override = getOverride(id);
@@ -336,32 +314,32 @@ async function listAudio(minId = 0, limit = 1000) {
     const chat = await getChat();
     const items = [];
     let maxId = minId;
-    let latestCover = null;
+
+    // Reset detector for full scan
+    if (minId === 0) {
+      CoverDetector.clear();
+    }
 
     // Strategy 1: Use getMessages with limit (fastest and returns newest 100-300 messages)
     try {
-      const recentMessages = await c.getMessages(chat, { limit: 200 });
+      const recentMessages = await c.getMessages(chat, { limit: 300 });
       if (recentMessages && recentMessages.length > 0) {
-        // Sort ascending so cover photos preceding audios are parsed first
         const sorted = [...recentMessages].sort((a, b) => a.id - b.id);
+
+        // Pass 1: Ingest and register all cover candidates
         for (const m of sorted) {
           if (!m || !m.id) continue;
           if (m.id > maxId) maxId = m.id;
-
-          // If this is a photo/cover message, record it as the active album cover
+          CoverDetector.registerMessage(m);
           if (isImageMessage(m)) {
-            const meta = parseAlbumCaption(m.message || '');
-            latestCover = {
-              photoMsgId: m.id,
-              media: m.media,
-              album: meta?.album || '',
-              artist: meta?.artist || '',
-            };
-            photoCache.set(`msg_${m.id}`, m.media);
-            continue;
+            photoCache.set(`msg_${m.id}`, m.media || m);
           }
+        }
 
-          const it = toItem(m, latestCover);
+        // Pass 2: Ingest audio tracks with high-confidence artwork matching
+        for (const m of sorted) {
+          if (!m || !m.id) continue;
+          const it = toItem(m);
           if (it) items.push(it);
         }
 
@@ -376,23 +354,21 @@ async function listAudio(minId = 0, limit = 1000) {
 
     // Strategy 2: iterMessages
     try {
+      const fetched = [];
       for await (const m of c.iterMessages(chat, { limit, minId })) {
         if (!m || !m.id) continue;
         if (m.id > maxId) maxId = m.id;
-
+        fetched.push(m);
+      }
+      const sorted = [...fetched].sort((a, b) => a.id - b.id);
+      for (const m of sorted) {
+        CoverDetector.registerMessage(m);
         if (isImageMessage(m)) {
-          const meta = parseAlbumCaption(m.message || '');
-          latestCover = {
-            photoMsgId: m.id,
-            media: m.media,
-            album: meta?.album || '',
-            artist: meta?.artist || '',
-          };
-          photoCache.set(`msg_${m.id}`, m.media);
-          continue;
+          photoCache.set(`msg_${m.id}`, m.media || m);
         }
-
-        const it = toItem(m, latestCover);
+      }
+      for (const m of sorted) {
+        const it = toItem(m);
         if (it) items.push(it);
       }
       connectionStatus.discoveredCount = items.length;
@@ -406,7 +382,7 @@ async function listAudio(minId = 0, limit = 1000) {
     maxId = minId;
     let start = Math.max(1, minId);
     let emptyBatches = 0;
-    latestCover = null;
+    const allMsgs = [];
 
     while (emptyBatches < 30 && start < 25000) {
       const ids = Array.from({ length: 100 }, (_, i) => start + i);
@@ -417,25 +393,23 @@ async function listAudio(minId = 0, limit = 1000) {
         if (!m || !m.id) continue;
         foundAny = true;
         if (m.id > maxId) maxId = m.id;
-
-        if (isImageMessage(m)) {
-          const meta = parseAlbumCaption(m.message || '');
-          latestCover = {
-            photoMsgId: m.id,
-            media: m.media,
-            album: meta?.album || '',
-            artist: meta?.artist || '',
-          };
-          photoCache.set(`msg_${m.id}`, m.media);
-          continue;
-        }
-
-        const it = toItem(m, latestCover);
-        if (it) items.push(it);
+        allMsgs.push(m);
       }
 
       emptyBatches = foundAny ? 0 : emptyBatches + 1;
       start += 100;
+    }
+
+    const sorted = [...allMsgs].sort((a, b) => a.id - b.id);
+    for (const m of sorted) {
+      CoverDetector.registerMessage(m);
+      if (isImageMessage(m)) {
+        photoCache.set(`msg_${m.id}`, m.media || m);
+      }
+    }
+    for (const m of sorted) {
+      const it = toItem(m);
+      if (it) items.push(it);
     }
 
     connectionStatus.discoveredCount = items.length;
@@ -443,6 +417,52 @@ async function listAudio(minId = 0, limit = 1000) {
   } catch (e) {
     console.error('Library scan failed:', e.errorMessage || e.message);
     connectionStatus.lastError = e.errorMessage || e.message;
+    throw wrap(e);
+  }
+}
+
+// Rescan artwork relationships without re-downloading audio files
+async function rescanArtwork(existingItems = []) {
+  try {
+    const c = await getClient();
+    const chat = await getChat();
+    CoverDetector.clear();
+
+    const recent = await c.getMessages(chat, { limit: 300 });
+    const sorted = [...(recent || [])].sort((a, b) => a.id - b.id);
+
+    for (const m of sorted) {
+      CoverDetector.registerMessage(m);
+      if (isImageMessage(m)) {
+        photoCache.set(`msg_${m.id}`, m.media || m);
+      }
+    }
+
+    let updatedCount = 0;
+    const updatedItems = existingItems.map(item => {
+      const entry = docs.get(String(item.id));
+      const newArtwork = CoverDetector.determineArtwork(item, entry?.doc, entry?.message);
+      if (newArtwork.photoMsgId) {
+        trackToPhotoMap.set(String(item.id), newArtwork.photoMsgId);
+      }
+      if (newArtwork.source !== item.artwork?.source || newArtwork.artworkUrl !== item.thumbnail) {
+        updatedCount++;
+      }
+      return {
+        ...item,
+        artwork: newArtwork,
+        thumbnail: newArtwork.artworkUrl || item.thumbnail,
+      };
+    });
+
+    return {
+      success: true,
+      updatedCount,
+      health: CoverDetector.getArtworkHealth(updatedItems),
+      items: updatedItems,
+    };
+  } catch (e) {
+    console.error('Rescan artwork failed:', e.message);
     throw wrap(e);
   }
 }
@@ -586,6 +606,8 @@ function getConnectionStatus() {
 
 module.exports = {
   listAudio,
+  rescanArtwork,
+  CoverDetector,
   getDoc,
   streamRange,
   downloadThumbnail,

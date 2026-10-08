@@ -16,6 +16,7 @@ import {
   adminUpdateTrack,
   adminRemoveTrack,
   adminSaveArtwork,
+  adminGetArtworkDiagnostics,
 } from '../../utils/adminApi';
 import { useAdminStore } from '../../store/useAdminStore';
 import { formatDuration, formatFileSize } from '../../utils/formatters';
@@ -47,7 +48,25 @@ export function AdminLibrary() {
   const [deletingTrack, setDeletingTrack] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  // Artwork Diagnostic Modal State
+  const [diagTrack, setDiagTrack] = useState(null);
+  const [diagData, setDiagData] = useState(null);
+  const [diagLoading, setDiagLoading] = useState(false);
+
   const showToast = useAdminStore(s => s.showToast);
+
+  const handleOpenDiagnostics = async track => {
+    setDiagTrack(track);
+    setDiagLoading(true);
+    try {
+      const data = await adminGetArtworkDiagnostics(track.id);
+      setDiagData(data);
+    } catch (err) {
+      showToast(err.message || 'Failed to load diagnostics', 'error');
+    } finally {
+      setDiagLoading(false);
+    }
+  };
 
   const fetchLibraryData = async (currentPage = 1, query = '') => {
     setLoading(true);
@@ -227,6 +246,13 @@ export function AdminLibrary() {
 
                     <td className="p-4 text-right">
                       <div className="flex items-center justify-end gap-1">
+                        <button
+                          onClick={() => handleOpenDiagnostics(t)}
+                          className="p-1.5 rounded-lg hover:bg-accent/20 text-warm-muted hover:text-accent transition"
+                          title="Artwork Pipeline Diagnostics"
+                        >
+                          <Image className="w-3.5 h-3.5" />
+                        </button>
                         <button
                           onClick={() => handleOpenEdit(t)}
                           className="p-1.5 rounded-lg hover:bg-white/10 text-warm-muted hover:text-white transition"
@@ -425,6 +451,111 @@ export function AdminLibrary() {
                 className="px-4 py-2 rounded-xl bg-red-500 text-white font-bold text-xs shadow-lg shadow-red-500/30 hover:bg-red-600 transition disabled:opacity-50"
               >
                 {isDeleting ? 'Removing...' : 'Remove Entry'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ARTWORK DIAGNOSTICS & TELEGRAM PIPELINE MODAL */}
+      {diagTrack && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in"
+          onClick={() => setDiagTrack(null)}
+        >
+          <div
+            className="w-full max-w-lg rounded-3xl bg-bg-secondary border border-white/10 p-6 shadow-2xl space-y-4 animate-scale-up text-xs text-warm-white"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between pb-3 border-b border-white/5">
+              <div>
+                <h3 className="text-base font-bold text-warm-white">
+                  Artwork Pipeline Diagnostics
+                </h3>
+                <p className="text-[11px] text-warm-muted">
+                  How SPiDEYxFLASH matched this track's real Telegram cover
+                </p>
+              </div>
+              <button onClick={() => setDiagTrack(null)} className="text-warm-muted hover:text-white">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {diagLoading ? (
+              <div className="py-12 flex flex-col items-center justify-center gap-3 text-warm-muted">
+                <RefreshCw className="w-6 h-6 animate-spin text-accent" />
+                <span>Analyzing Telegram artwork pipeline...</span>
+              </div>
+            ) : diagData ? (
+              <div className="space-y-4">
+                {/* Visual Preview */}
+                <div className="flex items-center gap-4 p-4 rounded-2xl bg-bg-card border border-white/5">
+                  <img
+                    src={diagData.artworkUrl || artworkUrl(diagTrack.id, diagTrack.title)}
+                    alt={diagTrack.title}
+                    className="w-20 h-20 rounded-xl object-cover bg-bg-secondary border border-white/10 flex-shrink-0"
+                  />
+                  <div className="space-y-1 min-w-0">
+                    <p className="font-bold text-sm text-warm-white truncate">{diagTrack.title}</p>
+                    <p className="text-xs text-warm-muted truncate">{diagTrack.artist}</p>
+                    <span className="inline-block px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-accent/20 text-accent border border-accent/30">
+                      {diagData.matchType || diagTrack.artworkType || 'telegram_media_group'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Score & Health Metric */}
+                <div className="space-y-2 p-4 rounded-2xl bg-bg-card border border-white/5">
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold text-warm-muted">Artwork Confidence Score</span>
+                    <span className="font-mono font-bold text-accent">
+                      {diagData.confidence ?? diagTrack.artworkConfidence ?? 90} / 100
+                    </span>
+                  </div>
+                  <div className="w-full h-2 rounded-full bg-white/10 overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-amber-500 to-accent transition-all duration-500"
+                      style={{ width: `${diagData.confidence ?? diagTrack.artworkConfidence ?? 90}%` }}
+                    />
+                  </div>
+                </div>
+
+                {/* Technical Diagnostic Attributes */}
+                <div className="space-y-2 p-4 rounded-2xl bg-bg-card border border-white/5 text-[11px] font-mono">
+                  <div className="flex items-center justify-between py-1 border-b border-white/5">
+                    <span className="text-warm-muted">Telegram Message ID:</span>
+                    <span className="text-warm-white font-semibold">#{diagData.telegramMsgId || diagTrack.id}</span>
+                  </div>
+                  <div className="flex items-center justify-between py-1 border-b border-white/5">
+                    <span className="text-warm-muted">Album Group Key:</span>
+                    <span className="text-warm-white truncate max-w-xs">{diagData.albumArtworkId || 'album_' + diagTrack.album}</span>
+                  </div>
+                  <div className="flex items-center justify-between py-1 border-b border-white/5">
+                    <span className="text-warm-muted">Cache Sizing Options:</span>
+                    <div className="flex items-center gap-2 text-accent">
+                      <a href={`${artworkUrl(diagTrack.id, diagTrack.title)}?size=300`} target="_blank" rel="noreferrer" className="hover:underline">300px</a>
+                      <span>·</span>
+                      <a href={`${artworkUrl(diagTrack.id, diagTrack.title)}?size=600`} target="_blank" rel="noreferrer" className="hover:underline">600px</a>
+                      <span>·</span>
+                      <a href={`${artworkUrl(diagTrack.id, diagTrack.title)}?size=1000`} target="_blank" rel="noreferrer" className="hover:underline">1000px</a>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between py-1">
+                    <span className="text-warm-muted">Is Real Telegram Photo:</span>
+                    <span className={diagData.isRealTelegramCover ? 'text-emerald-400 font-bold' : 'text-amber-400 font-bold'}>
+                      {diagData.isRealTelegramCover ? 'YES (Confidence >= 75)' : 'Fallback / Embedded'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ) : null}
+
+            <div className="flex items-center justify-end pt-2">
+              <button
+                onClick={() => setDiagTrack(null)}
+                className="px-5 py-2 rounded-xl bg-accent text-bg-primary font-bold shadow-md shadow-accent/25 hover:scale-105 transition"
+              >
+                Close Diagnostics
               </button>
             </div>
           </div>

@@ -46,10 +46,15 @@ export const useAudioStore = create(
       isQueueOpen: false,
       isEqualizerOpen: false,
       isSearchModalOpen: false,
+      isSleepTimerOpen: false,
+
+      // Sleep Timer
+      sleepTimer: null, // { active: boolean, duration: number|string, remaining: number, mode: 'time'|'end_of_track', endsAt: number|null }
 
       // User Collections (Persisted Locally)
       likedTrackIds: [],
       recentlyPlayed: [],
+      playHistory: [], // [{ id, title, artist, album, playedAt, playCount }]
       playlists: [
         {
           id: 'favorites',
@@ -148,13 +153,40 @@ export const useAudioStore = create(
         });
       },
 
-      next: () => {
+      next: (fallbackTracks = []) => {
         const nextTrack = pickNextTrack(get(), 1);
         if (nextTrack) {
           get().playTrack(nextTrack);
-        } else {
-          set({ isPlaying: false });
+          return;
         }
+
+        // Smart Queue Autoplay recommendation when queue reaches end and repeat is off
+        const { currentTrack, repeatMode, queue } = get();
+        if (repeatMode === 'off' && fallbackTracks.length > 0 && currentTrack) {
+          // Priority 1: Same album
+          let recommended = fallbackTracks.find(
+            t => t.id !== currentTrack.id && t.album && t.album === currentTrack.album && !queue.some(q => q.id === t.id)
+          );
+          // Priority 2: Same artist
+          if (!recommended) {
+            recommended = fallbackTracks.find(
+              t => t.id !== currentTrack.id && t.artist && t.artist === currentTrack.artist && !queue.some(q => q.id === t.id)
+            );
+          }
+          // Priority 3: Any unplayed track
+          if (!recommended) {
+            recommended = fallbackTracks.find(
+              t => t.id !== currentTrack.id && !queue.some(q => q.id === t.id)
+            );
+          }
+
+          if (recommended) {
+            get().playTrack(recommended, [...queue, recommended]);
+            return;
+          }
+        }
+
+        set({ isPlaying: false });
       },
 
       prev: () => {
@@ -204,6 +236,66 @@ export const useAudioStore = create(
       },
 
       isLiked: trackId => get().likedTrackIds.includes(String(trackId)),
+
+      // Sleep Timer Actions
+      setSleepTimerOpen: val => set({ isSleepTimerOpen: val }),
+
+      setSleepTimer: secondsOrMode => {
+        if (!secondsOrMode) {
+          set({ sleepTimer: null });
+          return;
+        }
+
+        if (secondsOrMode === 'end_of_track') {
+          set({
+            sleepTimer: {
+              active: true,
+              duration: 'end_of_track',
+              remaining: 0,
+              mode: 'end_of_track',
+              endsAt: null,
+            },
+          });
+          return;
+        }
+
+        if (typeof secondsOrMode === 'number') {
+          const endsAt = Date.now() + secondsOrMode * 1000;
+          set({
+            sleepTimer: {
+              active: true,
+              duration: secondsOrMode,
+              remaining: secondsOrMode,
+              mode: 'time',
+              endsAt,
+            },
+          });
+        }
+      },
+
+      cancelSleepTimer: () => set({ sleepTimer: null }),
+
+      // Play Count & History Tracking (threshold: 30s)
+      recordPlay: track => {
+        if (!track || !track.id) return;
+        set(state => {
+          const existing = state.playHistory.find(h => h.id === track.id);
+          const playCount = (existing?.playCount || 0) + 1;
+          const updatedHistory = [
+            {
+              id: track.id,
+              title: track.title,
+              artist: track.artist,
+              album: track.album,
+              playedAt: Date.now(),
+              playCount,
+            },
+            ...state.playHistory.filter(h => h.id !== track.id),
+          ].slice(0, 100);
+
+          return { playHistory: updatedHistory };
+        });
+      },
 
       // Playlists
       createPlaylist: name => {
@@ -278,6 +370,7 @@ export const useAudioStore = create(
         shuffle: state.shuffle,
         likedTrackIds: state.likedTrackIds,
         recentlyPlayed: state.recentlyPlayed,
+        playHistory: state.playHistory,
         playlists: state.playlists,
       }),
     }
