@@ -1,8 +1,9 @@
 const router = require('express').Router();
-const { getDoc, downloadThumbnail } = require('../utils/telegramApi');
+const { getDoc, downloadThumbnail, downloadPhotoByMsgId } = require('../utils/telegramApi');
 const { getArtwork } = require('../services/cacheService');
 
-const ID = /^\d{1,12}$/;
+const ID = /^(msg_\d{1,12}|\d{1,12})$/;
+const memoryThumbCache = new Map(); // id -> buffer
 
 const PALETTES = [
   { from: '#f43f5e', to: '#fb7185', bg: '#2b1016' },
@@ -58,7 +59,31 @@ router.get('/:id', async (req, res) => {
     return res.send(generatePlaceholderSvg(title, artist));
   }
 
-  // 1. Check custom artwork
+  // Check in-memory image buffer cache
+  if (memoryThumbCache.has(id)) {
+    const buffer = memoryThumbCache.get(id);
+    res.setHeader('Content-Type', 'image/jpeg');
+    res.setHeader('Cache-Control', 'public, max-age=86400');
+    return res.send(buffer);
+  }
+
+  // 1. If this is a direct Telegram Photo message cover (`msg_1234`)
+  if (id.startsWith('msg_')) {
+    const photoMsgId = id.replace('msg_', '');
+    try {
+      const buffer = await downloadPhotoByMsgId(photoMsgId);
+      if (buffer && buffer.length > 0) {
+        memoryThumbCache.set(id, buffer);
+        res.setHeader('Content-Type', 'image/jpeg');
+        res.setHeader('Cache-Control', 'public, max-age=86400');
+        return res.send(buffer);
+      }
+    } catch (err) {
+      // Continue to fallback
+    }
+  }
+
+  // 2. Check custom artwork override
   const custom = getArtwork(id);
   if (custom) {
     if (custom.startsWith('http://') || custom.startsWith('https://')) {
@@ -74,12 +99,13 @@ router.get('/:id', async (req, res) => {
     }
   }
 
-  // 2. Check Telegram document thumbnail
+  // 3. Check Telegram audio document thumbnail
   try {
     const entry = await getDoc(id);
     if (entry && entry.doc) {
       const thumbBuffer = await downloadThumbnail(entry.doc);
       if (thumbBuffer && thumbBuffer.length > 0) {
+        memoryThumbCache.set(id, thumbBuffer);
         res.setHeader('Content-Type', 'image/jpeg');
         res.setHeader('Cache-Control', 'public, max-age=86400');
         return res.send(thumbBuffer);
@@ -89,7 +115,7 @@ router.get('/:id', async (req, res) => {
     // Continue to fallback
   }
 
-  // 3. Fallback high-res SVG
+  // 4. Fallback high-res SVG
   res.setHeader('Content-Type', 'image/svg+xml');
   res.setHeader('Cache-Control', 'public, max-age=86400');
   res.send(generatePlaceholderSvg(title, artist));

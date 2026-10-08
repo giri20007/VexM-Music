@@ -11,7 +11,9 @@ const CHUNK = 512 * 1024; // Telegram-friendly aligned request size
 
 let clientP = null;
 let chatP = null;
-const docs = new Map(); // id -> { doc, mime, size, item }
+const docs = new Map(); // id -> { doc, mime, size, item, photoMedia }
+const photoCache = new Map(); // msgId -> photoBuffer / location
+const trackToPhotoMap = new Map(); // trackId -> photoMsgId
 
 let connectionStatus = {
   connected: false,
@@ -98,6 +100,25 @@ async function getClient() {
     connectionStatus.connecting = false;
     connectionStatus.lastConnected = new Date().toISOString();
     connectionStatus.lastError = null;
+
+    // Attach real-time update listener for new channel uploads
+    try {
+      c.addEventHandler(async update => {
+        try {
+          const msg = update?.message;
+          if (msg) {
+            const item = toItem(msg);
+            if (item) {
+              const { updateItemInMemory } = require('../routes/library');
+              updateItemInMemory(item.id, item);
+            }
+          }
+        } catch { /* ignore */ }
+      });
+    } catch (e) {
+      console.warn('Real-time handler note:', e.message);
+    }
+
     return c;
   })().catch(e => {
     console.error('Telegram login failed:', e.errorMessage || e.message);
@@ -139,33 +160,116 @@ function getChat() {
   return chatP;
 }
 
-function toItem(m) {
+// Clean and extract album metadata from photo captions
+function parseAlbumCaption(caption = '') {
+  if (!caption) return null;
+  // Examples:
+  // "Karuppu (2026) (Sai Abhyankkar) (Think Music) [24bit-48kHz]"
+  // "Leo (2023) - Anirudh Ravichander"
+  const lines = caption.split('\n').filter(Boolean);
+  const firstLine = lines[0] || '';
+  const clean = firstLine.replace(/\[.*?\]/g, '').replace(/#\w+/g, '').trim();
+
+  let album = '';
+  let artist = '';
+
+  const matchParen = clean.match(/^([^(]+)(?:\(([^)]+)\))?(?:\(([^)]+)\))?/);
+  if (matchParen) {
+    album = (matchParen[1] || '').trim();
+    artist = (matchParen[2] || '').trim();
+  } else {
+    const parts = clean.split(/[-–]/);
+    album = (parts[0] || '').trim();
+    artist = (parts[1] || '').trim();
+  }
+
+  return {
+    album: album || 'Unknown Album',
+    artist: artist || 'Unknown Artist',
+  };
+}
+
+// Check if message is a cover photo / image document
+function isImageMessage(m) {
+  if (!m || !m.media) return false;
+  if (m.media.photo) return true;
+  const doc = m.media.document;
+  if (doc) {
+    const mime = doc.mimeType || '';
+    const fn = doc.attributes?.find(a => a.className === 'DocumentAttributeFilename')?.fileName || '';
+    if (mime.startsWith('image/') || /\.(png|jpe?g|webp)$/i.test(fn)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function toItem(m, currentCover = null) {
   const doc = m.media?.document;
   if (!doc) return null;
   const attrs = doc.attributes || [];
   const au = attrs.find(a => a.className === 'DocumentAttributeAudio');
   const fileName = attrs.find(a => a.className === 'DocumentAttributeFilename')?.fileName || '';
   const mime = doc.mimeType || '';
-  if (!au && !mime.startsWith('audio/')) return null;
+
+  // Only consider audio files (ignore images/videos/documents)
+  if (!au && !mime.startsWith('audio/') && !/\.(mp3|flac|m4a|aac|wav|ogg|opus)$/i.test(fileName)) {
+    return null;
+  }
 
   const id = String(m.id);
   const quality = formatQuality(mime, fileName, au);
 
-  // Extract thumbnail if available
+  // Extract thumbnail if embedded in audio document
   let hasThumbnail = false;
   if (doc.thumbs && doc.thumbs.length > 0) {
     hasThumbnail = true;
   }
 
-  // Base extracted item
+  // Derive album and artist
+  let artist = au?.performer || '';
+  let album = '';
+  let title = au?.title || '';
+
+  if (!title && fileName) {
+    // If filename like "01 - Song Title.flac" or "Artist - Song Title.mp3"
+    const nameWithoutExt = fileName.replace(/\.[^.]+$/, '');
+    const parts = nameWithoutExt.split(/[-–]/);
+    if (parts.length > 1) {
+      if (!artist) artist = parts[0].replace(/^\d+\s*/, '').trim();
+      title = parts[1].trim();
+    } else {
+      title = nameWithoutExt.replace(/^\d+\s*[-–.]?\s*/, '').trim();
+    }
+  }
+
+  if (!artist && currentCover?.artist && currentCover.artist !== 'Unknown Artist') {
+    artist = currentCover.artist;
+  }
+
+  if (!album && currentCover?.album && currentCover.album !== 'Unknown Album') {
+    album = currentCover.album;
+  }
+
+  // Cover image URL: embedded thumbnail or paired album cover photo
+  let artworkEndpoint = null;
+  if (hasThumbnail) {
+    artworkEndpoint = `/api/artwork/${id}`;
+  } else if (currentCover?.photoMsgId) {
+    artworkEndpoint = `/api/artwork/msg_${currentCover.photoMsgId}`;
+    trackToPhotoMap.set(id, currentCover.photoMsgId);
+  } else {
+    artworkEndpoint = `/api/artwork/${id}`;
+  }
+
   const rawItem = {
     id,
     messageId: m.id,
     fileId: id,
-    title: au?.title || fileName.replace(/\.[^.]+$/, '') || 'Untitled',
-    artist: au?.performer || 'Unknown Artist',
-    album: 'Unknown Album',
-    albumArtist: au?.performer || 'Unknown Artist',
+    title: title || 'Untitled Track',
+    artist: artist || 'Unknown Artist',
+    album: album || 'Single / Unknown Album',
+    albumArtist: artist || 'Unknown Artist',
     fileName,
     duration: au?.duration || 0,
     size: Number(doc.size),
@@ -175,7 +279,7 @@ function toItem(m) {
     sampleRate: quality.sampleRate,
     bitDepth: quality.bitDepth,
     isLossless: quality.isLossless,
-    thumbnail: hasThumbnail ? `/api/artwork/${id}` : null,
+    thumbnail: artworkEndpoint,
     date: m.date,
     hasTelegramDoc: true,
   };
@@ -193,47 +297,116 @@ function toItem(m) {
   return item;
 }
 
-// minId > 0 fetches only newer messages
+// Fetch audio tracks and pair with album cover images
 async function listAudio(minId = 0, limit = 1000) {
   try {
     const c = await getClient();
     const chat = await getChat();
     const items = [];
     let maxId = minId;
+    let latestCover = null;
 
-    // Normal path: read channel history
+    // Strategy 1: Use getMessages with limit (fastest and returns newest 100-300 messages)
+    try {
+      const recentMessages = await c.getMessages(chat, { limit: 200 });
+      if (recentMessages && recentMessages.length > 0) {
+        // Sort ascending so cover photos preceding audios are parsed first
+        const sorted = [...recentMessages].sort((a, b) => a.id - b.id);
+        for (const m of sorted) {
+          if (!m || !m.id) continue;
+          if (m.id > maxId) maxId = m.id;
+
+          // If this is a photo/cover message, record it as the active album cover
+          if (isImageMessage(m)) {
+            const meta = parseAlbumCaption(m.message || '');
+            latestCover = {
+              photoMsgId: m.id,
+              media: m.media,
+              album: meta?.album || '',
+              artist: meta?.artist || '',
+            };
+            photoCache.set(`msg_${m.id}`, m.media);
+            continue;
+          }
+
+          const it = toItem(m, latestCover);
+          if (it) items.push(it);
+        }
+
+        if (items.length > 0) {
+          connectionStatus.discoveredCount = items.length;
+          return { items, maxId };
+        }
+      }
+    } catch (e1) {
+      console.warn('getMessages limit strategy note:', e1.message);
+    }
+
+    // Strategy 2: iterMessages
     try {
       for await (const m of c.iterMessages(chat, { limit, minId })) {
+        if (!m || !m.id) continue;
         if (m.id > maxId) maxId = m.id;
-        const it = toItem(m);
+
+        if (isImageMessage(m)) {
+          const meta = parseAlbumCaption(m.message || '');
+          latestCover = {
+            photoMsgId: m.id,
+            media: m.media,
+            album: meta?.album || '',
+            artist: meta?.artist || '',
+          };
+          photoCache.set(`msg_${m.id}`, m.media);
+          continue;
+        }
+
+        const it = toItem(m, latestCover);
         if (it) items.push(it);
       }
-      connectionStatus.discoveredCount = Math.max(connectionStatus.discoveredCount, items.length);
+      connectionStatus.discoveredCount = items.length;
       return { items, maxId };
-    } catch (e) {
-      if (!/BOT_METHOD_INVALID/.test(String(e.errorMessage || e.message))) throw e;
+    } catch (e2) {
+      if (!/BOT_METHOD_INVALID/.test(String(e2.errorMessage || e2.message))) throw e2;
     }
 
-    // Bot-friendly path: fetch messages by ID in batches of 100
+    // Strategy 3: Bot ID scan with high tolerance (checks up to 3,000 message IDs)
     items.length = 0;
     maxId = minId;
-    let start = minId + 1;
-    let empty = 0;
-    while (empty < 2 && start < 20000) {
+    let start = Math.max(1, minId);
+    let emptyBatches = 0;
+    latestCover = null;
+
+    while (emptyBatches < 30 && start < 25000) {
       const ids = Array.from({ length: 100 }, (_, i) => start + i);
       const msgs = await c.getMessages(chat, { ids });
-      let found = false;
+      let foundAny = false;
+
       for (const m of msgs) {
         if (!m || !m.id) continue;
-        found = true;
+        foundAny = true;
         if (m.id > maxId) maxId = m.id;
-        const it = toItem(m);
+
+        if (isImageMessage(m)) {
+          const meta = parseAlbumCaption(m.message || '');
+          latestCover = {
+            photoMsgId: m.id,
+            media: m.media,
+            album: meta?.album || '',
+            artist: meta?.artist || '',
+          };
+          photoCache.set(`msg_${m.id}`, m.media);
+          continue;
+        }
+
+        const it = toItem(m, latestCover);
         if (it) items.push(it);
       }
-      empty = found ? 0 : empty + 1;
+
+      emptyBatches = foundAny ? 0 : emptyBatches + 1;
       start += 100;
     }
-    connectionStatus.discoveredCount = Math.max(connectionStatus.discoveredCount, items.length);
+
+    connectionStatus.discoveredCount = items.length;
     return { items, maxId };
   } catch (e) {
     console.error('Library scan failed:', e.errorMessage || e.message);
@@ -288,22 +461,62 @@ async function* streamRange(doc, start, end) {
   }
 }
 
-async function downloadThumbnail(doc) {
-  if (!doc.thumbs || doc.thumbs.length === 0) return null;
+// Download thumbnail or cover photo from Telegram
+async function downloadThumbnail(docOrMedia) {
+  if (!docOrMedia) return null;
   const c = await getClient();
-  const thumb = doc.thumbs[doc.thumbs.length - 1]; // largest thumbnail
-  const location = new Api.InputDocumentFileLocation({
-    id: doc.id,
-    accessHash: doc.accessHash,
-    fileReference: doc.fileReference,
-    thumbSize: thumb.type || 'm',
-  });
 
   try {
-    const buffer = await c.downloadMedia(location);
-    return buffer;
+    // 1. If document with thumbs
+    if (docOrMedia.thumbs && docOrMedia.thumbs.length > 0) {
+      const thumb = docOrMedia.thumbs[docOrMedia.thumbs.length - 1];
+      const location = new Api.InputDocumentFileLocation({
+        id: docOrMedia.id,
+        accessHash: docOrMedia.accessHash,
+        fileReference: docOrMedia.fileReference,
+        thumbSize: thumb.type || 'm',
+      });
+      return await c.downloadMedia(location);
+    }
+
+    // 2. If photo message media
+    if (docOrMedia.photo || docOrMedia.className === 'MessageMediaPhoto') {
+      const photo = docOrMedia.photo || docOrMedia;
+      return await c.downloadMedia(photo);
+    }
+
+    // 3. If document image
+    if (docOrMedia.id && docOrMedia.accessHash) {
+      return await c.downloadMedia(docOrMedia);
+    }
+
+    return null;
   } catch (e) {
     console.error('Thumbnail download error:', e.errorMessage || e.message);
+    return null;
+  }
+}
+
+// Download cover photo by message ID
+async function downloadPhotoByMsgId(msgId) {
+  try {
+    const key = `msg_${msgId}`;
+    let media = photoCache.get(key);
+    if (!media) {
+      const c = await getClient();
+      const chat = await getChat();
+      const [m] = await c.getMessages(chat, { ids: [Number(msgId)] });
+      if (m && m.media) {
+        media = m.media;
+        photoCache.set(key, media);
+      }
+    }
+    if (media) {
+      return await downloadThumbnail(media);
+    }
+    return null;
+  } catch (e) {
+    console.warn('Failed to download photo for msg', msgId, e.message);
     return null;
   }
 }
@@ -341,6 +554,7 @@ module.exports = {
   getDoc,
   streamRange,
   downloadThumbnail,
+  downloadPhotoByMsgId,
   testConnection,
   getConnectionStatus,
   wrap,
