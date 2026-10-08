@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import {
   ChevronDown,
   MoreHorizontal,
@@ -19,17 +19,40 @@ import {
 import { useAudioStore } from '../../store/useAudioStore';
 import { seek } from '../../hooks/usePlayer';
 import { formatDuration, formatQualityBadge } from '../../utils/formatters';
-import { artworkUrl } from '../../utils/api';
+import { getTrackArtworkUrl } from '../../utils/artworkGenerator';
 import { LyricsView } from './LyricsView';
 import { TrackDetails } from './TrackDetails';
+
+// Isolated Scrubber component to prevent full modal re-renders during playback timeupdates
+const ModalScrubber = memo(function ModalScrubber() {
+  const currentTime = useAudioStore(s => s.currentTime);
+  const duration = useAudioStore(s => s.duration);
+
+  return (
+    <div className="space-y-1 select-none">
+      <input
+        type="range"
+        min="0"
+        max={duration || 1}
+        step="0.5"
+        value={Math.min(currentTime, duration || 0)}
+        onChange={e => seek(Number(e.target.value))}
+        aria-label="Seek time"
+        className="w-full h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer"
+      />
+      <div className="flex items-center justify-between text-xs tabular-nums text-warm-muted font-medium pt-1">
+        <span>{formatDuration(currentTime)}</span>
+        <span>{formatDuration(duration)}</span>
+      </div>
+    </div>
+  );
+});
 
 export function NowPlayingModal() {
   const isNowPlayingOpen = useAudioStore(s => s.isNowPlayingOpen);
   const setNowPlayingOpen = useAudioStore(s => s.setNowPlayingOpen);
   const currentTrack = useAudioStore(s => s.currentTrack);
   const isPlaying = useAudioStore(s => s.isPlaying);
-  const currentTime = useAudioStore(s => s.currentTime);
-  const duration = useAudioStore(s => s.duration);
   const volume = useAudioStore(s => s.volume);
   const isMuted = useAudioStore(s => s.isMuted);
   const shuffle = useAudioStore(s => s.shuffle);
@@ -49,19 +72,21 @@ export function NowPlayingModal() {
   const removeFromQueue = useAudioStore(s => s.removeFromQueue);
 
   const [activeTab, setActiveTab] = useState('lyrics'); // lyrics | upnext | details
+  const [imgError, setImgError] = useState(false);
 
   if (!isNowPlayingOpen || !currentTrack) return null;
 
   const isLiked = likedTrackIds.includes(String(currentTrack.id));
   const quality = formatQualityBadge(currentTrack);
-  const coverSrc = currentTrack.thumbnail || artworkUrl(currentTrack.id, currentTrack.title);
+  const fallbackArt = getTrackArtworkUrl(currentTrack, 600);
+  const coverSrc = (!imgError && currentTrack.thumbnail) ? currentTrack.thumbnail : fallbackArt;
   const upNextTracks = queue.filter(t => t.id !== currentTrack.id);
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-bg-primary text-warm-white overflow-y-auto animate-fade-in select-none">
       {/* Dynamic Blurred Background Artwork */}
       <div
-        className="absolute inset-0 opacity-15 filter blur-3xl pointer-events-none -z-10 bg-cover bg-center transition-all duration-1000 scale-125"
+        className="absolute inset-0 opacity-20 filter blur-3xl pointer-events-none -z-10 bg-cover bg-center transition-all duration-1000 scale-125"
         style={{ backgroundImage: `url(${coverSrc})` }}
       />
 
@@ -75,10 +100,10 @@ export function NowPlayingModal() {
           <ChevronDown className="w-6 h-6" />
         </button>
 
-        {/* Context Pill (Matches Screenshot 2) */}
+        {/* Context Pill */}
         <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-warm-muted">
           <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
-          <span>Playing from Recently played</span>
+          <span>Playing from SPiDEYxFLASH</span>
         </div>
 
         <div className="flex items-center gap-2">
@@ -94,14 +119,15 @@ export function NowPlayingModal() {
 
       {/* Main Dual-Column Content */}
       <main className="flex-1 max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-8 p-6 lg:p-10 items-center">
-        {/* Left Column: Artwork, Track Info, Scrubber, Controls (Matches Screenshot 2) */}
+        {/* Left Column: Artwork, Track Info, Scrubber, Controls */}
         <div className="lg:col-span-6 flex flex-col justify-center max-w-lg mx-auto w-full space-y-6">
           {/* Large Square Artwork */}
           <div className="relative aspect-square w-full rounded-3xl overflow-hidden bg-bg-card shadow-2xl border border-white/10 group">
             <img
               src={coverSrc}
               alt={currentTrack.title}
-              className="w-full h-full object-cover shadow-inner"
+              onError={() => setImgError(true)}
+              className="w-full h-full object-cover shadow-inner transition-transform duration-500 group-hover:scale-102"
             />
           </div>
 
@@ -143,25 +169,10 @@ export function NowPlayingModal() {
             </div>
           </div>
 
-          {/* Scrubber Progress Bar */}
-          <div className="space-y-1">
-            <input
-              type="range"
-              min="0"
-              max={duration || 1}
-              step="0.5"
-              value={Math.min(currentTime, duration || 0)}
-              onChange={e => seek(Number(e.target.value))}
-              aria-label="Seek time"
-              className="w-full h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer"
-            />
-            <div className="flex items-center justify-between text-xs tabular-nums text-warm-muted font-medium pt-1">
-              <span>{formatDuration(currentTime)}</span>
-              <span>{formatDuration(duration)}</span>
-            </div>
-          </div>
+          {/* Isolated Scrubber Progress Bar */}
+          <ModalScrubber />
 
-          {/* Playback Controls Row (Matches Screenshot 2) */}
+          {/* Playback Controls Row */}
           <div className="flex items-center justify-between px-2 pt-2">
             <button
               onClick={toggleShuffle}
@@ -179,7 +190,7 @@ export function NowPlayingModal() {
               <SkipBack className="w-6 h-6 fill-current" />
             </button>
 
-            {/* Prominent Circular Coral Pink Play Button */}
+            {/* Prominent Circular Play Button */}
             <button
               onClick={togglePlay}
               className="w-16 h-16 rounded-full bg-accent text-bg-primary flex items-center justify-center shadow-xl shadow-accent/30 hover:scale-105 active:scale-95 transition-all"
@@ -231,7 +242,7 @@ export function NowPlayingModal() {
           </div>
         </div>
 
-        {/* Right Column: 3-Tab Panel (Lyrics, Up Next, Details) (Matches Screenshot 2) */}
+        {/* Right Column: 3-Tab Panel (Lyrics, Up Next, Details) */}
         <div className="lg:col-span-6 h-[550px] flex flex-col rounded-3xl bg-bg-secondary/70 border border-white/10 backdrop-blur-xl p-6 shadow-2xl">
           {/* Panel Header Tabs */}
           <div className="flex items-center justify-between pb-4 border-b border-white/5 mb-4">
@@ -294,7 +305,7 @@ export function NowPlayingModal() {
                       >
                         <div className="w-8 h-8 rounded-lg overflow-hidden bg-bg-secondary flex-shrink-0">
                           <img
-                            src={t.thumbnail || artworkUrl(t.id, t.title)}
+                            src={t.thumbnail || getTrackArtworkUrl(t, 100)}
                             alt={t.title}
                             className="w-full h-full object-cover"
                           />

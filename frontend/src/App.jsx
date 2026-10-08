@@ -4,6 +4,7 @@ import { Header } from './components/layout/Header';
 import { BottomPlayer } from './components/layout/BottomPlayer';
 import { MobileNav } from './components/layout/MobileNav';
 import { GlobalSearchModal } from './components/layout/GlobalSearchModal';
+import { LivelyBackground } from './components/layout/LivelyBackground';
 
 import { NowPlayingModal } from './components/player/NowPlayingModal';
 import { QueueDrawer } from './components/player/QueueDrawer';
@@ -33,7 +34,7 @@ export default function App() {
   const [currentRoute, setCurrentRoute] = useState('home');
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
-  // Apply saved theme and accent colors
+  // Apply saved theme and accent colors on mount
   const theme = useSettingsStore(s => s.theme);
   const accentColor = useSettingsStore(s => s.accentColor);
   const setTheme = useSettingsStore(s => s.setTheme);
@@ -80,7 +81,10 @@ export default function App() {
   else if (currentRoute === 'recaps') headerTitle = 'Recaps';
 
   return (
-    <div className="min-h-screen flex flex-col bg-bg-primary text-warm-white selection:bg-accent selection:text-bg-primary">
+    <div className="relative min-h-screen flex flex-col bg-bg-primary text-warm-white selection:bg-accent selection:text-bg-primary">
+      {/* Dynamic Animated Lively Background */}
+      <LivelyBackground />
+
       {/* Top Application Layout (Desktop Sidebar + Main Content) */}
       <div className="flex-1 flex overflow-hidden">
         {/* Left Navigation Sidebar (Persistent on Desktop) */}
@@ -161,16 +165,16 @@ export default function App() {
         </div>
       </div>
 
-      {/* Persistent Bottom Player (Screenshots 1, 2, 3) */}
+      {/* Persistent Bottom Player */}
       <BottomPlayer />
 
-      {/* Mobile Bottom Navigation Bar (Screenshots responsive behavior) */}
+      {/* Mobile Bottom Navigation Bar */}
       <MobileNav
         currentRoute={currentRoute}
         onNavigate={navigate}
       />
 
-      {/* Fullscreen Now Playing Modal (Matches Screenshot 2) */}
+      {/* Fullscreen Now Playing Modal */}
       <NowPlayingModal />
 
       {/* Up Next / Queue Drawer */}

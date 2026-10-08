@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { User, Play, ArrowLeft } from 'lucide-react';
 import { useAudioStore } from '../store/useAudioStore';
 import { TrackRow } from '../components/library/TrackRow';
 import { ArtistCard } from '../components/library/ArtistCard';
 import { formatDuration } from '../utils/formatters';
+import { getArtistAvatarUrl } from '../utils/artworkGenerator';
 
 export function ArtistsPage({ lib, selectedArtistName, onNavigate, onBack }) {
   const playTrack = useAudioStore(s => s.playTrack);
+  const [imgErr, setImgErr] = useState(false);
 
   const selectedArtist = selectedArtistName
     ? lib.artists.find(a => a.name === selectedArtistName)
@@ -14,6 +16,7 @@ export function ArtistsPage({ lib, selectedArtistName, onNavigate, onBack }) {
 
   if (selectedArtist) {
     const totalDuration = selectedArtist.tracks.reduce((s, t) => s + (t.duration || 0), 0);
+    const avatar = (!imgErr && selectedArtist.thumbnail) ? selectedArtist.thumbnail : getArtistAvatarUrl(selectedArtist.name, 400);
 
     return (
       <div className="flex-1 max-w-7xl mx-auto w-full p-4 sm:p-6 space-y-6 select-none animate-fade-in">
@@ -27,14 +30,13 @@ export function ArtistsPage({ lib, selectedArtistName, onNavigate, onBack }) {
 
         {/* Artist Header */}
         <div className="flex flex-col sm:flex-row sm:items-end gap-6 p-6 sm:p-8 rounded-3xl bg-gradient-to-tr from-[#2a1711] via-[#1d120e] to-bg-card border border-white/5 shadow-2xl">
-          <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-full overflow-hidden bg-bg-card border border-white/10 shadow-xl flex-shrink-0">
-            {selectedArtist.thumbnail ? (
-              <img src={selectedArtist.thumbnail} alt={selectedArtist.name} className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-accent/40">
-                <User className="w-16 h-16" />
-              </div>
-            )}
+          <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-full overflow-hidden bg-bg-card border-2 border-white/10 shadow-xl flex-shrink-0">
+            <img
+              src={avatar}
+              alt={selectedArtist.name}
+              onError={() => setImgErr(true)}
+              className="w-full h-full object-cover"
+            />
           </div>
 
           <div className="space-y-2 flex-1">

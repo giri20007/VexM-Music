@@ -4,26 +4,58 @@ const { getArtwork } = require('../services/cacheService');
 
 const ID = /^\d{1,12}$/;
 
-// Fallback SVG generator for tracks with no thumbnail
-function generatePlaceholderSvg(title = 'SPiDEYxFLASH') {
-  const initial = (title[0] || 'S').toUpperCase();
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+const PALETTES = [
+  { from: '#f43f5e', to: '#fb7185', bg: '#2b1016' },
+  { from: '#8b5cf6', to: '#c084fc', bg: '#1c102b' },
+  { from: '#06b6d4', to: '#38bdf8', bg: '#0d222b' },
+  { from: '#f59e0b', to: '#fbbf24', bg: '#2b200d' },
+  { from: '#10b981', to: '#34d399', bg: '#0d2b1b' },
+  { from: '#ff7b72', to: '#ffa198', bg: '#2e1512' },
+];
+
+function stringHash(str = '') {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash << 5) - hash + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash);
+}
+
+function generatePlaceholderSvg(title = 'SPiDEYxFLASH', artist = '') {
+  const hash = stringHash(`${title}_${artist}`);
+  const pal = PALETTES[hash % PALETTES.length];
+  const initial = (title[0] || '♪').toUpperCase();
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="0 0 500 500">
     <defs>
-      <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#38231a"/>
-        <stop offset="100%" stop-color="#18100d"/>
+      <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="${pal.bg}"/>
+        <stop offset="100%" stop-color="#0e0807"/>
       </linearGradient>
+      <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="${pal.from}" stop-opacity="0.4"/>
+        <stop offset="100%" stop-color="#000000" stop-opacity="0.9"/>
+      </radialGradient>
     </defs>
-    <rect width="400" height="400" rx="32" fill="url(#grad)"/>
-    <circle cx="200" cy="200" r="90" fill="#ff7b72" fill-opacity="0.12" stroke="#ff7b72" stroke-width="2" stroke-opacity="0.3"/>
-    <text x="200" y="225" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="76" font-weight="900" fill="#ff7b72" text-anchor="middle">${initial}</text>
+    <rect width="500" height="500" rx="36" fill="url(#bg)"/>
+    <circle cx="250" cy="250" r="160" fill="url(#glow)" stroke="rgba(255,255,255,0.1)" stroke-width="3"/>
+    <circle cx="250" cy="250" r="120" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="2"/>
+    <circle cx="250" cy="250" r="80" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="2"/>
+    <circle cx="250" cy="250" r="45" fill="${pal.from}" stroke="rgba(255,255,255,0.2)" stroke-width="3"/>
+    <circle cx="250" cy="250" r="12" fill="#0e0807"/>
+    <text x="250" y="258" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="28" font-weight="900" fill="#ffffff" text-anchor="middle" dominant-baseline="middle">${initial}</text>
   </svg>`;
 }
 
 router.get('/:id', async (req, res) => {
   const { id } = req.params;
+  const title = req.query.title || 'SPiDEYxFLASH';
+  const artist = req.query.artist || '';
+
   if (!ID.test(id)) {
-    return res.status(400).json({ error: 'Invalid track ID' });
+    res.setHeader('Content-Type', 'image/svg+xml');
+    return res.send(generatePlaceholderSvg(title, artist));
   }
 
   // 1. Check custom artwork
@@ -47,20 +79,20 @@ router.get('/:id', async (req, res) => {
     const entry = await getDoc(id);
     if (entry && entry.doc) {
       const thumbBuffer = await downloadThumbnail(entry.doc);
-      if (thumbBuffer) {
+      if (thumbBuffer && thumbBuffer.length > 0) {
         res.setHeader('Content-Type', 'image/jpeg');
         res.setHeader('Cache-Control', 'public, max-age=86400');
         return res.send(thumbBuffer);
       }
     }
   } catch (err) {
-    // Continue to placeholder
+    // Continue to fallback
   }
 
-  // 3. Fallback placeholder SVG
+  // 3. Fallback high-res SVG
   res.setHeader('Content-Type', 'image/svg+xml');
   res.setHeader('Cache-Control', 'public, max-age=86400');
-  res.send(generatePlaceholderSvg(req.query.title || 'S'));
+  res.send(generatePlaceholderSvg(title, artist));
 });
 
 module.exports = router;

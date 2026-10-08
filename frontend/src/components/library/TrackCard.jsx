@@ -1,11 +1,13 @@
-import React from 'react';
-import { Play, Pause, Music2 } from 'lucide-react';
+import React, { memo, useState } from 'react';
+import { Play, Pause } from 'lucide-react';
 import { useAudioStore } from '../../store/useAudioStore';
-import { artworkUrl } from '../../utils/api';
+import { getTrackArtworkUrl } from '../../utils/artworkGenerator';
 
-export function TrackCard({ track, onPlay }) {
+export const TrackCard = memo(function TrackCard({ track, onPlay }) {
   const currentTrack = useAudioStore(s => s.currentTrack);
   const isPlaying = useAudioStore(s => s.isPlaying);
+
+  const [imgErr, setImgErr] = useState(false);
 
   const isCurrent = currentTrack?.id === track.id;
   const isCurrentPlaying = isCurrent && isPlaying;
@@ -21,7 +23,8 @@ export function TrackCard({ track, onPlay }) {
     }
   };
 
-  const coverSrc = track.thumbnail || artworkUrl(track.id, track.title);
+  const fallback = getTrackArtworkUrl(track, 150);
+  const coverSrc = (!imgErr && track.thumbnail) ? track.thumbnail : fallback;
 
   return (
     <div
@@ -35,18 +38,12 @@ export function TrackCard({ track, onPlay }) {
         <img
           src={coverSrc}
           alt={track.title}
+          onError={() => setImgErr(true)}
           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           loading="lazy"
-          onError={e => {
-            e.target.style.display = 'none';
-            e.target.nextSibling.style.display = 'flex';
-          }}
         />
-        <div className="hidden w-full h-full items-center justify-center bg-bg-card text-accent">
-          <Music2 className="w-6 h-6" />
-        </div>
 
-        {/* Play overlay button on image */}
+        {/* Play overlay button */}
         <div
           className={`absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity duration-200 ${
             isCurrentPlaying ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
@@ -73,4 +70,4 @@ export function TrackCard({ track, onPlay }) {
       </div>
     </div>
   );
-}
+});

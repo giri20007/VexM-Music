@@ -3,7 +3,7 @@ const tg = require('../utils/telegramApi');
 const { getOverride, getArtwork } = require('../services/cacheService');
 const { logActivity } = require('../services/activityLog');
 
-const TTL = 5 * 60 * 1000;
+const TTL = 30 * 1000; // Fast 30-second cache TTL for instant sync
 const items = new Map(); // id -> item
 const removedIds = new Set(); // ids hidden from library
 let maxId = 0;
@@ -25,7 +25,6 @@ async function sync(full = false) {
   syncing = (async () => {
     try {
       const startTime = Date.now();
-      logActivity('LIBRARY_SYNC_STARTED', { full, previousCount: items.size });
       const r = await tg.listAudio(full ? 0 : maxId);
       if (full) {
         items.clear();
@@ -48,13 +47,16 @@ async function sync(full = false) {
       maxId = Math.max(maxId, r.maxId);
       lastSync = Date.now();
       const elapsed = Date.now() - startTime;
-      logActivity('LIBRARY_SYNC_COMPLETED', {
-        full,
-        totalItems: items.size,
-        added,
-        updated,
-        elapsedMs: elapsed,
-      });
+
+      if (added > 0 || full) {
+        logActivity('LIBRARY_SYNC_COMPLETED', {
+          full,
+          totalItems: items.size,
+          added,
+          updated,
+          elapsedMs: elapsed,
+        });
+      }
 
       return {
         total: items.size,
@@ -64,7 +66,7 @@ async function sync(full = false) {
         lastSync,
       };
     } catch (e) {
-      logActivity('LIBRARY_SYNC_FAILED', { error: e.message });
+      console.warn('Auto-sync notice:', e.message);
       throw e;
     } finally {
       syncing = null;
@@ -72,6 +74,11 @@ async function sync(full = false) {
   })();
   return syncing;
 }
+
+// Background auto-discovery every 30 seconds
+setInterval(() => {
+  sync(false).catch(() => {});
+}, 30 * 1000);
 
 // Public Library Listing
 router.get('/', async (req, res, next) => {
@@ -85,7 +92,7 @@ router.get('/', async (req, res, next) => {
       .map(applyOverrides)
       .sort((a, b) => (b.date || 0) - (a.date || 0));
 
-    res.set('Cache-Control', 'private, max-age=30').json({
+    res.set('Cache-Control', 'private, max-age=10').json({
       items: list,
       total: list.length,
       lastSync,

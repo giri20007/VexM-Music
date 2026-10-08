@@ -1,8 +1,8 @@
-import React, { memo } from 'react';
-import { Play, Pause, Heart, MoreVertical, Plus, Music2 } from 'lucide-react';
+import React, { memo, useState } from 'react';
+import { Play, Pause, Heart, Plus, Music2 } from 'lucide-react';
 import { useAudioStore } from '../../store/useAudioStore';
 import { formatDuration, formatQualityBadge } from '../../utils/formatters';
-import { artworkUrl } from '../../utils/api';
+import { getTrackArtworkUrl } from '../../utils/artworkGenerator';
 
 export const TrackRow = memo(function TrackRow({
   track,
@@ -17,7 +17,8 @@ export const TrackRow = memo(function TrackRow({
   const likedTrackIds = useAudioStore(s => s.likedTrackIds);
   const toggleLike = useAudioStore(s => s.toggleLike);
   const enqueue = useAudioStore(s => s.enqueue);
-  const playNext = useAudioStore(s => s.playNext);
+
+  const [hasImgError, setHasImgError] = useState(false);
 
   const isCurrent = currentTrack?.id === track.id;
   const isCurrentPlaying = isCurrent && isPlaying;
@@ -35,7 +36,8 @@ export const TrackRow = memo(function TrackRow({
     }
   };
 
-  const coverSrc = track.thumbnail || artworkUrl(track.id, track.title);
+  const fallbackArt = getTrackArtworkUrl(track, 120);
+  const coverSrc = (!hasImgError && track.thumbnail) ? track.thumbnail : fallbackArt;
 
   return (
     <div
@@ -64,16 +66,10 @@ export const TrackRow = memo(function TrackRow({
             <img
               src={coverSrc}
               alt={track.title}
+              onError={() => setHasImgError(true)}
               className="w-full h-full object-cover"
               loading="lazy"
-              onError={e => {
-                e.target.style.display = 'none';
-                e.target.nextSibling.style.display = 'flex';
-              }}
             />
-            <div className="hidden w-full h-full items-center justify-center bg-bg-card text-accent">
-              <Music2 className="w-5 h-5" />
-            </div>
           </div>
         )}
 
@@ -88,7 +84,7 @@ export const TrackRow = memo(function TrackRow({
         </div>
       </div>
 
-      {/* Center: Format Badge (FLAC / MP3) */}
+      {/* Center: Format Badge */}
       {quality && (
         <div className="hidden sm:block">
           <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded border ${quality.color}`}>
@@ -116,19 +112,17 @@ export const TrackRow = memo(function TrackRow({
           {formatDuration(track.duration)}
         </span>
 
-        <div className="relative group/menu">
-          <button
-            onClick={e => {
-              e.stopPropagation();
-              enqueue(track);
-            }}
-            className="opacity-0 group-hover:opacity-100 p-1.5 rounded-full hover:bg-white/10 text-warm-muted hover:text-white transition"
-            title="Add to queue"
-            aria-label="Add to queue"
-          >
-            <Plus className="w-4 h-4" />
-          </button>
-        </div>
+        <button
+          onClick={e => {
+            e.stopPropagation();
+            enqueue(track);
+          }}
+          className="opacity-0 group-hover:opacity-100 p-1.5 rounded-full hover:bg-white/10 text-warm-muted hover:text-white transition"
+          title="Add to queue"
+          aria-label="Add to queue"
+        >
+          <Plus className="w-4 h-4" />
+        </button>
       </div>
     </div>
   );

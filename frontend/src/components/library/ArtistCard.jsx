@@ -1,9 +1,11 @@
-import React from 'react';
-import { User, Play } from 'lucide-react';
+import React, { memo, useState } from 'react';
+import { Play } from 'lucide-react';
 import { useAudioStore } from '../../store/useAudioStore';
+import { getArtistAvatarUrl } from '../../utils/artworkGenerator';
 
-export function ArtistCard({ artist, onClick }) {
+export const ArtistCard = memo(function ArtistCard({ artist, onClick }) {
   const playTrack = useAudioStore(s => s.playTrack);
+  const [imgErr, setImgErr] = useState(false);
 
   const handlePlayArtist = e => {
     e.stopPropagation();
@@ -12,24 +14,21 @@ export function ArtistCard({ artist, onClick }) {
     }
   };
 
+  const avatarSrc = (!imgErr && artist.thumbnail) ? artist.thumbnail : getArtistAvatarUrl(artist.name);
+
   return (
     <div
       onClick={onClick}
-      className="group relative flex flex-col items-center p-4 rounded-2xl bg-bg-card hover:bg-bg-cardHover border border-white/5 transition-all duration-200 cursor-pointer text-center"
+      className="group relative flex flex-col items-center p-4 rounded-3xl bg-bg-card hover:bg-bg-cardHover border border-white/5 transition-all duration-200 cursor-pointer text-center"
     >
-      <div className="relative w-28 h-28 rounded-full overflow-hidden bg-[#1d120e] border border-white/10 mb-3 shadow-lg">
-        {artist.thumbnail ? (
-          <img
-            src={artist.thumbnail}
-            alt={artist.name}
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-            loading="lazy"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-bg-card to-bg-active text-accent/50">
-            <User className="w-12 h-12" />
-          </div>
-        )}
+      <div className="relative w-28 h-28 rounded-full overflow-hidden bg-[#1d120e] border border-white/10 mb-3 shadow-lg group-hover:border-accent/40 transition">
+        <img
+          src={avatarSrc}
+          alt={artist.name}
+          onError={() => setImgErr(true)}
+          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+          loading="lazy"
+        />
 
         {/* Hover Play Button */}
         <button
@@ -49,4 +48,4 @@ export function ArtistCard({ artist, onClick }) {
       </p>
     </div>
   );
-}
+});

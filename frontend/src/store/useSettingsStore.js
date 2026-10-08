@@ -12,13 +12,35 @@ export const EQ_PRESETS = {
   Classical: [3, 2, 1, 0, 0, 0, 1, 2, 3, 3],
 };
 
+const THEME_CLASSES = [
+  'theme-cyberpunk-neon',
+  'theme-midnight-navy',
+  'theme-pure-black',
+  'theme-emerald-forest',
+  'theme-sunset-rose',
+  'theme-amethyst-purple',
+  'theme-retro-amber',
+];
+
+const ACCENT_CLASSES = [
+  'accent-coral',
+  'accent-amber',
+  'accent-cyan',
+  'accent-violet',
+  'accent-emerald',
+  'accent-rose',
+  'accent-lime',
+  'accent-sky',
+];
+
 export const useSettingsStore = create(
   persist(
     (set, get) => ({
-      // Appearance
-      theme: 'warm-dark', // warm-dark | midnight | pure-black
-      accentColor: 'coral', // coral | violet | emerald | amber | cyan
-      density: 'comfortable', // comfortable | compact
+      // Appearance & Themes
+      theme: 'warm-espresso',
+      accentColor: 'coral',
+      livelyBackground: 'aurora', // aurora | glow | mesh | off
+      density: 'comfortable',
       animations: true,
 
       // Playback
@@ -27,7 +49,7 @@ export const useSettingsStore = create(
       crossfade: 0,
       volumeNormalization: false,
       defaultSpeed: 1,
-      preferredQuality: 'high', // high | medium | data-saver
+      preferredQuality: 'high',
 
       // Lyrics
       autoShowLyrics: false,
@@ -41,7 +63,7 @@ export const useSettingsStore = create(
       eqPreset: 'Flat',
       eqGains: [...EQ_PRESETS.Flat],
 
-      // User Profile (Account info matching Screenshot 1)
+      // User Profile
       account: {
         username: 'SPIDERMÄN',
         handle: '@Strieee',
@@ -50,27 +72,24 @@ export const useSettingsStore = create(
         avatarUrl: null,
       },
 
-      // Appearance Actions
+      // Theme Actions
       setTheme: theme => {
-        document.body.classList.remove('theme-midnight', 'theme-pure-black');
-        if (theme === 'midnight') document.body.classList.add('theme-midnight');
-        if (theme === 'pure-black') document.body.classList.add('theme-pure-black');
+        THEME_CLASSES.forEach(cls => document.body.classList.remove(cls));
+        if (theme !== 'warm-espresso') {
+          document.body.classList.add(`theme-${theme}`);
+        }
         set({ theme });
       },
 
       setAccentColor: accentColor => {
-        document.body.classList.remove(
-          'accent-violet',
-          'accent-emerald',
-          'accent-amber',
-          'accent-cyan'
-        );
+        ACCENT_CLASSES.forEach(cls => document.body.classList.remove(cls));
         if (accentColor !== 'coral') {
           document.body.classList.add(`accent-${accentColor}`);
         }
         set({ accentColor });
       },
 
+      setLivelyBackground: livelyBackground => set({ livelyBackground }),
       setDensity: density => set({ density }),
       setAnimations: animations => set({ animations }),
 

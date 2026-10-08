@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, memo } from 'react';
 import {
   Play,
   Pause,
@@ -19,13 +19,52 @@ import {
 import { useAudioStore } from '../../store/useAudioStore';
 import { seek } from '../../hooks/usePlayer';
 import { formatDuration } from '../../utils/formatters';
-import { artworkUrl } from '../../utils/api';
+import { getTrackArtworkUrl } from '../../utils/artworkGenerator';
 
-export function BottomPlayer() {
-  const currentTrack = useAudioStore(s => s.currentTrack);
-  const isPlaying = useAudioStore(s => s.isPlaying);
+// Isolated Scrubber Component to prevent bottom player re-renders
+const BottomScrubber = memo(function BottomScrubber() {
   const currentTime = useAudioStore(s => s.currentTime);
   const duration = useAudioStore(s => s.duration);
+
+  return (
+    <div className="hidden md:flex items-center gap-2.5 w-full text-[11px] tabular-nums text-warm-muted">
+      <span className="w-8 text-right">{formatDuration(currentTime)}</span>
+      <div className="relative flex-1 flex items-center">
+        <input
+          type="range"
+          min="0"
+          max={duration || 1}
+          step="0.5"
+          value={Math.min(currentTime, duration || 0)}
+          onChange={e => seek(Number(e.target.value))}
+          aria-label="Seek track position"
+          className="w-full h-1 bg-white/10 rounded-full appearance-none cursor-pointer"
+        />
+      </div>
+      <span className="w-8 text-left">{formatDuration(duration)}</span>
+    </div>
+  );
+});
+
+// Mobile Progress Line
+const MobileProgressLine = memo(function MobileProgressLine() {
+  const currentTime = useAudioStore(s => s.currentTime);
+  const duration = useAudioStore(s => s.duration);
+  const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
+
+  return (
+    <div className="md:hidden absolute top-0 left-0 right-0 h-1 bg-white/10">
+      <div
+        className="h-full bg-accent transition-all duration-100"
+        style={{ width: `${progressPercent}%` }}
+      />
+    </div>
+  );
+});
+
+export const BottomPlayer = memo(function BottomPlayer() {
+  const currentTrack = useAudioStore(s => s.currentTrack);
+  const isPlaying = useAudioStore(s => s.isPlaying);
   const volume = useAudioStore(s => s.volume);
   const isMuted = useAudioStore(s => s.isMuted);
   const shuffle = useAudioStore(s => s.shuffle);
@@ -46,8 +85,9 @@ export function BottomPlayer() {
   const setQueueOpen = useAudioStore(s => s.setQueueOpen);
   const setEqualizerOpen = useAudioStore(s => s.setEqualizerOpen);
 
+  const [imgErr, setImgErr] = useState(false);
+
   const isLiked = currentTrack ? likedTrackIds.includes(String(currentTrack.id)) : false;
-  const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   if (!currentTrack) {
     return (
@@ -60,17 +100,13 @@ export function BottomPlayer() {
     );
   }
 
-  const coverSrc = currentTrack.thumbnail || artworkUrl(currentTrack.id, currentTrack.title);
+  const fallbackArt = getTrackArtworkUrl(currentTrack, 200);
+  const coverSrc = (!imgErr && currentTrack.thumbnail) ? currentTrack.thumbnail : fallbackArt;
 
   return (
     <footer className="fixed bottom-0 left-0 right-0 z-30 h-22 md:h-20 bg-bg-secondary/98 backdrop-blur-xl border-t border-white/5 flex flex-col justify-center px-3 sm:px-6 select-none shadow-2xl">
       {/* Mobile Top Scrubber Line */}
-      <div className="md:hidden absolute top-0 left-0 right-0 h-1 bg-white/10">
-        <div
-          className="h-full bg-accent transition-all duration-100"
-          style={{ width: `${progressPercent}%` }}
-        />
-      </div>
+      <MobileProgressLine />
 
       <div className="flex items-center justify-between gap-2 sm:gap-4 max-w-7xl mx-auto w-full">
         {/* Left: Track Information & Like Button */}
@@ -82,6 +118,7 @@ export function BottomPlayer() {
             <img
               src={coverSrc}
               alt={currentTrack.title}
+              onError={() => setImgErr(true)}
               className="w-full h-full object-cover transition duration-200 group-hover:scale-105"
             />
             <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
@@ -109,7 +146,7 @@ export function BottomPlayer() {
           </button>
         </div>
 
-        {/* Center: Playback Controls & Scrubber */}
+        {/* Center: Playback Controls & Isolated Scrubber */}
         <div className="flex flex-col items-center justify-center flex-1 max-w-lg min-w-0 px-2">
           {/* Controls Row */}
           <div className="flex items-center gap-3 sm:gap-5 mb-1">
@@ -168,25 +205,10 @@ export function BottomPlayer() {
           </div>
 
           {/* Desktop Scrubber Progress Bar */}
-          <div className="hidden md:flex items-center gap-2.5 w-full text-[11px] tabular-nums text-warm-muted">
-            <span className="w-8 text-right">{formatDuration(currentTime)}</span>
-            <div className="relative flex-1 flex items-center">
-              <input
-                type="range"
-                min="0"
-                max={duration || 1}
-                step="0.5"
-                value={Math.min(currentTime, duration || 0)}
-                onChange={e => seek(Number(e.target.value))}
-                aria-label="Seek track position"
-                className="w-full h-1 bg-white/10 rounded-full appearance-none cursor-pointer"
-              />
-            </div>
-            <span className="w-8 text-left">{formatDuration(duration)}</span>
-          </div>
+          <BottomScrubber />
         </div>
 
-        {/* Right: Extra Controls (Lyrics, Queue, Volume, Fullscreen) */}
+        {/* Right: Extra Controls */}
         <div className="hidden md:flex items-center justify-end gap-2.5 w-1/4 sm:w-1/3 text-warm-muted">
           <button
             onClick={() => setNowPlayingOpen(true)}
@@ -214,7 +236,7 @@ export function BottomPlayer() {
           >
             <ListMusic className="w-4 h-4" />
             {queue.length > 0 && (
-              <span className="absolute 1 top-1 right-1 w-2 h-2 rounded-full bg-accent" />
+              <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-accent" />
             )}
           </button>
 
@@ -251,4 +273,4 @@ export function BottomPlayer() {
       </div>
     </footer>
   );
-}
+});

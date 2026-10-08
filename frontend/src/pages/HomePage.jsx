@@ -1,15 +1,16 @@
-import React from 'react';
-import { Play, Sparkles, Clock, RefreshCw, ChevronRight, Music2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { Play, Clock, RefreshCw, ChevronRight } from 'lucide-react';
 import { useAudioStore } from '../store/useAudioStore';
 import { TrackCard } from '../components/library/TrackCard';
 import { TrackRow } from '../components/library/TrackRow';
 import { AlbumCard } from '../components/library/AlbumCard';
 import { ArtistCard } from '../components/library/ArtistCard';
-import { artworkUrl } from '../utils/api';
+import { getTrackArtworkUrl } from '../utils/artworkGenerator';
 
 export function HomePage({ lib, onNavigate }) {
   const recentlyPlayed = useAudioStore(s => s.recentlyPlayed);
   const playTrack = useAudioStore(s => s.playTrack);
+  const [heroImgErr, setHeroImgErr] = useState(false);
 
   const items = lib.allItems || [];
   const newestTrack = items[0] || null;
@@ -22,7 +23,8 @@ export function HomePage({ lib, onNavigate }) {
     }
   };
 
-  const heroCover = newestTrack?.thumbnail || (newestTrack ? artworkUrl(newestTrack.id, newestTrack.title) : null);
+  const fallbackHero = newestTrack ? getTrackArtworkUrl(newestTrack, 800) : null;
+  const heroCover = (!heroImgErr && newestTrack?.thumbnail) ? newestTrack.thumbnail : fallbackHero;
 
   return (
     <div className="flex-1 max-w-7xl mx-auto w-full p-4 sm:p-6 space-y-8 select-none">
@@ -81,7 +83,7 @@ export function HomePage({ lib, onNavigate }) {
         )}
       </section>
 
-      {/* 2. DUAL SPLIT: NEWEST ADDITION (Hero Card) + RECENTLY ADDED (Matches Screenshot 3) */}
+      {/* 2. DUAL SPLIT: NEWEST ADDITION (Hero Card) + RECENTLY ADDED */}
       <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left: Newest Addition Hero Card (5 cols) */}
         <div className="lg:col-span-5 space-y-3">
@@ -98,11 +100,12 @@ export function HomePage({ lib, onNavigate }) {
               <img
                 src={heroCover}
                 alt={newestTrack.title}
+                onError={() => setHeroImgErr(true)}
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
 
               {/* Dark Gradient Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-between p-6">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent flex flex-col justify-between p-6">
                 {/* Top Badge: "Just added" */}
                 <div>
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-[11px] font-semibold text-accent">
@@ -143,7 +146,7 @@ export function HomePage({ lib, onNavigate }) {
           )}
         </div>
 
-        {/* Right: Recently Added Numbered List (7 cols) (Matches Screenshot 3) */}
+        {/* Right: Recently Added Numbered List (7 cols) */}
         <div className="lg:col-span-7 space-y-3">
           <div className="flex items-center justify-between">
             <div>

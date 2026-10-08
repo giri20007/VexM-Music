@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import { fetchLibrary } from '../utils/api';
+import { getTrackArtworkUrl, getArtistAvatarUrl } from '../utils/artworkGenerator';
 
 export function useLibrary() {
   const [items, setItems] = useState([]);
@@ -11,26 +12,62 @@ export function useLibrary() {
   const [sort, setSort] = useState('recent');
   const [filterFormat, setFilterFormat] = useState('all');
 
-  const load = useCallback(async refresh => {
-    setState('connecting');
-    setError('');
-    setRetry(0);
+  const isInitialLoad = useRef(true);
+
+  const load = useCallback(async (refresh = false, silent = false) => {
+    if (!silent) {
+      setState('connecting');
+      setError('');
+      setRetry(0);
+    }
     try {
-      const data = await fetchLibrary(refresh, setRetry);
-      setItems(data.items || []);
+      const data = await fetchLibrary(refresh, silent ? null : setRetry);
+      const rawItems = data.items || [];
+
+      // Ensure every item has a reliable thumbnail
+      const processed = rawItems.map(t => ({
+        ...t,
+        thumbnail: t.thumbnail || getTrackArtworkUrl(t),
+      }));
+
+      setItems(processed);
       setState('ready');
     } catch (e) {
-      setError(
-        e.status === 503
-          ? 'Telegram connection unavailable. Check credentials on Render.'
-          : e.message || 'Could not reach SPiDEYxFLASH backend'
-      );
-      setState('error');
+      if (!silent) {
+        setError(
+          e.status === 503
+            ? 'Telegram connection unavailable. Check credentials on Render.'
+            : e.message || 'Could not reach SPiDEYxFLASH backend'
+        );
+        setState('error');
+      }
+    } finally {
+      isInitialLoad.current = false;
     }
   }, []);
 
+  // Initial load
   useEffect(() => {
-    load(false);
+    load(false, false);
+  }, [load]);
+
+  // Background Auto-Discovery: Check for new Telegram tracks every 20 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      load(false, true); // Silent background poll
+    }, 20 * 1000);
+
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        load(false, true);
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
   }, [load]);
 
   useEffect(() => {
@@ -76,12 +113,11 @@ export function useLibrary() {
           artist: t.albumArtist || t.artist || 'Various Artists',
           tracks: [],
           year: t.year || null,
-          thumbnail: t.thumbnail,
+          thumbnail: t.thumbnail || getTrackArtworkUrl(t),
         });
       }
       const entry = map.get(name);
       entry.tracks.push(t);
-      if (!entry.thumbnail && t.thumbnail) entry.thumbnail = t.thumbnail;
     });
     return Array.from(map.values()).sort((a, b) => b.tracks.length - a.tracks.length);
   }, [items]);
@@ -94,12 +130,11 @@ export function useLibrary() {
         map.set(name, {
           name,
           tracks: [],
-          thumbnail: t.thumbnail,
+          thumbnail: getArtistAvatarUrl(name),
         });
       }
       const entry = map.get(name);
       entry.tracks.push(t);
-      if (!entry.thumbnail && t.thumbnail) entry.thumbnail = t.thumbnail;
     });
     return Array.from(map.values()).sort((a, b) => b.tracks.length - a.tracks.length);
   }, [items]);
@@ -119,6 +154,6 @@ export function useLibrary() {
     setSort,
     filterFormat,
     setFilterFormat,
-    refresh: () => load(true),
+    refresh: () => load(true, false),
   };
 }
