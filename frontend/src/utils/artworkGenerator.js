@@ -1,3 +1,5 @@
+import { BASE_URL } from './api';
+
 // High-performance dynamic SVG artwork & artist avatar generator
 // Generates beautiful gradients, vinyl discs, and typography so images NEVER break
 
@@ -11,6 +13,24 @@ const PALETTES = [
   { from: '#6366f1', to: '#818cf8', bg: '#13152b', accent: '#e0e7ff' }, // Indigo
   { from: '#ff7b72', to: '#ffa198', bg: '#2e1512', accent: '#ffdcd7' }, // Spidey Coral
 ];
+
+export function getArtworkSrc(track) {
+  if (!track) return '';
+  const thumb = track.thumbnail;
+  if (thumb) {
+    if (thumb.startsWith('http://') || thumb.startsWith('https://') || thumb.startsWith('data:')) {
+      return thumb;
+    }
+    if (thumb.startsWith('/')) {
+      return `${BASE_URL}${thumb}`;
+    }
+    return `${BASE_URL}/api/artwork/${track.id}`;
+  }
+  if (track.id) {
+    return `${BASE_URL}/api/artwork/${track.id}`;
+  }
+  return getTrackArtworkUrl(track);
+}
 
 function stringHash(str = '') {
   let hash = 0;

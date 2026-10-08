@@ -32,7 +32,7 @@ const wrap = e => {
   return err('Telegram connection unavailable', 502);
 };
 
-function formatQuality(mimeType, fileName, audioAttr) {
+function formatQuality(mimeType = '', fileName = '', audioAttr = null, fileSize = 0) {
   const ext = (fileName || '').split('.').pop().toLowerCase();
   let format = 'MP3';
   let bitrate = 320;
@@ -40,27 +40,59 @@ function formatQuality(mimeType, fileName, audioAttr) {
   let bitDepth = 16;
   let isLossless = false;
 
+  const durationSec = audioAttr?.duration || 0;
+  let calculatedBitrate = 0;
+  if (fileSize > 0 && durationSec > 0) {
+    calculatedBitrate = Math.round((fileSize * 8) / (durationSec * 1000));
+  }
+
   if (ext === 'flac' || mimeType.includes('flac')) {
     format = 'FLAC';
     isLossless = true;
-    sampleRate = 48000;
-    bitDepth = 24;
-    bitrate = null;
+    if (calculatedBitrate > 1100 || fileSize > 30 * 1024 * 1024) {
+      sampleRate = 48000;
+      bitDepth = 24;
+      bitrate = calculatedBitrate || 1450;
+    } else {
+      sampleRate = 44100;
+      bitDepth = 16;
+      bitrate = calculatedBitrate || 850;
+    }
   } else if (ext === 'wav' || mimeType.includes('wav')) {
     format = 'WAV';
     isLossless = true;
     sampleRate = 44100;
     bitDepth = 16;
-    bitrate = null;
+    bitrate = calculatedBitrate || 1411;
   } else if (ext === 'm4a' || ext === 'aac' || mimeType.includes('aac') || mimeType.includes('mp4')) {
     format = 'AAC';
-    bitrate = 256;
+    isLossless = false;
+    sampleRate = 44100;
+    bitDepth = 16;
+    if (calculatedBitrate) {
+      bitrate = calculatedBitrate >= 280 ? 320 : calculatedBitrate >= 220 ? 256 : calculatedBitrate >= 160 ? 192 : 128;
+    } else {
+      bitrate = 256;
+    }
   } else if (ext === 'opus' || ext === 'ogg' || mimeType.includes('opus') || mimeType.includes('ogg')) {
     format = 'OPUS';
-    bitrate = 160;
+    isLossless = false;
+    sampleRate = 48000;
+    bitDepth = 16;
+    bitrate = calculatedBitrate ? Math.min(320, calculatedBitrate) : 160;
+  } else {
+    format = 'MP3';
+    isLossless = false;
+    sampleRate = 44100;
+    bitDepth = 16;
+    if (calculatedBitrate) {
+      bitrate = calculatedBitrate >= 280 ? 320 : calculatedBitrate >= 220 ? 256 : calculatedBitrate >= 160 ? 192 : 128;
+    } else {
+      bitrate = 320;
+    }
   }
 
-  return { format, bitrate, sampleRate, bitDepth, isLossless };
+  return { format, bitrate, sampleRate, bitDepth, isLossless, calculatedBitrate };
 }
 
 async function getClient() {
@@ -212,13 +244,14 @@ function toItem(m, currentCover = null) {
   const fileName = attrs.find(a => a.className === 'DocumentAttributeFilename')?.fileName || '';
   const mime = doc.mimeType || '';
 
-  // Only consider audio files (ignore images/videos/documents)
-  if (!au && !mime.startsWith('audio/') && !/\.(mp3|flac|m4a|aac|wav|ogg|opus)$/i.test(fileName)) {
+  // Only consider audio files (ignore images/videos/generic docs)
+  if (!au && !mime.startsWith('audio/') && !/\.(mp3|flac|m4a|aac|wav|ogg|opus|wma|alac|aiff|ape|dsf|dff)$/i.test(fileName)) {
     return null;
   }
 
   const id = String(m.id);
-  const quality = formatQuality(mime, fileName, au);
+  const fileSize = Number(doc.size) || 0;
+  const quality = formatQuality(mime, fileName, au, fileSize);
 
   // Extract thumbnail if embedded in audio document
   let hasThumbnail = false;
@@ -232,7 +265,6 @@ function toItem(m, currentCover = null) {
   let title = au?.title || '';
 
   if (!title && fileName) {
-    // If filename like "01 - Song Title.flac" or "Artist - Song Title.mp3"
     const nameWithoutExt = fileName.replace(/\.[^.]+$/, '');
     const parts = nameWithoutExt.split(/[-–]/);
     if (parts.length > 1) {
@@ -272,7 +304,7 @@ function toItem(m, currentCover = null) {
     albumArtist: artist || 'Unknown Artist',
     fileName,
     duration: au?.duration || 0,
-    size: Number(doc.size),
+    size: fileSize,
     mimeType: mime || 'audio/mpeg',
     format: quality.format,
     bitrate: quality.bitrate,
@@ -293,7 +325,7 @@ function toItem(m, currentCover = null) {
     thumbnail: customArt || (override?.artworkUrl || rawItem.thumbnail),
   };
 
-  docs.set(id, { doc, mime: item.mimeType, size: item.size, item });
+  docs.set(id, { doc, mime: item.mimeType, size: item.size, item, message: m });
   return item;
 }
 
@@ -467,30 +499,30 @@ async function downloadThumbnail(docOrMedia) {
   const c = await getClient();
 
   try {
-    // 1. If document with thumbs
+    // 1. If document with thumbs or MessageMediaDocument
     if (docOrMedia.thumbs && docOrMedia.thumbs.length > 0) {
-      const thumb = docOrMedia.thumbs[docOrMedia.thumbs.length - 1];
-      const location = new Api.InputDocumentFileLocation({
-        id: docOrMedia.id,
-        accessHash: docOrMedia.accessHash,
-        fileReference: docOrMedia.fileReference,
-        thumbSize: thumb.type || 'm',
-      });
-      return await c.downloadMedia(location);
+      const buf = await c.downloadMedia(docOrMedia, { thumb: -1 });
+      if (buf && buf.length > 0) return buf;
     }
 
-    // 2. If photo message media
-    if (docOrMedia.photo || docOrMedia.className === 'MessageMediaPhoto') {
-      const photo = docOrMedia.photo || docOrMedia;
-      return await c.downloadMedia(photo);
-    }
-
-    // 3. If document image
-    if (docOrMedia.id && docOrMedia.accessHash) {
+    // 2. If photo message media or Photo
+    if (docOrMedia.photo || docOrMedia.className === 'MessageMediaPhoto' || docOrMedia.className === 'Photo') {
+      const buf = await c.downloadMedia(docOrMedia, { thumb: -1 });
+      if (buf && buf.length > 0) return buf;
       return await c.downloadMedia(docOrMedia);
     }
 
-    return null;
+    // 3. If Message object
+    if (docOrMedia.media || docOrMedia.className === 'Message') {
+      const buf = await c.downloadMedia(docOrMedia, { thumb: -1 });
+      if (buf && buf.length > 0) return buf;
+      return await c.downloadMedia(docOrMedia);
+    }
+
+    // 4. Fallback directly to downloadMedia
+    const buf = await c.downloadMedia(docOrMedia, { thumb: -1 });
+    if (buf && buf.length > 0) return buf;
+    return await c.downloadMedia(docOrMedia);
   } catch (e) {
     console.error('Thumbnail download error:', e.errorMessage || e.message);
     return null;
@@ -502,17 +534,20 @@ async function downloadPhotoByMsgId(msgId) {
   try {
     const key = `msg_${msgId}`;
     let media = photoCache.get(key);
+    const c = await getClient();
+
     if (!media) {
-      const c = await getClient();
       const chat = await getChat();
       const [m] = await c.getMessages(chat, { ids: [Number(msgId)] });
-      if (m && m.media) {
-        media = m.media;
+      if (m) {
+        media = m.media || m;
         photoCache.set(key, media);
       }
     }
     if (media) {
-      return await downloadThumbnail(media);
+      const buf = await c.downloadMedia(media, { thumb: -1 });
+      if (buf && buf.length > 0) return buf;
+      return await c.downloadMedia(media);
     }
     return null;
   } catch (e) {
@@ -557,5 +592,7 @@ module.exports = {
   downloadPhotoByMsgId,
   testConnection,
   getConnectionStatus,
+  trackToPhotoMap,
+  photoCache,
   wrap,
 };

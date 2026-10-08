@@ -5,7 +5,7 @@ import { TrackCard } from '../components/library/TrackCard';
 import { TrackRow } from '../components/library/TrackRow';
 import { AlbumCard } from '../components/library/AlbumCard';
 import { ArtistCard } from '../components/library/ArtistCard';
-import { getTrackArtworkUrl } from '../utils/artworkGenerator';
+import { getArtworkSrc, getTrackArtworkUrl } from '../utils/artworkGenerator';
 
 export function HomePage({ lib, onNavigate }) {
   const recentlyPlayed = useAudioStore(s => s.recentlyPlayed);
@@ -23,8 +23,7 @@ export function HomePage({ lib, onNavigate }) {
     }
   };
 
-  const fallbackHero = newestTrack ? getTrackArtworkUrl(newestTrack, 800) : null;
-  const heroCover = (!heroImgErr && newestTrack?.thumbnail) ? newestTrack.thumbnail : fallbackHero;
+  const heroCover = (!heroImgErr && newestTrack) ? getArtworkSrc(newestTrack) : (newestTrack ? getTrackArtworkUrl(newestTrack, 800) : null);
 
   return (
     <div className="flex-1 max-w-7xl mx-auto w-full p-4 sm:p-6 space-y-8 select-none">

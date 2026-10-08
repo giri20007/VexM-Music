@@ -99,16 +99,43 @@ router.get('/:id', async (req, res) => {
     }
   }
 
-  // 3. Check Telegram audio document thumbnail
+  // 3. Check Telegram audio document thumbnail or paired album photo
   try {
+    const { trackToPhotoMap } = require('../utils/telegramApi');
     const entry = await getDoc(id);
-    if (entry && entry.doc) {
-      const thumbBuffer = await downloadThumbnail(entry.doc);
-      if (thumbBuffer && thumbBuffer.length > 0) {
-        memoryThumbCache.set(id, thumbBuffer);
-        res.setHeader('Content-Type', 'image/jpeg');
-        res.setHeader('Cache-Control', 'public, max-age=86400');
-        return res.send(thumbBuffer);
+    if (entry) {
+      // 3a. Try embedded document thumb
+      if (entry.doc) {
+        const thumbBuffer = await downloadThumbnail(entry.doc);
+        if (thumbBuffer && thumbBuffer.length > 0) {
+          memoryThumbCache.set(id, thumbBuffer);
+          res.setHeader('Content-Type', 'image/jpeg');
+          res.setHeader('Cache-Control', 'public, max-age=86400');
+          return res.send(thumbBuffer);
+        }
+      }
+
+      // 3b. Try message object directly
+      if (entry.message) {
+        const msgThumbBuffer = await downloadThumbnail(entry.message);
+        if (msgThumbBuffer && msgThumbBuffer.length > 0) {
+          memoryThumbCache.set(id, msgThumbBuffer);
+          res.setHeader('Content-Type', 'image/jpeg');
+          res.setHeader('Cache-Control', 'public, max-age=86400');
+          return res.send(msgThumbBuffer);
+        }
+      }
+
+      // 3c. Try paired album photo message
+      const pairedPhotoId = trackToPhotoMap.get(id);
+      if (pairedPhotoId) {
+        const photoBuf = await downloadPhotoByMsgId(pairedPhotoId);
+        if (photoBuf && photoBuf.length > 0) {
+          memoryThumbCache.set(id, photoBuf);
+          res.setHeader('Content-Type', 'image/jpeg');
+          res.setHeader('Cache-Control', 'public, max-age=86400');
+          return res.send(photoBuf);
+        }
       }
     }
   } catch (err) {

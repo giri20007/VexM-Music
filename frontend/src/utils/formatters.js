@@ -21,39 +21,64 @@ export function formatFileSize(bytes) {
 
 export function formatQualityBadge(track) {
   if (!track) return null;
-  if (track.format === 'FLAC') {
-    const sr = track.sampleRate ? `${(track.sampleRate / 1000).toFixed(1)}k` : '48.0k';
+
+  const format = (track.format || 'MP3').toUpperCase();
+  const bitrate = track.bitrate;
+  const bitDepth = track.bitDepth || (track.isLossless ? 24 : 16);
+  const sampleRate = track.sampleRate || 44100;
+  const srFormatted = (sampleRate / 1000).toFixed(1).replace(/\.0$/, '');
+
+  if (format === 'FLAC') {
+    if (bitDepth === 24 || sampleRate >= 48000) {
+      return {
+        label: `Hi-Res FLAC ${bitDepth}/${srFormatted}k`,
+        fullLabel: `FLAC 24-bit / ${sampleRate / 1000}kHz`,
+        isLossless: true,
+        color: 'bg-amber-500/20 text-amber-300 border-amber-500/40 shadow-sm shadow-amber-500/10',
+      };
+    }
     return {
-      label: `FLAC ${sr}`,
+      label: `FLAC ${bitDepth}/${srFormatted}k`,
+      fullLabel: `FLAC 16-bit / 44.1kHz (CD)`,
       isLossless: true,
-      color: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
+      color: 'bg-amber-400/15 text-amber-200 border-amber-400/30',
     };
   }
-  if (track.format === 'WAV') {
+
+  if (format === 'WAV') {
     return {
-      label: 'WAV LOSSLESS',
+      label: `WAV ${bitDepth}/${srFormatted}k`,
+      fullLabel: `WAV Lossless ${bitDepth}-bit / ${srFormatted}kHz`,
       isLossless: true,
-      color: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
+      color: 'bg-amber-500/20 text-amber-300 border-amber-500/40',
     };
   }
-  if (track.format === 'AAC') {
+
+  if (format === 'AAC' || format === 'M4A') {
     return {
-      label: 'AAC 256k',
+      label: `AAC ${bitrate ? bitrate + 'k' : '256k'}`,
+      fullLabel: `AAC ${bitrate || 256} kbps`,
       isLossless: false,
       color: 'bg-accent/15 text-accent border-accent/30',
     };
   }
-  if (track.format === 'OPUS') {
+
+  if (format === 'OPUS' || format === 'OGG') {
     return {
-      label: 'OPUS',
+      label: `OPUS ${bitrate ? bitrate + 'k' : '160k'}`,
+      fullLabel: `OPUS ${bitrate || 160} kbps`,
       isLossless: false,
-      color: 'bg-blue-500/15 text-blue-300 border-blue-500/30',
+      color: 'bg-sky-500/15 text-sky-300 border-sky-500/30',
     };
   }
+
+  // MP3 or generic
+  const mp3Bitrate = bitrate ? `${bitrate}k` : '320k';
   return {
-    label: `${track.format || 'MP3'} ${track.bitrate ? track.bitrate + 'k' : '320k'}`,
+    label: `MP3 ${mp3Bitrate}`,
+    fullLabel: `MP3 ${mp3Bitrate}`,
     isLossless: false,
-    color: 'bg-white/10 text-warm-white border-white/10',
+    color: 'bg-white/10 text-warm-white border-white/15',
   };
 }
 

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
-import { fetchLibrary } from '../utils/api';
-import { getTrackArtworkUrl, getArtistAvatarUrl } from '../utils/artworkGenerator';
+import { fetchLibrary, BASE_URL } from '../utils/api';
+import { getTrackArtworkUrl, getArtistAvatarUrl, getArtworkSrc } from '../utils/artworkGenerator';
+import { useAudioStore } from '../store/useAudioStore';
 
 export function useLibrary() {
   const [items, setItems] = useState([]);
@@ -11,8 +12,10 @@ export function useLibrary() {
   const [debounced, setDebounced] = useState('');
   const [sort, setSort] = useState('recent');
   const [filterFormat, setFilterFormat] = useState('all');
+  const [newTracksNotification, setNewTracksNotification] = useState(null);
 
   const isInitialLoad = useRef(true);
+  const previousIdsRef = useRef(new Set());
 
   const load = useCallback(async (refresh = false, silent = false) => {
     if (!silent) {
@@ -24,12 +27,32 @@ export function useLibrary() {
       const data = await fetchLibrary(refresh, silent ? null : setRetry);
       const rawItems = data.items || [];
 
-      // Ensure every item has a reliable thumbnail
-      const processed = rawItems.map(t => ({
-        ...t,
-        thumbnail: t.thumbnail || getTrackArtworkUrl(t),
-      }));
+      // Ensure every item has a reliable thumbnail and absolute URL
+      const processed = rawItems.map(t => {
+        let thumb = t.thumbnail || '';
+        if (thumb && thumb.startsWith('/')) {
+          thumb = `${BASE_URL}${thumb}`;
+        }
+        return {
+          ...t,
+          thumbnail: thumb || getTrackArtworkUrl(t),
+        };
+      });
 
+      // Detect newly discovered tracks from Telegram
+      if (!isInitialLoad.current && previousIdsRef.current.size > 0) {
+        const newlyAdded = processed.filter(t => !previousIdsRef.current.has(String(t.id)));
+        if (newlyAdded.length > 0) {
+          setNewTracksNotification({
+            count: newlyAdded.length,
+            tracks: newlyAdded,
+            timestamp: Date.now(),
+          });
+        }
+      }
+
+      // Update known track ID cache
+      previousIdsRef.current = new Set(processed.map(t => String(t.id)));
       setItems(processed);
       setState('ready');
     } catch (e) {
@@ -154,6 +177,14 @@ export function useLibrary() {
     setSort,
     filterFormat,
     setFilterFormat,
+    newTracksNotification,
+    dismissNewTracksNotification: () => setNewTracksNotification(null),
+    playNewTracks: () => {
+      if (newTracksNotification?.tracks?.length > 0) {
+        useAudioStore.getState().playTrack(newTracksNotification.tracks[0], newTracksNotification.tracks);
+        setNewTracksNotification(null);
+      }
+    },
     refresh: () => load(true, false),
   };
 }

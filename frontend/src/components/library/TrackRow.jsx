@@ -2,7 +2,7 @@ import React, { memo, useState } from 'react';
 import { Play, Pause, Heart, Plus, Music2 } from 'lucide-react';
 import { useAudioStore } from '../../store/useAudioStore';
 import { formatDuration, formatQualityBadge } from '../../utils/formatters';
-import { getTrackArtworkUrl } from '../../utils/artworkGenerator';
+import { getArtworkSrc, getTrackArtworkUrl } from '../../utils/artworkGenerator';
 
 export const TrackRow = memo(function TrackRow({
   track,
@@ -36,8 +36,7 @@ export const TrackRow = memo(function TrackRow({
     }
   };
 
-  const fallbackArt = getTrackArtworkUrl(track, 120);
-  const coverSrc = (!hasImgError && track.thumbnail) ? track.thumbnail : fallbackArt;
+  const coverSrc = !hasImgError ? getArtworkSrc(track) : getTrackArtworkUrl(track, 120);
 
   return (
     <div

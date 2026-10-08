@@ -19,7 +19,7 @@ import {
 import { useAudioStore } from '../../store/useAudioStore';
 import { seek } from '../../hooks/usePlayer';
 import { formatDuration } from '../../utils/formatters';
-import { getTrackArtworkUrl } from '../../utils/artworkGenerator';
+import { getArtworkSrc, getTrackArtworkUrl } from '../../utils/artworkGenerator';
 
 // Isolated Scrubber Component to prevent bottom player re-renders
 const BottomScrubber = memo(function BottomScrubber() {
@@ -100,8 +100,7 @@ export const BottomPlayer = memo(function BottomPlayer() {
     );
   }
 
-  const fallbackArt = getTrackArtworkUrl(currentTrack, 200);
-  const coverSrc = (!imgErr && currentTrack.thumbnail) ? currentTrack.thumbnail : fallbackArt;
+  const coverSrc = !imgErr ? getArtworkSrc(currentTrack) : getTrackArtworkUrl(currentTrack, 200);
 
   return (
     <footer className="fixed bottom-0 left-0 right-0 z-30 h-22 md:h-20 bg-bg-secondary/98 backdrop-blur-xl border-t border-white/5 flex flex-col justify-center px-3 sm:px-6 select-none shadow-2xl">

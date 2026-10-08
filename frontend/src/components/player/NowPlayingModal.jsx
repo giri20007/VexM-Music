@@ -19,7 +19,7 @@ import {
 import { useAudioStore } from '../../store/useAudioStore';
 import { seek } from '../../hooks/usePlayer';
 import { formatDuration, formatQualityBadge } from '../../utils/formatters';
-import { getTrackArtworkUrl } from '../../utils/artworkGenerator';
+import { getArtworkSrc, getTrackArtworkUrl } from '../../utils/artworkGenerator';
 import { LyricsView } from './LyricsView';
 import { TrackDetails } from './TrackDetails';
 
@@ -78,8 +78,7 @@ export function NowPlayingModal() {
 
   const isLiked = likedTrackIds.includes(String(currentTrack.id));
   const quality = formatQualityBadge(currentTrack);
-  const fallbackArt = getTrackArtworkUrl(currentTrack, 600);
-  const coverSrc = (!imgError && currentTrack.thumbnail) ? currentTrack.thumbnail : fallbackArt;
+  const coverSrc = !imgError ? getArtworkSrc(currentTrack) : getTrackArtworkUrl(currentTrack, 600);
   const upNextTracks = queue.filter(t => t.id !== currentTrack.id);
 
   return (
@@ -305,7 +304,7 @@ export function NowPlayingModal() {
                       >
                         <div className="w-8 h-8 rounded-lg overflow-hidden bg-bg-secondary flex-shrink-0">
                           <img
-                            src={t.thumbnail || getTrackArtworkUrl(t, 100)}
+                            src={getArtworkSrc(t)}
                             alt={t.title}
                             className="w-full h-full object-cover"
                           />

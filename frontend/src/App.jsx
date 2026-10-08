@@ -5,6 +5,7 @@ import { BottomPlayer } from './components/layout/BottomPlayer';
 import { MobileNav } from './components/layout/MobileNav';
 import { GlobalSearchModal } from './components/layout/GlobalSearchModal';
 import { LivelyBackground } from './components/layout/LivelyBackground';
+import { NewTracksBanner } from './components/layout/NewTracksBanner';
 
 import { NowPlayingModal } from './components/player/NowPlayingModal';
 import { QueueDrawer } from './components/player/QueueDrawer';
@@ -84,6 +85,13 @@ export default function App() {
     <div className="relative min-h-screen flex flex-col bg-bg-primary text-warm-white selection:bg-accent selection:text-bg-primary">
       {/* Dynamic Animated Lively Background */}
       <LivelyBackground />
+
+      {/* Floating Top Notification for New Telegram Songs */}
+      <NewTracksBanner
+        notification={lib.newTracksNotification}
+        onPlay={lib.playNewTracks}
+        onDismiss={lib.dismissNewTracksNotification}
+      />
 
       {/* Top Application Layout (Desktop Sidebar + Main Content) */}
       <div className="flex-1 flex overflow-hidden">

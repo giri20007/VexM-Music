@@ -75,10 +75,10 @@ async function sync(full = false) {
   return syncing;
 }
 
-// Background auto-discovery every 30 seconds
+// Background auto-discovery every 20 seconds
 setInterval(() => {
   sync(false).catch(() => {});
-}, 30 * 1000);
+}, 20 * 1000);
 
 // Public Library Listing
 router.get('/', async (req, res, next) => {
@@ -120,13 +120,12 @@ module.exports = {
   },
   getAllItems: () => [...items.values()].filter(i => !removedIds.has(i.id)).map(applyOverrides),
   updateItemInMemory: (id, updates) => {
-    const existing = items.get(String(id));
-    if (existing) {
-      const updated = { ...existing, ...updates };
-      items.set(String(id), updated);
-      return updated;
-    }
-    return null;
+    const sId = String(id);
+    if (removedIds.has(sId)) return null;
+    const existing = items.get(sId);
+    const updated = applyOverrides({ ...(existing || {}), ...updates, id: sId });
+    items.set(sId, updated);
+    return updated;
   },
   removeItemFromMemory: id => {
     const sId = String(id);

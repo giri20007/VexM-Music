@@ -1,7 +1,7 @@
 import React, { memo, useState } from 'react';
 import { Play, Pause } from 'lucide-react';
 import { useAudioStore } from '../../store/useAudioStore';
-import { getTrackArtworkUrl } from '../../utils/artworkGenerator';
+import { getArtworkSrc, getTrackArtworkUrl } from '../../utils/artworkGenerator';
 
 export const TrackCard = memo(function TrackCard({ track, onPlay }) {
   const currentTrack = useAudioStore(s => s.currentTrack);
@@ -23,8 +23,7 @@ export const TrackCard = memo(function TrackCard({ track, onPlay }) {
     }
   };
 
-  const fallback = getTrackArtworkUrl(track, 150);
-  const coverSrc = (!imgErr && track.thumbnail) ? track.thumbnail : fallback;
+  const coverSrc = !imgErr ? getArtworkSrc(track) : getTrackArtworkUrl(track, 150);
 
   return (
     <div
