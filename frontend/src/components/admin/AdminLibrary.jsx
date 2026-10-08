@@ -10,6 +10,8 @@ import {
   FileAudio,
   Radio,
   ExternalLink,
+  Sparkles,
+  Layers,
 } from 'lucide-react';
 import {
   adminGetLibrary,
@@ -17,6 +19,7 @@ import {
   adminRemoveTrack,
   adminSaveArtwork,
   adminGetArtworkDiagnostics,
+  adminGetArtworkCandidates,
 } from '../../utils/adminApi';
 import { useAdminStore } from '../../store/useAdminStore';
 import { formatDuration, formatFileSize } from '../../utils/formatters';
@@ -53,6 +56,12 @@ export function AdminLibrary() {
   const [diagData, setDiagData] = useState(null);
   const [diagLoading, setDiagLoading] = useState(false);
 
+  // Artwork Candidate Picker Modal State
+  const [candidateTrack, setCandidateTrack] = useState(null);
+  const [candidates, setCandidates] = useState([]);
+  const [candidateLoading, setCandidateLoading] = useState(false);
+  const [isApplyingCandidate, setIsApplyingCandidate] = useState(false);
+
   const showToast = useAdminStore(s => s.showToast);
 
   const handleOpenDiagnostics = async track => {
@@ -65,6 +74,37 @@ export function AdminLibrary() {
       showToast(err.message || 'Failed to load diagnostics', 'error');
     } finally {
       setDiagLoading(false);
+    }
+  };
+
+  const handleOpenCandidates = async track => {
+    setCandidateTrack(track);
+    setCandidateLoading(true);
+    try {
+      const data = await adminGetArtworkCandidates(track.id);
+      setCandidates(data.candidates || []);
+    } catch (err) {
+      showToast(err.message || 'Failed to load artwork candidates', 'error');
+    } finally {
+      setCandidateLoading(false);
+    }
+  };
+
+  const handleSelectCandidate = async candidate => {
+    if (!candidateTrack) return;
+    setIsApplyingCandidate(true);
+    try {
+      await adminSaveArtwork(candidateTrack.id, candidate.url);
+      showToast(`Artwork updated to "${candidate.label}"`, 'success');
+      if (editingTrack?.id === candidateTrack.id) {
+        setEditForm(prev => ({ ...prev, artworkUrl: candidate.url }));
+      }
+      setCandidateTrack(null);
+      fetchLibraryData(page, searchQuery);
+    } catch (err) {
+      showToast(err.message || 'Failed to apply candidate artwork', 'error');
+    } finally {
+      setIsApplyingCandidate(false);
     }
   };
 
@@ -261,6 +301,13 @@ export function AdminLibrary() {
                     <td className="p-4 text-right">
                       <div className="flex items-center justify-end gap-1">
                         <button
+                          onClick={() => handleOpenCandidates(t)}
+                          className="p-1.5 rounded-lg hover:bg-amber-500/20 text-warm-muted hover:text-amber-300 transition"
+                          title="Artwork Candidate Picker"
+                        >
+                          <Sparkles className="w-3.5 h-3.5" />
+                        </button>
+                        <button
                           onClick={() => handleOpenDiagnostics(t)}
                           className="p-1.5 rounded-lg hover:bg-accent/20 text-warm-muted hover:text-accent transition"
                           title="Artwork Pipeline Diagnostics"
@@ -444,7 +491,15 @@ export function AdminLibrary() {
                       className="w-full px-3 py-1.5 rounded-xl bg-bg-card border border-white/10 text-xs text-warm-white focus:outline-none focus:border-accent"
                     />
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <button
+                        type="button"
+                        onClick={() => handleOpenCandidates(editingTrack)}
+                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-[11px] font-semibold text-amber-300 transition border border-amber-500/30"
+                      >
+                        <Sparkles className="w-3 h-3" />
+                        <span>Candidate Picker</span>
+                      </button>
                       <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-[11px] font-semibold text-warm-white transition border border-white/10">
                         <span>Upload Custom Cover</span>
                         <input
@@ -621,6 +676,122 @@ export function AdminLibrary() {
                 className="px-5 py-2 rounded-xl bg-accent text-bg-primary font-bold shadow-md shadow-accent/25 hover:scale-105 transition"
               >
                 Close Diagnostics
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ARTWORK CANDIDATE PICKER MODAL */}
+      {candidateTrack && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in"
+          onClick={() => setCandidateTrack(null)}
+        >
+          <div
+            className="w-full max-w-2xl rounded-3xl bg-bg-secondary border border-white/10 p-6 shadow-2xl space-y-4 animate-scale-up text-xs text-warm-white max-h-[90vh] flex flex-col"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between pb-3 border-b border-white/5 flex-shrink-0">
+              <div>
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-amber-300" />
+                  <h3 className="text-base font-bold text-warm-white">
+                    Artwork Candidates
+                  </h3>
+                </div>
+                <p className="text-[11px] text-warm-muted truncate max-w-md">
+                  Select a real Telegram cover, album sibling, or high-res artwork for <strong className="text-warm-white font-semibold">"{candidateTrack.title}"</strong>
+                </p>
+              </div>
+              <button onClick={() => setCandidateTrack(null)} className="text-warm-muted hover:text-white">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto space-y-3 pr-1 py-1">
+              {candidateLoading ? (
+                <div className="py-16 flex flex-col items-center justify-center gap-3 text-warm-muted">
+                  <RefreshCw className="w-6 h-6 animate-spin text-accent" />
+                  <span>Scanning Telegram channel and album matches...</span>
+                </div>
+              ) : candidates.length === 0 ? (
+                <div className="py-12 text-center text-warm-muted">
+                  No additional artwork candidates found for this track.
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {candidates.map((cand, idx) => {
+                    const isCurrent = cand.url === candidateTrack.thumbnail || cand.source === 'current';
+                    return (
+                      <div
+                        key={idx}
+                        className={`p-3.5 rounded-2xl bg-bg-card border transition flex flex-col justify-between gap-3 ${
+                          isCurrent ? 'border-accent/40 bg-accent/5' : 'border-white/5 hover:border-white/15'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-16 h-16 rounded-xl overflow-hidden bg-bg-secondary border border-white/10 flex-shrink-0">
+                            <img
+                              src={cand.url}
+                              alt={cand.label}
+                              className="w-full h-full object-cover"
+                              onError={e => {
+                                e.target.style.display = 'none';
+                              }}
+                            />
+                          </div>
+
+                          <div className="min-w-0 flex-1 space-y-1">
+                            <p className="font-bold text-xs text-warm-white line-clamp-2">
+                              {cand.label}
+                            </p>
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold border ${
+                                cand.confidence >= 85
+                                  ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20'
+                                  : 'bg-amber-500/10 text-amber-300 border-amber-500/20'
+                              }`}>
+                                {cand.confidence}% match
+                              </span>
+                              <span className="text-[10px] text-warm-muted font-mono uppercase">
+                                {cand.source.replace('_', ' ')}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <button
+                          disabled={isApplyingCandidate || isCurrent}
+                          onClick={() => handleSelectCandidate(cand)}
+                          className={`w-full py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 ${
+                            isCurrent
+                              ? 'bg-white/5 text-accent cursor-default'
+                              : 'bg-accent text-bg-primary shadow-md shadow-accent/20 hover:scale-[1.02]'
+                          }`}
+                        >
+                          {isCurrent ? (
+                            <>
+                              <Check className="w-3.5 h-3.5" />
+                              <span>Active Cover</span>
+                            </>
+                          ) : (
+                            <span>Set as Track Artwork</span>
+                          )}
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            <div className="flex items-center justify-end pt-2 border-t border-white/5 flex-shrink-0">
+              <button
+                onClick={() => setCandidateTrack(null)}
+                className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-warm-white text-xs font-semibold transition"
+              >
+                Close
               </button>
             </div>
           </div>

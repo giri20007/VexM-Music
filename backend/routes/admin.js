@@ -23,6 +23,10 @@ const {
   clearCache,
   exportMetadata,
   importMetadata,
+  setArtistAlias,
+  getArtistAlias,
+  getAllArtistAliases,
+  removeArtistAlias,
 } = require('../services/cacheService');
 const {
   getLyrics,
@@ -358,21 +362,166 @@ router.delete('/logs', (req, res) => {
   res.json({ success: true, message: 'Logs cleared' });
 });
 
-// 17. Backup Export & Import
-router.get('/export', (req, res) => {
-  const data = exportMetadata();
-  res.setHeader('Content-Type', 'application/json');
-  res.setHeader('Content-Disposition', `attachment; filename=spideyxflash_metadata_${Date.now()}.json`);
-  res.send(JSON.stringify(data, null, 2));
+// 18. Artist Management & Deduplication
+router.get('/artists', (req, res) => {
+  const items = getAllItems();
+  const artistMap = new Map(); // name -> { name, trackCount, albums: Set, sampleTrack }
+
+  items.forEach(item => {
+    const name = item.artist || 'Unknown Artist';
+    if (!artistMap.has(name)) {
+      artistMap.set(name, {
+        name,
+        trackCount: 0,
+        albums: new Set(),
+        sampleTrack: item,
+      });
+    }
+    const entry = artistMap.get(name);
+    entry.trackCount++;
+    if (item.album) entry.albums.add(item.album);
+  });
+
+  const list = Array.from(artistMap.values()).map(a => ({
+    name: a.name,
+    trackCount: a.trackCount,
+    albumCount: a.albums.size,
+    thumbnail: a.sampleTrack?.thumbnail,
+  }));
+
+  list.sort((a, b) => b.trackCount - a.trackCount);
+  res.json({ artists: list, aliases: getAllArtistAliases() });
 });
 
-router.post('/import', (req, res) => {
-  try {
-    const result = importMetadata(req.body);
-    res.json(result);
-  } catch (err) {
-    res.status(400).json({ error: true, message: err.message });
+router.get('/artists/duplicates', (req, res) => {
+  const items = getAllItems();
+  const rawNames = Array.from(new Set(items.map(i => i.artist).filter(Boolean)));
+  const duplicateGroups = [];
+
+  // Group by simplified name (lowercase, no extra spaces, punctuation stripped)
+  const normMap = new Map();
+  rawNames.forEach(raw => {
+    const simplified = raw.toLowerCase().replace(/[^\w]/g, '').trim();
+    if (!normMap.has(simplified)) {
+      normMap.set(simplified, []);
+    }
+    normMap.get(simplified).push(raw);
+  });
+
+  normMap.forEach(group => {
+    if (group.length > 1) {
+      duplicateGroups.push({
+        canonical: group[0],
+        variations: group,
+      });
+    }
+  });
+
+  res.json({ duplicates: duplicateGroups });
+});
+
+router.post('/artists/merge', (req, res) => {
+  const { sourceArtist, targetArtist } = req.body || {};
+  if (!sourceArtist || !targetArtist) {
+    return res.status(400).json({ error: true, message: 'sourceArtist and targetArtist required' });
   }
+
+  setArtistAlias(sourceArtist, targetArtist);
+
+  // Update all existing items in memory
+  const items = getAllItems();
+  let updatedCount = 0;
+  items.forEach(item => {
+    if (item.artist === sourceArtist) {
+      updateItemInMemory(item.id, { artist: targetArtist });
+      setOverride(item.id, { artist: targetArtist });
+      updatedCount++;
+    }
+  });
+
+  logActivity('ARTIST_MERGED', { sourceArtist, targetArtist, updatedCount });
+  res.json({ success: true, message: `Merged "${sourceArtist}" into "${targetArtist}"`, updatedCount });
+});
+
+router.post('/artists/rename', (req, res) => {
+  const { oldName, newName } = req.body || {};
+  if (!oldName || !newName) {
+    return res.status(400).json({ error: true, message: 'oldName and newName required' });
+  }
+
+  const items = getAllItems();
+  let count = 0;
+  items.forEach(item => {
+    if (item.artist === oldName) {
+      updateItemInMemory(item.id, { artist: newName });
+      setOverride(item.id, { artist: newName });
+      count++;
+    }
+  });
+
+  logActivity('ARTIST_RENAMED', { oldName, newName, count });
+  res.json({ success: true, message: `Renamed artist to "${newName}" across ${count} tracks` });
+});
+
+// 19. Artwork Candidate Search & Picker
+router.get('/artwork/candidates/:id', (req, res) => {
+  const { id } = req.params;
+  const track = getItem(id);
+  if (!track) return res.status(404).json({ error: true, message: 'Track not found' });
+
+  const candidates = [];
+
+  // 1. Current assigned artwork
+  candidates.push({
+    source: 'current',
+    url: track.thumbnail || `/api/artwork/${track.id}`,
+    label: 'Currently Active Artwork',
+    confidence: 100,
+  });
+
+  // 2. Telegram audio file thumbnail
+  candidates.push({
+    source: 'telegram_embedded',
+    url: `/api/artwork/${track.id}?src=doc`,
+    label: 'Telegram Embedded Audio Cover',
+    confidence: 85,
+  });
+
+  // 3. Album match candidate if same album exists
+  if (track.album && track.album !== 'Unknown Album') {
+    candidates.push({
+      source: 'album_match',
+      url: `/api/artwork/album_${encodeURIComponent(track.album.toLowerCase())}`,
+      label: `Matching Album Artwork (${track.album})`,
+      confidence: 90,
+    });
+  }
+
+  // 4. Look for other tracks in the same album
+  const allItems = getAllItems();
+  const sameAlbumTracks = allItems.filter(
+    t => t.id !== track.id && t.album && t.album === track.album && t.thumbnail
+  );
+  sameAlbumTracks.slice(0, 3).forEach(other => {
+    candidates.push({
+      source: 'sibling_track',
+      url: other.thumbnail,
+      label: `Album Sibling: ${other.title}`,
+      confidence: 75,
+    });
+  });
+
+  res.json({ trackId: id, title: track.title, artist: track.artist, candidates });
+});
+
+// 20. Active Sessions & Auth Logs
+router.get('/sessions', (req, res) => {
+  const logs = getLogs(50);
+  const authLogs = logs.filter(l => l.action?.includes('AUTH') || l.action?.includes('LOGIN'));
+  res.json({
+    activeAdmin: req.adminUser,
+    recentAuthActivity: authLogs,
+  });
 });
 
 module.exports = router;

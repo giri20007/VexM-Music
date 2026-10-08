@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const tg = require('../utils/telegramApi');
-const { getOverride, getArtwork } = require('../services/cacheService');
+const { getOverride, getArtwork, getArtistAlias } = require('../services/cacheService');
 const { logActivity } = require('../services/activityLog');
 
 const TTL = 30 * 1000; // Fast 30-second cache TTL for instant sync
@@ -13,9 +13,11 @@ let syncing = null;
 function applyOverrides(item) {
   const override = getOverride(item.id);
   const customArt = getArtwork(item.id);
+  const canonicalArtist = getArtistAlias(override?.artist || item.artist);
   return {
     ...item,
     ...(override || {}),
+    artist: canonicalArtist || override?.artist || item.artist,
     thumbnail: customArt || (override?.artworkUrl || item.thumbnail),
   };
 }

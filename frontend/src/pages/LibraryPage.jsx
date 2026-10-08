@@ -100,21 +100,24 @@ export function LibraryPage({ lib, onNavigate }) {
               className="flex-1 min-w-[200px] text-xs px-3.5 py-2.5 rounded-xl bg-bg-card border border-white/5 text-warm-white placeholder:text-warm-muted/60 focus:outline-none focus:ring-1 focus:ring-accent/50"
             />
 
-            {/* Quick Format Filter Pills */}
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+            {/* Quick Format & Smart Filter Pills */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
               {[
                 { id: 'all', label: 'All' },
-                { id: 'flac', label: 'FLAC' },
+                { id: 'flac', label: 'FLAC (Hi-Res)' },
                 { id: 'mp3', label: 'MP3' },
                 { id: 'aac', label: 'AAC' },
                 { id: 'wav', label: 'WAV' },
+                { id: 'recent', label: 'Recently Added' },
+                { id: 'mostPlayed', label: 'Most Played' },
+                { id: 'favorites', label: 'Favorites' },
               ].map(fmt => (
                 <button
                   key={fmt.id}
                   onClick={() => lib.setFilterFormat(fmt.id)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition ${
                     lib.filterFormat === fmt.id
-                      ? 'bg-accent text-bg-primary shadow-sm'
+                      ? 'bg-accent text-bg-primary shadow-sm font-bold'
                       : 'bg-bg-card hover:bg-bg-cardHover text-warm-muted hover:text-white border border-white/5'
                   }`}
                 >

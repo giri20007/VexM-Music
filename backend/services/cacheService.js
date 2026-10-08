@@ -16,8 +16,10 @@ if (!fs.existsSync(DATA_DIR)) {
 }
 
 // In-memory stores
-let metadataOverrides = new Map(); // trackId -> { title, artist, album, albumArtist, genre, year, trackNumber, discNumber, artworkUrl, updatedAt }
+let metadataOverrides = new Map(); // trackId -> { title, artist, album, albumArtist, genre, language, year, trackNumber, discNumber, artworkUrl, updatedAt }
 let customArtwork = new Map(); // trackId -> custom artwork url / base64
+let verifiedArtwork = new Set(); // trackIds with manually verified artwork
+let artistAliases = new Map(); // normalizedAlias -> canonicalName
 
 function loadLocalData() {
   try {
@@ -25,6 +27,8 @@ function loadLocalData() {
       const data = JSON.parse(fs.readFileSync(METADATA_FILE, 'utf8'));
       metadataOverrides = new Map(Object.entries(data.overrides || {}));
       customArtwork = new Map(Object.entries(data.artwork || {}));
+      verifiedArtwork = new Set(Array.isArray(data.verifiedArtwork) ? data.verifiedArtwork : []);
+      artistAliases = new Map(Object.entries(data.artistAliases || {}));
     }
   } catch (err) {
     console.error('Error loading metadata overrides:', err.message);
@@ -36,6 +40,8 @@ function saveLocalData() {
     const payload = {
       overrides: Object.fromEntries(metadataOverrides),
       artwork: Object.fromEntries(customArtwork),
+      verifiedArtwork: Array.from(verifiedArtwork),
+      artistAliases: Object.fromEntries(artistAliases),
       savedAt: new Date().toISOString(),
     };
     fs.writeFileSync(METADATA_FILE, JSON.stringify(payload, null, 2), 'utf8');
@@ -68,29 +74,64 @@ function removeOverride(trackId) {
   const id = String(trackId);
   const deleted = metadataOverrides.delete(id);
   customArtwork.delete(id);
+  verifiedArtwork.delete(id);
   if (deleted) saveLocalData();
   return deleted;
 }
 
-function setArtwork(trackId, artworkUrl) {
+function setArtwork(trackId, artworkUrl, isVerified = true) {
   const id = String(trackId);
   if (artworkUrl) {
     customArtwork.set(id, artworkUrl);
+    if (isVerified) {
+      verifiedArtwork.add(id);
+    }
   } else {
     customArtwork.delete(id);
+    verifiedArtwork.delete(id);
   }
   saveLocalData();
-  logActivity('ARTWORK_UPDATED', { trackId: id, hasArtwork: Boolean(artworkUrl) });
+  logActivity('ARTWORK_UPDATED', { trackId: id, hasArtwork: Boolean(artworkUrl), isVerified });
 }
 
 function getArtwork(trackId) {
   return customArtwork.get(String(trackId)) || null;
 }
 
+function isArtworkVerified(trackId) {
+  return verifiedArtwork.has(String(trackId));
+}
+
+function setArtistAlias(alias, canonical) {
+  if (!alias || !canonical) return;
+  const key = alias.trim().toLowerCase();
+  artistAliases.set(key, canonical.trim());
+  saveLocalData();
+  logActivity('ARTIST_ALIAS_SET', { alias, canonical });
+}
+
+function getArtistAlias(name) {
+  if (!name) return null;
+  return artistAliases.get(name.trim().toLowerCase()) || null;
+}
+
+function getAllArtistAliases() {
+  return Object.fromEntries(artistAliases);
+}
+
+function removeArtistAlias(alias) {
+  if (!alias) return;
+  const deleted = artistAliases.delete(alias.trim().toLowerCase());
+  if (deleted) saveLocalData();
+  return deleted;
+}
+
 function getCacheStats() {
   return {
     metadataOverridesCount: metadataOverrides.size,
     customArtworkCount: customArtwork.size,
+    verifiedArtworkCount: verifiedArtwork.size,
+    artistAliasesCount: artistAliases.size,
     lastSaved: fs.existsSync(METADATA_FILE) ? fs.statSync(METADATA_FILE).mtime : null,
   };
 }
@@ -103,7 +144,12 @@ function clearCache(target = 'all') {
   }
   if (target === 'all' || target === 'artwork') {
     customArtwork.clear();
+    verifiedArtwork.clear();
     cleared.push('artwork');
+  }
+  if (target === 'all' || target === 'artists') {
+    artistAliases.clear();
+    cleared.push('artists');
   }
   saveLocalData();
   logActivity('CACHE_CLEARED', { target, cleared });
@@ -112,10 +158,12 @@ function clearCache(target = 'all') {
 
 function exportMetadata() {
   return {
-    version: '1.0',
+    version: '1.2',
     exportDate: new Date().toISOString(),
     overrides: Object.fromEntries(metadataOverrides),
     artwork: Object.fromEntries(customArtwork),
+    verifiedArtwork: Array.from(verifiedArtwork),
+    artistAliases: Object.fromEntries(artistAliases),
   };
 }
 
@@ -133,6 +181,7 @@ function importMetadata(data) {
           album: typeof val.album === 'string' ? val.album : undefined,
           albumArtist: typeof val.albumArtist === 'string' ? val.albumArtist : undefined,
           genre: typeof val.genre === 'string' ? val.genre : undefined,
+          language: typeof val.language === 'string' ? val.language : undefined,
           year: val.year ? Number(val.year) : undefined,
           trackNumber: val.trackNumber ? Number(val.trackNumber) : undefined,
           discNumber: val.discNumber ? Number(val.discNumber) : undefined,
@@ -149,6 +198,16 @@ function importMetadata(data) {
       }
     }
   }
+  if (Array.isArray(data.verifiedArtwork)) {
+    data.verifiedArtwork.forEach(id => verifiedArtwork.add(String(id)));
+  }
+  if (data.artistAliases && typeof data.artistAliases === 'object') {
+    for (const [alias, canonical] of Object.entries(data.artistAliases)) {
+      if (typeof canonical === 'string') {
+        artistAliases.set(alias.toLowerCase(), canonical);
+      }
+    }
+  }
   saveLocalData();
   logActivity('METADATA_IMPORTED', { count: importedCount });
   return { success: true, importedCount };
@@ -160,6 +219,11 @@ module.exports = {
   removeOverride,
   setArtwork,
   getArtwork,
+  isArtworkVerified,
+  setArtistAlias,
+  getArtistAlias,
+  getAllArtistAliases,
+  removeArtistAlias,
   getCacheStats,
   clearCache,
   exportMetadata,

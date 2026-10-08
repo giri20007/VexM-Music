@@ -121,8 +121,27 @@ export const adminGetArtworkHealth = () => adminRequest('/api/admin/artwork/heal
 export const adminRescanArtwork = () => adminRequest('/api/admin/artwork/rescan', { method: 'POST' });
 export const adminGetArtworkDiagnostics = id =>
   adminRequest(`/api/admin/artwork/diagnostics/${encodeURIComponent(id)}`);
+export const adminGetArtworkCandidates = id =>
+  adminRequest(`/api/admin/artwork/candidates/${encodeURIComponent(id)}`);
 export const adminOverrideArtwork = (id, coverType, coverSource) =>
   adminRequest(`/api/admin/artwork/override/${encodeURIComponent(id)}`, {
     method: 'POST',
     body: JSON.stringify({ coverType, coverSource }),
   });
+
+// Section 130+: Artist Management & Deduplication APIs
+export const adminGetArtists = () => adminRequest('/api/admin/artists');
+export const adminGetDuplicateArtists = () => adminRequest('/api/admin/artists/duplicates');
+export const adminMergeArtists = (sourceArtist, targetArtist) =>
+  adminRequest('/api/admin/artists/merge', {
+    method: 'POST',
+    body: JSON.stringify({ sourceArtist, targetArtist }),
+  });
+export const adminRenameArtist = (oldName, newName) =>
+  adminRequest('/api/admin/artists/rename', {
+    method: 'POST',
+    body: JSON.stringify({ oldName, newName }),
+  });
+
+// Section 140: Active Sessions Telemetry
+export const adminGetSessions = () => adminRequest('/api/admin/sessions');

@@ -114,11 +114,24 @@ export function useLibrary() {
     return () => clearTimeout(t);
   }, [query]);
 
+  const likedTrackIds = useAudioStore(s => s.likedTrackIds);
+  const playHistory = useAudioStore(s => s.playHistory);
+
   // Filtered & Sorted Tracks
   const visible = useMemo(() => {
     let result = [...items];
 
-    if (filterFormat !== 'all') {
+    if (filterFormat === 'favorites') {
+      const likedSet = new Set((likedTrackIds || []).map(String));
+      result = result.filter(i => likedSet.has(String(i.id)));
+    } else if (filterFormat === 'mostPlayed') {
+      const countMap = new Map((playHistory || []).map(h => [String(h.id), h.playCount || 0]));
+      result = result
+        .filter(i => (countMap.get(String(i.id)) || 0) > 0)
+        .sort((a, b) => (countMap.get(String(b.id)) || 0) - (countMap.get(String(a.id)) || 0));
+    } else if (filterFormat === 'recent') {
+      result.sort((a, b) => (b.date || b.id || 0) - (a.date || a.id || 0));
+    } else if (filterFormat !== 'all') {
       result = result.filter(i => i.format?.toLowerCase() === filterFormat.toLowerCase());
     }
 
@@ -130,16 +143,20 @@ export function useLibrary() {
       );
     }
 
-    const sorters = {
-      recent: (a, b) => (b.date || 0) - (a.date || 0),
-      alpha: (a, b) => (a.title || '').localeCompare(b.title || ''),
-      artist: (a, b) => (a.artist || '').localeCompare(b.artist || ''),
-      duration: (a, b) => (b.duration || 0) - (a.duration || 0),
-      size: (a, b) => (b.size || 0) - (a.size || 0),
-    };
+    if (filterFormat !== 'mostPlayed' && filterFormat !== 'recent') {
+      const sorters = {
+        recent: (a, b) => (b.date || 0) - (a.date || 0),
+        alpha: (a, b) => (a.title || '').localeCompare(b.title || ''),
+        artist: (a, b) => (a.artist || '').localeCompare(b.artist || ''),
+        duration: (a, b) => (b.duration || 0) - (a.duration || 0),
+        size: (a, b) => (b.size || 0) - (a.size || 0),
+      };
 
-    return result.sort(sorters[sort] || sorters.recent);
-  }, [items, debounced, sort, filterFormat]);
+      return result.sort(sorters[sort] || sorters.recent);
+    }
+
+    return result;
+  }, [items, debounced, sort, filterFormat, likedTrackIds, playHistory]);
 
   // Derived collections for Albums & Artists
   const albums = useMemo(() => {

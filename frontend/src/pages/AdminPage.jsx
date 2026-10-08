@@ -12,12 +12,14 @@ import {
   ArrowLeft,
   Menu,
   X,
+  Users,
 } from 'lucide-react';
 import { useAdminStore } from '../store/useAdminStore';
 import { AdminLogin } from '../components/admin/AdminLogin';
 import { AdminDashboard } from '../components/admin/AdminDashboard';
 import { AdminLibrary } from '../components/admin/AdminLibrary';
 import { AdminLyrics } from '../components/admin/AdminLyrics';
+import { AdminArtists } from '../components/admin/AdminArtists';
 import { AdminTelegram } from '../components/admin/AdminTelegram';
 import { AdminCache } from '../components/admin/AdminCache';
 import { AdminSystem } from '../components/admin/AdminSystem';
@@ -54,6 +56,7 @@ export function AdminPage({ onBackToApp }) {
   const tabs = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'library', label: 'Library & Tracks', icon: Music2 },
+    { id: 'artists', label: 'Artist Manager', icon: Users },
     { id: 'lyrics', label: 'Lyrics Editor', icon: Mic2 },
     { id: 'telegram', label: 'Telegram & Sync', icon: Radio },
     { id: 'cache', label: 'Cache Manager', icon: Database },
@@ -183,6 +186,7 @@ export function AdminPage({ onBackToApp }) {
         <div className="flex-1 p-4 sm:p-8 max-w-7xl w-full mx-auto pb-24">
           {activeTab === 'dashboard' && <AdminDashboard onNavigateTab={setActiveTab} />}
           {activeTab === 'library' && <AdminLibrary />}
+          {activeTab === 'artists' && <AdminArtists />}
           {activeTab === 'lyrics' && <AdminLyrics />}
           {activeTab === 'telegram' && <AdminTelegram />}
           {activeTab === 'cache' && <AdminCache />}
