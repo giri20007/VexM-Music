@@ -596,6 +596,20 @@ async function testConnection() {
   }
 }
 
+// Read only the first N bytes (e.g. 512 KB) of an audio file for metadata/lyrics inspection
+async function readPartialAudioChunk(doc, maxBytes = 512 * 1024) {
+  if (!doc) return null;
+  const targetEnd = Math.min(Number(doc.size || maxBytes) - 1, maxBytes - 1);
+  const chunks = [];
+  let totalBytes = 0;
+  for await (const chunk of streamRange(doc, 0, targetEnd)) {
+    chunks.push(chunk);
+    totalBytes += chunk.length;
+    if (totalBytes >= maxBytes) break;
+  }
+  return chunks.length > 0 ? Buffer.concat(chunks) : null;
+}
+
 function getConnectionStatus() {
   return {
     ...connectionStatus,
@@ -610,6 +624,7 @@ module.exports = {
   CoverDetector,
   getDoc,
   streamRange,
+  readPartialAudioChunk,
   downloadThumbnail,
   downloadPhotoByMsgId,
   testConnection,

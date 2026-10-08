@@ -16,6 +16,8 @@ import {
   ListMusic,
   Info,
   Moon,
+  Sparkles,
+  Trash2,
 } from 'lucide-react';
 import { useAudioStore } from '../../store/useAudioStore';
 import { seek } from '../../hooks/usePlayer';
@@ -139,6 +141,15 @@ export function NowPlayingModal() {
               onError={() => setImgError(true)}
               className="w-full h-full object-cover shadow-inner transition-transform duration-500 group-hover:scale-102"
             />
+            {currentTrack.artworkConfidence >= 60 && (
+              <div
+                className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10 flex items-center gap-1.5 text-[11px] font-bold text-accent"
+                title="Verified Telegram Cover Artwork"
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Telegram Cover</span>
+              </div>
+            )}
           </div>
 
           {/* Track Info & Like */}
@@ -305,41 +316,55 @@ export function NowPlayingModal() {
             {activeTab === 'lyrics' && <LyricsView track={currentTrack} />}
 
             {activeTab === 'upnext' && (
-              <div className="h-full overflow-y-auto pr-2 space-y-1.5 no-scrollbar">
+              <div className="h-full overflow-y-auto pr-2 space-y-2 no-scrollbar">
                 {upNextTracks.length === 0 ? (
-                  <p className="p-8 text-center text-xs text-warm-muted">No upcoming tracks.</p>
+                  <div className="h-full flex flex-col items-center justify-center py-12 text-warm-muted/60 text-center">
+                    <ListMusic className="w-10 h-10 mb-2 opacity-30" />
+                    <p className="font-medium text-warm-white/70">No upcoming tracks</p>
+                    <p className="text-xs text-warm-muted/60 mt-1 max-w-xs">
+                      Tracks you add to the queue or albums you play will appear here.
+                    </p>
+                  </div>
                 ) : (
                   upNextTracks.map((t, i) => (
                     <div
                       key={`${t.id}_${i}`}
-                      className="group flex items-center justify-between gap-3 p-2 rounded-xl bg-bg-card hover:bg-bg-cardHover border border-white/5 text-xs transition"
+                      className="group flex items-center justify-between gap-3 p-2.5 rounded-2xl bg-bg-card hover:bg-bg-cardHover border border-white/5 hover:border-accent/30 text-xs transition-all shadow-sm"
                     >
                       <div
-                        onClick={() => playTrack(t)}
+                        onClick={() => playTrack(t, queue)}
                         className="flex items-center gap-3 min-w-0 flex-1 cursor-pointer"
                       >
-                        <div className="w-8 h-8 rounded-lg overflow-hidden bg-bg-secondary flex-shrink-0">
+                        <span className="text-[11px] font-mono text-warm-muted/70 w-5 text-center flex-shrink-0 group-hover:text-accent font-bold">
+                          {i + 1}
+                        </span>
+                        <div className="w-10 h-10 rounded-xl overflow-hidden bg-bg-secondary flex-shrink-0 border border-white/5 shadow-inner">
                           <img
-                            src={getArtworkSrc(t)}
+                            src={getArtworkSrc(t, 100)}
                             alt={t.title}
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover transition-transform group-hover:scale-105"
                           />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <p className="truncate font-semibold text-warm-white group-hover:text-accent">
+                          <p className="truncate font-bold text-warm-white group-hover:text-accent transition-colors">
                             {t.title}
                           </p>
-                          <p className="truncate text-[10px] text-warm-muted">{t.artist}</p>
+                          <p className="truncate text-[11px] text-warm-muted mt-0.5">{t.artist}</p>
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-2 text-warm-muted">
-                        <span className="tabular-nums text-[11px]">{formatDuration(t.duration)}</span>
+                      <div className="flex items-center gap-2.5 text-warm-muted flex-shrink-0">
+                        <span className="tabular-nums font-mono text-[11px]">{formatDuration(t.duration)}</span>
                         <button
-                          onClick={() => removeFromQueue(t.id)}
-                          className="p-1 hover:text-red-400 opacity-0 group-hover:opacity-100 transition"
+                          onClick={e => {
+                            e.stopPropagation();
+                            removeFromQueue(t.id);
+                          }}
+                          className="p-1.5 rounded-lg hover:bg-white/10 hover:text-rose-400 opacity-0 group-hover:opacity-100 transition"
+                          title="Remove from queue"
+                          aria-label="Remove from queue"
                         >
-                          ✕
+                          <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
                     </div>

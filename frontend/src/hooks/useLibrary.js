@@ -3,6 +3,22 @@ import { fetchLibrary, BASE_URL } from '../utils/api';
 import { getTrackArtworkUrl, getArtistAvatarUrl, getArtworkSrc } from '../utils/artworkGenerator';
 import { useAudioStore } from '../store/useAudioStore';
 
+export function splitArtists(artistStr) {
+  if (!artistStr || typeof artistStr !== 'string') return ['Unknown Artist'];
+  const cleaned = artistStr.trim();
+  if (!cleaned || cleaned.toLowerCase() === 'unknown' || cleaned.toLowerCase() === 'unknown artist') {
+    return ['Unknown Artist'];
+  }
+
+  // Split on delimiters like: feat., ft., featuring, with, vs., &, ;, /, or comma
+  const parts = cleaned
+    .split(/(?:\s+(?:feat\.?|ft\.?|featuring|with|vs\.?)\s+|\s+&\s+|\s*;\s*|\s*\/\s*|,\s*)/i)
+    .map(p => p.trim())
+    .filter(p => p.length > 0 && p.toLowerCase() !== 'various artists' && p.toLowerCase() !== 'unknown');
+
+  return parts.length > 0 ? Array.from(new Set(parts)) : [cleaned];
+}
+
 export function useLibrary() {
   const [items, setItems] = useState([]);
   const [state, setState] = useState('connecting'); // connecting | ready | error
@@ -148,18 +164,55 @@ export function useLibrary() {
   const artists = useMemo(() => {
     const map = new Map();
     items.forEach(t => {
-      const name = t.artist && t.artist !== 'Unknown Artist' ? t.artist : 'Unknown Artist';
-      if (!map.has(name)) {
-        map.set(name, {
-          name,
-          tracks: [],
-          thumbnail: getArtistAvatarUrl(name),
-        });
-      }
-      const entry = map.get(name);
-      entry.tracks.push(t);
+      const rawArtist = t.artist || t.albumArtist || 'Unknown Artist';
+      const parsedArtists = splitArtists(rawArtist);
+
+      parsedArtists.forEach(name => {
+        const canonicalKey = name.toLowerCase();
+        if (!map.has(canonicalKey)) {
+          map.set(canonicalKey, {
+            name,
+            tracks: [],
+            albumsMap: new Map(),
+            thumbnail: null,
+            artworkConfidence: 0,
+          });
+        }
+        const entry = map.get(canonicalKey);
+
+        if (!entry.tracks.some(existing => existing.id === t.id)) {
+          entry.tracks.push(t);
+        }
+
+        const albumName = t.album && t.album !== 'Unknown Album' ? t.album : null;
+        if (albumName && !entry.albumsMap.has(albumName)) {
+          entry.albumsMap.set(albumName, {
+            name: albumName,
+            artist: t.albumArtist || name,
+            year: t.year || null,
+            thumbnail: t.thumbnail || getTrackArtworkUrl(t),
+            tracks: [],
+          });
+        }
+        if (albumName && entry.albumsMap.has(albumName)) {
+          entry.albumsMap.get(albumName).tracks.push(t);
+        }
+
+        const trackConfidence = t.artworkConfidence || (t.thumbnail?.startsWith('http') ? 70 : 10);
+        if (trackConfidence > entry.artworkConfidence) {
+          entry.artworkConfidence = trackConfidence;
+          entry.thumbnail = t.thumbnail || getArtworkSrc(t, 400);
+        }
+      });
     });
-    return Array.from(map.values()).sort((a, b) => b.tracks.length - a.tracks.length);
+
+    return Array.from(map.values())
+      .map(artist => ({
+        ...artist,
+        albums: Array.from(artist.albumsMap.values()),
+        thumbnail: artist.thumbnail || getArtistAvatarUrl(artist.name),
+      }))
+      .sort((a, b) => b.tracks.length - a.tracks.length);
   }, [items]);
 
   return {

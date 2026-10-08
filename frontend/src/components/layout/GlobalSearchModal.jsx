@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Search, X, Music2, Disc3, User, Play } from 'lucide-react';
 import { useAudioStore } from '../../store/useAudioStore';
 import { formatDuration } from '../../utils/formatters';
-import { artworkUrl } from '../../utils/api';
+import { getArtworkSrc } from '../../utils/artworkGenerator';
 
 export function GlobalSearchModal({ allTracks = [], onNavigate }) {
   const isSearchModalOpen = useAudioStore(s => s.isSearchModalOpen);
@@ -107,7 +107,7 @@ export function GlobalSearchModal({ allTracks = [], onNavigate }) {
               </div>
               {matchingTracks.map((t, idx) => {
                 const isSelected = idx === selectedIndex;
-                const cover = t.thumbnail || artworkUrl(t.id, t.title);
+                const cover = getArtworkSrc(t, 100);
                 return (
                   <div
                     key={t.id}

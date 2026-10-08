@@ -34,6 +34,31 @@ export function getArtworkSrc(track, size = null) {
   return getTrackArtworkUrl(track, size || 400);
 }
 
+export function getArtistArtworkSrc(artist, size = null) {
+  if (!artist) return '';
+  const name = typeof artist === 'string' ? artist : (artist.name || 'Unknown Artist');
+  const thumb = typeof artist === 'object' ? artist.thumbnail : null;
+
+  if (thumb) {
+    if (thumb.startsWith('http://') || thumb.startsWith('https://') || thumb.startsWith('data:')) {
+      return thumb;
+    }
+    if (thumb.startsWith('/')) {
+      const sep = thumb.includes('?') ? '&' : '?';
+      return `${BASE_URL}${thumb}${size ? `${sep}size=${size}` : ''}`;
+    }
+  }
+
+  if (typeof artist === 'object' && artist.tracks?.length > 0) {
+    const trackWithArt = artist.tracks.find(t => t.thumbnail || t.id);
+    if (trackWithArt) {
+      return getArtworkSrc(trackWithArt, size || 400);
+    }
+  }
+
+  return getArtistAvatarUrl(name, size || 300);
+}
+
 function stringHash(str = '') {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {

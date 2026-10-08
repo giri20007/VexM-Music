@@ -58,14 +58,20 @@ export function Sidebar({ currentRoute, onNavigate }) {
           onClick={() => onNavigate('home')}
           className="flex items-center gap-3 cursor-pointer group"
         >
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-accent to-[#f43f5e] flex items-center justify-center text-bg-primary shadow-lg shadow-accent/20 group-hover:scale-105 transition">
+          <div className="relative w-9 h-9 rounded-xl bg-gradient-to-tr from-accent via-[#ff6b6b] to-[#f43f5e] flex items-center justify-center text-bg-primary shadow-lg shadow-accent/25 group-hover:scale-105 group-hover:shadow-accent/40 transition-all duration-300">
             <Music2 className="w-5 h-5 fill-bg-primary stroke-bg-primary" />
+            <div className="absolute inset-0 rounded-xl bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
           </div>
           {!collapsed && (
             <div className="flex flex-col">
-              <span className="font-extrabold text-base tracking-tight text-warm-white flex items-center">
-                SPiDEY<span className="text-accent">x</span>FLASH
-              </span>
+              <div className="flex items-center gap-1.5">
+                <span className="font-black text-base tracking-tight bg-gradient-to-r from-warm-white via-white to-[#ffa198] bg-clip-text text-transparent">
+                  SPiDEY<span className="text-accent drop-shadow-[0_0_8px_rgba(255,123,114,0.6)]">x</span>FLASH
+                </span>
+                <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.2 rounded bg-accent/15 text-accent border border-accent/20">
+                  PRO
+                </span>
+              </div>
             </div>
           )}
         </div>

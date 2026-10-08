@@ -5,17 +5,31 @@ const { logActivity } = require('./activityLog');
 const DATA_DIR = path.join(__dirname, '..', 'data');
 const LYRICS_FILE = path.join(DATA_DIR, 'lyrics_cache.json');
 
-let lyricsStore = new Map(); // trackId -> { type: 'synced'|'plain', content: string, lines: Array<{time: number, text: string}>, updatedAt: string }
+let lyricsStore = new Map(); // trackId -> { type: 'synced'|'plain', source: 'embedded'|'admin', raw: string, lines: Array<{time: number, text: string}>, updatedAt: string }
+const negativeCache = new Map(); // trackId -> timestamp checked
 
 function parseLRC(rawLrc) {
   if (!rawLrc || typeof rawLrc !== 'string') return [];
   const lines = [];
-  const timeRegex = /\[(\d{1,2}):(\d{2})(?:\.(\d{2,3}))?\]/g;
+  const timeRegex = /\[(\d{1,2}):(\d{2})(?:[.:](\d{2,3}))?\]/g;
+  let globalOffsetMs = 0;
 
   const rawLines = rawLrc.split('\n');
   for (const line of rawLines) {
     const trimmed = line.trim();
     if (!trimmed) continue;
+
+    // Check for [offset:+/-xxx] tag
+    const offsetMatch = trimmed.match(/^\[offset:\s*([+-]?\d+)\s*\]/i);
+    if (offsetMatch) {
+      globalOffsetMs = parseInt(offsetMatch[1], 10) || 0;
+      continue;
+    }
+
+    // Skip non-timed metadata tags like [ar:...], [ti:...], [al:...]
+    if (/^\[(ar|ti|al|by|length|re|ve|la):.*\]/i.test(trimmed)) {
+      continue;
+    }
 
     const matches = [...trimmed.matchAll(timeRegex)];
     if (matches.length > 0) {
@@ -23,9 +37,13 @@ function parseLRC(rawLrc) {
       for (const m of matches) {
         const mins = parseInt(m[1], 10);
         const secs = parseInt(m[2], 10);
-        const ms = m[3] ? (m[3].length === 2 ? parseInt(m[3], 10) * 10 : parseInt(m[3], 10)) : 0;
-        const totalSecs = mins * 60 + secs + ms / 1000;
-        lines.push({ time: totalSecs, text });
+        let ms = 0;
+        if (m[3]) {
+          ms = m[3].length === 2 ? parseInt(m[3], 10) * 10 : parseInt(m[3], 10);
+        }
+        let totalSecs = mins * 60 + secs + (ms / 1000) + (globalOffsetMs / 1000);
+        if (totalSecs < 0) totalSecs = 0;
+        lines.push({ time: Number(totalSecs.toFixed(3)), text: text || '♪' });
       }
     }
   }
@@ -60,8 +78,25 @@ function getLyrics(trackId) {
   return lyricsStore.get(String(trackId)) || null;
 }
 
-function setLyrics(trackId, rawContent, type = 'auto') {
+function isNegativeCached(trackId) {
+  const ts = negativeCache.get(String(trackId));
+  if (!ts) return false;
+  // Negative cache valid for 2 hours
+  if (Date.now() - ts < 2 * 60 * 60 * 1000) {
+    return true;
+  }
+  negativeCache.delete(String(trackId));
+  return false;
+}
+
+function setNegativeCached(trackId) {
+  negativeCache.set(String(trackId), Date.now());
+}
+
+function setLyrics(trackId, rawContent, type = 'auto', source = 'admin') {
   const id = String(trackId);
+  negativeCache.delete(id);
+
   if (!rawContent || !rawContent.trim()) {
     lyricsStore.delete(id);
     saveLyricsData();
@@ -74,6 +109,7 @@ function setLyrics(trackId, rawContent, type = 'auto') {
 
   const entry = {
     type: isSynced ? 'synced' : 'plain',
+    source: source || 'admin',
     raw: rawContent.trim(),
     lines: isSynced ? parsedLines : [],
     updatedAt: new Date().toISOString(),
@@ -81,12 +117,13 @@ function setLyrics(trackId, rawContent, type = 'auto') {
 
   lyricsStore.set(id, entry);
   saveLyricsData();
-  logActivity('LYRICS_UPDATED', { trackId: id, type: entry.type, lineCount: entry.lines.length });
+  logActivity('LYRICS_UPDATED', { trackId: id, type: entry.type, source: entry.source, lineCount: entry.lines.length });
   return entry;
 }
 
 function deleteLyrics(trackId) {
   const id = String(trackId);
+  negativeCache.delete(id);
   const removed = lyricsStore.delete(id);
   if (removed) {
     saveLyricsData();
@@ -97,6 +134,7 @@ function deleteLyrics(trackId) {
 
 function clearLyricsCache() {
   lyricsStore.clear();
+  negativeCache.clear();
   saveLyricsData();
   logActivity('CACHE_CLEARED', { target: 'lyrics' });
   return { success: true };
@@ -107,6 +145,8 @@ module.exports = {
   setLyrics,
   deleteLyrics,
   parseLRC,
+  isNegativeCached,
+  setNegativeCached,
   clearLyricsCache,
   getLyricsCount: () => lyricsStore.size,
 };

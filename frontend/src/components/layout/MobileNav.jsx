@@ -1,7 +1,7 @@
 import React from 'react';
 import { Home, Search, Library, Settings, Play, Pause, Music2 } from 'lucide-react';
 import { useAudioStore } from '../../store/useAudioStore';
-import { artworkUrl } from '../../utils/api';
+import { getArtworkSrc } from '../../utils/artworkGenerator';
 
 export function MobileNav({ currentRoute, onNavigate }) {
   const currentTrack = useAudioStore(s => s.currentTrack);
@@ -27,7 +27,7 @@ export function MobileNav({ currentRoute, onNavigate }) {
           <div className="flex items-center gap-3 min-w-0 flex-1">
             <div className="w-9 h-9 rounded-lg overflow-hidden bg-bg-active flex-shrink-0">
               <img
-                src={currentTrack.thumbnail || artworkUrl(currentTrack.id, currentTrack.title)}
+                src={getArtworkSrc(currentTrack, 100)}
                 alt={currentTrack.title}
                 className="w-full h-full object-cover"
               />

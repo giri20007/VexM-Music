@@ -4,12 +4,13 @@ import { useSettingsStore } from '../../store/useSettingsStore';
 import { fetchTrackLyrics } from '../../utils/api';
 import { parseLrc, findActiveLyricIndex } from '../../utils/lrcParser';
 import { seek } from '../../hooks/usePlayer';
-import { Minus, Plus, RefreshCw, Music2 } from 'lucide-react';
+import { Minus, Plus, RefreshCw, Music2, Copy, Check, Sparkles, FileAudio, RotateCcw } from 'lucide-react';
 
 export function LyricsView({ track }) {
   const currentTime = useAudioStore(s => s.currentTime);
   const [lyricsData, setLyricsData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const syncLyrics = useSettingsStore(s => s.syncLyrics);
   const autoScroll = useSettingsStore(s => s.autoScroll);
@@ -77,38 +78,100 @@ export function LyricsView({ track }) {
     }
   };
 
+  const handleCopyLyrics = async () => {
+    const textToCopy = parsedLines.length > 0
+      ? parsedLines.map(l => l.text).join('\n')
+      : lyricsData?.raw || '';
+    if (!textToCopy) return;
+
+    try {
+      await navigator.clipboard.writeText(textToCopy);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // ignore
+    }
+  };
+
+  const hasLyrics = parsedLines.length > 0 || !!lyricsData?.raw;
+  const isEmbedded = lyricsData?.source === 'embedded';
+
   return (
-    <div className="flex flex-col h-full select-none">
-      {/* Timing offset bar (Matches Screenshot 2: - 0 ms +) */}
-      {isSynced && (
-        <div className="flex items-center justify-between pb-3 mb-2 border-b border-white/5 text-xs text-warm-muted">
-          <span className="text-[11px] font-medium text-warm-muted/70">Sync tuning</span>
-          <div className="flex items-center gap-1.5 bg-bg-card px-2.5 py-1 rounded-full border border-white/5">
+    <div className="flex flex-col h-full select-none font-sans">
+      {/* Top Header: Source Badge & Tuning Bar */}
+      {hasLyrics && (
+        <div className="flex items-center justify-between pb-3 mb-2 border-b border-white/5 text-xs text-warm-muted gap-2 flex-wrap">
+          {/* Source Badges */}
+          <div className="flex items-center gap-2 flex-wrap">
+            {isEmbedded ? (
+              <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-accent/15 border border-accent/30 text-[10px] font-bold text-accent">
+                <FileAudio className="w-3 h-3" />
+                <span>Embedded in Audio</span>
+              </span>
+            ) : isSynced ? (
+              <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-[10px] font-bold text-emerald-400">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span>Synced Lyrics</span>
+              </span>
+            ) : (
+              <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-semibold text-warm-muted">
+                <span>Text Lyrics</span>
+              </span>
+            )}
+
+            {/* Copy button */}
             <button
-              onClick={() => adjustLyricsOffset(-100)}
-              className="p-1 hover:text-white transition"
-              title="-100ms"
+              onClick={handleCopyLyrics}
+              className="flex items-center gap-1 px-2 py-0.5 rounded-md hover:bg-white/5 text-warm-muted hover:text-white text-[11px] transition"
+              title="Copy lyrics to clipboard"
             >
-              <Minus className="w-3 h-3" />
-            </button>
-            <span className="tabular-nums font-mono text-[11px] min-w-[50px] text-center text-warm-white">
-              {offsetMs >= 0 ? `+${offsetMs}` : offsetMs} ms
-            </span>
-            <button
-              onClick={() => adjustLyricsOffset(100)}
-              className="p-1 hover:text-white transition"
-              title="+100ms"
-            >
-              <Plus className="w-3 h-3" />
+              {copied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+              <span>{copied ? 'Copied' : 'Copy'}</span>
             </button>
           </div>
+
+          {/* Timing offset bar (- 0 ms +) */}
+          {isSynced && (
+            <div className="flex items-center gap-1.5 bg-bg-card px-2.5 py-1 rounded-full border border-white/5">
+              <button
+                onClick={() => adjustLyricsOffset(-100)}
+                className="p-1 hover:text-white transition"
+                title="Delay lyrics 100ms (-100ms)"
+              >
+                <Minus className="w-3 h-3" />
+              </button>
+              <span
+                onClick={() => adjustLyricsOffset(-offsetMs)}
+                className="tabular-nums font-mono text-[11px] min-w-[52px] text-center text-warm-white cursor-pointer hover:text-accent transition"
+                title="Click to reset offset to 0ms"
+              >
+                {offsetMs >= 0 ? `+${offsetMs}` : offsetMs} ms
+              </span>
+              <button
+                onClick={() => adjustLyricsOffset(100)}
+                className="p-1 hover:text-white transition"
+                title="Advance lyrics 100ms (+100ms)"
+              >
+                <Plus className="w-3 h-3" />
+              </button>
+              {offsetMs !== 0 && (
+                <button
+                  onClick={() => adjustLyricsOffset(-offsetMs)}
+                  className="p-1 text-warm-muted hover:text-accent transition"
+                  title="Reset to 0ms"
+                >
+                  <RotateCcw className="w-2.5 h-2.5" />
+                </button>
+              )}
+            </div>
+          )}
         </div>
       )}
 
       {/* Lyrics Content Container */}
       <div
         ref={containerRef}
-        className="flex-1 overflow-y-auto pr-2 space-y-4 no-scrollbar scroll-smooth"
+        className="flex-1 overflow-y-auto pr-2 space-y-4 no-scrollbar scroll-smooth antialiased"
         style={{ fontSize: `${fontSize}px` }}
       >
         {loading ? (
@@ -124,7 +187,7 @@ export function LyricsView({ track }) {
                 key={line.id || idx}
                 ref={isActive ? activeLineRef : null}
                 onClick={() => handleLineClick(line.time)}
-                className={`transition-all duration-300 cursor-pointer font-bold leading-relaxed ${
+                className={`transition-all duration-300 cursor-pointer font-bold leading-relaxed break-words ${
                   isActive
                     ? 'text-accent scale-105 origin-left glow-text font-black'
                     : 'text-warm-muted/50 hover:text-warm-muted'
@@ -135,7 +198,7 @@ export function LyricsView({ track }) {
             );
           })
         ) : lyricsData?.raw ? (
-          <div className="whitespace-pre-line text-warm-white/80 leading-relaxed font-medium">
+          <div className="whitespace-pre-line text-warm-white/80 leading-relaxed font-medium break-words">
             {lyricsData.raw}
           </div>
         ) : (
@@ -151,3 +214,4 @@ export function LyricsView({ track }) {
     </div>
   );
 }
+
