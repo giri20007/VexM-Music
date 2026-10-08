@@ -1,0 +1,96 @@
+import React from 'react';
+import { Disc3, Play, ArrowLeft } from 'lucide-react';
+import { useAudioStore } from '../store/useAudioStore';
+import { TrackRow } from '../components/library/TrackRow';
+import { AlbumCard } from '../components/library/AlbumCard';
+import { formatDuration } from '../utils/formatters';
+
+export function AlbumsPage({ lib, selectedAlbumName, onNavigate, onBack }) {
+  const playTrack = useAudioStore(s => s.playTrack);
+
+  const selectedAlbum = selectedAlbumName
+    ? lib.albums.find(a => a.name === selectedAlbumName)
+    : null;
+
+  if (selectedAlbum) {
+    const totalDuration = selectedAlbum.tracks.reduce((s, t) => s + (t.duration || 0), 0);
+
+    return (
+      <div className="flex-1 max-w-7xl mx-auto w-full p-4 sm:p-6 space-y-6 select-none animate-fade-in">
+        <button
+          onClick={onBack}
+          className="flex items-center gap-2 text-xs font-semibold text-warm-muted hover:text-white transition"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>Back to Albums</span>
+        </button>
+
+        {/* Album Banner */}
+        <div className="flex flex-col sm:flex-row sm:items-end gap-6 p-6 sm:p-8 rounded-3xl bg-gradient-to-tr from-[#2a1711] via-[#1d120e] to-bg-card border border-white/5 shadow-2xl">
+          <div className="w-32 h-32 sm:w-44 sm:h-44 rounded-2xl overflow-hidden bg-bg-card border border-white/10 shadow-xl flex-shrink-0">
+            {selectedAlbum.thumbnail ? (
+              <img src={selectedAlbum.thumbnail} alt={selectedAlbum.name} className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-accent/40">
+                <Disc3 className="w-16 h-16" />
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-2 flex-1">
+            <span className="text-xs font-bold uppercase tracking-wider text-accent">Album</span>
+            <h1 className="text-2xl sm:text-4xl font-black text-warm-white tracking-tight">
+              {selectedAlbum.name}
+            </h1>
+            <p className="text-xs sm:text-sm text-warm-muted">
+              {selectedAlbum.artist} · {selectedAlbum.tracks.length} tracks · {formatDuration(totalDuration)}
+            </p>
+
+            <div className="pt-2">
+              <button
+                onClick={() => playTrack(selectedAlbum.tracks[0], selectedAlbum.tracks)}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-accent text-bg-primary font-bold text-xs shadow-lg shadow-accent/25 hover:scale-105 active:scale-95 transition"
+              >
+                <Play className="w-4 h-4 fill-current ml-0.5" />
+                <span>Play Album</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Album Tracks */}
+        <div className="bg-bg-secondary/40 p-2 rounded-2xl border border-white/5 space-y-1">
+          {selectedAlbum.tracks.map((t, idx) => (
+            <TrackRow
+              key={t.id}
+              track={t}
+              index={idx}
+              showNumber={true}
+              showCover={false}
+            />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex-1 max-w-7xl mx-auto w-full p-4 sm:p-6 space-y-6 select-none">
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl sm:text-2xl font-black tracking-tight text-warm-white">
+          Albums ({lib.albums.length})
+        </h1>
+      </div>
+
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        {lib.albums.map(album => (
+          <AlbumCard
+            key={album.name}
+            album={album}
+            onClick={() => onNavigate(`album:${album.name}`)}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
