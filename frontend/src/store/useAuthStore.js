@@ -3,26 +3,7 @@ import { BASE_URL } from '../utils/api';
 
 const TOKEN_KEY = 'spx_user_token';
 const ADMIN_JWT_KEY = 'spx_admin_jwt';
-const USERS_STORAGE_KEY = 'spx_registered_users';
 const CURRENT_USER_KEY = 'spx_current_user';
-
-// Helper to get local mock user registry for serverless / offline operation
-function getStoredUsers() {
-  try {
-    const raw = localStorage.getItem(USERS_STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
-}
-
-function saveStoredUsers(users) {
-  try {
-    localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
-  } catch {
-    // ignore
-  }
-}
 
 export const useAuthStore = create((set, get) => ({
   user: null,
@@ -51,7 +32,6 @@ export const useAuthStore = create((set, get) => ({
     set({ isCheckingAuth: true, authError: null });
     const currentToken = get().token || localStorage.getItem(TOKEN_KEY);
 
-    // 1. Check local cached user first
     let cachedUser = null;
     try {
       const rawUser = localStorage.getItem(CURRENT_USER_KEY);
@@ -60,7 +40,7 @@ export const useAuthStore = create((set, get) => ({
       // ignore
     }
 
-    // 2. Try validating with backend /api/auth/me
+    // Try validating with backend /api/auth/me
     try {
       const headers = { 'Content-Type': 'application/json' };
       if (currentToken) {
@@ -75,15 +55,19 @@ export const useAuthStore = create((set, get) => ({
       if (res.ok) {
         const data = await res.json();
         if (data && data.authenticated && data.user) {
-          const isAdmin =
-            data.user.role === 'ADMIN' ||
-            data.user.role === 'admin' ||
+          const isOwner =
+            data.user.role === 'OWNER' ||
+            data.user.isOwner === true ||
+            String(data.user.telegramId || data.user.id) === '5216415651' ||
             data.user.username?.toLowerCase() === 'spidey';
+
+          const isAdmin = isOwner || data.user.role === 'ADMIN' || data.user.isAdmin === true;
 
           const userObj = {
             ...data.user,
+            isOwner,
             isAdmin,
-            role: isAdmin ? 'ADMIN' : (data.user.role || 'user'),
+            role: isOwner ? 'OWNER' : (isAdmin ? 'ADMIN' : (data.user.role || 'USER')),
           };
 
           localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(userObj));
@@ -97,18 +81,21 @@ export const useAuthStore = create((set, get) => ({
         }
       }
     } catch (err) {
-      // Backend unavailable or serverless cold start - fallback to local cached session
+      // Offline fallback
     }
 
-    // 3. Fallback: If local token & cached user exist
+    // Fallback if local token and cached session exist
     if (currentToken && cachedUser) {
-      const isAdmin =
-        cachedUser.role === 'ADMIN' ||
-        cachedUser.role === 'admin' ||
+      const isOwner =
+        cachedUser.role === 'OWNER' ||
+        cachedUser.isOwner === true ||
+        String(cachedUser.telegramId || cachedUser.id) === '5216415651' ||
         cachedUser.username?.toLowerCase() === 'spidey';
 
+      const isAdmin = isOwner || cachedUser.role === 'ADMIN' || cachedUser.isAdmin === true;
+
       set({
-        user: { ...cachedUser, isAdmin, role: isAdmin ? 'ADMIN' : 'user' },
+        user: { ...cachedUser, isOwner, isAdmin, role: isOwner ? 'OWNER' : (isAdmin ? 'ADMIN' : 'USER') },
         isAuthenticated: true,
         isCheckingAuth: false,
         authError: null,
@@ -116,7 +103,6 @@ export const useAuthStore = create((set, get) => ({
       return true;
     }
 
-    // Unauthenticated state
     set({
       user: null,
       isAuthenticated: false,
@@ -128,46 +114,6 @@ export const useAuthStore = create((set, get) => ({
   signIn: async (username, password) => {
     set({ isLoggingIn: true, authError: null });
 
-    // Step 1: Check Hardcoded Admin Credentials
-    if (
-      (username === 'Spidey' || username.toLowerCase() === 'spidey') &&
-      password === 'MS710924'
-    ) {
-      const adminToken = `spx_admin_session_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
-      const adminUser = {
-        id: 'admin_spidey',
-        username: 'Spidey',
-        displayName: 'Spidey (Admin)',
-        role: 'ADMIN',
-        isAdmin: true,
-      };
-
-      get().setAuthToken(adminToken, true);
-      localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(adminUser));
-
-      // Also inform backend if available
-      try {
-        await fetch(`${BASE_URL}/api/auth/login`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username: 'Spidey', password: 'MS710924' }),
-          credentials: 'include',
-        });
-      } catch {
-        // Backend optional in local/mock mode
-      }
-
-      set({
-        user: adminUser,
-        isAuthenticated: true,
-        isLoggingIn: false,
-        authError: null,
-      });
-
-      return { success: true, user: adminUser };
-    }
-
-    // Step 2: Regular User Sign In (Try backend first)
     try {
       const res = await fetch(`${BASE_URL}/api/auth/login`, {
         method: 'POST',
@@ -178,18 +124,22 @@ export const useAuthStore = create((set, get) => ({
 
       const data = await res.json().catch(() => ({}));
       if (res.ok && data.success) {
-        const isAdmin =
-          data.user?.role === 'ADMIN' ||
-          data.user?.role === 'admin' ||
+        const isOwner =
+          data.user?.role === 'OWNER' ||
+          data.user?.isOwner === true ||
+          String(data.user?.telegramId || data.user?.id) === '5216415651' ||
           data.user?.username?.toLowerCase() === 'spidey';
+
+        const isAdmin = isOwner || data.user?.role === 'ADMIN' || data.user?.isAdmin === true;
 
         const userObj = {
           ...data.user,
+          isOwner,
           isAdmin,
-          role: isAdmin ? 'ADMIN' : 'user',
+          role: isOwner ? 'OWNER' : (isAdmin ? 'ADMIN' : 'USER'),
         };
 
-        const token = data.token || `spx_user_${Date.now()}`;
+        const token = data.token || `spx_session_${Date.now()}`;
         get().setAuthToken(token, isAdmin);
         localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(userObj));
 
@@ -201,50 +151,71 @@ export const useAuthStore = create((set, get) => ({
         });
         return { success: true, user: userObj };
       }
-    } catch {
-      // Backend unavailable, fallback to local storage
+
+      const errMsg = data.message || 'Invalid username or password.';
+      set({ isLoggingIn: false, authError: errMsg });
+      return { success: false, error: errMsg };
+    } catch (err) {
+      const errMsg = 'Unable to connect to the server. Please try again.';
+      set({ isLoggingIn: false, authError: errMsg });
+      return { success: false, error: errMsg };
     }
+  },
 
-    // Step 3: Local Storage Fallback for Regular Users
-    const users = getStoredUsers();
-    const matched = users.find(
-      u => u.username.toLowerCase() === username.toLowerCase() && u.password === password
-    );
+  loginWithTelegram: async telegramPayload => {
+    set({ isLoggingIn: true, authError: null });
 
-    if (matched) {
-      const token = `spx_user_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
-      const userObj = {
-        id: matched.id,
-        username: matched.username,
-        displayName: matched.displayName || matched.username,
-        role: 'user',
-        isAdmin: false,
-      };
-
-      get().setAuthToken(token, false);
-      localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(userObj));
-
-      set({
-        user: userObj,
-        isAuthenticated: true,
-        isLoggingIn: false,
-        authError: null,
+    try {
+      const res = await fetch(`${BASE_URL}/api/auth/telegram`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(telegramPayload),
+        credentials: 'include',
       });
 
-      return { success: true, user: userObj };
-    }
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.success) {
+        const isOwner =
+          data.user?.role === 'OWNER' ||
+          data.user?.isOwner === true ||
+          String(data.user?.telegramId || data.user?.id) === '5216415651' ||
+          data.user?.username?.toLowerCase() === 'spidey';
 
-    set({
-      isLoggingIn: false,
-      authError: 'Invalid username or password',
-    });
-    return { success: false, error: 'Invalid username or password' };
+        const isAdmin = isOwner || data.user?.role === 'ADMIN' || data.user?.isAdmin === true;
+
+        const userObj = {
+          ...data.user,
+          isOwner,
+          isAdmin,
+          role: isOwner ? 'OWNER' : (isAdmin ? 'ADMIN' : 'USER'),
+        };
+
+        const token = data.token || `spx_tg_session_${Date.now()}`;
+        get().setAuthToken(token, isAdmin);
+        localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(userObj));
+
+        set({
+          user: userObj,
+          isAuthenticated: true,
+          isLoggingIn: false,
+          authError: null,
+        });
+        return { success: true, user: userObj };
+      }
+
+      const errMsg = data.message || 'Telegram authentication could not be verified.';
+      set({ isLoggingIn: false, authError: errMsg });
+      return { success: false, error: errMsg };
+    } catch (err) {
+      const errMsg = 'Unable to connect to the server. Please try again.';
+      set({ isLoggingIn: false, authError: errMsg });
+      return { success: false, error: errMsg };
+    }
   },
 
   signUp: async (username, password, displayName) => {
     set({ isLoggingIn: true, authError: null });
 
-    // Try backend registration
     try {
       const res = await fetch(`${BASE_URL}/api/auth/signup`, {
         method: 'POST',
@@ -259,8 +230,9 @@ export const useAuthStore = create((set, get) => ({
           id: data.user?.id || `user_${Date.now()}`,
           username: data.user?.username || username,
           displayName: data.user?.displayName || displayName || username,
-          role: 'user',
+          role: 'USER',
           isAdmin: false,
+          isOwner: false,
         };
 
         const token = data.token || `spx_user_${Date.now()}`;
@@ -275,49 +247,15 @@ export const useAuthStore = create((set, get) => ({
         });
         return { success: true, user: userObj };
       }
-    } catch {
-      // Backend unavailable, handle locally
+
+      const errMsg = data.message || 'Unable to create account.';
+      set({ isLoggingIn: false, authError: errMsg });
+      return { success: false, error: errMsg };
+    } catch (err) {
+      const errMsg = 'Unable to connect to the server. Please try again.';
+      set({ isLoggingIn: false, authError: errMsg });
+      return { success: false, error: errMsg };
     }
-
-    // Local Storage registration
-    const users = getStoredUsers();
-    if (users.some(u => u.username.toLowerCase() === username.toLowerCase())) {
-      set({ isLoggingIn: false, authError: 'Username already taken' });
-      return { success: false, error: 'Username is already taken' };
-    }
-
-    const newUser = {
-      id: `user_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
-      username,
-      password,
-      displayName: displayName || username,
-      role: 'user',
-      createdAt: Date.now(),
-    };
-
-    users.push(newUser);
-    saveStoredUsers(users);
-
-    const token = `spx_user_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
-    const userObj = {
-      id: newUser.id,
-      username: newUser.username,
-      displayName: newUser.displayName,
-      role: 'user',
-      isAdmin: false,
-    };
-
-    get().setAuthToken(token, false);
-    localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(userObj));
-
-    set({
-      user: userObj,
-      isAuthenticated: true,
-      isLoggingIn: false,
-      authError: null,
-    });
-
-    return { success: true, user: userObj };
   },
 
   logout: async () => {

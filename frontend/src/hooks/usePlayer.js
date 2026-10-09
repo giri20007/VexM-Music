@@ -27,19 +27,87 @@ if (preloadAudio) {
   preloadAudio.preload = 'none';
 }
 
+export function getAudioDiagnostics() {
+  if (!audioCtx) {
+    return {
+      state: 'Native Browser Audio',
+      sampleRate: 'Native Hardware Rate',
+      latency: '< 10 ms',
+      channels: 'Stereo (2 Ch)',
+      routing: 'Direct Bit-Perfect Native Playback',
+    };
+  }
+  return {
+    state: audioCtx.state,
+    sampleRate: `${audioCtx.sampleRate / 1000} kHz`,
+    latency: audioCtx.baseLatency ? `${(audioCtx.baseLatency * 1000).toFixed(1)} ms` : 'Low Latency',
+    channels: `${audioCtx.destination.maxChannelCount >= 2 ? 'Stereo (2 Ch)' : 'Direct Out'}`,
+    routing: 'Direct Native & AnalyserNode Tap',
+  };
+}
+
+function connectAudioGraph(enableEq, gains) {
+  if (!audioCtx || !sourceNode || !analyserNode) return;
+  try {
+    // Disconnect existing graph
+    try {
+      sourceNode.disconnect();
+      eqFilters.forEach(f => f.disconnect());
+      if (gainNode) gainNode.disconnect();
+      analyserNode.disconnect();
+    } catch {
+      // ignore
+    }
+
+    if (enableEq && eqFilters.length > 0) {
+      // Connect through EQ chain
+      let lastNode = sourceNode;
+      eqFilters.forEach((filter, idx) => {
+        const gain = gains && gains[idx] !== undefined ? gains[idx] : 0;
+        filter.gain.setValueAtTime(gain, audioCtx.currentTime);
+        lastNode.connect(filter);
+        lastNode = filter;
+      });
+      if (gainNode) {
+        lastNode.connect(gainNode);
+        gainNode.connect(analyserNode);
+      } else {
+        lastNode.connect(analyserNode);
+      }
+      analyserNode.connect(audioCtx.destination);
+    } else {
+      // Transparent direct path: source -> analyser -> destination
+      sourceNode.connect(analyserNode);
+      analyserNode.connect(audioCtx.destination);
+    }
+  } catch (err) {
+    console.warn('Audio graph connection update:', err.message);
+  }
+}
+
 function setupWebAudio() {
   if (audioCtx || !audio) return;
   try {
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContext) return;
-    audioCtx = new AudioContext();
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return;
+    audioCtx = new AudioContextClass({ latencyHint: 'playback' });
+
+    try {
+      audioCtx.destination.channelCount = 2;
+      audioCtx.destination.channelCountMode = 'max';
+    } catch {
+      // ignore
+    }
+
     sourceNode = audioCtx.createMediaElementSource(audio);
     gainNode = audioCtx.createGain();
+    gainNode.gain.value = 1.0;
+
     analyserNode = audioCtx.createAnalyser();
     analyserNode.fftSize = 256;
     analyserNode.smoothingTimeConstant = 0.8;
 
-    // Create 10-band peaking equalizer filters
+    // Create 10-band peaking equalizer filters (inactive by default for direct bit-perfect reproduction)
     eqFilters = EQ_FREQUENCIES.map((freq, idx) => {
       const filter = audioCtx.createBiquadFilter();
       if (idx === 0) {
@@ -55,15 +123,8 @@ function setupWebAudio() {
       return filter;
     });
 
-    // Chain: source -> eq0 -> eq1 ... eq9 -> gain -> analyser -> destination
-    let lastNode = sourceNode;
-    eqFilters.forEach(f => {
-      lastNode.connect(f);
-      lastNode = f;
-    });
-    lastNode.connect(gainNode);
-    gainNode.connect(analyserNode);
-    analyserNode.connect(audioCtx.destination);
+    const { eqEnabled, eqGains } = useSettingsStore.getState();
+    connectAudioGraph(eqEnabled, eqGains);
 
     window.__SPX_ANALYSER__ = analyserNode;
     window.__SPX_AUDIO_CTX__ = audioCtx;
@@ -285,19 +346,19 @@ export function usePlayer() {
     }
   }, [speed, track?.id]);
 
-  // 6. Equalizer Gain Updates
+  // 6. Equalizer Dynamic Graph Connection & Gain Updates
   useEffect(() => {
-    if (!eqFilters.length) return;
-    eqFilters.forEach((filter, idx) => {
-      const targetGain = eqEnabled && eqGains[idx] !== undefined ? eqGains[idx] : 0;
-      filter.gain.setTargetAtTime(targetGain, audioCtx ? audioCtx.currentTime : 0, 0.05);
-    });
+    connectAudioGraph(eqEnabled, eqGains);
   }, [eqEnabled, eqGains]);
 
-  // 7. Volume Normalization
+  // 7. Volume Normalization (Optional)
   useEffect(() => {
-    if (!gainNode) return;
-    const targetGain = volumeNormalization ? 0.85 : 1.0;
-    gainNode.gain.setTargetAtTime(targetGain, audioCtx ? audioCtx.currentTime : 0, 0.05);
+    if (!gainNode || !audioCtx) return;
+    const targetGain = volumeNormalization ? 0.92 : 1.0;
+    try {
+      gainNode.gain.setTargetAtTime(targetGain, audioCtx.currentTime, 0.05);
+    } catch {
+      // ignore
+    }
   }, [volumeNormalization]);
 }

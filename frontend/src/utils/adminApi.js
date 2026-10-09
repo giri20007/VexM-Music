@@ -150,3 +150,45 @@ export const adminRenameArtist = (oldName, newName) =>
 
 // Section 140: Active Sessions Telemetry
 export const adminGetSessions = () => adminRequest('/api/admin/sessions');
+
+// Section 150: Track Hide & Restore
+export const adminHideTrack = id =>
+  adminRequest(`/api/admin/tracks/${encodeURIComponent(id)}/hide`, { method: 'POST' });
+export const adminRestoreTrack = id =>
+  adminRequest(`/api/admin/tracks/${encodeURIComponent(id)}/restore`, { method: 'POST' });
+
+// Section 160: User Management
+export const adminGetUsers = () => adminRequest('/api/admin/users');
+export const adminUpdateUser = (id, updates) =>
+  adminRequest(`/api/admin/users/${encodeURIComponent(id)}`, {
+    method: 'PATCH',
+    body: JSON.stringify(updates),
+  });
+export const adminRevokeUser = id =>
+  adminRequest(`/api/admin/users/${encodeURIComponent(id)}/revoke`, { method: 'POST' });
+
+// Section 170: Album Management
+export const adminGetAlbums = () => adminRequest('/api/admin/albums');
+export const adminUpdateAlbum = (name, updates) =>
+  adminRequest(`/api/admin/albums/${encodeURIComponent(name)}`, {
+    method: 'PATCH',
+    body: JSON.stringify(updates),
+  });
+export const adminDeleteAlbum = name =>
+  adminRequest(`/api/admin/albums/${encodeURIComponent(name)}`, { method: 'DELETE' });
+
+// Section 180: Playlist Management
+export const adminGetPlaylists = () => adminRequest('/api/admin/playlists');
+export const adminCreatePlaylist = data =>
+  adminRequest('/api/admin/playlists', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+export const adminUpdatePlaylist = (id, updates) =>
+  adminRequest(`/api/admin/playlists/${encodeURIComponent(id)}`, {
+    method: 'PATCH',
+    body: JSON.stringify(updates),
+  });
+export const adminDeletePlaylist = id =>
+  adminRequest(`/api/admin/playlists/${encodeURIComponent(id)}`, { method: 'DELETE' });
+

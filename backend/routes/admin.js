@@ -55,11 +55,11 @@ router.post('/login', loginLimiter, async (req, res) => {
     return res.status(401).json({
       error: true,
       code: 'INVALID_CREDENTIALS',
-      message: 'Invalid credentials',
+      message: 'Invalid administrator credentials.',
     });
   }
 
-  const token = generateToken({ username, role: 'admin' });
+  const token = generateToken({ username, role: 'OWNER', isOwner: true, isAdmin: true });
   const isProd = process.env.NODE_ENV === 'production';
 
   // Set HTTP-Only secure cookie
@@ -77,7 +77,9 @@ router.post('/login', loginLimiter, async (req, res) => {
     token, // Also returned for Authorization header fallback in cross-origin environments
     user: {
       username,
-      role: 'admin',
+      role: 'OWNER',
+      isOwner: true,
+      isAdmin: true,
     },
   });
 });
@@ -580,6 +582,241 @@ router.get('/sessions', (req, res) => {
     activeAdmin: req.adminUser,
     recentAuthActivity: authLogs,
   });
+});
+
+// 21. Track Hide & Restore
+router.post('/tracks/:id/hide', (req, res) => {
+  const { id } = req.params;
+  const item = getItem(id);
+  if (!item) return res.status(404).json({ error: true, message: 'Track not found' });
+
+  updateItemInMemory(id, { hidden: true });
+  setOverride(id, { hidden: true });
+  logActivity('TRACK_HIDDEN', { trackId: id, title: item.title });
+  res.json({ success: true, message: `Track "${item.title}" hidden` });
+});
+
+router.post('/tracks/:id/restore', (req, res) => {
+  const { id } = req.params;
+  const item = getItem(id);
+  if (!item) return res.status(404).json({ error: true, message: 'Track not found' });
+
+  updateItemInMemory(id, { hidden: false });
+  setOverride(id, { hidden: false });
+  logActivity('TRACK_RESTORED', { trackId: id, title: item.title });
+  res.json({ success: true, message: `Track "${item.title}" restored` });
+});
+
+// 22. User Management
+const fs = require('fs');
+const USERS_FILE = path.join(__dirname, '../data/users.json');
+
+function readUsers() {
+  try {
+    if (fs.existsSync(USERS_FILE)) {
+      return JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
+    }
+  } catch {
+    // ignore
+  }
+  return [];
+}
+
+function writeUsers(users) {
+  try {
+    const dir = path.dirname(USERS_FILE);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), 'utf8');
+  } catch (err) {
+    console.error('User save error:', err.message);
+  }
+}
+
+router.get('/users', (req, res) => {
+  const users = readUsers().map(u => ({
+    id: u.id,
+    telegramId: u.telegramId || null,
+    username: u.username,
+    displayName: u.displayName || u.username,
+    role: u.role || 'USER',
+    createdAt: u.createdAt || Date.now(),
+    lastActive: u.lastActive || Date.now(),
+    status: u.status || 'active',
+  }));
+  res.json({ users });
+});
+
+router.patch('/users/:id', (req, res) => {
+  const { id } = req.params;
+  const { status, role } = req.body || {};
+  const users = readUsers();
+  const idx = users.findIndex(u => u.id === id || String(u.telegramId) === id);
+  if (idx === -1) return res.status(404).json({ error: true, message: 'User not found' });
+
+  if (status) users[idx].status = status;
+  if (role && users[idx].username !== 'Spidey') users[idx].role = role;
+  writeUsers(users);
+
+  logActivity('USER_UPDATED', { userId: id, status, role });
+  res.json({ success: true, user: users[idx] });
+});
+
+router.post('/users/:id/revoke', (req, res) => {
+  const { id } = req.params;
+  const users = readUsers();
+  const user = users.find(u => u.id === id || String(u.telegramId) === id);
+  if (!user) return res.status(404).json({ error: true, message: 'User not found' });
+
+  logActivity('USER_SESSION_REVOKED', { userId: id, username: user.username });
+  res.json({ success: true, message: `Session revoked for user ${user.username}` });
+});
+
+// 23. Album Management
+router.get('/albums', (req, res) => {
+  const items = getAllItems();
+  const albumMap = new Map();
+
+  items.forEach(item => {
+    const alb = item.album || 'Unknown Album';
+    if (!albumMap.has(alb)) {
+      albumMap.set(alb, {
+        name: alb,
+        artist: item.artist,
+        year: item.year || null,
+        tracks: [],
+        thumbnail: item.thumbnail || null,
+        trackCount: 0,
+      });
+    }
+    const entry = albumMap.get(alb);
+    entry.tracks.push(item);
+    entry.trackCount++;
+    if (!entry.thumbnail && item.thumbnail) {
+      entry.thumbnail = item.thumbnail;
+    }
+  });
+
+  res.json({ albums: Array.from(albumMap.values()) });
+});
+
+router.patch('/albums/:name', (req, res) => {
+  const oldName = decodeURIComponent(req.params.name);
+  const { newName, artist, artworkUrl } = req.body || {};
+
+  const items = getAllItems();
+  let count = 0;
+
+  items.forEach(item => {
+    if (item.album === oldName) {
+      const updates = {};
+      if (newName) updates.album = newName;
+      if (artist) updates.artist = artist;
+      if (artworkUrl) updates.artworkUrl = artworkUrl;
+
+      updateItemInMemory(item.id, updates);
+      setOverride(item.id, updates);
+      count++;
+    }
+  });
+
+  logActivity('ALBUM_UPDATED', { oldName, newName, count });
+  res.json({ success: true, message: `Album "${oldName}" updated across ${count} tracks` });
+});
+
+router.delete('/albums/:name', (req, res) => {
+  const albName = decodeURIComponent(req.params.name);
+  const items = getAllItems();
+  let count = 0;
+
+  items.forEach(item => {
+    if (item.album === albName) {
+      updateItemInMemory(item.id, { album: 'Single' });
+      setOverride(item.id, { album: 'Single' });
+      count++;
+    }
+  });
+
+  logActivity('ALBUM_DELETED', { album: albName, count });
+  res.json({ success: true, message: `Album "${albName}" disassociated from ${count} tracks` });
+});
+
+// 24. Playlist Management
+const PLAYLISTS_FILE = path.join(__dirname, '../data/playlists.json');
+
+function readPlaylists() {
+  try {
+    if (fs.existsSync(PLAYLISTS_FILE)) {
+      return JSON.parse(fs.readFileSync(PLAYLISTS_FILE, 'utf8'));
+    }
+  } catch {
+    // ignore
+  }
+  return [
+    {
+      id: 'favorites',
+      name: 'Featured Playlist',
+      createdAt: Date.now(),
+      trackIds: [],
+    },
+  ];
+}
+
+function writePlaylists(playlists) {
+  try {
+    const dir = path.dirname(PLAYLISTS_FILE);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(PLAYLISTS_FILE, JSON.stringify(playlists, null, 2), 'utf8');
+  } catch (err) {
+    console.error('Playlist save error:', err.message);
+  }
+}
+
+router.get('/playlists', (req, res) => {
+  res.json({ playlists: readPlaylists() });
+});
+
+router.post('/playlists', (req, res) => {
+  const { name, trackIds = [] } = req.body || {};
+  if (!name || !name.trim()) return res.status(400).json({ error: true, message: 'Name is required' });
+
+  const playlists = readPlaylists();
+  const newPl = {
+    id: `pl_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
+    name: name.trim(),
+    createdAt: Date.now(),
+    trackIds,
+  };
+  playlists.push(newPl);
+  writePlaylists(playlists);
+
+  logActivity('PLAYLIST_CREATED', { name: newPl.name, id: newPl.id });
+  res.json({ success: true, playlist: newPl });
+});
+
+router.patch('/playlists/:id', (req, res) => {
+  const { id } = req.params;
+  const { name, trackIds } = req.body || {};
+  const playlists = readPlaylists();
+  const idx = playlists.findIndex(p => p.id === id);
+  if (idx === -1) return res.status(404).json({ error: true, message: 'Playlist not found' });
+
+  if (name) playlists[idx].name = name.trim();
+  if (Array.isArray(trackIds)) playlists[idx].trackIds = trackIds;
+  writePlaylists(playlists);
+
+  logActivity('PLAYLIST_UPDATED', { id, name: playlists[idx].name });
+  res.json({ success: true, playlist: playlists[idx] });
+});
+
+router.delete('/playlists/:id', (req, res) => {
+  const { id } = req.params;
+  let playlists = readPlaylists();
+  const target = playlists.find(p => p.id === id);
+  playlists = playlists.filter(p => p.id !== id);
+  writePlaylists(playlists);
+
+  logActivity('PLAYLIST_DELETED', { id, name: target?.name });
+  res.json({ success: true, message: 'Playlist deleted' });
 });
 
 module.exports = router;

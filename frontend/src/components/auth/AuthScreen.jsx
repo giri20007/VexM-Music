@@ -21,6 +21,24 @@ export function AuthScreen() {
 
   const signIn = useAuthStore(s => s.signIn);
   const signUp = useAuthStore(s => s.signUp);
+  const loginWithTelegram = useAuthStore(s => s.loginWithTelegram);
+
+  // Setup Telegram login callback on window for official widget
+  React.useEffect(() => {
+    window.onTelegramAuth = async user => {
+      try {
+        setIsLoggingIn(true);
+        const res = await loginWithTelegram(user);
+        if (!res.success) {
+          setLoginError(res.error || 'Telegram authentication failed.');
+        }
+      } catch (err) {
+        setLoginError(err.message || 'Telegram login failed.');
+      } finally {
+        setIsLoggingIn(false);
+      }
+    };
+  }, []);
 
   const handleSignIn = async e => {
     e.preventDefault();

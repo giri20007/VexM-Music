@@ -1,15 +1,27 @@
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'spidey_x_flash_super_secret_jwt_key_2026';
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'Spidey';
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'MS710924';
+const OWNER_TELEGRAM_ID = process.env.OWNER_TELEGRAM_ID || '5216415651';
+
+// Pre-computed bcrypt hash for owner password MS710924 (cost factor 10)
+const ADMIN_PASSWORD_HASH =
+  process.env.ADMIN_PASSWORD_HASH ||
+  '$2b$10$YVIWnwov6RymvPvSzGBy4umFhHMdyiuYt68SgozwaTASfvw/TIa1C';
 
 async function verifyCredentials(username, password) {
   if (!username || !password) return false;
-  return (
-    (username === ADMIN_USERNAME || username.toLowerCase() === ADMIN_USERNAME.toLowerCase()) &&
-    password === ADMIN_PASSWORD
-  );
+  const matchUser =
+    String(username).trim().toLowerCase() === ADMIN_USERNAME.toLowerCase();
+  if (!matchUser) return false;
+
+  try {
+    return await bcrypt.compare(String(password), ADMIN_PASSWORD_HASH);
+  } catch (err) {
+    console.error('Password verification error:', err.message);
+    return false;
+  }
 }
 
 function generateToken(payload) {
@@ -43,7 +55,7 @@ function extractToken(req) {
 }
 
 /**
- * Middleware: Requires a valid authenticated session (user or admin)
+ * Middleware: Requires a valid authenticated session (user, admin, or owner)
  */
 function requireAuth(req, res, next) {
   const token = extractToken(req);
@@ -60,19 +72,28 @@ function requireAuth(req, res, next) {
     return res.status(401).json({
       error: true,
       code: 'INVALID_SESSION',
-      message: 'Session is invalid or has expired. Please sign in again.',
+      message: 'Your session has expired. Please sign in again.',
     });
   }
 
+  const isOwner =
+    String(decoded.telegramId || decoded.id) === OWNER_TELEGRAM_ID ||
+    decoded.role === 'OWNER' ||
+    decoded.username?.toLowerCase() === ADMIN_USERNAME.toLowerCase();
+
   const isAdmin =
+    isOwner ||
     decoded.role === 'ADMIN' ||
     decoded.role === 'admin' ||
-    decoded.username?.toLowerCase() === ADMIN_USERNAME.toLowerCase();
+    decoded.isAdmin === true;
+
+  const role = isOwner ? 'OWNER' : (isAdmin ? 'ADMIN' : (decoded.role || 'USER'));
 
   req.user = {
     ...decoded,
+    role,
     isAdmin,
-    role: isAdmin ? 'ADMIN' : (decoded.role || 'user'),
+    isOwner,
   };
   req.adminUser = req.user;
 
@@ -80,7 +101,7 @@ function requireAuth(req, res, next) {
 }
 
 /**
- * Middleware: Strictly requires Admin privileges (Spidey / MS710924)
+ * Middleware: Strictly requires Admin or Owner privileges
  */
 function requireAdmin(req, res, next) {
   if (!req.user) {
@@ -93,18 +114,21 @@ function requireAdmin(req, res, next) {
 
 function checkAdminPermission(req, res, next) {
   const user = req.user;
-  const isAuthorizedAdmin =
+  const isAuthorized =
     user &&
-    (user.role === 'ADMIN' ||
+    (user.isOwner ||
+      user.isAdmin ||
+      user.role === 'OWNER' ||
+      user.role === 'ADMIN' ||
       user.role === 'admin' ||
-      user.isAdmin === true ||
+      String(user.telegramId || user.id) === OWNER_TELEGRAM_ID ||
       user.username?.toLowerCase() === ADMIN_USERNAME.toLowerCase());
 
-  if (!isAuthorizedAdmin) {
+  if (!isAuthorized) {
     return res.status(403).json({
       error: true,
       code: 'FORBIDDEN',
-      message: 'Access Denied: Admin privileges are required.',
+      message: 'You do not have permission to access the administrator panel.',
     });
   }
 
@@ -122,5 +146,5 @@ module.exports = {
   generateToken,
   verifyToken,
   ADMIN_USERNAME,
-  ADMIN_PASSWORD,
+  OWNER_TELEGRAM_ID,
 };

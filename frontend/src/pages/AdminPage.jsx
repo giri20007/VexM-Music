@@ -3,7 +3,12 @@ import {
   Shield,
   LayoutDashboard,
   Music2,
+  Disc3,
+  Users,
   Mic2,
+  Image,
+  ListMusic,
+  UserCheck,
   Radio,
   Database,
   Server,
@@ -12,14 +17,18 @@ import {
   ArrowLeft,
   Menu,
   X,
-  Users,
+  Sparkles,
 } from 'lucide-react';
 import { useAdminStore } from '../store/useAdminStore';
 import { AdminLogin } from '../components/admin/AdminLogin';
 import { AdminDashboard } from '../components/admin/AdminDashboard';
 import { AdminLibrary } from '../components/admin/AdminLibrary';
-import { AdminLyrics } from '../components/admin/AdminLyrics';
+import { AdminAlbums } from '../components/admin/AdminAlbums';
 import { AdminArtists } from '../components/admin/AdminArtists';
+import { AdminLyrics } from '../components/admin/AdminLyrics';
+import { AdminArtwork } from '../components/admin/AdminArtwork';
+import { AdminPlaylists } from '../components/admin/AdminPlaylists';
+import { AdminUsers } from '../components/admin/AdminUsers';
 import { AdminTelegram } from '../components/admin/AdminTelegram';
 import { AdminCache } from '../components/admin/AdminCache';
 import { AdminSystem } from '../components/admin/AdminSystem';
@@ -55,13 +64,16 @@ export function AdminPage({ onBackToApp }) {
 
   const tabs = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'library', label: 'Library & Tracks', icon: Music2 },
-    { id: 'artists', label: 'Artist Manager', icon: Users },
-    { id: 'lyrics', label: 'Lyrics Editor', icon: Mic2 },
+    { id: 'tracks', label: 'Tracks', icon: Music2 },
+    { id: 'albums', label: 'Albums', icon: Disc3 },
+    { id: 'artists', label: 'Artists', icon: Users },
+    { id: 'lyrics', label: 'Lyrics', icon: Mic2 },
+    { id: 'artwork', label: 'Artwork', icon: Image },
+    { id: 'playlists', label: 'Playlists', icon: ListMusic },
+    { id: 'users', label: 'Users', icon: UserCheck },
     { id: 'telegram', label: 'Telegram & Sync', icon: Radio },
     { id: 'cache', label: 'Cache Manager', icon: Database },
-    { id: 'system', label: 'System Telemetry', icon: Server },
-    { id: 'logs', label: 'Audit Logs', icon: Clock },
+    { id: 'system', label: 'System Logs', icon: Server },
   ];
 
   return (
@@ -91,20 +103,24 @@ export function AdminPage({ onBackToApp }) {
           mobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >
-        <div className="space-y-6">
-          {/* Brand Header */}
-          <div className="flex items-center justify-between px-2 pt-2">
+        <div className="space-y-5">
+          {/* Brand Header: SPiDEYxFLASH ADMIN • OWNER • @Spidey */}
+          <div className="flex items-center justify-between px-2 pt-2 border-b border-white/5 pb-4">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-accent to-[#f43f5e] flex items-center justify-center text-bg-primary shadow-lg shadow-accent/20">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-accent via-rose-500 to-fuchsia-600 flex items-center justify-center text-bg-primary shadow-lg shadow-accent/25 relative group">
                 <Shield className="w-5 h-5 fill-bg-primary stroke-bg-primary" />
+                <span className="absolute -bottom-1 -right-1 w-2.5 h-2.5 bg-emerald-400 rounded-full border-2 border-bg-secondary" />
               </div>
               <div>
-                <span className="font-extrabold text-sm tracking-tight text-warm-white block">
-                  SPiDEY<span className="text-accent">x</span>FLASH
+                <span className="font-black text-xs tracking-wide text-warm-white block">
+                  SPiDEY<span className="text-accent">x</span>FLASH ADMIN
                 </span>
-                <span className="text-[10px] uppercase tracking-wider font-bold text-accent">
-                  Admin Panel
-                </span>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <span className="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 text-[9px] font-black tracking-wider border border-amber-500/30">
+                    OWNER
+                  </span>
+                  <span className="text-[10px] text-warm-muted font-medium">@Spidey</span>
+                </div>
               </div>
             </div>
 
@@ -120,15 +136,15 @@ export function AdminPage({ onBackToApp }) {
           <nav className="space-y-1">
             {tabs.map(item => {
               const Icon = item.icon;
-              const isActive = activeTab === item.id;
+              const isActive = activeTab === item.id || (item.id === 'tracks' && activeTab === 'library');
               return (
                 <button
                   key={item.id}
                   onClick={() => {
-                    setActiveTab(item.id);
+                    setActiveTab(item.id === 'tracks' ? 'library' : item.id);
                     setMobileMenuOpen(false);
                   }}
-                  className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition ${
+                  className={`w-full flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-semibold transition ${
                     isActive
                       ? 'bg-bg-active text-accent shadow-inner'
                       : 'text-warm-muted hover:text-warm-white hover:bg-white/5'
@@ -185,12 +201,21 @@ export function AdminPage({ onBackToApp }) {
 
         <div className="flex-1 p-4 sm:p-8 max-w-7xl w-full mx-auto pb-24">
           {activeTab === 'dashboard' && <AdminDashboard onNavigateTab={setActiveTab} />}
-          {activeTab === 'library' && <AdminLibrary />}
+          {(activeTab === 'library' || activeTab === 'tracks') && <AdminLibrary />}
+          {activeTab === 'albums' && <AdminAlbums />}
           {activeTab === 'artists' && <AdminArtists />}
           {activeTab === 'lyrics' && <AdminLyrics />}
+          {activeTab === 'artwork' && <AdminArtwork />}
+          {activeTab === 'playlists' && <AdminPlaylists />}
+          {activeTab === 'users' && <AdminUsers />}
           {activeTab === 'telegram' && <AdminTelegram />}
           {activeTab === 'cache' && <AdminCache />}
-          {activeTab === 'system' && <AdminSystem />}
+          {activeTab === 'system' && (
+            <div className="space-y-8">
+              <AdminSystem />
+              <AdminLogs />
+            </div>
+          )}
           {activeTab === 'logs' && <AdminLogs />}
         </div>
       </main>

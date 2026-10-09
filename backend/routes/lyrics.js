@@ -58,7 +58,7 @@ router.get('/:id', async (req, res) => {
       error: true,
       available: false,
       code: 'LYRICS_NOT_FOUND',
-      message: 'Lyrics unavailable for this track',
+      message: 'No lyrics were found for this track.',
     });
   }
 
