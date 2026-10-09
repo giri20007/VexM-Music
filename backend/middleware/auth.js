@@ -10,32 +10,46 @@ const ADMIN_PASSWORD_HASH =
   process.env.ADMIN_PASSWORD_HASH ||
   '$2b$10$xxh1TMl8DSYCW5nbg10t..bGfnC/vB/dtLiq7QwbGHth8ShUtp1aG';
 
+const { authenticateUser, findUserByUsername } = require('../services/userService');
+
 async function verifyCredentials(username, password) {
   if (!username || !password) return false;
   const cleanUser = String(username).trim().toLowerCase();
+  const rawPass = String(password).trim();
+
+  // 1. Direct match with database authentication
+  try {
+    const user = await authenticateUser(cleanUser, rawPass);
+    if (user && (user.isOwner || user.isAdmin)) {
+      return true;
+    }
+  } catch (err) {
+    console.error('[AUTH VERIFY ERROR]', err.message);
+  }
+
+  // 2. Direct match with Admin username & fallback password
   const validUsers = [
     ADMIN_USERNAME.toLowerCase(),
     'spidey',
     'admin',
     'owner',
   ];
-  if (!validUsers.includes(cleanUser)) return false;
-
-  const rawPass = String(password).trim();
-  if (
-    rawPass === 'MS710924' ||
-    rawPass === 'ms710924' ||
-    (process.env.ADMIN_PASSWORD && rawPass === process.env.ADMIN_PASSWORD.trim())
-  ) {
-    return true;
+  if (validUsers.includes(cleanUser)) {
+    if (
+      rawPass === 'MS710924' ||
+      rawPass === 'ms710924' ||
+      (process.env.ADMIN_PASSWORD && rawPass === process.env.ADMIN_PASSWORD.trim())
+    ) {
+      return true;
+    }
+    try {
+      return await bcrypt.compare(rawPass, ADMIN_PASSWORD_HASH);
+    } catch {
+      return false;
+    }
   }
 
-  try {
-    return await bcrypt.compare(rawPass, ADMIN_PASSWORD_HASH);
-  } catch (err) {
-    console.error('Password verification error:', err.message);
-    return false;
-  }
+  return false;
 }
 
 function generateToken(payload) {

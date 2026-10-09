@@ -9,6 +9,7 @@ const {
   ADMIN_USERNAME,
 } = require('../middleware/auth');
 const { loginLimiter, adminApiLimiter } = require('../middleware/rateLimiter');
+const userService = require('../services/userService');
 const {
   getAllItems,
   getItem,
@@ -645,67 +646,128 @@ router.post('/tracks/:id/restore', (req, res) => {
   res.json({ success: true, message: `Track "${item.title}" restored` });
 });
 
-// 22. User Management
-const USERS_FILE = path.join(__dirname, '../data/users.json');
-
-function readUsers() {
+// 22. User Management (Persistent Database Operations)
+router.get('/users', async (req, res) => {
   try {
-    if (fs.existsSync(USERS_FILE)) {
-      return JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
-    }
-  } catch {
-    // ignore
-  }
-  return [];
-}
-
-function writeUsers(users) {
-  try {
-    const dir = path.dirname(USERS_FILE);
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), 'utf8');
+    const users = await userService.getAllUsers();
+    res.json({ users });
   } catch (err) {
-    console.error('User save error:', err.message);
+    console.error('[ADMIN GET USERS ERROR]', err);
+    res.status(500).json({ error: true, message: 'Failed to retrieve users', details: err.message });
   }
-}
-
-router.get('/users', (req, res) => {
-  const users = readUsers().map(u => ({
-    id: u.id,
-    telegramId: u.telegramId || null,
-    username: u.username,
-    displayName: u.displayName || u.username,
-    role: u.role || 'USER',
-    createdAt: u.createdAt || Date.now(),
-    lastActive: u.lastActive || Date.now(),
-    status: u.status || 'active',
-  }));
-  res.json({ users });
 });
 
-router.patch('/users/:id', (req, res) => {
-  const { id } = req.params;
-  const { status, role } = req.body || {};
-  const users = readUsers();
-  const idx = users.findIndex(u => u.id === id || String(u.telegramId) === id);
-  if (idx === -1) return res.status(404).json({ error: true, message: 'User not found' });
+router.post('/users', async (req, res) => {
+  const { username, password, displayName, role = 'USER', email } = req.body || {};
+  if (!username || !password) {
+    return res.status(400).json({ error: true, message: 'Username and password required' });
+  }
 
-  if (status) users[idx].status = status;
-  if (role && users[idx].username !== 'Spidey') users[idx].role = role;
-  writeUsers(users);
+  // Prevent creating duplicate Owner or promoting without permission
+  if (role === 'OWNER' && !req.adminUser?.isOwner) {
+    return res.status(403).json({ error: true, message: 'Only the system Owner can assign the OWNER role' });
+  }
 
-  logActivity('USER_UPDATED', { userId: id, status, role });
-  res.json({ success: true, user: users[idx] });
+  try {
+    const user = await userService.createUser({
+      username: username.trim(),
+      password: password.trim(),
+      displayName: displayName ? displayName.trim() : username.trim(),
+      email: email ? email.trim() : null,
+      role: role.toUpperCase(),
+    });
+
+    logActivity('USER_CREATED_BY_ADMIN', { username: user.username, role: user.role });
+    res.status(201).json({ success: true, user });
+  } catch (err) {
+    console.error('[ADMIN CREATE USER ERROR]', err);
+    res.status(400).json({ error: true, message: err.message || 'Failed to create user' });
+  }
 });
 
-router.post('/users/:id/revoke', (req, res) => {
+router.patch('/users/:id', async (req, res) => {
   const { id } = req.params;
-  const users = readUsers();
-  const user = users.find(u => u.id === id || String(u.telegramId) === id);
-  if (!user) return res.status(404).json({ error: true, message: 'User not found' });
+  const { status, role, displayName } = req.body || {};
 
-  logActivity('USER_SESSION_REVOKED', { userId: id, username: user.username });
-  res.json({ success: true, message: `Session revoked for user ${user.username}` });
+  try {
+    const targetUser = await userService.findUserById(id) || await userService.findUserByTelegramId(id);
+    if (!targetUser) return res.status(404).json({ error: true, message: 'User not found' });
+
+    // Protect Owner role and status from modification
+    if (targetUser.role === 'OWNER' && (status === 'disabled' || (role && role !== 'OWNER'))) {
+      return res.status(403).json({ error: true, message: 'Cannot modify Owner status or role' });
+    }
+
+    if (role === 'OWNER' && !req.adminUser?.isOwner) {
+      return res.status(403).json({ error: true, message: 'Only the system Owner can assign the OWNER role' });
+    }
+
+    const updates = {};
+    if (status) updates.status = status;
+    if (role) updates.role = role.toUpperCase();
+    if (displayName) updates.displayName = displayName.trim();
+
+    const updated = await userService.updateUser(targetUser.id, updates);
+    logActivity('USER_UPDATED', { userId: id, updates });
+    res.json({ success: true, user: userService.toSafeUser(updated) });
+  } catch (err) {
+    console.error('[ADMIN UPDATE USER ERROR]', err);
+    res.status(500).json({ error: true, message: 'Failed to update user', details: err.message });
+  }
+});
+
+router.post('/users/:id/reset-password', async (req, res) => {
+  const { id } = req.params;
+  const { newPassword } = req.body || {};
+
+  if (!newPassword || newPassword.length < 4) {
+    return res.status(400).json({ error: true, message: 'New password must be at least 4 characters' });
+  }
+
+  try {
+    const targetUser = await userService.findUserById(id) || await userService.findUserByTelegramId(id);
+    if (!targetUser) return res.status(404).json({ error: true, message: 'User not found' });
+
+    await userService.resetUserPassword(targetUser.id, newPassword);
+    logActivity('USER_PASSWORD_RESET_BY_ADMIN', { userId: id, username: targetUser.username });
+    res.json({ success: true, message: `Password reset successfully for ${targetUser.username}` });
+  } catch (err) {
+    console.error('[ADMIN RESET PASSWORD ERROR]', err);
+    res.status(500).json({ error: true, message: 'Failed to reset password', details: err.message });
+  }
+});
+
+router.delete('/users/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const targetUser = await userService.findUserById(id) || await userService.findUserByTelegramId(id);
+    if (!targetUser) return res.status(404).json({ error: true, message: 'User not found' });
+
+    if (targetUser.role === 'OWNER') {
+      return res.status(403).json({ error: true, message: 'Cannot delete system Owner account' });
+    }
+
+    await userService.deleteUser(targetUser.id);
+    logActivity('USER_DELETED', { userId: id, username: targetUser.username });
+    res.json({ success: true, message: `User ${targetUser.username} deleted permanently` });
+  } catch (err) {
+    console.error('[ADMIN DELETE USER ERROR]', err);
+    res.status(500).json({ error: true, message: 'Failed to delete user', details: err.message });
+  }
+});
+
+router.post('/users/:id/revoke', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const targetUser = await userService.findUserById(id) || await userService.findUserByTelegramId(id);
+    if (!targetUser) return res.status(404).json({ error: true, message: 'User not found' });
+
+    logActivity('USER_SESSION_REVOKED', { userId: id, username: targetUser.username });
+    res.json({ success: true, message: `Session revoked for user ${targetUser.username}` });
+  } catch (err) {
+    res.status(500).json({ error: true, message: 'Failed to revoke session' });
+  }
 });
 
 // 23. Album Management

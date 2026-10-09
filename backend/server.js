@@ -94,7 +94,14 @@ app.use((err, _req, res, _next) => {
   }
 });
 
+const { seedOwnerAndMigrate } = require('./services/userService');
+
 const port = process.env.PORT || 10000;
-app.listen(port, () => {
+app.listen(port, async () => {
   console.log(`[SPiDEYxFLASH] API running on http://localhost:${port}`);
+  try {
+    await seedOwnerAndMigrate();
+  } catch (err) {
+    console.error('[DATABASE INIT ERROR]', err.message);
+  }
 });
