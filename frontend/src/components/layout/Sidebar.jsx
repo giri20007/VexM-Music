@@ -94,7 +94,7 @@ export function Sidebar({ currentRoute, onNavigate }) {
       </div>
 
       {/* Main Nav Links */}
-      <nav className="px-3 space-y-1 mt-2">
+      <nav className="px-3 space-y-1.5 mt-2">
         {navItems.map(item => {
           const Icon = item.icon;
           const isActive = currentRoute === item.id;
@@ -102,14 +102,14 @@ export function Sidebar({ currentRoute, onNavigate }) {
             <button
               key={item.id}
               onClick={() => onNavigate(item.id)}
-              className={`w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 ${
+              className={`w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-2xl text-sm font-semibold transition-all duration-150 relative ${
                 isActive
-                  ? 'bg-bg-active text-accent font-semibold shadow-inner'
+                  ? 'bg-accent text-bg-primary font-bold shadow-md shadow-accent/25'
                   : 'text-warm-muted hover:text-warm-white hover:bg-white/5'
               }`}
               title={collapsed ? item.label : undefined}
             >
-              <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? 'text-accent' : ''}`} />
+              <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? 'stroke-[2.5]' : ''}`} />
               {!collapsed && <span>{item.label}</span>}
             </button>
           );
@@ -117,7 +117,7 @@ export function Sidebar({ currentRoute, onNavigate }) {
       </nav>
 
       {/* Separator */}
-      <div className="my-4 mx-4 border-t border-white/5" />
+      <div className="my-3 mx-4 border-t border-white/5" />
 
       {/* Your Library Section */}
       <div className="flex-1 overflow-y-auto px-3 space-y-2 no-scrollbar">
@@ -138,19 +138,19 @@ export function Sidebar({ currentRoute, onNavigate }) {
         {/* Liked Songs Entry */}
         <button
           onClick={() => onNavigate('liked')}
-          className={`w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-sm transition-all duration-150 ${
+          className={`w-full flex items-center gap-3.5 px-3.5 py-2 rounded-2xl text-sm transition-all duration-150 ${
             currentRoute === 'liked'
-              ? 'bg-bg-active text-warm-white font-semibold'
+              ? 'bg-white/10 text-warm-white font-semibold'
               : 'text-warm-muted hover:text-warm-white hover:bg-white/5'
           }`}
           title={collapsed ? 'Liked songs' : undefined}
         >
-          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-accent to-[#e11d48] flex items-center justify-center text-bg-primary shadow-sm flex-shrink-0">
+          <div className="w-7 h-7 rounded-xl bg-gradient-to-br from-accent to-[#e11d48] flex items-center justify-center text-bg-primary shadow-sm flex-shrink-0">
             <Heart className="w-4 h-4 fill-bg-primary stroke-bg-primary" />
           </div>
           {!collapsed && (
             <div className="text-left min-w-0 flex-1">
-              <p className="truncate font-medium text-xs text-warm-white">Liked songs</p>
+              <p className="truncate font-semibold text-xs text-warm-white">Liked songs</p>
               <p className="truncate text-[11px] text-warm-muted">{likedTrackIds.length} tracks</p>
             </div>
           )}
@@ -182,7 +182,7 @@ export function Sidebar({ currentRoute, onNavigate }) {
                 <button
                   key={p.id}
                   onClick={() => onNavigate(`playlist:${p.id}`)}
-                  className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs transition ${
+                  className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs transition ${
                     currentRoute === `playlist:${p.id}`
                       ? 'bg-bg-active text-accent font-medium'
                       : 'text-warm-muted hover:text-warm-white hover:bg-white/5'
@@ -202,34 +202,34 @@ export function Sidebar({ currentRoute, onNavigate }) {
         )}
       </div>
 
-      {/* Bottom Footer Section: Settings & (Admin Only) */}
+      {/* Bottom Footer Section: Settings & User Profile */}
       <div className="p-3 border-t border-white/5 space-y-1">
-        {/* Admin Dashboard Entry: Only visible to authenticated Admin User (ID 5216415651) */}
+        {/* Subtle Admin Quick Link if Admin */}
         {user?.isAdmin && (
           <button
             onClick={() => onNavigate('admin')}
-            className={`w-full flex items-center gap-3.5 px-3.5 py-2 rounded-xl text-xs font-semibold transition ${
+            className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition ${
               currentRoute === 'admin'
                 ? 'bg-accent text-bg-primary shadow-md'
-                : 'bg-accent/10 border border-accent/20 text-accent hover:bg-accent/20'
+                : 'text-accent/90 hover:bg-accent/10 border border-accent/20'
             }`}
-            title={collapsed ? 'Admin Panel' : undefined}
+            title={collapsed ? 'Admin Dashboard' : undefined}
           >
-            <Shield className="w-4 h-4 flex-shrink-0" />
+            <Shield className="w-3.5 h-3.5 flex-shrink-0" />
             {!collapsed && <span>Admin Dashboard</span>}
           </button>
         )}
 
         <button
           onClick={() => onNavigate('settings')}
-          className={`w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-sm font-medium transition ${
+          className={`w-full flex items-center gap-3.5 px-3.5 py-2 rounded-2xl text-xs sm:text-sm font-medium transition ${
             currentRoute.startsWith('settings')
               ? 'bg-bg-active text-accent font-semibold'
               : 'text-warm-muted hover:text-warm-white hover:bg-white/5'
           }`}
           title={collapsed ? 'Settings' : undefined}
         >
-          <Settings className={`w-5 h-5 flex-shrink-0 ${currentRoute.startsWith('settings') ? 'text-accent' : ''}`} />
+          <Settings className={`w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 ${currentRoute.startsWith('settings') ? 'text-accent' : ''}`} />
           {!collapsed && <span>Settings</span>}
         </button>
 

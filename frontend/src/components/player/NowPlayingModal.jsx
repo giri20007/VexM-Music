@@ -149,6 +149,37 @@ export function NowPlayingModal() {
   const [imgError, setImgError] = useState(false);
   const [isFullscreenVisualizerOpen, setIsFullscreenVisualizerOpen] = useState(false);
 
+  // Quick Switching Keyboard Hotkeys (V = Visualizer, L = Lyrics, A = Artwork, Esc = Minimize)
+  React.useEffect(() => {
+    if (!isNowPlayingOpen) return;
+    const handleKeyDown = e => {
+      const tag = e.target.tagName?.toLowerCase();
+      if (tag === 'input' || tag === 'textarea' || tag === 'select' || e.target.isContentEditable) return;
+
+      const key = e.key.toLowerCase();
+      if (key === 'v') {
+        e.preventDefault();
+        setViewMode('visualizer');
+      } else if (key === 'l') {
+        e.preventDefault();
+        setViewMode('lyrics');
+      } else if (key === 'a') {
+        e.preventDefault();
+        setViewMode('artwork');
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        if (activeDrawer) {
+          setActiveDrawer(null);
+        } else {
+          setNowPlayingOpen(false);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isNowPlayingOpen, activeDrawer, setNowPlayingOpen]);
+
   if (!isNowPlayingOpen || !currentTrack) return null;
 
   const isLiked = likedTrackIds.includes(String(currentTrack.id));
@@ -177,7 +208,7 @@ export function NowPlayingModal() {
         <button
           onClick={() => setNowPlayingOpen(false)}
           className="p-2 sm:p-2.5 rounded-full bg-white/5 hover:bg-white/15 text-warm-muted hover:text-white transition backdrop-blur-md border border-white/5 shadow-sm"
-          title="Minimize player"
+          title="Minimize player (Esc)"
           aria-label="Minimize player"
         >
           <ChevronDown className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -274,9 +305,11 @@ export function NowPlayingModal() {
                 ? 'bg-gradient-to-r from-accent to-[#f43f5e] text-bg-primary shadow-lg shadow-accent/25'
                 : 'text-warm-muted hover:text-white hover:bg-white/5'
             }`}
+            title="Switch to Artwork (Press 'A')"
           >
             <Disc3 className="w-3.5 h-3.5" />
             <span>Artwork</span>
+            <kbd className="hidden sm:inline-block text-[9px] px-1 py-0.2 rounded bg-black/30 opacity-70">A</kbd>
           </button>
 
           <button
@@ -286,9 +319,11 @@ export function NowPlayingModal() {
                 ? 'bg-gradient-to-r from-accent to-[#f43f5e] text-bg-primary shadow-lg shadow-accent/25'
                 : 'text-warm-muted hover:text-white hover:bg-white/5'
             }`}
+            title="Switch to Synced Lyrics (Press 'L')"
           >
             <Mic2 className="w-3.5 h-3.5" />
             <span>Synced Lyrics</span>
+            <kbd className="hidden sm:inline-block text-[9px] px-1 py-0.2 rounded bg-black/30 opacity-70">L</kbd>
           </button>
 
           <button
@@ -298,9 +333,11 @@ export function NowPlayingModal() {
                 ? 'bg-gradient-to-r from-accent to-[#f43f5e] text-bg-primary shadow-lg shadow-accent/25'
                 : 'text-warm-muted hover:text-white hover:bg-white/5'
             }`}
+            title="Switch to 360° Visualizer (Press 'V')"
           >
             <Activity className="w-3.5 h-3.5" />
             <span>360° Visualizer</span>
+            <kbd className="hidden sm:inline-block text-[9px] px-1 py-0.2 rounded bg-black/30 opacity-70">V</kbd>
           </button>
         </div>
 
@@ -403,14 +440,48 @@ export function NowPlayingModal() {
             </div>
           )}
 
-          {/* MODE 3: 360° AUDIO VISUALIZER */}
+          {/* MODE 3: 360° AUDIO VISUALIZER WITH DYNAMIC AMBIENT GLOW & TRACK CONTEXT */}
           {viewMode === 'visualizer' && (
-            <div className="w-full max-w-xl aspect-square max-h-[460px] rounded-3xl overflow-hidden animate-scale-up shadow-2xl border border-white/15">
-              <AudioVisualizer
-                onToggleFullscreen={() => setIsFullscreenVisualizerOpen(true)}
-                onCollapse={() => setViewMode('artwork')}
-                interactive={true}
-              />
+            <div className="relative w-full max-w-xl flex flex-col items-center animate-scale-up">
+              {/* Dynamic Soft Ambient Glow Backing (Warm Coral & Neon Violet) */}
+              <div className="absolute inset-0 -m-8 rounded-full bg-gradient-to-tr from-[#ff6b6b]/25 via-[#f43f5e]/20 to-[#a855f7]/25 filter blur-[80px] pointer-events-none -z-10 animate-pulse-slow" />
+
+              {/* Top Track Context Header (Title, Artist, Album, Quality) */}
+              <div className="w-full flex items-center justify-between px-3 py-2 mb-2 rounded-2xl bg-black/40 border border-white/10 backdrop-blur-xl text-xs z-10 shadow-lg">
+                <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                  <div className="w-8 h-8 rounded-lg overflow-hidden bg-bg-card flex-shrink-0 border border-white/10">
+                    <img src={coverSrc} alt={currentTrack.title} className="w-full h-full object-cover" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-bold text-warm-white truncate text-xs sm:text-sm">{currentTrack.title}</p>
+                    <p className="text-[11px] text-warm-muted truncate">{currentTrack.artist}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  {quality && (
+                    <span className={`text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded border ${quality.color}`}>
+                      {quality.label}
+                    </span>
+                  )}
+                  <button
+                    onClick={() => toggleLike(currentTrack.id)}
+                    className={`p-1.5 rounded-full transition hover:scale-110 ${isLiked ? 'text-accent' : 'text-warm-muted hover:text-white'}`}
+                    aria-label={isLiked ? 'Unlike' : 'Like'}
+                  >
+                    <Heart className={`w-4 h-4 ${isLiked ? 'fill-accent' : ''}`} />
+                  </button>
+                </div>
+              </div>
+
+              {/* Visualizer Canvas Container */}
+              <div className="w-full aspect-square max-h-[440px] rounded-3xl overflow-hidden shadow-2xl border border-white/15 bg-black/30 backdrop-blur-xl relative">
+                <AudioVisualizer
+                  onToggleFullscreen={() => setIsFullscreenVisualizerOpen(true)}
+                  onCollapse={() => setViewMode('artwork')}
+                  interactive={true}
+                />
+              </div>
             </div>
           )}
         </div>

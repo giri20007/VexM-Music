@@ -60,52 +60,57 @@ export const TrackRow = memo(function TrackRow({
       <div
         onClick={handlePlayClick}
         onContextMenu={handleContextMenu}
-        className={`group relative flex items-center justify-between gap-3 rounded-xl px-3 py-2 text-sm transition-all duration-150 cursor-pointer ${
-          isCurrent ? 'bg-bg-active text-white' : 'hover:bg-bg-card text-warm-white'
+        className={`group relative flex items-center justify-between gap-3 rounded-2xl px-3.5 py-2.5 text-sm transition-all duration-200 cursor-pointer select-none border border-transparent ${
+          isCurrent
+            ? 'bg-bg-active text-white border-accent/20 shadow-sm'
+            : 'hover:bg-bg-card/90 hover:border-white/5 text-warm-white'
         }`}
       >
         {/* Left: Index / Play Icon + Cover + Title/Artist */}
-        <div className="flex items-center gap-3 min-w-0 flex-1">
+        <div className="flex items-center gap-3.5 min-w-0 flex-1">
           {showNumber && (
-            <div className="w-6 text-center text-xs font-medium text-warm-muted group-hover:text-warm-white">
+            <div className="w-6 text-center text-xs font-mono font-medium text-warm-muted group-hover:text-warm-white flex items-center justify-center flex-shrink-0">
               <span className="group-hover:hidden">{isCurrentPlaying ? '▶' : index !== undefined ? index + 1 : ''}</span>
               <button
                 onClick={handlePlayClick}
-                className="hidden group-hover:inline-flex items-center justify-center text-accent"
+                className="hidden group-hover:inline-flex items-center justify-center text-accent transition-transform hover:scale-125"
                 aria-label={isCurrentPlaying ? 'Pause' : 'Play'}
               >
-                {isCurrentPlaying ? <Pause className="w-3.5 h-3.5 fill-current" /> : <Play className="w-3.5 h-3.5 fill-current" />}
+                {isCurrentPlaying ? <Pause className="w-4 h-4 fill-current" /> : <Play className="w-4 h-4 fill-current ml-0.5" />}
               </button>
             </div>
           )}
 
           {showCover && (
-            <div className="relative w-10 h-10 flex-shrink-0 rounded-lg overflow-hidden bg-bg-card border border-white/5">
+            <div className="relative w-10 h-10 flex-shrink-0 rounded-xl overflow-hidden bg-bg-card border border-white/10 shadow-sm group/cover">
               <img
                 src={coverSrc}
                 alt={track.title}
                 onError={() => setHasImgError(true)}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                 loading="lazy"
               />
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/cover:opacity-100 flex items-center justify-center transition-opacity">
+                {isCurrentPlaying ? <Pause className="w-3.5 h-3.5 text-accent fill-current" /> : <Play className="w-3.5 h-3.5 text-white fill-current ml-0.5" />}
+              </div>
             </div>
           )}
 
           <div className="min-w-0 flex-1">
-            <p className={`truncate font-medium text-[13.5px] ${isCurrent ? 'text-accent font-semibold' : 'text-warm-white'}`}>
+            <p className={`truncate font-semibold text-[13.5px] ${isCurrent ? 'text-accent' : 'text-warm-white group-hover:text-warm-white'}`}>
               {track.title}
             </p>
-            <p className="truncate text-xs text-warm-muted">
+            <p className="truncate text-xs text-warm-muted group-hover:text-warm-muted/90">
               {track.artist}
               {showAlbum && track.album && track.album !== 'Unknown Album' ? ` · ${track.album}` : ''}
             </p>
           </div>
         </div>
 
-        {/* Center: Format Badge */}
+        {/* Center: Audio Quality Pill */}
         {quality && (
-          <div className="hidden sm:block">
-            <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded border ${quality.color}`}>
+          <div className="hidden sm:block flex-shrink-0">
+            <span className={`text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full border shadow-xs ${quality.color}`}>
               {quality.label}
             </span>
           </div>
@@ -118,7 +123,7 @@ export const TrackRow = memo(function TrackRow({
               e.stopPropagation();
               toggleLike(track.id);
             }}
-            className={`p-1.5 rounded-full transition hover:scale-110 ${
+            className={`p-1.5 rounded-full transition-transform hover:scale-125 ${
               isLiked ? 'text-accent fill-accent' : 'opacity-0 group-hover:opacity-100 text-warm-muted hover:text-white'
             }`}
             aria-label={isLiked ? 'Unlike' : 'Like'}
@@ -126,7 +131,7 @@ export const TrackRow = memo(function TrackRow({
             <Heart className={`w-4 h-4 ${isLiked ? 'fill-accent' : ''}`} />
           </button>
 
-          <span className="w-10 text-right tabular-nums text-warm-muted">
+          <span className="w-12 text-right tabular-nums font-mono text-[11px] text-warm-muted">
             {formatDuration(track.duration)}
           </span>
 
@@ -135,7 +140,7 @@ export const TrackRow = memo(function TrackRow({
               e.stopPropagation();
               enqueue(track);
             }}
-            className="opacity-0 group-hover:opacity-100 p-1.5 rounded-full hover:bg-white/10 text-warm-muted hover:text-white transition"
+            className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-white/10 text-warm-muted hover:text-white transition"
             title="Add to queue"
             aria-label="Add to queue"
           >
@@ -144,7 +149,7 @@ export const TrackRow = memo(function TrackRow({
 
           <button
             onClick={handleMoreClick}
-            className="opacity-0 group-hover:opacity-100 p-1.5 rounded-full hover:bg-white/10 text-warm-muted hover:text-white transition"
+            className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-white/10 text-warm-muted hover:text-white transition"
             title="More options"
             aria-label="More options"
           >

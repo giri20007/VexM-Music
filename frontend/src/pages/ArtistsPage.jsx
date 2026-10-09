@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { User, Play, Shuffle, Share2, Check, ArrowLeft, Disc3, Sparkles } from 'lucide-react';
 import { useAudioStore } from '../store/useAudioStore';
 import { TrackRow } from '../components/library/TrackRow';
@@ -179,28 +179,102 @@ export function ArtistsPage({ lib, selectedArtistName, onNavigate, onBack }) {
     );
   }
 
+  const [artistSearch, setArtistSearch] = useState('');
+  const [selectedLetter, setSelectedLetter] = useState('ALL');
+
+  const alphabet = ['ALL', ...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''), '#'];
+
+  const filteredArtists = useMemo(() => {
+    let list = lib.artists || [];
+    if (artistSearch.trim()) {
+      const q = artistSearch.trim().toLowerCase();
+      list = list.filter(a => a.name.toLowerCase().includes(q));
+    }
+    if (selectedLetter !== 'ALL') {
+      if (selectedLetter === '#') {
+        list = list.filter(a => !/^[a-zA-Z]/.test(a.name.trim()));
+      } else {
+        list = list.filter(a => a.name.trim().toUpperCase().startsWith(selectedLetter));
+      }
+    }
+    return list;
+  }, [lib.artists, artistSearch, selectedLetter]);
+
   return (
     <div className="flex-1 max-w-7xl mx-auto w-full p-4 sm:p-6 space-y-6 select-none animate-fade-in">
-      <div className="flex items-center justify-between">
+      {/* Top Header & Search Input */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl sm:text-2xl font-black tracking-tight text-warm-white">
             Artists ({lib.artists.length})
           </h1>
           <p className="text-xs text-warm-muted mt-0.5">
-            Discover all artists featured in your Telegram music collection
+            Discover and explore all artists featured in your Telegram music collection
           </p>
+        </div>
+
+        {/* Real-time Artist Search Input */}
+        <div className="w-full md:w-72">
+          <input
+            type="search"
+            placeholder="Search artists..."
+            value={artistSearch}
+            onChange={e => setArtistSearch(e.target.value)}
+            className="w-full text-xs px-3.5 py-2 rounded-xl bg-bg-card border border-white/8 text-warm-white placeholder:text-warm-muted/60 focus:outline-none focus:ring-1 focus:ring-accent/50"
+          />
         </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-        {lib.artists.map(artist => (
-          <ArtistCard
-            key={artist.name}
-            artist={artist}
-            onClick={() => onNavigate(`artist:${artist.name}`)}
-          />
-        ))}
+      {/* A–Z Fast Alphabet Scrubber Bar */}
+      <div className="flex items-center gap-1 p-1 rounded-2xl bg-bg-card border border-white/8 overflow-x-auto no-scrollbar shadow-sm">
+        {alphabet.map(letter => {
+          const isActive = selectedLetter === letter;
+          return (
+            <button
+              key={letter}
+              onClick={() => setSelectedLetter(letter)}
+              className={`min-w-[28px] h-7 px-1.5 rounded-lg text-xs font-bold transition-all ${
+                isActive
+                  ? 'bg-accent text-bg-primary shadow-sm'
+                  : 'text-warm-muted hover:text-white hover:bg-white/5'
+              }`}
+            >
+              {letter}
+            </button>
+          );
+        })}
       </div>
+
+      {/* Artists Grid */}
+      {filteredArtists.length > 0 ? (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+          {filteredArtists.map(artist => (
+            <ArtistCard
+              key={artist.name}
+              artist={artist}
+              onClick={() => onNavigate(`artist:${artist.name}`)}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="p-16 text-center text-warm-muted text-sm border border-dashed border-white/10 rounded-3xl space-y-2">
+          <p className="font-bold text-warm-white">No artists found</p>
+          <p className="text-xs text-warm-muted">
+            No artists match your search "{artistSearch}" {selectedLetter !== 'ALL' ? `under "${selectedLetter}"` : ''}.
+          </p>
+          {(artistSearch || selectedLetter !== 'ALL') && (
+            <button
+              onClick={() => {
+                setArtistSearch('');
+                setSelectedLetter('ALL');
+              }}
+              className="mt-3 px-4 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-semibold text-accent transition"
+            >
+              Reset Filters
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 }

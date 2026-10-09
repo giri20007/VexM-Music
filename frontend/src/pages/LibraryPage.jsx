@@ -212,9 +212,22 @@ export function LibraryPage({ lib, onNavigate }) {
             </select>
           </div>
 
-          {/* Track List */}
+          {/* Track Table Header & List */}
           {lib.items.length > 0 ? (
             <div className="bg-bg-secondary/40 p-2 rounded-2xl border border-white/8 space-y-1">
+              {/* Standardized Table Column Headers */}
+              <div className="flex items-center justify-between gap-3 px-3.5 py-2 text-[11px] font-bold tracking-wider text-warm-muted/70 uppercase border-b border-white/5 select-none">
+                <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                  <span className="w-6 text-center">#</span>
+                  <span className="flex-1">Title & Artist</span>
+                </div>
+                <div className="hidden sm:block flex-shrink-0 w-24 text-center">Quality</div>
+                <div className="flex items-center gap-3 flex-shrink-0">
+                  <span className="w-12 text-right">Duration</span>
+                  <span className="w-16 text-right">Actions</span>
+                </div>
+              </div>
+
               {lib.items.map((track, idx) => (
                 <TrackRow
                   key={track.id}
@@ -227,19 +240,45 @@ export function LibraryPage({ lib, onNavigate }) {
               ))}
             </div>
           ) : (
-            <div className="p-16 text-center text-warm-muted text-sm border border-dashed border-white/10 rounded-3xl space-y-3">
-              <Music2 className="w-12 h-12 text-warm-muted/40 mx-auto" />
-              <p className="font-bold text-warm-white">No tracks found</p>
-              <p className="text-xs text-warm-muted max-w-sm mx-auto">
-                {lib.query ? `No songs match "${lib.query}".` : 'Your audio library is currently empty.'}
-              </p>
-              <button
-                onClick={() => onNavigate('search')}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-accent text-bg-primary font-bold text-xs shadow-md hover:scale-105 transition"
-              >
-                <Compass className="w-4 h-4" />
-                <span>Explore Music</span>
-              </button>
+            <div className="p-12 sm:p-16 text-center text-warm-muted text-sm border border-dashed border-white/10 rounded-3xl space-y-4">
+              {/* Vinyl Graphic with Glowing Accent Ring */}
+              <div className="relative w-20 h-20 rounded-full bg-gradient-to-tr from-[#2a1219] via-[#1a0c10] to-[#0d0507] border-2 border-white/10 flex items-center justify-center text-accent mx-auto shadow-xl shadow-accent/10 group animate-pulse-slow">
+                <div className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center">
+                  <Music2 className="w-4 h-4 text-accent" />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <p className="font-bold text-warm-white text-base">No tracks found</p>
+                <p className="text-xs text-warm-muted max-w-sm mx-auto leading-relaxed">
+                  {lib.query ? `No songs match "${lib.query}". Try another search term.` : 'Your saved tracks and favorites will appear here.'}
+                </p>
+              </div>
+
+              {/* Quick Shortcut Chips */}
+              <div className="flex items-center justify-center gap-2 pt-2 flex-wrap">
+                <button
+                  onClick={() => onNavigate('search')}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-accent text-bg-primary font-bold text-xs shadow-md hover:scale-105 transition"
+                >
+                  <Compass className="w-4 h-4" />
+                  <span>Explore Search</span>
+                </button>
+                <button
+                  onClick={() => onNavigate('artists')}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-warm-white border border-white/8 font-semibold text-xs transition"
+                >
+                  <Users className="w-4 h-4 text-accent" />
+                  <span>Browse Artists</span>
+                </button>
+                <button
+                  onClick={() => onNavigate('albums')}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-warm-white border border-white/8 font-semibold text-xs transition"
+                >
+                  <Disc3 className="w-4 h-4 text-accent" />
+                  <span>Explore Albums</span>
+                </button>
+              </div>
             </div>
           )}
         </div>
@@ -250,6 +289,19 @@ export function LibraryPage({ lib, onNavigate }) {
         <div className="space-y-4">
           {likedTracks.length > 0 ? (
             <div className="bg-bg-secondary/40 p-2 rounded-2xl border border-white/8 space-y-1">
+              {/* Standardized Table Column Headers */}
+              <div className="flex items-center justify-between gap-3 px-3.5 py-2 text-[11px] font-bold tracking-wider text-warm-muted/70 uppercase border-b border-white/5 select-none">
+                <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                  <span className="w-6 text-center">#</span>
+                  <span className="flex-1">Title & Artist</span>
+                </div>
+                <div className="hidden sm:block flex-shrink-0 w-24 text-center">Quality</div>
+                <div className="flex items-center gap-3 flex-shrink-0">
+                  <span className="w-12 text-right">Duration</span>
+                  <span className="w-16 text-right">Actions</span>
+                </div>
+              </div>
+
               {likedTracks.map((track, idx) => (
                 <TrackRow
                   key={track.id}
@@ -262,21 +314,32 @@ export function LibraryPage({ lib, onNavigate }) {
               ))}
             </div>
           ) : (
-            <div className="p-16 text-center text-warm-muted text-sm border border-dashed border-white/10 rounded-3xl space-y-3">
-              <div className="w-14 h-14 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 mx-auto">
-                <Heart className="w-7 h-7 fill-current" />
+            <div className="p-12 sm:p-16 text-center text-warm-muted text-sm border border-dashed border-white/10 rounded-3xl space-y-4">
+              <div className="w-16 h-16 rounded-full bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-400 mx-auto shadow-lg shadow-rose-500/10">
+                <Heart className="w-8 h-8 fill-current" />
               </div>
-              <p className="font-bold text-warm-white text-base">No Liked Songs Yet</p>
-              <p className="text-xs text-warm-muted max-w-sm mx-auto leading-relaxed">
-                Click the heart icon on any song while listening or browsing to save it to your favorites.
-              </p>
-              <button
-                onClick={() => onNavigate('albums')}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-accent text-bg-primary font-bold text-xs shadow-md hover:scale-105 transition"
-              >
-                <Compass className="w-4 h-4" />
-                <span>Explore Albums</span>
-              </button>
+              <div className="space-y-1">
+                <p className="font-bold text-warm-white text-base">No Liked Songs Yet</p>
+                <p className="text-xs text-warm-muted max-w-sm mx-auto leading-relaxed">
+                  Click the heart icon on any song while listening or browsing to save it to your favorites.
+                </p>
+              </div>
+              <div className="flex items-center justify-center gap-2 pt-2 flex-wrap">
+                <button
+                  onClick={() => onNavigate('albums')}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-accent text-bg-primary font-bold text-xs shadow-md hover:scale-105 transition"
+                >
+                  <Disc3 className="w-4 h-4" />
+                  <span>Explore Albums</span>
+                </button>
+                <button
+                  onClick={() => onNavigate('artists')}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-warm-white border border-white/8 font-semibold text-xs transition"
+                >
+                  <Users className="w-4 h-4 text-accent" />
+                  <span>Browse Artists</span>
+                </button>
+              </div>
             </div>
           )}
         </div>
@@ -321,6 +384,18 @@ export function LibraryPage({ lib, onNavigate }) {
         <div className="space-y-4">
           {historyTracks.length > 0 ? (
             <div className="bg-bg-secondary/40 p-2 rounded-2xl border border-white/8 space-y-1">
+              <div className="flex items-center justify-between gap-3 px-3.5 py-2 text-[11px] font-bold tracking-wider text-warm-muted/70 uppercase border-b border-white/5 select-none">
+                <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                  <span className="w-6 text-center">#</span>
+                  <span className="flex-1">Title & Artist</span>
+                </div>
+                <div className="hidden sm:block flex-shrink-0 w-24 text-center">Quality</div>
+                <div className="flex items-center gap-3 flex-shrink-0">
+                  <span className="w-12 text-right">Duration</span>
+                  <span className="w-16 text-right">Actions</span>
+                </div>
+              </div>
+
               {historyTracks.map((track, idx) => (
                 <TrackRow
                   key={`${track.id}_${idx}`}
@@ -349,6 +424,18 @@ export function LibraryPage({ lib, onNavigate }) {
         <div className="space-y-4">
           {mostPlayedTracks.length > 0 ? (
             <div className="bg-bg-secondary/40 p-2 rounded-2xl border border-white/8 space-y-1">
+              <div className="flex items-center justify-between gap-3 px-3.5 py-2 text-[11px] font-bold tracking-wider text-warm-muted/70 uppercase border-b border-white/5 select-none">
+                <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                  <span className="w-6 text-center">#</span>
+                  <span className="flex-1">Title & Artist</span>
+                </div>
+                <div className="hidden sm:block flex-shrink-0 w-24 text-center">Quality</div>
+                <div className="flex items-center gap-3 flex-shrink-0">
+                  <span className="w-12 text-right">Duration</span>
+                  <span className="w-16 text-right">Actions</span>
+                </div>
+              </div>
+
               {mostPlayedTracks.map((track, idx) => (
                 <TrackRow
                   key={track.id}
