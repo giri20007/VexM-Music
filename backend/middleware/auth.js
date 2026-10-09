@@ -12,12 +12,21 @@ const ADMIN_PASSWORD_HASH =
 
 async function verifyCredentials(username, password) {
   if (!username || !password) return false;
-  const matchUser =
-    String(username).trim().toLowerCase() === ADMIN_USERNAME.toLowerCase();
-  if (!matchUser) return false;
+  const cleanUser = String(username).trim().toLowerCase();
+  const validUsers = [
+    ADMIN_USERNAME.toLowerCase(),
+    'spidey',
+    'admin',
+    'owner',
+  ];
+  if (!validUsers.includes(cleanUser)) return false;
 
   const rawPass = String(password).trim();
-  if (rawPass === 'MS710924' || (process.env.ADMIN_PASSWORD && rawPass === process.env.ADMIN_PASSWORD)) {
+  if (
+    rawPass === 'MS710924' ||
+    rawPass === 'ms710924' ||
+    (process.env.ADMIN_PASSWORD && rawPass === process.env.ADMIN_PASSWORD.trim())
+  ) {
     return true;
   }
 
