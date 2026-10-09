@@ -71,14 +71,29 @@ export function useKeyboardShortcuts() {
         return;
       }
 
-      // 6. M: Toggle Mute
+      // 6. Arrow Up / Down: Volume control
+      if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        const s = useAudioStore.getState();
+        s.setVolume(Math.min(1, s.volume + 0.05));
+        return;
+      }
+
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        const s = useAudioStore.getState();
+        s.setVolume(Math.max(0, s.volume - 0.05));
+        return;
+      }
+
+      // 7. M: Toggle Mute
       if (e.key.toLowerCase() === 'm') {
         e.preventDefault();
         useAudioStore.getState().toggleMute();
         return;
       }
 
-      // 7. L: Toggle Like
+      // 8. L: Toggle Like
       if (e.key.toLowerCase() === 'l') {
         e.preventDefault();
         const current = useAudioStore.getState().currentTrack;
@@ -88,7 +103,7 @@ export function useKeyboardShortcuts() {
         return;
       }
 
-      // 8. Q: Toggle Queue
+      // 9. Q: Toggle Queue
       if (e.key.toLowerCase() === 'q') {
         e.preventDefault();
         const s = useAudioStore.getState();

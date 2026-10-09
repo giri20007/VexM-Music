@@ -4,11 +4,11 @@
 
 @layer base {
   :root {
-    --bg-primary: #130c0a;
-    --bg-secondary: #1a100d;
-    --bg-card: #241712;
-    --bg-card-hover: #2f1e18;
-    --bg-active: #38231a;
+    --bg-primary: #090a0f;
+    --bg-secondary: #0e1017;
+    --bg-card: #12141c;
+    --bg-card-hover: #191c26;
+    --bg-active: #222634;
     --accent-color: #ff7b72;
     --accent-hover: #ff928a;
     --accent-glow: rgba(255, 123, 114, 0.3);
@@ -334,4 +334,19 @@
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  display: inline-flex;
+  white-space: nowrap;
+  animation: marquee 16s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
 }

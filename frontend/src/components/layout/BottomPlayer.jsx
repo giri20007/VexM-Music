@@ -18,18 +18,52 @@ import {
 } from 'lucide-react';
 import { useAudioStore } from '../../store/useAudioStore';
 import { seek } from '../../hooks/usePlayer';
-import { formatDuration } from '../../utils/formatters';
+import { formatDuration, formatQualityBadge } from '../../utils/formatters';
 import { getArtworkSrc, getTrackArtworkUrl } from '../../utils/artworkGenerator';
 
-// Isolated Scrubber Component to prevent bottom player re-renders
+// Isolated Scrubber Component with Progress Fill & Hover Tooltip
 const BottomScrubber = memo(function BottomScrubber() {
   const currentTime = useAudioStore(s => s.currentTime);
   const duration = useAudioStore(s => s.duration);
+  const [hoverPercent, setHoverPercent] = useState(null);
+
+  const percent = duration > 0 ? Math.min(100, (currentTime / duration) * 100) : 0;
+
+  const handleMouseMove = e => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const pos = (e.clientX - rect.left) / rect.width;
+    setHoverPercent(Math.max(0, Math.min(1, pos)));
+  };
+
+  const handleMouseLeave = () => {
+    setHoverPercent(null);
+  };
 
   return (
-    <div className="hidden md:flex items-center gap-2.5 w-full text-[11px] tabular-nums text-warm-muted">
-      <span className="w-8 text-right">{formatDuration(currentTime)}</span>
-      <div className="relative flex-1 flex items-center">
+    <div className="hidden md:flex items-center gap-3 w-full text-[11px] tabular-nums text-warm-muted font-mono select-none">
+      <span className="w-8 text-right font-medium">{formatDuration(currentTime)}</span>
+      <div
+        className="relative flex-1 py-1.5 flex items-center group cursor-pointer"
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+      >
+        {/* Track Bar Background */}
+        <div className="relative w-full h-1 bg-white/10 rounded-full overflow-hidden transition-all group-hover:h-1.5">
+          {/* Active Fill */}
+          <div
+            className="absolute top-0 left-0 bottom-0 bg-gradient-to-r from-accent to-[#f43f5e] rounded-full transition-all duration-75"
+            style={{ width: `${percent}%` }}
+          />
+          {/* Hover Fill */}
+          {hoverPercent !== null && (
+            <div
+              className="absolute top-0 left-0 bottom-0 bg-white/20 rounded-full pointer-events-none"
+              style={{ width: `${hoverPercent * 100}%` }}
+            />
+          )}
+        </div>
+
+        {/* Real Range Input */}
         <input
           type="range"
           min="0"
@@ -38,10 +72,26 @@ const BottomScrubber = memo(function BottomScrubber() {
           value={Math.min(currentTime, duration || 0)}
           onChange={e => seek(Number(e.target.value))}
           aria-label="Seek track position"
-          className="w-full h-1 bg-white/10 rounded-full appearance-none cursor-pointer"
+          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
         />
+
+        {/* Scrubber Thumb */}
+        <div
+          className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-white shadow-md shadow-accent/50 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"
+          style={{ left: `${percent}%` }}
+        />
+
+        {/* Hover Time Tooltip */}
+        {hoverPercent !== null && duration > 0 && (
+          <div
+            className="absolute -top-7 -translate-x-1/2 px-2 py-0.5 rounded-md bg-black/90 backdrop-blur-md border border-white/15 text-[10px] font-mono text-warm-white pointer-events-none shadow-xl"
+            style={{ left: `${hoverPercent * 100}%` }}
+          >
+            {formatDuration(hoverPercent * duration)}
+          </div>
+        )}
       </div>
-      <span className="w-8 text-left">{formatDuration(duration)}</span>
+      <span className="w-8 text-left font-medium">{formatDuration(duration)}</span>
     </div>
   );
 });
@@ -55,7 +105,7 @@ const MobileProgressLine = memo(function MobileProgressLine() {
   return (
     <div className="md:hidden absolute top-0 left-0 right-0 h-1 bg-white/10">
       <div
-        className="h-full bg-accent transition-all duration-100"
+        className="h-full bg-gradient-to-r from-accent to-[#f43f5e] transition-all duration-100"
         style={{ width: `${progressPercent}%` }}
       />
     </div>
@@ -91,7 +141,7 @@ export const BottomPlayer = memo(function BottomPlayer() {
 
   if (!currentTrack) {
     return (
-      <footer className="h-20 bg-bg-secondary/95 backdrop-blur-lg border-t border-white/5 flex items-center justify-center px-4 text-xs text-warm-muted select-none">
+      <footer className="h-20 bg-bg-secondary/95 backdrop-blur-xl border-t border-white/8 flex items-center justify-center px-4 text-xs text-warm-muted select-none">
         <div className="flex items-center gap-2">
           <Music2 className="w-4 h-4 text-accent animate-pulse" />
           <span>Select a track from your library to start listening</span>
@@ -100,10 +150,11 @@ export const BottomPlayer = memo(function BottomPlayer() {
     );
   }
 
+  const quality = formatQualityBadge(currentTrack);
   const coverSrc = !imgErr ? getArtworkSrc(currentTrack) : getTrackArtworkUrl(currentTrack, 200);
 
   return (
-    <footer className="fixed bottom-0 left-0 right-0 z-30 h-22 md:h-20 bg-bg-secondary/98 backdrop-blur-xl border-t border-white/5 flex flex-col justify-center px-3 sm:px-6 select-none shadow-2xl">
+    <footer className="fixed bottom-0 left-0 right-0 z-30 h-22 md:h-20 bg-bg-secondary/98 backdrop-blur-2xl border-t border-white/8 flex flex-col justify-center px-3 sm:px-6 select-none shadow-2xl">
       {/* Mobile Top Scrubber Line */}
       <MobileProgressLine />
 
@@ -112,31 +163,38 @@ export const BottomPlayer = memo(function BottomPlayer() {
         <div className="flex items-center gap-3 min-w-0 w-1/4 sm:w-1/3">
           <div
             onClick={() => setNowPlayingOpen(true)}
-            className="relative w-12 h-12 rounded-xl overflow-hidden bg-bg-card border border-white/5 flex-shrink-0 cursor-pointer shadow-md group"
+            className="relative w-12 h-12 rounded-xl overflow-hidden bg-bg-card border border-white/10 flex-shrink-0 cursor-pointer shadow-md group"
           >
             <img
               src={coverSrc}
               alt={currentTrack.title}
               onError={() => setImgErr(true)}
-              className="w-full h-full object-cover transition duration-200 group-hover:scale-105"
+              className="w-full h-full object-cover transition duration-300 group-hover:scale-105"
             />
-            <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
+            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
               <Maximize2 className="w-4 h-4 text-white" />
             </div>
           </div>
 
-          <div className="min-w-0 flex-1 cursor-pointer" onClick={() => setNowPlayingOpen(true)}>
-            <h3 className="truncate text-xs sm:text-sm font-semibold text-warm-white hover:text-accent transition-colors">
-              {currentTrack.title}
-            </h3>
-            <p className="truncate text-[11px] sm:text-xs text-warm-muted">
+          <div className="min-w-0 flex-1 cursor-pointer overflow-hidden" onClick={() => setNowPlayingOpen(true)}>
+            <div className="flex items-center gap-1.5">
+              <h3 className="truncate text-xs sm:text-sm font-bold text-warm-white hover:text-accent transition-colors">
+                {currentTrack.title}
+              </h3>
+              {quality && (
+                <span className={`hidden lg:inline-block text-[9px] font-black px-1.5 py-0.2 rounded border ${quality.color} flex-shrink-0`}>
+                  {quality.label}
+                </span>
+              )}
+            </div>
+            <p className="truncate text-[11px] sm:text-xs text-warm-muted/80">
               {currentTrack.artist}
             </p>
           </div>
 
           <button
             onClick={() => toggleLike(currentTrack.id)}
-            className={`p-1.5 rounded-full transition hover:scale-110 flex-shrink-0 ${
+            className={`p-1.5 rounded-full transition-transform hover:scale-125 active:scale-95 flex-shrink-0 ${
               isLiked ? 'text-accent' : 'text-warm-muted hover:text-warm-white'
             }`}
             aria-label={isLiked ? 'Unlike' : 'Like'}
@@ -151,10 +209,10 @@ export const BottomPlayer = memo(function BottomPlayer() {
           <div className="flex items-center gap-3 sm:gap-5 mb-1">
             <button
               onClick={toggleShuffle}
-              className={`p-1.5 rounded-full transition hover:text-white ${
-                shuffle ? 'text-accent' : 'text-warm-muted'
+              className={`p-1.5 rounded-full transition ${
+                shuffle ? 'text-accent bg-accent/15 shadow-sm shadow-accent/20' : 'text-warm-muted hover:text-white'
               }`}
-              title="Shuffle"
+              title={`Shuffle ${shuffle ? 'On' : 'Off'}`}
               aria-label="Shuffle"
             >
               <Shuffle className="w-4 h-4" />
@@ -162,17 +220,19 @@ export const BottomPlayer = memo(function BottomPlayer() {
 
             <button
               onClick={prev}
-              className="p-1.5 text-warm-muted hover:text-warm-white transition hover:scale-105"
-              title="Previous"
+              className="p-1.5 text-warm-muted hover:text-warm-white transition hover:scale-110 active:scale-95"
+              title="Previous track"
               aria-label="Previous track"
             >
               <SkipBack className="w-4 h-4 sm:w-5 sm:h-5 fill-current" />
             </button>
 
-            {/* Main Round Pink Play/Pause Button */}
+            {/* Main Glowing Round Play/Pause Button */}
             <button
               onClick={togglePlay}
-              className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-accent text-bg-primary flex items-center justify-center shadow-lg shadow-accent/25 hover:scale-105 active:scale-95 transition-all"
+              className={`w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gradient-to-tr from-[#ff6b6b] via-[#f43f5e] to-[#c084fc] text-bg-primary flex items-center justify-center shadow-lg shadow-rose-500/25 hover:shadow-rose-500/40 hover:scale-105 active:scale-95 transition-all ${
+                isPlaying ? 'ring-2 ring-accent/30' : ''
+              }`}
               aria-label={isPlaying ? 'Pause' : 'Play'}
             >
               {isPlaying ? (
@@ -184,8 +244,8 @@ export const BottomPlayer = memo(function BottomPlayer() {
 
             <button
               onClick={next}
-              className="p-1.5 text-warm-muted hover:text-warm-white transition hover:scale-105"
-              title="Next"
+              className="p-1.5 text-warm-muted hover:text-warm-white transition hover:scale-110 active:scale-95"
+              title="Next track"
               aria-label="Next track"
             >
               <SkipForward className="w-4 h-4 sm:w-5 sm:h-5 fill-current" />
@@ -193,8 +253,8 @@ export const BottomPlayer = memo(function BottomPlayer() {
 
             <button
               onClick={cycleRepeat}
-              className={`p-1.5 rounded-full transition hover:text-white ${
-                repeatMode !== 'off' ? 'text-accent' : 'text-warm-muted'
+              className={`p-1.5 rounded-full transition ${
+                repeatMode !== 'off' ? 'text-accent bg-accent/15 shadow-sm shadow-accent/20' : 'text-warm-muted hover:text-white'
               }`}
               title={`Repeat: ${repeatMode}`}
               aria-label={`Repeat: ${repeatMode}`}
@@ -221,7 +281,7 @@ export const BottomPlayer = memo(function BottomPlayer() {
           <button
             onClick={() => setEqualizerOpen(true)}
             className="p-2 rounded-xl hover:bg-white/5 hover:text-warm-white transition"
-            title="Audio Equalizer"
+            title="Audio Equalizer & Spatializer"
             aria-label="Equalizer"
           >
             <Sliders className="w-4 h-4" />
@@ -234,7 +294,7 @@ export const BottomPlayer = memo(function BottomPlayer() {
             aria-label="Open queue"
           >
             <ListMusic className="w-4 h-4" />
-            {queue.length > 0 && (
+            {queue.length > 1 && (
               <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-accent" />
             )}
           </button>

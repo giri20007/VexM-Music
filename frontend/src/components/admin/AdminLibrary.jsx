@@ -15,6 +15,9 @@ import {
   Plus,
   Music,
   Link2,
+  Play,
+  Pause,
+  Disc3,
 } from 'lucide-react';
 import {
   adminGetLibrary,
@@ -26,6 +29,7 @@ import {
   adminGetArtworkCandidates,
 } from '../../utils/adminApi';
 import { useAdminStore } from '../../store/useAdminStore';
+import { useAudioStore } from '../../store/useAudioStore';
 import { formatDuration, formatFileSize } from '../../utils/formatters';
 import { artworkUrl } from '../../utils/api';
 
@@ -277,6 +281,49 @@ export function AdminLibrary() {
     }
   };
 
+  // Selection & Audio Store State
+  const [selectedTrackIds, setSelectedTrackIds] = useState([]);
+  const [isBulkDeleting, setIsBulkDeleting] = useState(false);
+
+  const currentTrack = useAudioStore(s => s.currentTrack);
+  const isPlaying = useAudioStore(s => s.isPlaying);
+  const playTrack = useAudioStore(s => s.playTrack);
+  const togglePlay = useAudioStore(s => s.togglePlay);
+
+  const handleToggleSelect = id => {
+    setSelectedTrackIds(prev =>
+      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+    );
+  };
+
+  const handleToggleSelectAll = () => {
+    if (selectedTrackIds.length === tracks.length) {
+      setSelectedTrackIds([]);
+    } else {
+      setSelectedTrackIds(tracks.map(t => t.id));
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (!selectedTrackIds.length) return;
+    if (!window.confirm(`Are you sure you want to remove ${selectedTrackIds.length} tracks from the library?`)) {
+      return;
+    }
+    setIsBulkDeleting(true);
+    try {
+      for (const id of selectedTrackIds) {
+        await adminRemoveTrack(id);
+      }
+      showToast(`Successfully removed ${selectedTrackIds.length} tracks`, 'success');
+      setSelectedTrackIds([]);
+      fetchLibraryData(page, searchQuery);
+    } catch (err) {
+      showToast(err.message || 'Failed to delete selected tracks', 'error');
+    } finally {
+      setIsBulkDeleting(false);
+    }
+  };
+
   return (
     <div className="space-y-6 select-none animate-fade-in">
       {/* Header */}
@@ -320,26 +367,77 @@ export function AdminLibrary() {
         </div>
       </div>
 
+      {/* Bulk Selection Bar */}
+      {selectedTrackIds.length > 0 && (
+        <div className="flex items-center justify-between p-3.5 rounded-2xl bg-accent/15 border border-accent/30 text-xs font-semibold animate-scale-up">
+          <span className="text-accent">
+            {selectedTrackIds.length} track(s) selected
+          </span>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleBulkDelete}
+              disabled={isBulkDeleting}
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-red-500/20 text-red-300 hover:bg-red-500/30 border border-red-500/30 transition font-bold disabled:opacity-50"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+              <span>{isBulkDeleting ? 'Deleting...' : 'Delete Selected'}</span>
+            </button>
+            <button
+              onClick={() => setSelectedTrackIds([])}
+              className="px-3 py-1.5 rounded-xl hover:bg-white/10 text-warm-muted hover:text-white transition"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Tracks Table */}
       <div className="rounded-3xl bg-bg-card border border-white/5 overflow-hidden shadow-2xl">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs text-warm-white">
             <thead className="bg-bg-secondary text-[11px] font-bold uppercase tracking-wider text-warm-muted border-b border-white/5">
               <tr>
+                <th className="p-4 w-10 text-center">
+                  <input
+                    type="checkbox"
+                    checked={tracks.length > 0 && selectedTrackIds.length === tracks.length}
+                    onChange={handleToggleSelectAll}
+                    className="rounded border-white/20 bg-bg-card accent-accent cursor-pointer"
+                    title="Select all"
+                  />
+                </th>
                 <th className="p-4 w-12 text-center">ID</th>
                 <th className="p-4">Track & Artist</th>
                 <th className="p-4 hidden md:table-cell">Album</th>
                 <th className="p-4 hidden sm:table-cell">Format</th>
                 <th className="p-4 hidden lg:table-cell">Size</th>
                 <th className="p-4 text-right">Duration</th>
-                <th className="p-4 text-right w-24">Actions</th>
+                <th className="p-4 text-right w-28">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
               {tracks.map(t => {
                 const cover = t.thumbnail || artworkUrl(t.id, t.title);
+                const isSelected = selectedTrackIds.includes(t.id);
+                const isThisPlaying = isPlaying && currentTrack?.id === t.id;
+
                 return (
-                  <tr key={t.id} className="hover:bg-bg-active/40 transition">
+                  <tr
+                    key={t.id}
+                    className={`transition ${
+                      isSelected ? 'bg-accent/10 hover:bg-accent/15' : 'hover:bg-bg-active/40'
+                    }`}
+                  >
+                    <td className="p-4 text-center">
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => handleToggleSelect(t.id)}
+                        className="rounded border-white/20 bg-bg-card accent-accent cursor-pointer"
+                      />
+                    </td>
+
                     <td className="p-4 text-center font-mono text-warm-muted text-[11px]">
                       #{t.id}
                     </td>
@@ -349,6 +447,9 @@ export function AdminLibrary() {
                         <img
                           src={cover}
                           alt={t.title}
+                          onError={e => {
+                            e.currentTarget.src = artworkUrl(t.id, t.title);
+                          }}
                           className="w-9 h-9 rounded-lg object-cover bg-bg-secondary flex-shrink-0"
                         />
                         <div className="min-w-0">
@@ -380,6 +481,29 @@ export function AdminLibrary() {
 
                     <td className="p-4 text-right">
                       <div className="flex items-center justify-end gap-1">
+                        {/* Audio Preview Action */}
+                        <button
+                          onClick={() => {
+                            if (isThisPlaying) {
+                              togglePlay();
+                            } else {
+                              playTrack(t, tracks);
+                            }
+                          }}
+                          className={`p-1.5 rounded-lg transition ${
+                            isThisPlaying
+                              ? 'text-accent bg-accent/20 shadow'
+                              : 'text-warm-muted hover:text-white hover:bg-white/10'
+                          }`}
+                          title={isThisPlaying ? 'Pause Preview' : 'Play Preview'}
+                        >
+                          {isThisPlaying ? (
+                            <Pause className="w-3.5 h-3.5 fill-current" />
+                          ) : (
+                            <Play className="w-3.5 h-3.5 fill-current ml-0.5" />
+                          )}
+                        </button>
+
                         <button
                           onClick={() => handleOpenCandidates(t)}
                           className="p-1.5 rounded-lg hover:bg-amber-500/20 text-warm-muted hover:text-amber-300 transition"
