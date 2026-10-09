@@ -4,18 +4,28 @@ const fs = require('fs');
 let dbClient = null;
 let dbType = 'none'; // 'mongodb' | 'postgres' | 'local'
 let isInitialized = false;
+let lastAttemptTime = 0;
+const RETRY_COOLDOWN_MS = 20000; // Allow retrying cloud connection every 20 seconds if previously failed
 
 const DEFAULT_MONGODB_URI =
   'mongodb+srv://sriram23550s_db_user:11nBmzgYSZQF9EHV@cluster0.wxamkiv.mongodb.net/musicplayer?retryWrites=true&w=majority';
 
-const DB_URI = process.env.MONGODB_URI || process.env.DATABASE_URL || process.env.POSTGRES_URL || DEFAULT_MONGODB_URI;
-
 /**
  * Initialize persistent database connection
  */
-async function initDatabase() {
-  if (isInitialized) return { dbType, client: dbClient };
+async function initDatabase(forceRetry = false) {
+  // If already connected to real cloud DB, return cached client
+  if (isInitialized && (dbType === 'mongodb' || dbType === 'postgres') && !forceRetry) {
+    return { dbType, client: dbClient };
+  }
 
+  // If in local fallback mode, only retry after cooldown to avoid slamming connection
+  const now = Date.now();
+  if (isInitialized && dbType === 'local' && !forceRetry && (now - lastAttemptTime < RETRY_COOLDOWN_MS)) {
+    return { dbType, client: dbClient };
+  }
+
+  lastAttemptTime = now;
   const uri = (process.env.MONGODB_URI || process.env.DATABASE_URL || process.env.POSTGRES_URL || DEFAULT_MONGODB_URI).trim();
 
   // 1. Check for MongoDB URI
@@ -24,8 +34,11 @@ async function initDatabase() {
       const { MongoClient } = require('mongodb');
       const client = new MongoClient(uri, {
         maxPoolSize: 10,
-        serverSelectionTimeoutMS: 5000,
-        connectTimeoutMS: 10000,
+        minPoolSize: 1,
+        serverSelectionTimeoutMS: 8000,
+        connectTimeoutMS: 15000,
+        socketTimeoutMS: 45000,
+        family: 4, // IPv4 preference for cloud container compatibility
       });
 
       await client.connect();
@@ -53,6 +66,13 @@ async function initDatabase() {
       return { dbType, client: dbClient };
     } catch (err) {
       console.error('❌ [DATABASE ERROR] Failed to connect to MongoDB:', err.message);
+      if (err.message && (err.message.includes('SSL alert number 80') || err.message.includes('tlsv1 alert internal error') || err.message.includes('MongoServerSelectionError'))) {
+        console.error('👉 [MONGODB ATLAS ACTION REQUIRED]:');
+        console.error('   1. Open MongoDB Atlas: https://cloud.mongodb.com');
+        console.error('   2. Navigate to "Security" -> "Network Access"');
+        console.error('   3. Click "Add IP Address" -> Select "Allow Access from Anywhere" (0.0.0.0/0)');
+        console.error('   4. Click "Confirm". Connection will auto-connect once applied!');
+      }
     }
   }
 
@@ -108,7 +128,7 @@ async function initDatabase() {
   dbType = 'local';
   isInitialized = true;
   console.log('⚠️ [DATABASE NOTICE] Running in local persistent storage mode.');
-  console.log('👉 Tip: Set MONGODB_URI or DATABASE_URL in Render / Vercel to connect to an external persistent cloud database.');
+  console.log('👉 Tip: Ensure MongoDB Atlas Network Access has 0.0.0.0/0 enabled for persistent cloud database storage.');
 
   return { dbType, client: null };
 }
