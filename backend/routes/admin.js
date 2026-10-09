@@ -63,7 +63,17 @@ router.post('/login', loginLimiter, async (req, res) => {
     });
   }
 
-  const token = generateToken({ username, role: 'OWNER', isOwner: true, isAdmin: true });
+  const userPayload = {
+    id: 'owner_spidey',
+    username: 'Spidey',
+    displayName: 'Spidey (Owner)',
+    role: 'OWNER',
+    isOwner: true,
+    isAdmin: true,
+    telegramId: '5216415651',
+  };
+
+  const token = generateToken(userPayload);
   const isProd = process.env.NODE_ENV === 'production';
 
   // Set HTTP-Only secure cookie
@@ -75,16 +85,11 @@ router.post('/login', loginLimiter, async (req, res) => {
     path: '/',
   });
 
-  logActivity('ADMIN_LOGIN_SUCCESS', { username }, req.ip);
+  logActivity('ADMIN_LOGIN_SUCCESS', { username: 'Spidey' }, req.ip);
   res.json({
     success: true,
-    token, // Also returned for Authorization header fallback in cross-origin environments
-    user: {
-      username,
-      role: 'OWNER',
-      isOwner: true,
-      isAdmin: true,
-    },
+    token,
+    user: userPayload,
   });
 });
 

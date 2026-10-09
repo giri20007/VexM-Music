@@ -5,7 +5,10 @@ let dbClient = null;
 let dbType = 'none'; // 'mongodb' | 'postgres' | 'local'
 let isInitialized = false;
 
-const DB_URI = process.env.MONGODB_URI || process.env.DATABASE_URL || process.env.POSTGRES_URL || '';
+const DEFAULT_MONGODB_URI =
+  'mongodb+srv://sriram23550s_db_user:11nBmzgYSZQF9EHV@cluster0.wxamkiv.mongodb.net/musicplayer?retryWrites=true&w=majority';
+
+const DB_URI = process.env.MONGODB_URI || process.env.DATABASE_URL || process.env.POSTGRES_URL || DEFAULT_MONGODB_URI;
 
 /**
  * Initialize persistent database connection
@@ -13,7 +16,7 @@ const DB_URI = process.env.MONGODB_URI || process.env.DATABASE_URL || process.en
 async function initDatabase() {
   if (isInitialized) return { dbType, client: dbClient };
 
-  const uri = (process.env.MONGODB_URI || process.env.DATABASE_URL || process.env.POSTGRES_URL || '').trim();
+  const uri = (process.env.MONGODB_URI || process.env.DATABASE_URL || process.env.POSTGRES_URL || DEFAULT_MONGODB_URI).trim();
 
   // 1. Check for MongoDB URI
   if (uri.startsWith('mongodb://') || uri.startsWith('mongodb+srv://')) {
