@@ -4,9 +4,9 @@ import { useSettingsStore } from '../../store/useSettingsStore';
 import { fetchTrackLyrics } from '../../utils/api';
 import { parseLrc, findActiveLyricIndex } from '../../utils/lrcParser';
 import { seek } from '../../hooks/usePlayer';
-import { Minus, Plus, RefreshCw, Music2, Copy, Check, Sparkles, FileAudio, RotateCcw } from 'lucide-react';
+import { Minus, Plus, RefreshCw, Music2, Copy, Check, FileAudio, RotateCcw } from 'lucide-react';
 
-export function LyricsView({ track }) {
+export function LyricsView({ track, isCompact = false }) {
   const currentTime = useAudioStore(s => s.currentTime);
   const [lyricsData, setLyricsData] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -58,7 +58,7 @@ export function LyricsView({ track }) {
     ? findActiveLyricIndex(parsedLines, currentTime, offsetMs)
     : -1;
 
-  // Auto-scroll to active line
+  // Auto-scroll to keep active line vertically centered in the container
   useEffect(() => {
     if (!autoScroll || !isSynced || activeIndex < 0 || !activeLineRef.current || !containerRef.current) return;
     const container = containerRef.current;
@@ -89,7 +89,7 @@ export function LyricsView({ track }) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      // ignore
+      // ignore clipboard error
     }
   };
 
@@ -97,19 +97,19 @@ export function LyricsView({ track }) {
   const isEmbedded = lyricsData?.source === 'embedded';
 
   return (
-    <div className="flex flex-col h-full select-none font-sans">
-      {/* Top Header: Source Badge & Tuning Bar */}
+    <div className="flex flex-col h-full select-none font-sans relative">
+      {/* Top Lyrics Controls & Timing Offset */}
       {hasLyrics && (
-        <div className="flex items-center justify-between pb-3 mb-2 border-b border-white/5 text-xs text-warm-muted gap-2 flex-wrap">
+        <div className="flex items-center justify-between pb-3 mb-3 border-b border-white/5 text-xs text-warm-muted gap-2 flex-wrap flex-shrink-0">
           {/* Source Badges */}
           <div className="flex items-center gap-2 flex-wrap">
             {isEmbedded ? (
-              <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-accent/15 border border-accent/30 text-[10px] font-bold text-accent">
+              <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-accent/15 border border-accent/30 text-[10px] font-bold text-accent shadow-sm">
                 <FileAudio className="w-3 h-3" />
                 <span>Embedded in Audio</span>
               </span>
             ) : isSynced ? (
-              <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-[10px] font-bold text-emerald-400">
+              <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-[10px] font-bold text-emerald-400 shadow-sm">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                 <span>Synced Lyrics</span>
               </span>
@@ -130,6 +130,7 @@ export function LyricsView({ track }) {
               onClick={handleCopyLyrics}
               className="flex items-center gap-1 px-2.5 py-0.5 rounded-md hover:bg-white/10 text-warm-muted hover:text-white text-[11px] transition"
               title="Copy lyrics to clipboard"
+              aria-label="Copy lyrics"
             >
               {copied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
               <span>{copied ? 'Copied' : 'Copy'}</span>
@@ -138,17 +139,18 @@ export function LyricsView({ track }) {
 
           {/* Timing offset bar (- 0 ms +) */}
           {isSynced && (
-            <div className="flex items-center gap-1.5 bg-bg-card px-2.5 py-1 rounded-full border border-white/5">
+            <div className="flex items-center gap-1.5 bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/10 shadow-sm">
               <button
                 onClick={() => adjustLyricsOffset(-100)}
                 className="p-1 hover:text-white transition"
                 title="Delay lyrics 100ms (-100ms)"
+                aria-label="Delay lyrics"
               >
                 <Minus className="w-3 h-3" />
               </button>
               <span
                 onClick={() => adjustLyricsOffset(-offsetMs)}
-                className="tabular-nums font-mono text-[11px] min-w-[52px] text-center text-warm-white cursor-pointer hover:text-accent transition"
+                className="tabular-nums font-mono text-[11px] min-w-[52px] text-center text-warm-white cursor-pointer hover:text-accent transition font-semibold"
                 title="Click to reset offset to 0ms"
               >
                 {offsetMs >= 0 ? `+${offsetMs}` : offsetMs} ms
@@ -157,6 +159,7 @@ export function LyricsView({ track }) {
                 onClick={() => adjustLyricsOffset(100)}
                 className="p-1 hover:text-white transition"
                 title="Advance lyrics 100ms (+100ms)"
+                aria-label="Advance lyrics"
               >
                 <Plus className="w-3 h-3" />
               </button>
@@ -165,6 +168,7 @@ export function LyricsView({ track }) {
                   onClick={() => adjustLyricsOffset(-offsetMs)}
                   className="p-1 text-warm-muted hover:text-accent transition"
                   title="Reset to 0ms"
+                  aria-label="Reset offset"
                 >
                   <RotateCcw className="w-2.5 h-2.5" />
                 </button>
@@ -174,29 +178,33 @@ export function LyricsView({ track }) {
         </div>
       )}
 
-      {/* Lyrics Content Container */}
+      {/* Lyrics Scrollable Stream */}
       <div
         ref={containerRef}
-        className="flex-1 overflow-y-auto pr-2 space-y-3 no-scrollbar scroll-smooth antialiased"
-        style={{ fontSize: `${fontSize}px` }}
+        className="flex-1 overflow-y-auto pr-2 space-y-4 sm:space-y-6 no-scrollbar scroll-smooth antialiased py-8"
+        style={{ fontSize: `${Math.max(16, fontSize)}px` }}
       >
         {loading ? (
-          <div className="h-full flex flex-col items-center justify-center text-warm-muted space-y-2">
-            <RefreshCw className="w-6 h-6 animate-spin text-accent" />
-            <p className="text-xs">Loading lyrics...</p>
+          <div className="h-full flex flex-col items-center justify-center text-warm-muted space-y-3 py-16">
+            <RefreshCw className="w-8 h-8 animate-spin text-accent" />
+            <p className="text-sm font-medium text-warm-white/80">Fetching Synchronized Lyrics...</p>
           </div>
         ) : parsedLines.length > 0 ? (
           parsedLines.map((line, idx) => {
             const isActive = idx === activeIndex;
+            const isPast = activeIndex >= 0 && idx < activeIndex;
+
             return (
               <p
                 key={line.id || idx}
                 ref={isActive ? activeLineRef : null}
                 onClick={() => handleLineClick(line.time)}
-                className={`transition-all duration-300 cursor-pointer font-bold leading-relaxed break-words ${
+                className={`transition-all duration-300 cursor-pointer leading-relaxed break-words font-sans ${
                   isActive
-                    ? 'text-accent scale-105 origin-left glow-text font-black'
-                    : 'text-warm-muted/50 hover:text-warm-muted'
+                    ? 'text-accent scale-105 sm:scale-110 origin-left glow-text font-black text-2xl sm:text-3xl opacity-100 translate-x-2'
+                    : isPast
+                    ? 'text-warm-muted/35 font-bold text-lg sm:text-xl hover:text-warm-white/70 hover:opacity-80'
+                    : 'text-warm-muted/60 font-bold text-lg sm:text-xl hover:text-warm-white hover:opacity-90'
                 }`}
               >
                 {line.text || '♪'}
@@ -204,19 +212,24 @@ export function LyricsView({ track }) {
             );
           })
         ) : lyricsData?.raw ? (
-          <div className="space-y-2 py-2">
+          <div className="space-y-3 py-4 text-center sm:text-left">
             {lyricsData.raw.split('\n').map((line, i) => (
-              <p key={i} className="text-warm-white/90 leading-relaxed font-semibold text-sm sm:text-base break-words">
+              <p
+                key={i}
+                className="text-warm-white/85 leading-relaxed font-semibold text-base sm:text-lg break-words"
+              >
                 {line.trim() || '\u00A0'}
               </p>
             ))}
           </div>
         ) : (
-          <div className="h-full flex flex-col items-center justify-center py-12 text-warm-muted/60 text-center">
-            <Music2 className="w-10 h-10 mb-2 opacity-30" />
-            <p className="font-medium text-warm-white/70">Lyrics unavailable</p>
-            <p className="text-xs text-warm-muted/60 mt-1 max-w-xs">
-              Synchronized lyrics can be added or edited via the SPiDEYxFLASH Admin panel.
+          <div className="h-full flex flex-col items-center justify-center py-20 text-warm-muted/70 text-center space-y-3">
+            <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-warm-muted/50 mx-auto">
+              <Music2 className="w-7 h-7" />
+            </div>
+            <p className="text-base font-bold text-warm-white">Lyrics Unavailable</p>
+            <p className="text-xs text-warm-muted/70 max-w-sm leading-relaxed">
+              Synchronized LRC lyrics can be added or updated for this track via the SPiDEYxFLASH Admin panel.
             </p>
           </div>
         )}
