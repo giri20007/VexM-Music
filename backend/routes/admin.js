@@ -1,5 +1,7 @@
 const router = require('express').Router();
 const os = require('os');
+const path = require('path');
+const fs = require('fs');
 const {
   authenticateAdmin,
   verifyCredentials,
@@ -608,7 +610,6 @@ router.post('/tracks/:id/restore', (req, res) => {
 });
 
 // 22. User Management
-const fs = require('fs');
 const USERS_FILE = path.join(__dirname, '../data/users.json');
 
 function readUsers() {
