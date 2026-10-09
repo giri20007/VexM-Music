@@ -115,6 +115,11 @@ router.get('/:id', (req, res) => {
 
 module.exports = {
   router,
+  getAllItems: () => {
+    return [...items.values()]
+      .filter(i => !removedIds.has(String(i.id)))
+      .map(applyOverrides);
+  },
   getItem: id => {
     if (removedIds.has(String(id))) return null;
     const it = items.get(String(id));

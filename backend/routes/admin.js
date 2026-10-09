@@ -17,6 +17,7 @@ const {
   removeItemFromMemory,
   forceSyncLibrary,
   getLibraryStats,
+  getLastSync,
 } = require('./library');
 const {
   setOverride,
@@ -135,39 +136,74 @@ router.get('/stats', (req, res) => {
   });
 });
 
-// 5. Admin Library Listing (with search, filter, pagination)
-router.get('/library', (req, res) => {
-  const { q = '', sort = 'recent', page = 1, limit = 50 } = req.query;
-  let items = getAllItems();
+// 5. Admin Library Listing (with search, filter, pagination, and tracks alias)
+const handleLibraryList = async (req, res) => {
+  try {
+    if (!getLastSync() || (getAllItems() && getAllItems().length === 0)) {
+      await forceSyncLibrary(false).catch(e => console.warn('[ADMIN AUTO-SYNC NOTICE]', e.message));
+    }
+    const { q = '', sort = 'recent', page = 1, limit = 50 } = req.query;
+    let items = (getAllItems() || []).map(i => ({
+      id: String(i.id || ''),
+      title: i.title || 'Untitled Track',
+      artist: i.artist || 'Unknown Artist',
+      album: i.album || 'Single',
+      albumArtist: i.albumArtist || i.artist || 'Unknown Artist',
+      genre: i.genre || 'Various',
+      year: i.year || null,
+      trackNumber: i.trackNumber || null,
+      discNumber: i.discNumber || null,
+      duration: i.duration || 0,
+      size: i.size || 0,
+      format: i.format || (i.audioUrl?.endsWith('.flac') ? 'FLAC' : 'MP3'),
+      thumbnail: i.thumbnail || null,
+      artworkUrl: i.thumbnail || null,
+      coverUrl: i.thumbnail || null,
+      audioUrl: i.audioUrl || i.streamUrl || '',
+      streamUrl: i.streamUrl || i.audioUrl || '',
+      date: i.date || Date.now(),
+      hidden: Boolean(i.hidden),
+    }));
 
-  if (q) {
-    const query = q.toLowerCase();
-    items = items.filter(i =>
-      `${i.title} ${i.artist} ${i.album} ${i.fileName} ${i.id}`.toLowerCase().includes(query)
-    );
+    if (q) {
+      const query = q.toLowerCase().trim();
+      items = items.filter(i =>
+        `${i.title} ${i.artist} ${i.album} ${i.genre} ${i.id}`.toLowerCase().includes(query)
+      );
+    }
+
+    const sorters = {
+      recent: (a, b) => (b.date || 0) - (a.date || 0),
+      alpha: (a, b) => (a.title || '').localeCompare(b.title || ''),
+      artist: (a, b) => (a.artist || '').localeCompare(b.artist || ''),
+      album: (a, b) => (a.album || '').localeCompare(b.album || ''),
+      duration: (a, b) => (b.duration || 0) - (a.duration || 0),
+      size: (a, b) => (b.size || 0) - (a.size || 0),
+    };
+    items.sort(sorters[sort] || sorters.recent);
+
+    const p = Math.max(1, parseInt(page, 10) || 1);
+    const lim = Math.min(100, Math.max(1, parseInt(limit, 10) || 50));
+    const total = items.length;
+    const paginated = items.slice((p - 1) * lim, p * lim);
+
+    res.json({
+      success: true,
+      items: paginated,
+      tracks: paginated,
+      total,
+      page: p,
+      limit: lim,
+      totalPages: Math.ceil(total / lim) || 1,
+    });
+  } catch (err) {
+    console.error('[ADMIN LIBRARY ERROR]', err);
+    res.status(500).json({ error: true, code: 'LIBRARY_FETCH_FAILED', message: 'Failed to retrieve tracks from library', details: err.message });
   }
+};
 
-  const sorters = {
-    recent: (a, b) => (b.date || 0) - (a.date || 0),
-    alpha: (a, b) => (a.title || '').localeCompare(b.title || ''),
-    duration: (a, b) => (b.duration || 0) - (a.duration || 0),
-    size: (a, b) => (b.size || 0) - (a.size || 0),
-  };
-  items.sort(sorters[sort] || sorters.recent);
-
-  const p = Math.max(1, parseInt(page, 10));
-  const lim = Math.min(100, Math.max(1, parseInt(limit, 10)));
-  const total = items.length;
-  const paginated = items.slice((p - 1) * lim, p * lim);
-
-  res.json({
-    items: paginated,
-    total,
-    page: p,
-    limit: lim,
-    totalPages: Math.ceil(total / lim),
-  });
-});
+router.get('/library', handleLibraryList);
+router.get('/tracks', handleLibraryList);
 
 // 6. Admin Library Full Sync
 router.post('/library/sync', async (req, res, next) => {
