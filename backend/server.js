@@ -96,12 +96,25 @@ app.use((err, _req, res, _next) => {
 
 const { seedOwnerAndMigrate } = require('./services/userService');
 
-const port = process.env.PORT || 10000;
-app.listen(port, async () => {
-  console.log(`[SPiDEYxFLASH] API running on http://localhost:${port}`);
-  try {
-    await seedOwnerAndMigrate();
-  } catch (err) {
-    console.error('[DATABASE INIT ERROR]', err.message);
+let seeded = false;
+app.use(async (_req, _res, next) => {
+  if (!seeded) {
+    seeded = true;
+    seedOwnerAndMigrate().catch(err => console.error('[DATABASE INIT ERROR]', err.message));
   }
+  next();
 });
+
+if (!process.env.VERCEL) {
+  const port = process.env.PORT || 10000;
+  app.listen(port, async () => {
+    console.log(`[SPiDEYxFLASH] API running on http://localhost:${port}`);
+    try {
+      await seedOwnerAndMigrate();
+    } catch (err) {
+      console.error('[DATABASE INIT ERROR]', err.message);
+    }
+  });
+}
+
+module.exports = app;

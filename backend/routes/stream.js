@@ -43,6 +43,12 @@ router.get('/:id', async (req, res, next) => {
     return res.redirect(302, item.audioUrl);
   }
 
+  // High-speed multi-worker F2L streaming redirect
+  const streamBase = (process.env.STREAM_SERVER_URL || 'https://dl.fxsmovies.live').replace(/\/+$/, '');
+  if (streamBase) {
+    return res.redirect(302, `${streamBase}/stream/${encodeURIComponent(id)}`);
+  }
+
   try {
     let entry = await getDoc(id);
     if (!entry || !entry.doc) {

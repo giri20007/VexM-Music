@@ -1,6 +1,7 @@
 export const BASE_URL = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '');
+export const STREAM_SERVER_URL = (import.meta.env.VITE_STREAM_URL || 'https://dl.fxsmovies.live').replace(/\/+$/, '');
 
-export const streamUrl = id => `${BASE_URL}/api/stream/${encodeURIComponent(id)}`;
+export const streamUrl = id => `${STREAM_SERVER_URL}/stream/${encodeURIComponent(id)}`;
 export const artworkUrl = (id, title = '') =>
   `${BASE_URL}/api/artwork/${encodeURIComponent(id)}${title ? `?title=${encodeURIComponent(title)}` : ''}`;
 

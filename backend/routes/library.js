@@ -102,17 +102,39 @@ async function sync(full = false) {
   return syncing;
 }
 
-// Background auto-discovery every 2 minutes (preventing Telegram FloodWait)
-setInterval(() => {
-  sync(false).catch(() => {});
-}, 120 * 1000);
+async function ensureHydrated() {
+  if (items.size > 0) return;
+  try {
+    const { initDatabase } = require('../services/db');
+    const { client } = await initDatabase();
+    if (client && client.db) {
+      const docs = await client.db.collection('tracks').find({}).toArray();
+      if (docs && docs.length > 0) {
+        docs.forEach(raw => {
+          items.set(String(raw.id), applyOverrides(raw));
+        });
+        console.log(`[Library] Hydrated ${items.size} tracks from MongoDB Atlas.`);
+      }
+    }
+  } catch (err) {
+    console.warn('[Library] MongoDB hydration note:', err.message);
+  }
+}
+
+// Background auto-discovery every 2 minutes when running as persistent server
+if (!process.env.VERCEL) {
+  setInterval(() => {
+    sync(false).catch(() => {});
+  }, 120 * 1000);
+}
 
 // Public Library Listing
 router.get('/', async (req, res, next) => {
   try {
+    await ensureHydrated();
     const full = req.query.refresh === '1';
-    if (full || !lastSync || Date.now() - lastSync > TTL) {
-      await sync(full);
+    if (!process.env.VERCEL && (full || !lastSync || Date.now() - lastSync > TTL)) {
+      await sync(full).catch(() => {});
     }
     const list = [...items.values()]
       .filter(i => !removedIds.has(i.id))
@@ -130,9 +152,14 @@ router.get('/', async (req, res, next) => {
 });
 
 // Public Single Track Lookup
-router.get('/:id', (req, res) => {
-  const it = items.get(req.params.id);
-  if (!it || removedIds.has(req.params.id)) {
+router.get('/:id', async (req, res) => {
+  await ensureHydrated();
+  let it = items.get(String(req.params.id));
+  if (!it) {
+    const cached = getLibraryCache();
+    it = cached?.items?.find(x => String(x.id) === String(req.params.id));
+  }
+  if (!it || removedIds.has(String(req.params.id))) {
     return res.status(404).json({ error: true, code: 'TRACK_NOT_FOUND', message: 'Track not found' });
   }
   res.json(applyOverrides(it));
@@ -147,7 +174,11 @@ module.exports = {
   },
   getItem: id => {
     if (removedIds.has(String(id))) return null;
-    const it = items.get(String(id));
+    let it = items.get(String(id));
+    if (!it) {
+      const cached = getLibraryCache();
+      it = cached?.items?.find(x => String(x.id) === String(id));
+    }
     return it ? applyOverrides(it) : null;
   },
   addItemToMemory: item => {
