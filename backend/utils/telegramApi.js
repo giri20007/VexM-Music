@@ -482,35 +482,60 @@ async function getDoc(id, fresh = false) {
 }
 
 // Yields exactly bytes [start..end] without buffering the entire file
-async function* streamRange(doc, start, end) {
+async function* streamRange(doc, start, end, docRefreshFn = null) {
   const c = await getClient();
   const aStart = start - (start % CHUNK);
-  const limit = Math.ceil((end - aStart + 1) / CHUNK);
   let pos = aStart;
-  const location = new Api.InputDocumentFileLocation({
-    id: doc.id,
-    accessHash: doc.accessHash,
-    fileReference: doc.fileReference,
+  let currentDoc = doc;
+
+  const createLocation = d => new Api.InputDocumentFileLocation({
+    id: d.id,
+    accessHash: d.accessHash,
+    fileReference: d.fileReference,
     thumbSize: '',
   });
 
-  try {
-    for await (const chunk of c.iterDownload({
-      file: location,
-      offset: bigInt(aStart),
-      limit,
-      requestSize: CHUNK,
-      dcId: doc.dcId,
-    })) {
-      const from = Math.max(start - pos, 0);
-      const to = Math.min(end - pos + 1, chunk.length);
-      if (to > from) yield chunk.subarray(from, to);
-      pos += chunk.length;
-      if (pos > end) return;
+  let location = createLocation(currentDoc);
+  let attempts = 0;
+
+  while (pos <= end && attempts < 3) {
+    try {
+      const remainingLimit = Math.ceil((end - pos + 1) / CHUNK);
+      for await (const chunk of c.iterDownload({
+        file: location,
+        offset: bigInt(pos),
+        limit: remainingLimit,
+        requestSize: CHUNK,
+        dcId: currentDoc.dcId,
+      })) {
+        const from = Math.max(start - pos, 0);
+        const to = Math.min(end - pos + 1, chunk.length);
+        if (to > from) yield chunk.subarray(from, to);
+        pos += chunk.length;
+        if (pos > end) return;
+      }
+      break;
+    } catch (e) {
+      attempts++;
+      const msg = String(e.errorMessage || e.message || '');
+      if (/FILEREF_UPGRADE_NEEDED|FILE_REFERENCE_EXPIRED/.test(msg) && docRefreshFn) {
+        console.warn('Refreshing expired Telegram document reference during stream:', msg);
+        try {
+          const refreshed = await docRefreshFn();
+          if (refreshed?.doc) {
+            currentDoc = refreshed.doc;
+            location = createLocation(currentDoc);
+            continue;
+          }
+        } catch (refreshErr) {
+          console.error('Failed to refresh document reference:', refreshErr.message);
+        }
+      }
+      if (attempts >= 3) {
+        console.error('Telegram streamRange failed after retries:', e.errorMessage || e.message);
+        throw e;
+      }
     }
-  } catch (e) {
-    console.error('Telegram download error:', e.errorMessage || e.message);
-    throw e;
   }
 }
 

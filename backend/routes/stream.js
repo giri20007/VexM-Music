@@ -38,7 +38,7 @@ router.get('/:id', async (req, res, next) => {
   const { id } = req.params;
   const item = getItem(id);
 
-  // If item has a custom external audio URL, redirect or stream directly
+  // If item has a custom external audio URL, redirect directly
   if (item && item.audioUrl && (item.audioUrl.startsWith('http://') || item.audioUrl.startsWith('https://'))) {
     return res.redirect(302, item.audioUrl);
   }
@@ -50,6 +50,13 @@ router.get('/:id', async (req, res, next) => {
     }
 
     const size = Number(entry.size) || 0;
+    const etag = `"spx-${id}-${size}"`;
+
+    // 304 Cache validation for full requests
+    if (req.headers['if-none-match'] === etag && !req.headers.range) {
+      return res.status(304).end();
+    }
+
     const r = req.headers.range ? parseRange(req.headers.range, size) : null;
     if (r === 'bad') {
       return res.status(416).set({
@@ -61,16 +68,18 @@ router.get('/:id', async (req, res, next) => {
     const start = r ? r.start : 0;
     const end = r ? r.end : size - 1;
     const mimeType = contentType(entry, item);
+    const origin = req.headers.origin || '*';
 
-    // Pull first chunk before sending headers so an expired file reference can be retried once
-    let gen = streamRange(entry.doc, start, end);
+    // Pull first chunk before sending headers with document refresh capability
+    const refreshDoc = () => getDoc(id, true);
+    let gen = streamRange(entry.doc, start, end, refreshDoc);
     let first;
     try {
       first = await gen.next();
     } catch (e1) {
-      console.error('Stream first attempt failed, refreshing doc:', e1.errorMessage || e1.message);
-      entry = await getDoc(id, true);
-      gen = streamRange(entry.doc, start, end);
+      console.warn('Stream initial attempt failed, refreshing Telegram doc:', e1.errorMessage || e1.message);
+      entry = await refreshDoc();
+      gen = streamRange(entry.doc, start, end, refreshDoc);
       first = await gen.next();
     }
 
@@ -78,9 +87,13 @@ router.get('/:id', async (req, res, next) => {
       'Content-Type': mimeType,
       'Accept-Ranges': 'bytes',
       'Content-Length': end - start + 1,
-      'Cache-Control': 'private, max-age=3600',
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Expose-Headers': 'Content-Range, Accept-Ranges, Content-Length, Content-Type, Content-Duration, X-Content-Duration',
+      'Cache-Control': 'public, max-age=86400, immutable',
+      'ETag': etag,
+      'Access-Control-Allow-Origin': origin,
+      'Access-Control-Allow-Credentials': 'true',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization, Range, Cookie',
+      'Access-Control-Expose-Headers': 'Content-Range, Accept-Ranges, Content-Length, Content-Type, Content-Duration, X-Content-Duration, ETag',
+      'Vary': 'Origin, Range',
     };
 
     if (item && Number.isFinite(item.duration) && item.duration > 0) {
@@ -95,19 +108,30 @@ router.get('/:id', async (req, res, next) => {
     res.writeHead(r ? 206 : 200, headers);
 
     let closed = false;
-    res.on('close', () => {
-      closed = true;
-    });
+    const cleanup = () => {
+      if (!closed) {
+        closed = true;
+        gen.return?.().catch(() => {});
+      }
+    };
+
+    res.on('close', cleanup);
+    res.on('error', cleanup);
 
     while (!first.done && !closed) {
-      if (!res.write(first.value)) {
+      const ok = res.write(first.value);
+      if (closed) break;
+      if (!ok) {
         await Promise.race([once(res, 'drain'), once(res, 'close')]);
       }
+      if (closed) break;
       first = await gen.next();
     }
 
-    await gen.return?.();
-    res.end();
+    cleanup();
+    if (!res.writableEnded && !closed) {
+      res.end();
+    }
   } catch (e) {
     console.error('Stream failed for ID', id, e.errorMessage || e.message);
     if (res.headersSent) {

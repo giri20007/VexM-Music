@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { formatDuration, formatFileSize, formatDate } from '../../utils/formatters';
-import { getAudioDiagnostics } from '../../hooks/usePlayer';
-import { Database, FileAudio, Headphones, Radio, Sparkles, Activity } from 'lucide-react';
+import { getDetailedDiagnostics } from '../../hooks/usePlayer';
+import { Database, FileAudio, Headphones, Radio, Sparkles, Activity, Wifi, Gauge } from 'lucide-react';
 
 export function TrackDetails({ track }) {
   if (!track) return null;
 
-  const [diagnostics, setDiagnostics] = useState(getAudioDiagnostics());
+  const [diagnostics, setDiagnostics] = useState(getDetailedDiagnostics());
 
   useEffect(() => {
-    setDiagnostics(getAudioDiagnostics());
+    setDiagnostics(getDetailedDiagnostics());
     const interval = setInterval(() => {
-      setDiagnostics(getAudioDiagnostics());
-    }, 2000);
+      setDiagnostics(getDetailedDiagnostics());
+    }, 1000);
     return () => clearInterval(interval);
   }, []);
 
@@ -31,17 +31,74 @@ export function TrackDetails({ track }) {
   ].filter(d => d.value !== null && d.value !== undefined && d.value !== '');
 
   return (
-    <div className="h-full overflow-y-auto pr-2 space-y-4 no-scrollbar select-none text-xs">
-      {/* 1. Audio Output / Playback Diagnostics */}
+    <div className="h-full overflow-y-auto pr-2 space-y-4 no-scrollbar select-none text-xs font-sans">
+      {/* 1. Real-time Stream & Buffer Diagnostics */}
+      <div className="p-3.5 rounded-2xl bg-gradient-to-br from-bg-card to-bg-secondary border border-cyan-500/20 space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-cyan-400 font-bold text-xs tracking-wider uppercase">
+            <Wifi className="w-4 h-4" />
+            <span>Network & Buffer Pipeline</span>
+          </div>
+          <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-[10px] font-semibold border border-emerald-500/20">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            HTTP 206 Partial Content
+          </span>
+        </div>
+
+        <div className="grid grid-cols-2 gap-2">
+          <div className="p-2.5 rounded-xl bg-bg-primary/60 border border-white/5">
+            <span className="block text-[10px] text-warm-muted uppercase tracking-wider mb-0.5">
+              Buffer Ahead
+            </span>
+            <span className="font-semibold text-warm-white font-mono">
+              {diagnostics.bufferAhead || '0.0s'}
+            </span>
+          </div>
+
+          <div className="p-2.5 rounded-xl bg-bg-primary/60 border border-white/5">
+            <span className="block text-[10px] text-warm-muted uppercase tracking-wider mb-0.5">
+              Pipeline State
+            </span>
+            <span className={`font-semibold text-xs ${diagnostics.isBuffering ? 'text-amber-400 animate-pulse' : 'text-emerald-400'}`}>
+              {diagnostics.isBuffering ? 'Buffering...' : 'Healthy (Streaming)'}
+            </span>
+          </div>
+
+          <div className="p-2.5 rounded-xl bg-bg-primary/60 border border-white/5">
+            <span className="block text-[10px] text-warm-muted uppercase tracking-wider mb-0.5">
+              HTML5 Ready State
+            </span>
+            <span className="font-semibold text-warm-white font-mono text-[11px]">
+              {diagnostics.readyState}
+            </span>
+          </div>
+
+          <div className="p-2.5 rounded-xl bg-bg-primary/60 border border-white/5">
+            <span className="block text-[10px] text-warm-muted uppercase tracking-wider mb-0.5">
+              Track Request Mode
+            </span>
+            <span className="font-semibold text-accent font-mono text-[11px]">
+              {diagnostics.trackChangeReason}
+            </span>
+          </div>
+        </div>
+
+        <div className="text-[11px] text-warm-muted/90 flex items-center justify-between pt-1 border-t border-white/5 font-mono">
+          <span>Request ID: #{diagnostics.playbackRequestId}</span>
+          <span>{diagnostics.networkState}</span>
+        </div>
+      </div>
+
+      {/* 2. Audio Output / Playback Diagnostics */}
       <div className="p-3.5 rounded-2xl bg-gradient-to-br from-bg-card to-bg-secondary border border-accent/20 space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-accent font-bold text-xs tracking-wider uppercase">
             <Headphones className="w-4 h-4" />
-            <span>Audio Output & Diagnostics</span>
+            <span>Audio Output & DSP Engine</span>
           </div>
-          <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-[10px] font-semibold border border-emerald-500/20">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            Bit-Perfect Stream
+          <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-400 text-[10px] font-semibold border border-purple-500/20">
+            <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
+            Direct Bit-Perfect Tap
           </span>
         </div>
 
@@ -66,7 +123,7 @@ export function TrackDetails({ track }) {
 
           <div className="p-2.5 rounded-xl bg-bg-primary/60 border border-white/5">
             <span className="block text-[10px] text-warm-muted uppercase tracking-wider mb-0.5">
-              Playback Sample Rate
+              DSP Sample Rate
             </span>
             <span className="font-semibold text-warm-white">
               {diagnostics.sampleRate}
@@ -89,7 +146,7 @@ export function TrackDetails({ track }) {
         </div>
       </div>
 
-      {/* 2. Track & Audio Specifications */}
+      {/* 3. Track & Audio Specifications */}
       <div className="p-3.5 rounded-2xl bg-bg-card border border-white/5 space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-accent font-semibold text-xs tracking-wider uppercase">
@@ -117,7 +174,7 @@ export function TrackDetails({ track }) {
         </div>
       </div>
 
-      {/* 3. Telegram Media Storage Banner */}
+      {/* 4. Telegram Media Storage Banner */}
       <div className="p-3 rounded-xl bg-bg-card/50 border border-white/5 flex items-center gap-3 text-warm-muted text-[11px]">
         <Database className="w-4 h-4 text-accent flex-shrink-0" />
         <span>Direct bit-for-bit high-fidelity audio stream from media server with zero lossy transcoding.</span>

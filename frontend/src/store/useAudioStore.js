@@ -32,8 +32,13 @@ export const useAudioStore = create(
       queue: [],
       isPlaying: false,
       isBuffering: false,
+      isSeeking: false,
+      playbackRequestId: 1,
+      trackChangeReason: 'INITIAL', // INITIAL | USER_SELECT | USER_NEXT | USER_PREVIOUS | NATURAL_END | RECOVERY
+      consecutiveFailureCount: 0,
       status: 'idle', // idle | loading | ready | error
       error: null,
+      lastErrorDetails: null,
       toast: null, // { message: string, type: 'info' | 'error' | 'success', id: number }
       currentTime: 0,
       duration: 0,
@@ -67,7 +72,7 @@ export const useAudioStore = create(
       ],
 
       // Actions
-      playTrack: (track, newQueue = null) => {
+      playTrack: (track, newQueue = null, reason = 'USER_SELECT') => {
         if (!track) return;
         set(state => {
           let updatedQueue = newQueue || state.queue;
@@ -82,10 +87,16 @@ export const useAudioStore = create(
           return {
             currentTrack: track,
             isPlaying: true,
+            isBuffering: true,
+            isSeeking: false,
+            playbackRequestId: (state.playbackRequestId || 0) + 1,
+            trackChangeReason: reason,
+            consecutiveFailureCount: 0,
             status: 'loading',
             error: null,
+            lastErrorDetails: null,
             currentTime: 0,
-            duration: track.duration || 0,
+            duration: Number(track.duration) || 0,
             queue: updatedQueue,
             recentlyPlayed: updatedRecents,
           };
@@ -155,10 +166,10 @@ export const useAudioStore = create(
         });
       },
 
-      next: (fallbackTracks = []) => {
+      next: (fallbackTracks = [], reason = 'USER_NEXT') => {
         const nextTrack = pickNextTrack(get(), 1);
         if (nextTrack) {
-          get().playTrack(nextTrack);
+          get().playTrack(nextTrack, null, reason);
           return;
         }
 
@@ -183,15 +194,15 @@ export const useAudioStore = create(
           }
 
           if (recommended) {
-            get().playTrack(recommended, [...queue, recommended]);
+            get().playTrack(recommended, [...queue, recommended], 'AUTOPLAY_RECOMMENDED');
             return;
           }
         }
 
-        set({ isPlaying: false });
+        set({ isPlaying: false, isBuffering: false });
       },
 
-      prev: () => {
+      prev: (reason = 'USER_PREVIOUS') => {
         // If track played for more than 3 seconds, restart it
         if (get().currentTime > 3) {
           set({ currentTime: 0 });
@@ -199,7 +210,7 @@ export const useAudioStore = create(
         }
         const prevTrack = pickNextTrack(get(), -1);
         if (prevTrack) {
-          get().playTrack(prevTrack);
+          get().playTrack(prevTrack, null, reason);
         }
       },
 

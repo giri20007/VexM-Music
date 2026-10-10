@@ -41,8 +41,11 @@ const ModalScrubber = memo(function ModalScrubber() {
   const currentTime = useAudioStore(s => s.currentTime);
   const duration = useAudioStore(s => s.duration);
   const [hoverPercent, setHoverPercent] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragValue, setDragValue] = useState(0);
 
-  const percent = duration > 0 ? Math.min(100, (currentTime / duration) * 100) : 0;
+  const displayTime = isDragging ? dragValue : currentTime;
+  const percent = duration > 0 ? Math.min(100, (displayTime / duration) * 100) : 0;
 
   const handleMouseMove = e => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -52,6 +55,28 @@ const ModalScrubber = memo(function ModalScrubber() {
 
   const handleMouseLeave = () => {
     setHoverPercent(null);
+  };
+
+  const handleStartDrag = e => {
+    setIsDragging(true);
+    const val = Number(e.target.value);
+    setDragValue(val);
+    useAudioStore.getState().set({ isSeeking: true });
+  };
+
+  const handleDragChange = e => {
+    const val = Number(e.target.value);
+    setDragValue(val);
+    if (!isDragging) {
+      setIsDragging(true);
+      useAudioStore.getState().set({ isSeeking: true });
+    }
+  };
+
+  const handleCommitSeek = e => {
+    const val = Number(e.target.value);
+    setIsDragging(false);
+    seek(val);
   };
 
   return (
@@ -84,8 +109,13 @@ const ModalScrubber = memo(function ModalScrubber() {
           min="0"
           max={duration || 1}
           step="0.1"
-          value={Math.min(currentTime, duration || 0)}
-          onChange={e => seek(Number(e.target.value))}
+          value={Math.min(displayTime, duration || 0)}
+          onPointerDown={handleStartDrag}
+          onTouchStart={handleStartDrag}
+          onChange={handleDragChange}
+          onPointerUp={handleCommitSeek}
+          onTouchEnd={handleCommitSeek}
+          onKeyUp={handleCommitSeek}
           aria-label="Seek track position"
           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
         />
@@ -109,7 +139,7 @@ const ModalScrubber = memo(function ModalScrubber() {
 
       {/* Timestamp labels */}
       <div className="flex items-center justify-between text-xs tabular-nums text-warm-muted font-medium px-0.5 font-mono">
-        <span>{formatDuration(currentTime)}</span>
+        <span>{formatDuration(displayTime)}</span>
         <span>{formatDuration(duration)}</span>
       </div>
     </div>

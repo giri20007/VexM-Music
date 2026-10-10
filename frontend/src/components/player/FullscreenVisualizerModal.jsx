@@ -29,6 +29,32 @@ import { LyricsView } from './LyricsView';
 const FullscreenScrubber = memo(function FullscreenScrubber() {
   const currentTime = useAudioStore(s => s.currentTime);
   const duration = useAudioStore(s => s.duration);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragValue, setDragValue] = useState(0);
+
+  const displayTime = isDragging ? dragValue : currentTime;
+
+  const handleStartDrag = e => {
+    setIsDragging(true);
+    const val = Number(e.target.value);
+    setDragValue(val);
+    useAudioStore.getState().set({ isSeeking: true });
+  };
+
+  const handleDragChange = e => {
+    const val = Number(e.target.value);
+    setDragValue(val);
+    if (!isDragging) {
+      setIsDragging(true);
+      useAudioStore.getState().set({ isSeeking: true });
+    }
+  };
+
+  const handleCommitSeek = e => {
+    const val = Number(e.target.value);
+    setIsDragging(false);
+    seek(val);
+  };
 
   return (
     <div className="w-full max-w-2xl mx-auto space-y-1 select-none">
@@ -37,13 +63,18 @@ const FullscreenScrubber = memo(function FullscreenScrubber() {
         min="0"
         max={duration || 1}
         step="0.1"
-        value={Math.min(currentTime, duration || 0)}
-        onChange={e => seek(Number(e.target.value))}
+        value={Math.min(displayTime, duration || 0)}
+        onPointerDown={handleStartDrag}
+        onTouchStart={handleStartDrag}
+        onChange={handleDragChange}
+        onPointerUp={handleCommitSeek}
+        onTouchEnd={handleCommitSeek}
+        onKeyUp={handleCommitSeek}
         aria-label="Seek time"
         className="w-full h-1.5 bg-white/10 hover:bg-white/20 rounded-full appearance-none cursor-pointer transition-all"
       />
-      <div className="flex items-center justify-between text-xs tabular-nums text-warm-muted font-medium pt-0.5">
-        <span>{formatDuration(currentTime)}</span>
+      <div className="flex items-center justify-between text-xs tabular-nums text-warm-muted font-medium pt-0.5 font-mono">
+        <span>{formatDuration(displayTime)}</span>
         <span>{formatDuration(duration)}</span>
       </div>
     </div>
