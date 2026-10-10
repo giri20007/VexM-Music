@@ -166,23 +166,36 @@ export function usePlayer() {
     window.addEventListener('touchstart', handleUserInteraction, { passive: true });
     window.addEventListener('keydown', handleUserInteraction, { passive: true });
 
+    const getValidDuration = (audDur, trackDur, currentDur = 0) => {
+      if (Number.isFinite(audDur) && audDur > 0) return audDur;
+      if (Number.isFinite(trackDur) && trackDur > 0) return trackDur;
+      if (Number.isFinite(currentDur) && currentDur > 0) return currentDur;
+      return 0;
+    };
+
     const onTimeUpdate = () => {
       const cur = audio.currentTime;
-      S().set({ currentTime: cur });
+      if (!Number.isFinite(cur)) return;
+      const state = S();
+      const dur = getValidDuration(audio.duration, state.currentTrack?.duration, state.duration);
+
+      state.set({
+        currentTime: cur,
+        ...(dur > 0 && Math.abs((state.duration || 0) - dur) > 0.5 ? { duration: dur } : {}),
+      });
 
       // 30s playback tracking threshold
-      const dur = audio.duration || S().currentTrack?.duration || 0;
       if (!playLoggedRef.current && (cur >= 30 || (dur > 0 && cur >= dur * 0.5))) {
         playLoggedRef.current = true;
-        if (S().currentTrack) {
-          S().recordPlay(S().currentTrack);
+        if (state.currentTrack) {
+          state.recordPlay(state.currentTrack);
         }
       }
 
       // Gapless Preloading for next track (15 seconds before track end)
       if (dur > 20 && cur > dur - 15) {
-        const queue = S().queue;
-        const currentIdx = queue.findIndex(t => t.id === S().currentTrack?.id);
+        const queue = state.queue;
+        const currentIdx = queue.findIndex(t => t.id === state.currentTrack?.id);
         const nextTrack = currentIdx >= 0 && currentIdx < queue.length - 1 ? queue[currentIdx + 1] : null;
         if (nextTrack && preloadedTrackIdRef.current !== nextTrack.id) {
           preloadedTrackIdRef.current = nextTrack.id;
@@ -200,13 +213,21 @@ export function usePlayer() {
       }
     };
 
+    const onDurationChange = () => {
+      const dur = getValidDuration(audio.duration, S().currentTrack?.duration, S().duration);
+      if (dur > 0) {
+        S().set({ duration: dur });
+      }
+    };
+
     const onLoadStart = () => {
       S().set({ status: 'loading', isBuffering: true });
     };
 
     const onLoadedMetadata = () => {
+      const dur = getValidDuration(audio.duration, S().currentTrack?.duration, S().duration);
       S().set({
-        duration: audio.duration || S().currentTrack?.duration || 0,
+        duration: dur,
         status: 'ready',
         isBuffering: false,
       });
@@ -289,6 +310,8 @@ export function usePlayer() {
 
     audio.addEventListener('loadstart', onLoadStart);
     audio.addEventListener('loadedmetadata', onLoadedMetadata);
+    audio.addEventListener('durationchange', onDurationChange);
+    audio.addEventListener('timeupdate', onTimeUpdate);
     audio.addEventListener('waiting', onWaiting);
     audio.addEventListener('canplay', onCanPlay);
     audio.addEventListener('canplaythrough', onCanPlayThrough);
@@ -306,6 +329,8 @@ export function usePlayer() {
 
       audio.removeEventListener('loadstart', onLoadStart);
       audio.removeEventListener('loadedmetadata', onLoadedMetadata);
+      audio.removeEventListener('durationchange', onDurationChange);
+      audio.removeEventListener('timeupdate', onTimeUpdate);
       audio.removeEventListener('waiting', onWaiting);
       audio.removeEventListener('canplay', onCanPlay);
       audio.removeEventListener('canplaythrough', onCanPlayThrough);
@@ -352,7 +377,13 @@ export function usePlayer() {
     }
 
     // Reset audio state before switching source
-    useAudioStore.getState().set({ currentTime: 0, isBuffering: true, error: null });
+    const trackDur = Number(track.duration) || 0;
+    useAudioStore.getState().set({
+      currentTime: 0,
+      duration: trackDur,
+      isBuffering: true,
+      error: null,
+    });
 
     // Set CORS before assigning src
     audio.crossOrigin = 'anonymous';

@@ -83,7 +83,7 @@ const ModalScrubber = memo(function ModalScrubber() {
           type="range"
           min="0"
           max={duration || 1}
-          step="0.5"
+          step="0.1"
           value={Math.min(currentTime, duration || 0)}
           onChange={e => seek(Number(e.target.value))}
           aria-label="Seek track position"

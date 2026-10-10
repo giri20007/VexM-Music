@@ -227,7 +227,7 @@ function toItem(m, currentCover = null) {
   const doc = m.media?.document;
   if (!doc) return null;
   const attrs = doc.attributes || [];
-  const au = attrs.find(a => a.className === 'DocumentAttributeAudio');
+  const au = attrs.find(a => a.className === 'DocumentAttributeAudio' || a.duration !== undefined);
   const fileName = attrs.find(a => a.className === 'DocumentAttributeFilename')?.fileName || '';
   const mime = doc.mimeType || '';
 
@@ -238,6 +238,7 @@ function toItem(m, currentCover = null) {
 
   const id = String(m.id);
   const fileSize = Number(doc.size) || 0;
+  const rawDuration = Number(au?.duration) || 0;
   const quality = formatQuality(mime, fileName, au, fileSize);
 
   // Derive album and artist
@@ -273,7 +274,7 @@ function toItem(m, currentCover = null) {
     album: album || 'Single / Unknown Album',
     albumArtist: artist || 'Unknown Artist',
     fileName,
-    duration: au?.duration || 0,
+    duration: rawDuration,
     size: fileSize,
     mimeType: mime || 'audio/mpeg',
     format: quality.format,

@@ -80,8 +80,13 @@ router.get('/:id', async (req, res, next) => {
       'Content-Length': end - start + 1,
       'Cache-Control': 'private, max-age=3600',
       'Access-Control-Allow-Origin': '*',
-      'Access-Control-Expose-Headers': 'Content-Range, Accept-Ranges, Content-Length, Content-Type',
+      'Access-Control-Expose-Headers': 'Content-Range, Accept-Ranges, Content-Length, Content-Type, Content-Duration, X-Content-Duration',
     };
+
+    if (item && Number.isFinite(item.duration) && item.duration > 0) {
+      headers['X-Content-Duration'] = String(item.duration);
+      headers['Content-Duration'] = String(item.duration);
+    }
 
     if (r) {
       headers['Content-Range'] = `bytes ${start}-${end}/${size}`;
