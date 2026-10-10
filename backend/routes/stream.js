@@ -87,8 +87,9 @@ router.get('/:id', async (req, res, next) => {
       'Content-Type': mimeType,
       'Accept-Ranges': 'bytes',
       'Content-Length': end - start + 1,
-      'Cache-Control': 'public, max-age=86400, immutable',
+      'Cache-Control': 'public, max-age=31536000, immutable',
       'ETag': etag,
+
       'Access-Control-Allow-Origin': origin,
       'Access-Control-Allow-Credentials': 'true',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization, Range, Cookie',

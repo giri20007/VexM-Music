@@ -3,11 +3,12 @@ const { StringSession } = require('telegram/sessions');
 const bigInt = require('big-integer');
 const fs = require('fs');
 const path = require('path');
-const { getOverride, getArtwork } = require('../services/cacheService');
+const { getOverride, getArtwork, getAudioChunk, setAudioChunk } = require('../services/cacheService');
 
 const err = (message, status, extra = {}) => Object.assign(new Error(message), { status }, extra);
 const SESSION_FILE = process.env.SESSION_FILE_PATH || path.join(__dirname, '..', 'data', 'spx-session.txt');
-const CHUNK = 512 * 1024; // Telegram-friendly aligned request size
+const CHUNK = 512 * 1024; // 512KB Telegram-friendly aligned request size
+
 
 let clientP = null;
 let chatP = null;
@@ -432,40 +433,77 @@ async function getDoc(id, fresh = false) {
   }
 }
 
-// Yields exactly bytes [start..end] without buffering the entire file
-async function* streamRange(doc, start, end, docRefreshFn = null) {
-  const c = await getClient();
-  const aStart = start - (start % CHUNK);
-  let pos = aStart;
-  let currentDoc = doc;
+// Download single 512KB chunk with LRU RAM caching
+async function downloadSingleChunk(doc, offset) {
+  const cached = getAudioChunk(doc.id, offset);
+  if (cached) {
+    return Promise.resolve(cached);
+  }
 
-  const createLocation = d => new Api.InputDocumentFileLocation({
-    id: d.id,
-    accessHash: d.accessHash,
-    fileReference: d.fileReference,
+  const c = await getClient();
+  const location = new Api.InputDocumentFileLocation({
+    id: doc.id,
+    accessHash: doc.accessHash,
+    fileReference: doc.fileReference,
     thumbSize: '',
   });
 
-  let location = createLocation(currentDoc);
+  const fetchPromise = (async () => {
+    for await (const chunk of c.iterDownload({
+      file: location,
+      offset: bigInt(offset),
+      limit: 1,
+      requestSize: CHUNK,
+      dcId: doc.dcId,
+    })) {
+      return chunk;
+    }
+    return Buffer.alloc(0);
+  })();
+
+  setAudioChunk(doc.id, offset, fetchPromise);
+  return fetchPromise;
+}
+
+// Proactive read-ahead prefetching (fetches upcoming chunks into RAM cache in background)
+function prefetchChunks(doc, currentOffset, count = 2) {
+  const totalSize = Number(doc.size) || 0;
+  for (let i = 1; i <= count; i++) {
+    const nextOffset = currentOffset + i * CHUNK;
+    if (totalSize > 0 && nextOffset >= totalSize) break;
+    const cached = getAudioChunk(doc.id, nextOffset);
+    if (!cached) {
+      downloadSingleChunk(doc, nextOffset).catch(() => {});
+    }
+  }
+}
+
+// Yields exactly bytes [start..end] with sub-millisecond pipelined read-ahead streaming
+async function* streamRange(doc, start, end, docRefreshFn = null) {
+  const aStart = start - (start % CHUNK);
+  let pos = aStart;
+  let currentDoc = doc;
   let attempts = 0;
 
   while (pos <= end && attempts < 3) {
     try {
-      const remainingLimit = Math.ceil((end - pos + 1) / CHUNK);
-      for await (const chunk of c.iterDownload({
-        file: location,
-        offset: bigInt(pos),
-        limit: remainingLimit,
-        requestSize: CHUNK,
-        dcId: currentDoc.dcId,
-      })) {
-        const from = Math.max(start - pos, 0);
-        const to = Math.min(end - pos + 1, chunk.length);
-        if (to > from) yield chunk.subarray(from, to);
-        pos += chunk.length;
-        if (pos > end) return;
+      // Fire proactive read-ahead for next 2 chunks in background
+      prefetchChunks(currentDoc, pos, 2);
+
+      const chunk = await downloadSingleChunk(currentDoc, pos);
+      if (!chunk || chunk.length === 0) {
+        break;
       }
-      break;
+
+      const from = Math.max(start - pos, 0);
+      const to = Math.min(end - pos + 1, chunk.length);
+      if (to > from) {
+        yield chunk.subarray(from, to);
+      }
+
+      pos += chunk.length;
+      attempts = 0; // Reset attempts on successful chunk
+      if (pos > end) return;
     } catch (e) {
       attempts++;
       const msg = String(e.errorMessage || e.message || '');
@@ -475,7 +513,6 @@ async function* streamRange(doc, start, end, docRefreshFn = null) {
           const refreshed = await docRefreshFn();
           if (refreshed?.doc) {
             currentDoc = refreshed.doc;
-            location = createLocation(currentDoc);
             continue;
           }
         } catch (refreshErr) {
@@ -489,6 +526,7 @@ async function* streamRange(doc, start, end, docRefreshFn = null) {
     }
   }
 }
+
 
 // Download thumbnail or cover photo from Telegram
 async function downloadThumbnail(docOrMedia) {

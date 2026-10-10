@@ -240,6 +240,49 @@ function saveLibraryCache(items, maxId) {
   }
 }
 
+// In-Memory High-Speed Audio Chunk LRU Cache (Up to 128 chunks = ~64MB RAM)
+const MAX_AUDIO_CHUNKS = 128;
+const audioChunkCache = new Map(); // key -> { buffer, promise, addedAt }
+
+function getAudioChunkKey(docId, offset) {
+  return `${docId}_${offset}`;
+}
+
+function getAudioChunk(docId, offset) {
+  const key = getAudioChunkKey(docId, offset);
+  const entry = audioChunkCache.get(key);
+  if (!entry) return null;
+  // Re-insert for LRU ordering
+  audioChunkCache.delete(key);
+  audioChunkCache.set(key, entry);
+  return entry.buffer || entry.promise || null;
+}
+
+function setAudioChunk(docId, offset, bufferOrPromise) {
+  const key = getAudioChunkKey(docId, offset);
+  if (audioChunkCache.size >= MAX_AUDIO_CHUNKS) {
+    const oldestKey = audioChunkCache.keys().next().value;
+    audioChunkCache.delete(oldestKey);
+  }
+  const isPromise = bufferOrPromise && typeof bufferOrPromise.then === 'function';
+  const entry = {
+    buffer: isPromise ? null : bufferOrPromise,
+    promise: isPromise ? bufferOrPromise : null,
+    addedAt: Date.now(),
+  };
+
+  if (isPromise) {
+    bufferOrPromise.then(buf => {
+      entry.buffer = buf;
+      entry.promise = null;
+    }).catch(() => {
+      audioChunkCache.delete(key);
+    });
+  }
+
+  audioChunkCache.set(key, entry);
+}
+
 module.exports = {
   getOverride,
   setOverride,
@@ -257,5 +300,8 @@ module.exports = {
   importMetadata,
   getLibraryCache,
   saveLibraryCache,
+  getAudioChunk,
+  setAudioChunk,
 };
+
 

@@ -2,12 +2,14 @@ import { useEffect, useRef } from 'react';
 import { useAudioStore } from '../store/useAudioStore';
 import { useSettingsStore, EQ_FREQUENCIES } from '../store/useSettingsStore';
 import { streamUrl, artworkUrl } from '../utils/api';
+import { preloadNextQueueTracks } from '../utils/audioPreloader';
 
 export const audio = typeof Audio !== 'undefined' ? new Audio() : null;
 if (audio) {
-  audio.preload = 'metadata';
+  audio.preload = 'auto';
   audio.crossOrigin = 'anonymous';
 }
+
 
 export const seek = t => {
   if (audio && Number.isFinite(t)) {
@@ -253,20 +255,12 @@ export function usePlayer() {
         }
       }
 
-      // Next track cover preloading (15 seconds before track end)
-      if (state.duration > 20 && cur > state.duration - 15) {
-        const queue = state.queue;
-        const currentIdx = queue.findIndex(t => t.id === state.currentTrack?.id);
-        const nextTrack = currentIdx >= 0 && currentIdx < queue.length - 1 ? queue[currentIdx + 1] : null;
-        if (nextTrack && preloadedTrackIdRef.current !== nextTrack.id) {
-          preloadedTrackIdRef.current = nextTrack.id;
-          if (nextTrack.thumbnail) {
-            const img = new Image();
-            img.src = nextTrack.thumbnail;
-          }
-        }
+      // Predictive Next-Track Preloading: Pre-warm initial 512KB chunk & artwork
+      if (cur >= 4 || (state.duration > 20 && cur > state.duration - 30)) {
+        preloadNextQueueTracks(state.queue, state.currentTrack?.id, 1);
       }
     };
+
 
     const onDurationChange = () => {
       const dur = getValidDuration(audio.duration, S().currentTrack?.duration, S().duration);
