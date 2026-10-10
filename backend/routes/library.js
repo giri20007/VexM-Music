@@ -1,14 +1,29 @@
 const router = require('express').Router();
 const tg = require('../utils/telegramApi');
-const { getOverride, getArtwork, getArtistAlias } = require('../services/cacheService');
+const { getOverride, getArtwork, getArtistAlias, getLibraryCache, saveLibraryCache } = require('../services/cacheService');
 const { logActivity } = require('../services/activityLog');
 
-const TTL = 30 * 1000; // Fast 30-second cache TTL for instant sync
+const TTL = 60 * 1000; // 60-second cache TTL for HTTP queries
 const items = new Map(); // id -> item
 const removedIds = new Set(); // ids hidden from library
 let maxId = 0;
 let lastSync = 0;
 let syncing = null;
+
+// Immediately hydrate library from disk cache on startup
+try {
+  const cached = getLibraryCache();
+  if (cached && Array.isArray(cached.items) && cached.items.length > 0) {
+    cached.items.forEach(raw => {
+      items.set(String(raw.id), raw);
+    });
+    maxId = cached.maxId || 0;
+    lastSync = cached.savedAt ? new Date(cached.savedAt).getTime() : Date.now();
+    console.log(`[Library] Hydrated ${items.size} tracks instantly from disk cache (maxId: ${maxId})`);
+  }
+} catch (cacheErr) {
+  console.warn('[Library] Cache hydration note:', cacheErr.message);
+}
 
 function applyOverrides(item) {
   const override = getOverride(item.id);
@@ -50,6 +65,9 @@ async function sync(full = false) {
       lastSync = Date.now();
       const elapsed = Date.now() - startTime;
 
+      // Persist library snapshot to disk cache
+      saveLibraryCache(items, maxId);
+
       if (added > 0 || full) {
         logActivity('LIBRARY_SYNC_COMPLETED', {
           full,
@@ -69,7 +87,14 @@ async function sync(full = false) {
       };
     } catch (e) {
       console.warn('Auto-sync notice:', e.message);
-      throw e;
+      // If network fails but we have disk cache, return cached total
+      return {
+        total: items.size,
+        added: 0,
+        updated: 0,
+        maxId,
+        lastSync,
+      };
     } finally {
       syncing = null;
     }
@@ -77,10 +102,10 @@ async function sync(full = false) {
   return syncing;
 }
 
-// Background auto-discovery every 20 seconds
+// Background auto-discovery every 2 minutes (preventing Telegram FloodWait)
 setInterval(() => {
   sync(false).catch(() => {});
-}, 20 * 1000);
+}, 120 * 1000);
 
 // Public Library Listing
 router.get('/', async (req, res, next) => {

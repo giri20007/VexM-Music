@@ -213,6 +213,33 @@ function importMetadata(data) {
   return { success: true, importedCount };
 }
 
+function getLibraryCache() {
+  try {
+    if (fs.existsSync(LIBRARY_CACHE_FILE)) {
+      const data = JSON.parse(fs.readFileSync(LIBRARY_CACHE_FILE, 'utf8'));
+      if (Array.isArray(data.items)) {
+        return { items: data.items, maxId: data.maxId || 0, savedAt: data.savedAt };
+      }
+    }
+  } catch (err) {
+    console.warn('Error reading library cache file:', err.message);
+  }
+  return null;
+}
+
+function saveLibraryCache(items, maxId) {
+  try {
+    const payload = {
+      items: Array.isArray(items) ? items : Array.from(items.values()),
+      maxId: Number(maxId) || 0,
+      savedAt: new Date().toISOString(),
+    };
+    fs.writeFileSync(LIBRARY_CACHE_FILE, JSON.stringify(payload, null, 2), 'utf8');
+  } catch (err) {
+    console.warn('Error saving library cache file:', err.message);
+  }
+}
+
 module.exports = {
   getOverride,
   setOverride,
@@ -228,4 +255,7 @@ module.exports = {
   clearCache,
   exportMetadata,
   importMetadata,
+  getLibraryCache,
+  saveLibraryCache,
 };
+

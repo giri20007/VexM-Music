@@ -321,84 +321,35 @@ async function listAudio(minId = 0, limit = 1000) {
       CoverDetector.clear();
     }
 
-    // Strategy 1: Use getMessages with limit (fastest and returns newest 100-300 messages)
-    try {
-      const recentMessages = await c.getMessages(chat, { limit: 300 });
-      if (recentMessages && recentMessages.length > 0) {
-        const sorted = [...recentMessages].sort((a, b) => a.id - b.id);
-
-        // Pass 1: Ingest and register all cover candidates
-        for (const m of sorted) {
-          if (!m || !m.id) continue;
-          if (m.id > maxId) maxId = m.id;
-          CoverDetector.registerMessage(m);
-          if (isImageMessage(m)) {
-            photoCache.set(`msg_${m.id}`, m.media || m);
-          }
-        }
-
-        // Pass 2: Ingest audio tracks with high-confidence artwork matching
-        for (const m of sorted) {
-          if (!m || !m.id) continue;
-          const it = toItem(m);
-          if (it) items.push(it);
-        }
-
-        if (items.length > 0) {
-          connectionStatus.discoveredCount = items.length;
-          return { items, maxId };
-        }
-      }
-    } catch (e1) {
-      console.warn('getMessages limit strategy note:', e1.message);
-    }
-
-    // Strategy 2: iterMessages
-    try {
-      const fetched = [];
-      for await (const m of c.iterMessages(chat, { limit, minId })) {
-        if (!m || !m.id) continue;
-        if (m.id > maxId) maxId = m.id;
-        fetched.push(m);
-      }
-      const sorted = [...fetched].sort((a, b) => a.id - b.id);
-      for (const m of sorted) {
-        CoverDetector.registerMessage(m);
-        if (isImageMessage(m)) {
-          photoCache.set(`msg_${m.id}`, m.media || m);
-        }
-      }
-      for (const m of sorted) {
-        const it = toItem(m);
-        if (it) items.push(it);
-      }
-      connectionStatus.discoveredCount = items.length;
-      return { items, maxId };
-    } catch (e2) {
-      if (!/BOT_METHOD_INVALID/.test(String(e2.errorMessage || e2.message))) throw e2;
-    }
-
-    // Strategy 3: Bot ID scan with high tolerance (checks up to 3,000 message IDs)
-    items.length = 0;
-    maxId = minId;
-    let start = Math.max(1, minId);
+    // Bot ID-based Scanning (Prevents BOT_METHOD_INVALID and eliminates FloodWait)
+    let start = Math.max(1, minId === 0 ? 1 : minId + 1);
     let emptyBatches = 0;
+    const maxEmptyBatches = minId > 0 ? 2 : 3; // Fast exit after 200-300 empty messages
     const allMsgs = [];
 
-    while (emptyBatches < 30 && start < 25000) {
+    while (emptyBatches < maxEmptyBatches && start < 20000) {
       const ids = Array.from({ length: 100 }, (_, i) => start + i);
-      const msgs = await c.getMessages(chat, { ids });
-      let foundAny = false;
+      try {
+        const msgs = await c.getMessages(chat, { ids });
+        let foundAny = false;
 
-      for (const m of msgs) {
-        if (!m || !m.id) continue;
-        foundAny = true;
-        if (m.id > maxId) maxId = m.id;
-        allMsgs.push(m);
+        for (const m of msgs) {
+          if (!m || !m.id) continue;
+          foundAny = true;
+          if (m.id > maxId) maxId = m.id;
+          allMsgs.push(m);
+        }
+
+        emptyBatches = foundAny ? 0 : emptyBatches + 1;
+        start += 100;
+      } catch (batchErr) {
+        const msg = String(batchErr.errorMessage || batchErr.message || '');
+        if (/FLOOD/.test(msg)) {
+          console.warn('Telegram rate limit during scan, stopping batch loop gracefully:', msg);
+          break;
+        }
+        throw batchErr;
       }
-
-      emptyBatches = foundAny ? 0 : emptyBatches + 1;
-      start += 100;
     }
 
     const sorted = [...allMsgs].sort((a, b) => a.id - b.id);
