@@ -47,14 +47,7 @@ app.use('/api', rateLimit({
   legacyHeaders: false,
 }));
 
-// Public Endpoints
-app.get('/', (_req, res) => res.json({
-  status: 'ok',
-  service: 'SPiDEYxFLASH Audio Player API',
-  version: '2.0.0',
-  health: '/api/health',
-}));
-
+// Public Health Endpoint
 app.get('/api/health', (_req, res) => res.json({
   status: 'ok',
   service: 'SPiDEYxFLASH Audio Player',
@@ -77,6 +70,18 @@ app.use('/api', (_req, res) => res.status(404).json({
   code: 'NOT_FOUND',
   message: 'API route not found',
 }));
+
+// Serve frontend static files if built (instant fullstack preview)
+const path = require('path');
+const fs = require('fs');
+const frontendDist = path.join(__dirname, '../frontend/dist');
+if (fs.existsSync(frontendDist)) {
+  app.use(express.static(frontendDist));
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api')) return next();
+    res.sendFile(path.join(frontendDist, 'index.html'));
+  });
+}
 
 // Global Error Handler
 app.use((err, _req, res, _next) => {
