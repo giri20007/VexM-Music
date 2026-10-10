@@ -1,11 +1,11 @@
-import React, { memo, useState } from 'react';
-import { Play, Sparkles } from 'lucide-react';
+import React, { memo } from 'react';
+import { Play } from 'lucide-react';
 import { useAudioStore } from '../../store/useAudioStore';
 import { getArtistArtworkSrc } from '../../utils/artworkGenerator';
+import { SafeImage } from '../ui/SafeImage';
 
 export const ArtistCard = memo(function ArtistCard({ artist, onClick }) {
   const playTrack = useAudioStore(s => s.playTrack);
-  const [imgErr, setImgErr] = useState(false);
 
   const handlePlayArtist = e => {
     e.stopPropagation();
@@ -14,19 +14,9 @@ export const ArtistCard = memo(function ArtistCard({ artist, onClick }) {
     }
   };
 
-  const avatarSrc = !imgErr ? getArtistArtworkSrc(artist, 300) : null;
+  const avatarSrc = getArtistArtworkSrc(artist, 300);
   const trackCount = artist.tracks?.length || 0;
   const albumCount = artist.albums?.length || 0;
-
-  // Extract initials (up to 2 characters) for high-end gradient fallback
-  const getInitials = name => {
-    if (!name) return 'A';
-    const words = name.trim().split(/\s+/);
-    if (words.length >= 2) {
-      return (words[0][0] + words[1][0]).toUpperCase();
-    }
-    return name.slice(0, 2).toUpperCase();
-  };
 
   return (
     <div
@@ -35,21 +25,14 @@ export const ArtistCard = memo(function ArtistCard({ artist, onClick }) {
     >
       {/* Circular Artist Portrait with subtle outer ring & glow */}
       <div className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-full overflow-hidden bg-gradient-to-tr from-[#1e1014] via-[#2a1219] to-[#12080c] border-2 border-white/10 mb-3.5 shadow-xl group-hover:border-accent/80 group-hover:ring-4 group-hover:ring-accent/20 transition-all duration-300">
-        {avatarSrc && !imgErr ? (
-          <img
-            src={avatarSrc}
-            alt={artist.name}
-            onError={() => setImgErr(true)}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-108"
-            loading="lazy"
-          />
-        ) : (
-          <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-tr from-accent/30 via-rose-600/30 to-purple-600/30 text-warm-white select-none">
-            <span className="text-xl sm:text-2xl font-black tracking-wider text-accent drop-shadow-md">
-              {getInitials(artist.name)}
-            </span>
-          </div>
-        )}
+        <SafeImage
+          src={avatarSrc}
+          fallbackType="artist"
+          artistName={artist.name}
+          alt={artist.name}
+          size={300}
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-108"
+        />
 
         {/* Floating Hover Play Button Overlay */}
         <button

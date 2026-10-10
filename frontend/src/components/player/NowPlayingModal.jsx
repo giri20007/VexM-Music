@@ -24,11 +24,13 @@ import {
   ArrowUp,
   ArrowDown,
   Layers,
+  Loader2,
 } from 'lucide-react';
 import { useAudioStore } from '../../store/useAudioStore';
 import { seek } from '../../hooks/usePlayer';
 import { formatDuration, formatQualityBadge } from '../../utils/formatters';
 import { getArtworkSrc, getTrackArtworkUrl } from '../../utils/artworkGenerator';
+import { SafeImage } from '../ui/SafeImage';
 import { LyricsView } from './LyricsView';
 import { TrackDetails } from './TrackDetails';
 import { AudioVisualizer, MiniBeatVisualizer } from './AudioVisualizer';
@@ -63,7 +65,7 @@ const ModalScrubber = memo(function ModalScrubber() {
         <div className="relative w-full h-1.5 sm:h-2 bg-white/10 rounded-full overflow-hidden transition-all group-hover:h-2.5">
           {/* Active Progress Fill */}
           <div
-            className="absolute top-0 left-0 bottom-0 bg-gradient-to-r from-accent to-[#f43f5e] rounded-full transition-all duration-75"
+            className="absolute top-0 left-0 bottom-0 bg-gradient-to-r from-[#00f2fe] via-[#4facfe] to-[#f093fb] rounded-full transition-all duration-75"
             style={{ width: `${percent}%` }}
           />
 
@@ -90,7 +92,7 @@ const ModalScrubber = memo(function ModalScrubber() {
 
         {/* Glowing Scrubber Thumb */}
         <div
-          className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-3.5 h-3.5 rounded-full bg-white shadow-lg shadow-accent/50 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"
+          className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-3.5 h-3.5 rounded-full bg-white shadow-lg shadow-cyan-400/60 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"
           style={{ left: `${percent}%` }}
         />
 
@@ -122,6 +124,7 @@ export function NowPlayingModal() {
   const sleepTimer = useAudioStore(s => s.sleepTimer);
   const currentTrack = useAudioStore(s => s.currentTrack);
   const isPlaying = useAudioStore(s => s.isPlaying);
+  const isBuffering = useAudioStore(s => s.isBuffering);
   const volume = useAudioStore(s => s.volume);
   const isMuted = useAudioStore(s => s.isMuted);
   const shuffle = useAudioStore(s => s.shuffle);
@@ -146,7 +149,6 @@ export function NowPlayingModal() {
   // View state: 'artwork' | 'lyrics' | 'visualizer'
   const [viewMode, setViewMode] = useState('artwork');
   const [activeDrawer, setActiveDrawer] = useState(null); // null | 'queue' | 'details'
-  const [imgError, setImgError] = useState(false);
   const [isFullscreenVisualizerOpen, setIsFullscreenVisualizerOpen] = useState(false);
 
   // Quick Switching Keyboard Hotkeys (V = Visualizer, L = Lyrics, A = Artwork, Esc = Minimize)
@@ -184,7 +186,7 @@ export function NowPlayingModal() {
 
   const isLiked = likedTrackIds.includes(String(currentTrack.id));
   const quality = formatQualityBadge(currentTrack);
-  const coverSrc = !imgError ? getArtworkSrc(currentTrack, 600) : getTrackArtworkUrl(currentTrack, 600);
+  const coverSrc = getArtworkSrc(currentTrack, 600);
   const upNextTracks = queue.filter(t => t.id !== currentTrack.id);
 
   return (
@@ -196,11 +198,14 @@ export function NowPlayingModal() {
       />
       <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-[#070709]/80 to-[#070709] pointer-events-none -z-10" />
 
-      {/* Dynamic Animated Pulse Aura */}
+      {/* Dynamic Animated Pulse Aura (Multi-Color Mesh Gradient) */}
       <div
-        className={`absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] rounded-full bg-accent/15 blur-[120px] pointer-events-none -z-10 transition-opacity duration-700 ${
-          isPlaying ? 'opacity-90 animate-pulse-slow' : 'opacity-30'
+        className={`absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-[130px] pointer-events-none -z-10 transition-opacity duration-700 ${
+          isPlaying ? 'opacity-80 animate-pulse-slow' : 'opacity-20'
         }`}
+        style={{
+          background: 'radial-gradient(circle at 35% 35%, #7F00FF 0%, transparent 60%), radial-gradient(circle at 65% 65%, #00F2FE 0%, transparent 60%)',
+        }}
       />
 
       {/* 2. Top Navigation Bar */}
@@ -302,7 +307,7 @@ export function NowPlayingModal() {
             onClick={() => setViewMode('artwork')}
             className={`flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-bold transition-all ${
               viewMode === 'artwork'
-                ? 'bg-gradient-to-r from-accent to-[#f43f5e] text-bg-primary shadow-lg shadow-accent/25'
+                ? 'bg-gradient-to-r from-[#00f2fe] via-[#f093fb] to-[#ff5858] text-bg-primary shadow-lg shadow-cyan-500/25'
                 : 'text-warm-muted hover:text-white hover:bg-white/5'
             }`}
             title="Switch to Artwork (Press 'A')"
@@ -316,7 +321,7 @@ export function NowPlayingModal() {
             onClick={() => setViewMode('lyrics')}
             className={`flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-bold transition-all ${
               viewMode === 'lyrics'
-                ? 'bg-gradient-to-r from-accent to-[#f43f5e] text-bg-primary shadow-lg shadow-accent/25'
+                ? 'bg-gradient-to-r from-[#00f2fe] via-[#f093fb] to-[#ff5858] text-bg-primary shadow-lg shadow-cyan-500/25'
                 : 'text-warm-muted hover:text-white hover:bg-white/5'
             }`}
             title="Switch to Synced Lyrics (Press 'L')"
@@ -330,7 +335,7 @@ export function NowPlayingModal() {
             onClick={() => setViewMode('visualizer')}
             className={`flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-bold transition-all ${
               viewMode === 'visualizer'
-                ? 'bg-gradient-to-r from-accent to-[#f43f5e] text-bg-primary shadow-lg shadow-accent/25'
+                ? 'bg-gradient-to-r from-[#00f2fe] via-[#f093fb] to-[#ff5858] text-bg-primary shadow-lg shadow-cyan-500/25'
                 : 'text-warm-muted hover:text-white hover:bg-white/5'
             }`}
             title="Switch to 360° Visualizer (Press 'V')"
@@ -348,18 +353,34 @@ export function NowPlayingModal() {
             <div className="flex flex-col items-center justify-center w-full max-w-md mx-auto space-y-5 animate-scale-up">
               {/* Large Rounded Artwork Card with Soft Ambient Glow */}
               <div className="relative aspect-square w-full max-w-[340px] sm:max-w-[400px] lg:max-w-[430px] rounded-3xl overflow-hidden bg-bg-card border border-white/15 shadow-2xl shadow-black/80 group">
-                <img
+                <SafeImage
                   src={coverSrc}
+                  track={currentTrack}
                   alt={currentTrack.title}
-                  onError={() => setImgError(true)}
+                  size={600}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-103"
                 />
 
                 {/* Ambient Highlight Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+
+                {/* Buffering Radar Ripple Effect Overlay */}
+                {isBuffering && (
+                  <div className="absolute inset-0 bg-black/60 backdrop-blur-xs flex flex-col items-center justify-center gap-3 z-20 animate-fade-in">
+                    <div className="relative flex items-center justify-center">
+                      <div className="w-20 h-20 rounded-full bg-cyan-500/20 animate-ping absolute" />
+                      <div className="w-14 h-14 rounded-full bg-gradient-to-tr from-[#00f2fe] to-[#f093fb] flex items-center justify-center text-bg-primary shadow-xl shadow-cyan-500/30 animate-spin">
+                        <Loader2 className="w-7 h-7 stroke-[2.5]" />
+                      </div>
+                    </div>
+                    <span className="text-xs font-bold text-warm-white tracking-wide bg-black/70 px-3 py-1 rounded-full border border-white/10 shadow-lg">
+                      Buffering Hi-Res Stream...
+                    </span>
+                  </div>
+                )}
 
                 {/* Verified Cover Badge */}
-                {currentTrack.artworkConfidence >= 60 && (
+                {currentTrack.artworkConfidence >= 60 && !isBuffering && (
                   <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-black/70 backdrop-blur-md border border-white/15 flex items-center gap-1.5 text-[11px] font-bold text-accent shadow-lg">
                     <Sparkles className="w-3.5 h-3.5 animate-pulse" />
                     <span>Verified Art</span>
@@ -409,9 +430,11 @@ export function NowPlayingModal() {
               {/* Floating Track Info Mini Pill */}
               <div className="flex items-center justify-between pb-3 mb-2 border-b border-white/5">
                 <div className="flex items-center gap-3 min-w-0">
-                  <img
+                  <SafeImage
                     src={coverSrc}
+                    track={currentTrack}
                     alt={currentTrack.title}
+                    size={80}
                     className="w-10 h-10 rounded-xl object-cover border border-white/10 shadow-md"
                   />
                   <div className="min-w-0">
@@ -443,14 +466,14 @@ export function NowPlayingModal() {
           {/* MODE 3: 360° AUDIO VISUALIZER WITH DYNAMIC AMBIENT GLOW & TRACK CONTEXT */}
           {viewMode === 'visualizer' && (
             <div className="relative w-full max-w-xl flex flex-col items-center animate-scale-up">
-              {/* Dynamic Soft Ambient Glow Backing (Warm Coral & Neon Violet) */}
-              <div className="absolute inset-0 -m-8 rounded-full bg-gradient-to-tr from-[#ff6b6b]/25 via-[#f43f5e]/20 to-[#a855f7]/25 filter blur-[80px] pointer-events-none -z-10 animate-pulse-slow" />
+              {/* Dynamic Soft Ambient Glow Backing */}
+              <div className="absolute inset-0 -m-8 rounded-full bg-gradient-to-tr from-[#7F00FF]/25 via-[#00F2FE]/20 to-[#FF007F]/25 filter blur-[80px] pointer-events-none -z-10 animate-pulse-slow" />
 
               {/* Top Track Context Header (Title, Artist, Album, Quality) */}
               <div className="w-full flex items-center justify-between px-3 py-2 mb-2 rounded-2xl bg-black/40 border border-white/10 backdrop-blur-xl text-xs z-10 shadow-lg">
                 <div className="flex items-center gap-2.5 min-w-0 flex-1">
                   <div className="w-8 h-8 rounded-lg overflow-hidden bg-bg-card flex-shrink-0 border border-white/10">
-                    <img src={coverSrc} alt={currentTrack.title} className="w-full h-full object-cover" />
+                    <SafeImage src={coverSrc} track={currentTrack} alt={currentTrack.title} size={80} className="w-full h-full object-cover" />
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="font-bold text-warm-white truncate text-xs sm:text-sm">{currentTrack.title}</p>
@@ -518,12 +541,14 @@ export function NowPlayingModal() {
             {/* Main Glowing Round Centerpiece Play/Pause Button */}
             <button
               onClick={togglePlay}
-              className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-tr from-[#ff6b6b] via-[#f43f5e] to-[#c084fc] text-bg-primary flex items-center justify-center shadow-xl shadow-rose-500/30 hover:shadow-rose-500/50 hover:scale-105 active:scale-95 transition-all duration-200 ${
-                isPlaying ? 'ring-4 ring-accent/30 animate-pulse-slow' : ''
+              className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-tr from-[#00f2fe] via-[#f093fb] to-[#ff5858] text-bg-primary flex items-center justify-center shadow-xl shadow-cyan-500/30 hover:shadow-cyan-500/50 hover:scale-105 active:scale-95 transition-all duration-200 ${
+                isPlaying && !isBuffering ? 'ring-4 ring-cyan-400/30 animate-pulse-slow' : ''
               }`}
-              aria-label={isPlaying ? 'Pause' : 'Play'}
+              aria-label={isBuffering ? 'Buffering' : isPlaying ? 'Pause' : 'Play'}
             >
-              {isPlaying ? (
+              {isBuffering ? (
+                <Loader2 className="w-7 h-7 sm:w-8 sm:h-8 animate-spin text-bg-primary stroke-[2.5]" />
+              ) : isPlaying ? (
                 <Pause className="w-7 h-7 sm:w-8 sm:h-8 fill-bg-primary stroke-bg-primary" />
               ) : (
                 <Play className="w-7 h-7 sm:w-8 sm:h-8 fill-bg-primary stroke-bg-primary ml-1" />
@@ -679,9 +704,11 @@ export function NowPlayingModal() {
                     </p>
                     <div className="flex items-center gap-3 p-3 rounded-2xl bg-accent/10 border border-accent/30 shadow-md">
                       <div className="w-11 h-11 rounded-xl overflow-hidden bg-bg-card flex-shrink-0 border border-white/10">
-                        <img
+                        <SafeImage
                           src={coverSrc}
+                          track={currentTrack}
                           alt={currentTrack.title}
+                          size={100}
                           className="w-full h-full object-cover"
                         />
                       </div>
@@ -725,7 +752,7 @@ export function NowPlayingModal() {
                                 className="flex items-center gap-3 min-w-0 flex-1 cursor-pointer"
                               >
                                 <div className="w-9 h-9 rounded-xl overflow-hidden bg-bg-secondary flex-shrink-0 border border-white/5">
-                                  <img src={cover} alt={t.title} className="w-full h-full object-cover" />
+                                  <SafeImage src={cover} track={t} alt={t.title} size={80} className="w-full h-full object-cover" />
                                 </div>
                                 <div className="min-w-0 flex-1">
                                   <p className="truncate font-bold text-warm-white group-hover:text-accent transition-colors">

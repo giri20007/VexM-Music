@@ -3,6 +3,7 @@ import { Search, X, Music2, Disc3, User, Play } from 'lucide-react';
 import { useAudioStore } from '../../store/useAudioStore';
 import { formatDuration } from '../../utils/formatters';
 import { getArtworkSrc } from '../../utils/artworkGenerator';
+import { SafeImage } from '../ui/SafeImage';
 
 export function GlobalSearchModal({ allTracks = [], onNavigate }) {
   const isSearchModalOpen = useAudioStore(s => s.isSearchModalOpen);
@@ -222,7 +223,7 @@ export function GlobalSearchModal({ allTracks = [], onNavigate }) {
                         >
                           <div className="flex items-center gap-3 min-w-0 flex-1">
                             <div className="relative w-9 h-9 rounded-xl overflow-hidden bg-bg-card flex-shrink-0 border border-white/5">
-                              <img src={cover} alt={t.title} className="w-full h-full object-cover" />
+                              <SafeImage src={cover} track={t} alt={t.title} size={80} className="w-full h-full object-cover" />
                             </div>
                             <div className="min-w-0 flex-1">
                               <p className={`truncate font-semibold text-xs sm:text-sm ${isSelected ? 'text-accent' : 'text-warm-white'}`}>

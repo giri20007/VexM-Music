@@ -31,8 +31,10 @@ export const useAudioStore = create(
       currentTrack: null,
       queue: [],
       isPlaying: false,
+      isBuffering: false,
       status: 'idle', // idle | loading | ready | error
       error: null,
+      toast: null, // { message: string, type: 'info' | 'error' | 'success', id: number }
       currentTime: 0,
       duration: 0,
       volume: 1,
@@ -348,6 +350,22 @@ export const useAudioStore = create(
           }),
         }));
       },
+
+      // Toast Alerts
+      showToast: (message, type = 'info', durationMs = 4000) => {
+        const id = Date.now();
+        set({ toast: { message, type, id } });
+        if (durationMs > 0) {
+          setTimeout(() => {
+            const current = get().toast;
+            if (current && current.id === id) {
+              set({ toast: null });
+            }
+          }, durationMs);
+        }
+      },
+      clearToast: () => set({ toast: null }),
+      setIsBuffering: isBuffering => set({ isBuffering }),
 
       // UI View controls
       setNowPlayingOpen: val => set({ isNowPlayingOpen: val }),

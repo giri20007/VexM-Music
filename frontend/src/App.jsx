@@ -7,6 +7,7 @@ import { GlobalSearchModal } from './components/layout/GlobalSearchModal';
 import { LivelyBackground } from './components/layout/LivelyBackground';
 import { NewTracksBanner } from './components/layout/NewTracksBanner';
 import { AuthScreen } from './components/auth/AuthScreen';
+import { ToastContainer } from './components/ui/Toast';
 
 import { NowPlayingModal } from './components/player/NowPlayingModal';
 import { QueueDrawer } from './components/player/QueueDrawer';
@@ -234,6 +235,9 @@ export default function App() {
       {/* Persistent Bottom Player */}
       <BottomPlayer />
 
+      {/* Global Toast Notifications for Playback & System Alerts */}
+      <ToastContainer />
+
       {/* Mobile Bottom Navigation Bar */}
       <MobileNav
         currentRoute={currentRoute}
@@ -260,6 +264,126 @@ export default function App() {
         allTracks={lib.allItems}
         onNavigate={navigate}
       />
+
+      {/* Mobile Slide-Over Sidebar Drawer & Backdrop */}
+      {mobileNavOpen && (
+        <div
+          className="md:hidden fixed inset-0 z-50 flex bg-black/70 backdrop-blur-sm animate-fade-in"
+          onClick={() => setMobileNavOpen(false)}
+        >
+          <div
+            className="w-72 max-w-[80vw] h-full bg-bg-secondary border-r border-white/10 shadow-2xl flex flex-col animate-scale-up select-none"
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Drawer Header */}
+            <div className="flex items-center justify-between p-4 border-b border-white/5">
+              <div
+                onClick={() => {
+                  setMobileNavOpen(false);
+                  navigate('home');
+                }}
+                className="flex items-center gap-2.5 cursor-pointer"
+              >
+                <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-accent to-[#f43f5e] flex items-center justify-center text-bg-primary font-black shadow-md">
+                  <Radio className="w-4 h-4 fill-bg-primary stroke-bg-primary" />
+                </div>
+                <span className="font-bold text-sm text-warm-white tracking-tight">
+                  SPiDEY<span className="text-accent">x</span>FLASH
+                </span>
+              </div>
+
+              <button
+                onClick={() => setMobileNavOpen(false)}
+                className="p-1.5 rounded-lg text-warm-muted hover:text-white hover:bg-white/5 transition"
+                aria-label="Close menu"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Navigation Links */}
+            <div className="flex-1 overflow-y-auto p-3 space-y-1.5 no-scrollbar">
+              {[
+                { id: 'home', label: 'Home' },
+                { id: 'library', label: 'Library' },
+                { id: 'search', label: 'Search' },
+                { id: 'liked', label: 'Liked Songs' },
+                { id: 'albums', label: 'Albums' },
+                { id: 'artists', label: 'Artists' },
+                { id: 'recaps', label: 'Recaps' },
+                { id: 'settings', label: 'Settings' },
+              ].map(item => {
+                const isActive = currentRoute === item.id || currentRoute.startsWith(`${item.id}:`);
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => {
+                      setMobileNavOpen(false);
+                      navigate(item.id);
+                    }}
+                    className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold transition ${
+                      isActive
+                        ? 'bg-accent text-bg-primary font-bold shadow-md'
+                        : 'text-warm-muted hover:text-warm-white hover:bg-white/5'
+                    }`}
+                  >
+                    <span>{item.label}</span>
+                    {isActive && <span className="w-1.5 h-1.5 rounded-full bg-bg-primary" />}
+                  </button>
+                );
+              })}
+
+              {/* Admin Link if Authorized */}
+              {isAdmin && (
+                <div className="pt-2 mt-2 border-t border-white/5">
+                  <button
+                    onClick={() => {
+                      setMobileNavOpen(false);
+                      navigate('admin');
+                    }}
+                    className={`w-full flex items-center gap-2 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition ${
+                      currentRoute === 'admin'
+                        ? 'bg-accent text-bg-primary'
+                        : 'bg-accent/15 border border-accent/30 text-accent hover:bg-accent/25'
+                    }`}
+                  >
+                    <span>Admin Dashboard</span>
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Drawer User Footer */}
+            {user && (
+              <div className="p-3 border-t border-white/5 flex items-center justify-between bg-bg-card/40">
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="w-7 h-7 rounded-full overflow-hidden bg-accent/20 flex items-center justify-center text-accent text-xs font-bold border border-white/10">
+                    {(user.displayName?.[0] || user.username?.[0] || 'U').toUpperCase()}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="truncate text-xs font-bold text-warm-white leading-tight">
+                      {user.displayName || user.username}
+                    </p>
+                    <p className="truncate text-[10px] text-warm-muted leading-tight">
+                      {isAdmin ? 'Administrator' : 'Listener'}
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => {
+                    setMobileNavOpen(false);
+                    useAuthStore.getState().logout();
+                  }}
+                  className="px-2.5 py-1 rounded-lg text-xs font-semibold text-red-400 hover:bg-red-500/10 transition"
+                >
+                  Sign Out
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

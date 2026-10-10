@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import { Disc3, Play } from 'lucide-react';
+import React from 'react';
+import { Play } from 'lucide-react';
 import { useAudioStore } from '../../store/useAudioStore';
+import { SafeImage } from '../ui/SafeImage';
 
 export function AlbumCard({ album, onClick }) {
   const playTrack = useAudioStore(s => s.playTrack);
-  const [imgErr, setImgErr] = useState(false);
 
   const handlePlayAlbum = e => {
     e.stopPropagation();
@@ -13,25 +13,21 @@ export function AlbumCard({ album, onClick }) {
     }
   };
 
+  const sampleTrack = album.tracks?.[0] || { title: album.name, artist: album.artist };
+
   return (
     <div
       onClick={onClick}
       className="group relative flex flex-col p-3 rounded-2xl bg-bg-card hover:bg-bg-cardHover border border-white/8 hover:border-white/15 transition-all duration-300 cursor-pointer shadow-md hover:shadow-xl hover:-translate-y-1"
     >
       <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-bg-secondary border border-white/8 mb-3 shadow-inner">
-        {album.thumbnail && !imgErr ? (
-          <img
-            src={album.thumbnail}
-            alt={album.name}
-            onError={() => setImgErr(true)}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-            loading="lazy"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-bg-card to-bg-active text-accent/40">
-            <Disc3 className="w-12 h-12" />
-          </div>
-        )}
+        <SafeImage
+          src={album.thumbnail}
+          track={sampleTrack}
+          alt={album.name}
+          size={300}
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+        />
 
         {/* Hover Play Overlay Button */}
         <button

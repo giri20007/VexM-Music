@@ -15,11 +15,13 @@ import {
   Heart,
   Sliders,
   Music2,
+  Loader2,
 } from 'lucide-react';
 import { useAudioStore } from '../../store/useAudioStore';
 import { seek } from '../../hooks/usePlayer';
 import { formatDuration, formatQualityBadge } from '../../utils/formatters';
-import { getArtworkSrc, getTrackArtworkUrl } from '../../utils/artworkGenerator';
+import { getArtworkSrc } from '../../utils/artworkGenerator';
+import { SafeImage } from '../ui/SafeImage';
 
 // Isolated Scrubber Component with Progress Fill & Hover Tooltip
 const BottomScrubber = memo(function BottomScrubber() {
@@ -51,7 +53,7 @@ const BottomScrubber = memo(function BottomScrubber() {
         <div className="relative w-full h-1 bg-white/10 rounded-full overflow-hidden transition-all group-hover:h-1.5">
           {/* Active Fill */}
           <div
-            className="absolute top-0 left-0 bottom-0 bg-gradient-to-r from-accent to-[#f43f5e] rounded-full transition-all duration-75"
+            className="absolute top-0 left-0 bottom-0 bg-gradient-to-r from-[#00f2fe] via-[#4facfe] to-[#f093fb] rounded-full transition-all duration-75"
             style={{ width: `${percent}%` }}
           />
           {/* Hover Fill */}
@@ -77,7 +79,7 @@ const BottomScrubber = memo(function BottomScrubber() {
 
         {/* Scrubber Thumb */}
         <div
-          className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-white shadow-md shadow-accent/50 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"
+          className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-white shadow-md shadow-cyan-400/60 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"
           style={{ left: `${percent}%` }}
         />
 
@@ -105,7 +107,7 @@ const MobileProgressLine = memo(function MobileProgressLine() {
   return (
     <div className="md:hidden absolute top-0 left-0 right-0 h-1 bg-white/10">
       <div
-        className="h-full bg-gradient-to-r from-accent to-[#f43f5e] transition-all duration-100"
+        className="h-full bg-gradient-to-r from-[#00f2fe] via-[#4facfe] to-[#f093fb] transition-all duration-100"
         style={{ width: `${progressPercent}%` }}
       />
     </div>
@@ -115,6 +117,7 @@ const MobileProgressLine = memo(function MobileProgressLine() {
 export const BottomPlayer = memo(function BottomPlayer() {
   const currentTrack = useAudioStore(s => s.currentTrack);
   const isPlaying = useAudioStore(s => s.isPlaying);
+  const isBuffering = useAudioStore(s => s.isBuffering);
   const volume = useAudioStore(s => s.volume);
   const isMuted = useAudioStore(s => s.isMuted);
   const shuffle = useAudioStore(s => s.shuffle);
@@ -135,8 +138,6 @@ export const BottomPlayer = memo(function BottomPlayer() {
   const setQueueOpen = useAudioStore(s => s.setQueueOpen);
   const setEqualizerOpen = useAudioStore(s => s.setEqualizerOpen);
 
-  const [imgErr, setImgErr] = useState(false);
-
   const isLiked = currentTrack ? likedTrackIds.includes(String(currentTrack.id)) : false;
 
   if (!currentTrack) {
@@ -151,7 +152,7 @@ export const BottomPlayer = memo(function BottomPlayer() {
   }
 
   const quality = formatQualityBadge(currentTrack);
-  const coverSrc = !imgErr ? getArtworkSrc(currentTrack) : getTrackArtworkUrl(currentTrack, 200);
+  const coverSrc = getArtworkSrc(currentTrack);
 
   return (
     <footer className="fixed bottom-0 left-0 right-0 z-30 h-22 md:h-20 bg-bg-secondary/98 backdrop-blur-2xl border-t border-white/8 flex flex-col justify-center px-3 sm:px-6 select-none shadow-2xl">
@@ -165,10 +166,11 @@ export const BottomPlayer = memo(function BottomPlayer() {
             onClick={() => setNowPlayingOpen(true)}
             className="relative w-12 h-12 rounded-xl overflow-hidden bg-bg-card border border-white/10 flex-shrink-0 cursor-pointer shadow-md group"
           >
-            <img
+            <SafeImage
               src={coverSrc}
+              track={currentTrack}
               alt={currentTrack.title}
-              onError={() => setImgErr(true)}
+              size={100}
               className="w-full h-full object-cover transition duration-300 group-hover:scale-105"
             />
             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
@@ -230,12 +232,14 @@ export const BottomPlayer = memo(function BottomPlayer() {
             {/* Main Glowing Round Play/Pause Button */}
             <button
               onClick={togglePlay}
-              className={`w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gradient-to-tr from-[#ff6b6b] via-[#f43f5e] to-[#c084fc] text-bg-primary flex items-center justify-center shadow-lg shadow-rose-500/25 hover:shadow-rose-500/40 hover:scale-105 active:scale-95 transition-all ${
-                isPlaying ? 'ring-2 ring-accent/30' : ''
+              className={`w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gradient-to-tr from-[#00f2fe] via-[#f093fb] to-[#ff5858] text-bg-primary flex items-center justify-center shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:scale-105 active:scale-95 transition-all ${
+                isPlaying && !isBuffering ? 'ring-2 ring-cyan-400/30' : ''
               }`}
-              aria-label={isPlaying ? 'Pause' : 'Play'}
+              aria-label={isBuffering ? 'Buffering' : isPlaying ? 'Pause' : 'Play'}
             >
-              {isPlaying ? (
+              {isBuffering ? (
+                <Loader2 className="w-5 h-5 animate-spin text-bg-primary stroke-[2.5]" />
+              ) : isPlaying ? (
                 <Pause className="w-5 h-5 fill-bg-primary stroke-bg-primary" />
               ) : (
                 <Play className="w-5 h-5 fill-bg-primary stroke-bg-primary ml-0.5" />

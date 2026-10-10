@@ -2,7 +2,8 @@ import React from 'react';
 import { useAudioStore } from '../../store/useAudioStore';
 import { X, Trash2, Shuffle, ArrowUp, ArrowDown, Music2 } from 'lucide-react';
 import { formatDuration } from '../../utils/formatters';
-import { artworkUrl } from '../../utils/api';
+import { getArtworkSrc } from '../../utils/artworkGenerator';
+import { SafeImage } from '../ui/SafeImage';
 
 export function QueueDrawer() {
   const isQueueOpen = useAudioStore(s => s.isQueueOpen);
@@ -76,9 +77,11 @@ export function QueueDrawer() {
               </p>
               <div className="flex items-center gap-3 p-3 rounded-xl bg-bg-active border border-accent/20">
                 <div className="w-10 h-10 rounded-lg overflow-hidden bg-bg-card flex-shrink-0">
-                  <img
-                    src={currentTrack.thumbnail || artworkUrl(currentTrack.id, currentTrack.title)}
+                  <SafeImage
+                    src={getArtworkSrc(currentTrack, 80)}
+                    track={currentTrack}
                     alt={currentTrack.title}
+                    size={80}
                     className="w-full h-full object-cover"
                   />
                 </div>
@@ -111,7 +114,7 @@ export function QueueDrawer() {
                 {queue.map((t, idx) => {
                   const isCurrent = t.id === currentTrack?.id;
                   if (isCurrent) return null;
-                  const cover = t.thumbnail || artworkUrl(t.id, t.title);
+                  const cover = getArtworkSrc(t, 80);
 
                   return (
                     <div
@@ -123,7 +126,7 @@ export function QueueDrawer() {
                         className="flex items-center gap-2.5 min-w-0 flex-1 cursor-pointer"
                       >
                         <div className="w-8 h-8 rounded-lg overflow-hidden bg-bg-secondary flex-shrink-0">
-                          <img src={cover} alt={t.title} className="w-full h-full object-cover" />
+                          <SafeImage src={cover} track={t} alt={t.title} size={80} className="w-full h-full object-cover" />
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="truncate font-medium text-warm-white group-hover:text-accent">

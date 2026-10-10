@@ -2,7 +2,8 @@ import React, { memo, useState } from 'react';
 import { Play, Pause, Heart, Plus, Music2, MoreHorizontal } from 'lucide-react';
 import { useAudioStore } from '../../store/useAudioStore';
 import { formatDuration, formatQualityBadge } from '../../utils/formatters';
-import { getArtworkSrc, getTrackArtworkUrl } from '../../utils/artworkGenerator';
+import { getArtworkSrc } from '../../utils/artworkGenerator';
+import { SafeImage } from '../ui/SafeImage';
 import { TrackContextMenu } from '../layout/TrackContextMenu';
 
 export const TrackRow = memo(function TrackRow({
@@ -19,7 +20,6 @@ export const TrackRow = memo(function TrackRow({
   const toggleLike = useAudioStore(s => s.toggleLike);
   const enqueue = useAudioStore(s => s.enqueue);
 
-  const [hasImgError, setHasImgError] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuPos, setMenuPos] = useState({ x: 0, y: 0 });
 
@@ -39,7 +39,7 @@ export const TrackRow = memo(function TrackRow({
     }
   };
 
-  const coverSrc = !hasImgError ? getArtworkSrc(track) : getTrackArtworkUrl(track, 120);
+  const coverSrc = getArtworkSrc(track, 120);
 
   const handleContextMenu = e => {
     e.preventDefault();
@@ -83,12 +83,12 @@ export const TrackRow = memo(function TrackRow({
 
           {showCover && (
             <div className="relative w-10 h-10 flex-shrink-0 rounded-xl overflow-hidden bg-bg-card border border-white/10 shadow-sm group/cover">
-              <img
+              <SafeImage
                 src={coverSrc}
+                track={track}
                 alt={track.title}
-                onError={() => setHasImgError(true)}
+                size={120}
                 className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                loading="lazy"
               />
               <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/cover:opacity-100 flex items-center justify-center transition-opacity">
                 {isCurrentPlaying ? <Pause className="w-3.5 h-3.5 text-accent fill-current" /> : <Play className="w-3.5 h-3.5 text-white fill-current ml-0.5" />}

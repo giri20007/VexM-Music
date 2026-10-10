@@ -156,6 +156,16 @@ export function usePlayer() {
 
     const S = () => useAudioStore.getState();
 
+    // Global interaction listener to resume suspended AudioContext
+    const handleUserInteraction = () => {
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume().catch(() => {});
+      }
+    };
+    window.addEventListener('click', handleUserInteraction, { passive: true });
+    window.addEventListener('touchstart', handleUserInteraction, { passive: true });
+    window.addEventListener('keydown', handleUserInteraction, { passive: true });
+
     const onTimeUpdate = () => {
       const cur = audio.currentTime;
       S().set({ currentTime: cur });
@@ -170,36 +180,63 @@ export function usePlayer() {
       }
 
       // Gapless Preloading for next track (15 seconds before track end)
-      if (dur > 20 && cur > dur - 15 && preloadAudio) {
+      if (dur > 20 && cur > dur - 15) {
         const queue = S().queue;
         const currentIdx = queue.findIndex(t => t.id === S().currentTrack?.id);
         const nextTrack = currentIdx >= 0 && currentIdx < queue.length - 1 ? queue[currentIdx + 1] : null;
         if (nextTrack && preloadedTrackIdRef.current !== nextTrack.id) {
           preloadedTrackIdRef.current = nextTrack.id;
-          preloadAudio.src = streamUrl(nextTrack.id);
-          preloadAudio.load();
+          // Preload audio
+          if (preloadAudio) {
+            preloadAudio.src = streamUrl(nextTrack.id);
+            preloadAudio.load();
+          }
+          // Preload next track cover
+          if (nextTrack.thumbnail) {
+            const img = new Image();
+            img.src = nextTrack.thumbnail;
+          }
         }
       }
+    };
+
+    const onLoadStart = () => {
+      S().set({ status: 'loading', isBuffering: true });
     };
 
     const onLoadedMetadata = () => {
       S().set({
         duration: audio.duration || S().currentTrack?.duration || 0,
         status: 'ready',
+        isBuffering: false,
       });
     };
 
     const onWaiting = () => {
-      S().set({ status: 'loading' });
+      S().set({ status: 'loading', isBuffering: true });
+    };
+
+    const onCanPlay = () => {
+      S().set({ status: 'ready', isBuffering: false });
+    };
+
+    const onCanPlayThrough = () => {
+      S().set({ status: 'ready', isBuffering: false });
+    };
+
+    const onStalled = () => {
+      if (S().isPlaying) {
+        S().set({ isBuffering: true });
+      }
     };
 
     const onPlaying = () => {
-      S().set({ status: 'ready', isPlaying: true });
+      S().set({ status: 'ready', isPlaying: true, isBuffering: false, error: null });
     };
 
     const onPause = () => {
       if (!audio.ended) {
-        S().set({ isPlaying: false });
+        S().set({ isPlaying: false, isBuffering: false });
       }
     };
 
@@ -208,7 +245,7 @@ export function usePlayer() {
       // Check Sleep Timer "End of track" mode
       if (state.sleepTimer?.mode === 'end_of_track') {
         audio.pause();
-        state.set({ isPlaying: false, sleepTimer: null });
+        state.set({ isPlaying: false, isBuffering: false, sleepTimer: null });
         return;
       }
 
@@ -221,29 +258,58 @@ export function usePlayer() {
       }
     };
 
-    const onError = () => {
+    let errorTimeout = null;
+    const onError = e => {
+      const state = S();
       const isOnline = typeof navigator !== 'undefined' ? navigator.onLine : true;
-      S().set({
+      const trackTitle = state.currentTrack?.title || 'Track';
+      const errMsg = isOnline
+        ? `Stream unavailable for "${trackTitle}". Attempting next track...`
+        : 'Network offline. Check your connection.';
+
+      state.set({
         status: 'error',
         isPlaying: false,
-        error: isOnline
-          ? 'Stream unavailable from Telegram. Retrying or check connection.'
-          : 'Network offline',
+        isBuffering: false,
+        error: errMsg,
       });
+
+      state.showToast(errMsg, 'error', 4500);
+
+      // Auto-advance after a short delay if queue has more tracks
+      if (state.queue.length > 1) {
+        clearTimeout(errorTimeout);
+        errorTimeout = setTimeout(() => {
+          if (useAudioStore.getState().status === 'error') {
+            useAudioStore.getState().next();
+          }
+        }, 2000);
+      }
     };
 
-    audio.addEventListener('timeupdate', onTimeUpdate);
+    audio.addEventListener('loadstart', onLoadStart);
     audio.addEventListener('loadedmetadata', onLoadedMetadata);
     audio.addEventListener('waiting', onWaiting);
+    audio.addEventListener('canplay', onCanPlay);
+    audio.addEventListener('canplaythrough', onCanPlayThrough);
+    audio.addEventListener('stalled', onStalled);
     audio.addEventListener('playing', onPlaying);
     audio.addEventListener('pause', onPause);
     audio.addEventListener('ended', onEnded);
     audio.addEventListener('error', onError);
 
     return () => {
-      audio.removeEventListener('timeupdate', onTimeUpdate);
+      window.removeEventListener('click', handleUserInteraction);
+      window.removeEventListener('touchstart', handleUserInteraction);
+      window.removeEventListener('keydown', handleUserInteraction);
+      clearTimeout(errorTimeout);
+
+      audio.removeEventListener('loadstart', onLoadStart);
       audio.removeEventListener('loadedmetadata', onLoadedMetadata);
       audio.removeEventListener('waiting', onWaiting);
+      audio.removeEventListener('canplay', onCanPlay);
+      audio.removeEventListener('canplaythrough', onCanPlayThrough);
+      audio.removeEventListener('stalled', onStalled);
       audio.removeEventListener('playing', onPlaying);
       audio.removeEventListener('pause', onPause);
       audio.removeEventListener('ended', onEnded);
@@ -285,9 +351,17 @@ export function usePlayer() {
       audioCtx.resume().catch(() => {});
     }
 
+    // Reset audio state before switching source
+    useAudioStore.getState().set({ currentTime: 0, isBuffering: true, error: null });
+
+    // Set CORS before assigning src
+    audio.crossOrigin = 'anonymous';
     audio.src = streamUrl(track.id);
 
     if (useAudioStore.getState().isPlaying) {
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume().catch(() => {});
+      }
       audio.play().catch(e => {
         console.warn('Autoplay prevented or streaming issue:', e.message);
       });

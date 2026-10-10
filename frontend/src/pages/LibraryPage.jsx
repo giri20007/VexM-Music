@@ -19,6 +19,7 @@ import { AlbumCard } from '../components/library/AlbumCard';
 import { ArtistCard } from '../components/library/ArtistCard';
 import { PlaylistCard } from '../components/library/PlaylistCard';
 import { PlaylistCreationModal } from '../components/library/PlaylistCreationModal';
+import { TrackListSkeleton, CardGridSkeleton } from '../components/ui/Skeleton';
 
 export function LibraryPage({ lib, onNavigate }) {
   const [activeTab, setActiveTab] = useState('songs'); // songs | liked | playlists | history | mostPlayed | albums | artists
@@ -213,7 +214,9 @@ export function LibraryPage({ lib, onNavigate }) {
           </div>
 
           {/* Track Table Header & List */}
-          {lib.items.length > 0 ? (
+          {lib.state === 'connecting' && lib.items.length === 0 ? (
+            <TrackListSkeleton count={10} />
+          ) : lib.items.length > 0 ? (
             <div className="bg-bg-secondary/40 p-2 rounded-2xl border border-white/8 space-y-1">
               {/* Standardized Table Column Headers */}
               <div className="flex items-center justify-between gap-3 px-3.5 py-2 text-[11px] font-bold tracking-wider text-warm-muted/70 uppercase border-b border-white/5 select-none">

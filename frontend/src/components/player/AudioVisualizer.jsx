@@ -131,50 +131,55 @@ export function AudioVisualizer({
       // Dynamic Radial Ambient Background Glow
       const ambientRadius = Math.min(width, height) * (0.35 + bass * 0.2);
       const ambientGrad = ctx.createRadialGradient(cx, cy, 10, cx, cy, ambientRadius);
-      ambientGrad.addColorStop(0, `rgba(255, 123, 114, ${0.15 + bass * 0.2})`);
-      ambientGrad.addColorStop(0.5, `rgba(168, 85, 247, ${0.08 + bass * 0.12})`);
+      ambientGrad.addColorStop(0, `rgba(127, 0, 255, ${0.18 + bass * 0.2})`); // Neon Violet
+      ambientGrad.addColorStop(0.4, `rgba(0, 242, 254, ${0.12 + bass * 0.15})`); // Electric Cyan
+      ambientGrad.addColorStop(0.8, `rgba(255, 0, 127, ${0.08 + bass * 0.1})`); // Sunset Crimson
       ambientGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
       ctx.fillStyle = ambientGrad;
       ctx.fillRect(0, 0, width, height);
 
-      // MODE 1: SPECTRUM (Vertical Rounded Frequency Bars)
+      // MODE 1: SPECTRUM (Vertical Rounded Frequency Bars with Tri-Stop Gradient & Reflection)
       if (activeMode === 'spectrum') {
-        const barCount = 42;
-        const totalBarWidth = width * 0.85;
+        const barCount = 44;
+        const totalBarWidth = width * 0.88;
         const dpr = window.devicePixelRatio || 1;
-        const barWidth = totalBarWidth / barCount - 3.5 * dpr;
+        const barWidth = totalBarWidth / barCount - 3 * dpr;
         const startX = (width - totalBarWidth) / 2;
-        const baseHeight = height * 0.72;
+        const baseHeight = height * 0.70;
 
         for (let i = 0; i < barCount; i++) {
           const binIdx = Math.floor((i / barCount) * 64);
           const val = isLiveAudio ? smoothData[binIdx] : 0.04;
-          const barH = Math.max(6 * dpr, val * height * 0.55);
-          const x = startX + i * (barWidth + 3.5 * dpr);
+          const barH = Math.max(6 * dpr, val * height * 0.58);
+          const x = startX + i * (barWidth + 3 * dpr);
           const y = baseHeight - barH;
 
+          // 3-Stop Multi-Color Gradient: Base (Cyan) -> Mid (Magenta) -> Peak (Neon Coral)
           const grad = ctx.createLinearGradient(0, baseHeight, 0, y);
-          grad.addColorStop(0, '#ff7b72');
-          grad.addColorStop(0.6, '#f43f5e');
-          grad.addColorStop(1, '#c084fc');
+          grad.addColorStop(0, '#00f2fe');   // Deep Electric Cyan
+          grad.addColorStop(0.25, '#4facfe'); // Neon Teal
+          grad.addColorStop(0.65, '#f093fb'); // Vivid Magenta / Electric Pink
+          grad.addColorStop(1, '#ff5858');   // Bright Neon Coral / Sunset Amber
 
           ctx.fillStyle = grad;
           ctx.beginPath();
           ctx.roundRect(x, y, barWidth, barH, [4 * dpr, 4 * dpr, 0, 0]);
           ctx.fill();
 
-          const reflH = barH * 0.22;
+          // Mirrored Reflection with Fading Blur
+          const reflH = barH * 0.28;
           const reflGrad = ctx.createLinearGradient(0, baseHeight, 0, baseHeight + reflH);
-          reflGrad.addColorStop(0, 'rgba(255, 123, 114, 0.25)');
-          reflGrad.addColorStop(1, 'rgba(168, 85, 247, 0)');
+          reflGrad.addColorStop(0, 'rgba(0, 242, 254, 0.3)');
+          reflGrad.addColorStop(0.5, 'rgba(240, 147, 251, 0.15)');
+          reflGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
           ctx.fillStyle = reflGrad;
           ctx.beginPath();
-          ctx.roundRect(x, baseHeight + 2, barWidth, reflH, [0, 0, 3, 3]);
+          ctx.roundRect(x, baseHeight + 3 * dpr, barWidth, reflH, [0, 0, 4 * dpr, 4 * dpr]);
           ctx.fill();
         }
       }
 
-      // MODE 2: WAVE (Multi-Layer Flowing Bezier Waveforms)
+      // MODE 2: WAVE (Multi-Layer Flowing Bezier Waveforms with Gradient Accents)
       else if (activeMode === 'wave') {
         const points = 64;
         const step = width / (points - 1);
@@ -182,9 +187,9 @@ export function AudioVisualizer({
         const dpr = window.devicePixelRatio || 1;
 
         const waveLayers = [
-          { alpha: 0.15, amp: 1.1, color: '#ff7b72', offset: 0 },
-          { alpha: 0.35, amp: 0.8, color: '#f43f5e', offset: 1.5 },
-          { alpha: 0.9, amp: 0.55, color: '#ffffff', offset: 3.0 },
+          { alpha: 0.2, amp: 1.1, color1: '#7F00FF', color2: '#00F2FE', offset: 0 },
+          { alpha: 0.45, amp: 0.8, color1: '#f093fb', color2: '#ff5858', offset: 1.5 },
+          { alpha: 0.95, amp: 0.55, color1: '#00f2fe', color2: '#ffffff', offset: 3.0 },
         ];
 
         waveLayers.forEach((layer, lIdx) => {
@@ -219,16 +224,20 @@ export function AudioVisualizer({
             }
           }
 
-          ctx.strokeStyle = layer.color;
-          ctx.lineWidth = (lIdx === 2 ? 3 : 2) * dpr;
-          ctx.shadowColor = '#f43f5e';
-          ctx.shadowBlur = lIdx === 2 ? 14 : 6;
+          const waveGrad = ctx.createLinearGradient(0, 0, width, 0);
+          waveGrad.addColorStop(0, layer.color1);
+          waveGrad.addColorStop(1, layer.color2);
+
+          ctx.strokeStyle = waveGrad;
+          ctx.lineWidth = (lIdx === 2 ? 3.5 : 2) * dpr;
+          ctx.shadowColor = layer.color1;
+          ctx.shadowBlur = lIdx === 2 ? 16 : 8;
           ctx.stroke();
           ctx.shadowBlur = 0;
         });
       }
 
-      // MODE 3: ROUND VFX / ORBITAL (360° Radial Spectrum, Spinning Vinyl, SPiDEYxFLASH Typography & Ambient Glow)
+      // MODE 3: ROUND VFX / ORBITAL (360° Radial Multi-Stop Gradient Spectrum & Neon Violet/Cyan/Crimson Core)
       else {
         if (isPlaying) {
           rotationRef.current += 0.004 + bass * 0.01;
@@ -246,7 +255,7 @@ export function AudioVisualizer({
         const discRadius = minDim * 0.22 * (1 + bass * 0.12);
         const ringOuterRadius = discRadius + 16 * dpr;
 
-        // 2. 360° Radial Frequency Spectrum Equalizer Bars
+        // 2. 360° Radial Frequency Spectrum Equalizer Bars with Multi-Stop Dynamic Gradient
         const rayCount = 64;
         const rayBaseRadius = ringOuterRadius + 4 * dpr;
 
@@ -254,17 +263,29 @@ export function AudioVisualizer({
           const angle = (i / rayCount) * Math.PI * 2 + rot;
           const binIdx = Math.floor((Math.abs(i - rayCount / 2) / (rayCount / 2)) * 52);
           const val = isLiveAudio ? smoothData[binIdx] : 0.06;
-          const rayLen = Math.max(4 * dpr, val * minDim * 0.23 * (1 + bass * 0.3));
+          const rayLen = Math.max(4 * dpr, val * minDim * 0.24 * (1 + bass * 0.35));
 
           const x1 = cx + Math.cos(angle) * rayBaseRadius;
           const y1 = cy + Math.sin(angle) * rayBaseRadius;
           const x2 = cx + Math.cos(angle) * (rayBaseRadius + rayLen);
           const y2 = cy + Math.sin(angle) * (rayBaseRadius + rayLen);
 
+          // Radial progression: Neon Violet (#7F00FF) -> Electric Cyan (#00F2FE) -> Sunset Crimson (#FF007F)
           const rayGrad = ctx.createLinearGradient(x1, y1, x2, y2);
-          rayGrad.addColorStop(0, '#ff6b6b');
-          rayGrad.addColorStop(0.5, '#f43f5e');
-          rayGrad.addColorStop(1, '#c084fc');
+          const normalizedAngle = ((i / rayCount) * 360) % 360;
+          if (normalizedAngle < 120) {
+            rayGrad.addColorStop(0, '#7F00FF');
+            rayGrad.addColorStop(0.5, '#00F2FE');
+            rayGrad.addColorStop(1, '#4facfe');
+          } else if (normalizedAngle < 240) {
+            rayGrad.addColorStop(0, '#00F2FE');
+            rayGrad.addColorStop(0.5, '#f093fb');
+            rayGrad.addColorStop(1, '#FF007F');
+          } else {
+            rayGrad.addColorStop(0, '#FF007F');
+            rayGrad.addColorStop(0.5, '#ff5858');
+            rayGrad.addColorStop(1, '#7F00FF');
+          }
 
           ctx.strokeStyle = rayGrad;
           ctx.lineWidth = 3.2 * dpr;
@@ -512,8 +533,9 @@ export const MiniBeatVisualizer = memo(function MiniBeatVisualizer({
           const y = height - barHeight;
 
           const grad = ctx.createLinearGradient(0, height, 0, y);
-          grad.addColorStop(0, '#ff7b72');
-          grad.addColorStop(1, '#f43f5e');
+          grad.addColorStop(0, '#00f2fe');
+          grad.addColorStop(0.5, '#f093fb');
+          grad.addColorStop(1, '#ff5858');
 
           ctx.fillStyle = grad;
           ctx.beginPath();
@@ -528,7 +550,11 @@ export const MiniBeatVisualizer = memo(function MiniBeatVisualizer({
           const x = i * (barWidth + 1.5);
           const y = height - barHeight;
 
-          ctx.fillStyle = '#ff7b72';
+          const grad = ctx.createLinearGradient(0, height, 0, y);
+          grad.addColorStop(0, '#00f2fe');
+          grad.addColorStop(1, '#ff5858');
+
+          ctx.fillStyle = grad;
           ctx.beginPath();
           ctx.roundRect(x, y, barWidth, barHeight, 2);
           ctx.fill();

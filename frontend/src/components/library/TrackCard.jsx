@@ -1,13 +1,12 @@
-import React, { memo, useState } from 'react';
+import React, { memo } from 'react';
 import { Play, Pause } from 'lucide-react';
 import { useAudioStore } from '../../store/useAudioStore';
-import { getArtworkSrc, getTrackArtworkUrl } from '../../utils/artworkGenerator';
+import { getArtworkSrc } from '../../utils/artworkGenerator';
+import { SafeImage } from '../ui/SafeImage';
 
 export const TrackCard = memo(function TrackCard({ track, onPlay }) {
   const currentTrack = useAudioStore(s => s.currentTrack);
   const isPlaying = useAudioStore(s => s.isPlaying);
-
-  const [imgErr, setImgErr] = useState(false);
 
   const isCurrent = currentTrack?.id === track.id;
   const isCurrentPlaying = isCurrent && isPlaying;
@@ -23,7 +22,7 @@ export const TrackCard = memo(function TrackCard({ track, onPlay }) {
     }
   };
 
-  const coverSrc = !imgErr ? getArtworkSrc(track) : getTrackArtworkUrl(track, 150);
+  const coverSrc = getArtworkSrc(track, 150);
 
   return (
     <div
@@ -34,12 +33,12 @@ export const TrackCard = memo(function TrackCard({ track, onPlay }) {
     >
       {/* Artwork Thumbnail */}
       <div className="relative w-14 h-14 flex-shrink-0 rounded-xl overflow-hidden bg-[#1f1410] border border-white/5 shadow-md">
-        <img
+        <SafeImage
           src={coverSrc}
+          track={track}
           alt={track.title}
-          onError={() => setImgErr(true)}
+          size={150}
           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-          loading="lazy"
         />
 
         {/* Play overlay button */}
