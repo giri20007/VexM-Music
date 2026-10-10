@@ -150,7 +150,11 @@ class CoverDetector {
     const trackFileName = track.fileName || '';
     const groupedId = message?.groupedId ? String(message.groupedId) : null;
     const msgId = message?.id ? Number(message.id) : 0;
-    const hasEmbeddedThumb = Boolean(doc?.thumbs && doc.thumbs.length > 0);
+    const hasEmbeddedThumb = Boolean(
+      (doc?.thumbs && doc.thumbs.length > 0) ||
+      (message?.media?.thumbs && message?.media?.thumbs?.length > 0) ||
+      (message?.media?.document?.thumbs && message?.media?.document?.thumbs?.length > 0)
+    );
 
     let bestArtwork = null;
 
@@ -168,14 +172,14 @@ class CoverDetector {
       };
     }
 
-    // 2. Explicit Album Match from known cover candidates (Confidence = 90 - 95)
-    if (!bestArtwork && trackAlbum && trackAlbum !== 'Unknown Album') {
+    // 2. Explicit Album Match from known cover candidates (Confidence = 95)
+    if (!bestArtwork && trackAlbum && trackAlbum !== 'Unknown Album' && trackAlbum !== 'Single / Unknown Album') {
       const normAlbum = normalizeString(trackAlbum);
-      if (this.albumArtworkMap.has(normAlbum)) {
+      if (normAlbum.length >= 3 && this.albumArtworkMap.has(normAlbum)) {
         const albInfo = this.albumArtworkMap.get(normAlbum);
         bestArtwork = {
           source: 'telegram',
-          confidence: albInfo.confidence || 90,
+          confidence: albInfo.confidence || 95,
           reason: `Matched album release: "${albInfo.album}"`,
           photoMsgId: String(albInfo.photoMsgId),
           mediaGroupId: groupedId,
@@ -185,16 +189,38 @@ class CoverDetector {
       }
     }
 
-    // 3. Match from filename/caption of candidates (Confidence = 85)
-    if (!bestArtwork && (trackTitle || trackFileName)) {
+    // 3. Embedded Audio Artwork (Confidence = 90 - genuine embedded ID3 track artwork)
+    if (!bestArtwork && hasEmbeddedThumb) {
+      bestArtwork = {
+        source: 'embedded',
+        confidence: 90,
+        reason: 'Embedded ID3 audio thumbnail',
+        photoMsgId: null,
+        mediaGroupId: null,
+        artworkUrl: `/api/artwork/${trackId}`,
+        albumArtworkId: `track_${trackId}`,
+      };
+    }
+
+    // 4. Strict match from filename/caption of candidates (Confidence = 80)
+    if (!bestArtwork && (trackTitle || trackFileName || trackAlbum)) {
       const normTitle = normalizeString(trackTitle);
       const normFn = normalizeString(trackFileName);
+      const normAlb = normalizeString(trackAlbum);
 
       for (const cand of this.coverCandidates) {
-        if (cand.album && (normFn.includes(normalizeString(cand.album)) || normTitle.includes(normalizeString(cand.album)))) {
+        if (!cand.album || cand.album === 'Unknown Album') continue;
+        const candNorm = normalizeString(cand.album);
+        if (candNorm.length < 3) continue;
+
+        if (
+          (normAlb && normAlb.length >= 3 && (normAlb.includes(candNorm) || candNorm.includes(normAlb))) ||
+          (normFn && normFn.length >= 4 && normFn.includes(candNorm)) ||
+          (normTitle && normTitle.length >= 4 && normTitle.includes(candNorm))
+        ) {
           bestArtwork = {
             source: 'telegram',
-            confidence: 85,
+            confidence: 80,
             reason: `Cover candidate match: "${cand.album}"`,
             photoMsgId: String(cand.msgId),
             mediaGroupId: cand.groupedId,
@@ -206,38 +232,31 @@ class CoverDetector {
       }
     }
 
-    // 4. Preceding nearby Telegram cover photo (within 35 messages prior) (Confidence = 75 - 80)
+    // 5. Preceding nearby Telegram cover photo ONLY if immediately adjacent (<= 2 msgs) with artist/title match
     if (!bestArtwork && msgId > 0 && this.coverCandidates.length > 0) {
-      // Find the most recent cover photo posted before this track
-      const preceding = this.coverCandidates
-        .filter(c => c.msgId < msgId && msgId - c.msgId <= 35)
+      const immediate = this.coverCandidates
+        .filter(c => c.msgId < msgId && msgId - c.msgId <= 2)
         .sort((a, b) => b.msgId - a.msgId);
 
-      if (preceding.length > 0) {
-        const nearest = preceding[0];
-        bestArtwork = {
-          source: 'telegram',
-          confidence: nearest.isExplicitCover ? 80 : 75,
-          reason: `Nearest release cover (Message #${nearest.msgId})`,
-          photoMsgId: String(nearest.msgId),
-          mediaGroupId: nearest.groupedId,
-          artworkUrl: `/api/artwork/msg_${nearest.msgId}`,
-          albumArtworkId: `msg_${nearest.msgId}`,
-        };
+      if (immediate.length > 0) {
+        const cand = immediate[0];
+        const candArtist = normalizeString(cand.artist);
+        const trArtist = normalizeString(trackArtist);
+        if (
+          (candArtist && trArtist && candArtist.length >= 3 && (candArtist.includes(trArtist) || trArtist.includes(candArtist))) ||
+          (cand.isExplicitCover && msgId - cand.msgId === 1)
+        ) {
+          bestArtwork = {
+            source: 'telegram',
+            confidence: 70,
+            reason: `Adjacent release cover (Message #${cand.msgId})`,
+            photoMsgId: String(cand.msgId),
+            mediaGroupId: cand.groupedId,
+            artworkUrl: `/api/artwork/msg_${cand.msgId}`,
+            albumArtworkId: `msg_${cand.msgId}`,
+          };
+        }
       }
-    }
-
-    // 5. Embedded Audio Artwork (Confidence = 60)
-    if (!bestArtwork && hasEmbeddedThumb) {
-      bestArtwork = {
-        source: 'embedded',
-        confidence: 60,
-        reason: 'Embedded ID3 audio thumbnail',
-        photoMsgId: null,
-        mediaGroupId: null,
-        artworkUrl: `/api/artwork/${trackId}`,
-        albumArtworkId: `track_${trackId}`,
-      };
     }
 
     // 6. Fallback (Confidence = 0)
@@ -245,7 +264,7 @@ class CoverDetector {
       bestArtwork = {
         source: 'fallback',
         confidence: 0,
-        reason: 'No Telegram cover candidate or embedded thumbnail found',
+        reason: 'No matching Telegram cover photo or embedded thumbnail found',
         photoMsgId: null,
         mediaGroupId: null,
         artworkUrl: `/api/artwork/${trackId}`,
