@@ -1,3 +1,7 @@
-const app = require('../backend/server');
+const app = require('../frontend/api/server/server');
 
-module.exports = app;
+module.exports = (req, res) => {
+  return app(req, res);
+};
+
+module.exports.default = app;

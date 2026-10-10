@@ -31,6 +31,9 @@ backend/data/artwork_cache/
 backend/data/cache/
 backend/data/*.json
 backend/data/*.txt
+frontend/api/server/data/spx-session.txt
+frontend/api/server/data/artwork_cache/
+
 .DS_Store
 Thumbs.db
 .vscode/
