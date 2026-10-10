@@ -6,6 +6,7 @@ import { ArtistCard } from '../components/library/ArtistCard';
 import { AlbumCard } from '../components/library/AlbumCard';
 import { formatDuration } from '../utils/formatters';
 import { getArtistArtworkSrc } from '../utils/artworkGenerator';
+import { SafeImage } from '../components/ui/SafeImage';
 
 export function ArtistsPage({ lib, selectedArtistName, onNavigate, onBack }) {
   const playTrack = useAudioStore(s => s.playTrack);
@@ -68,10 +69,12 @@ export function ArtistsPage({ lib, selectedArtistName, onNavigate, onBack }) {
 
           {/* Large Circular Artist Portrait */}
           <div className="relative w-36 h-36 sm:w-48 sm:h-48 rounded-full overflow-hidden bg-bg-card border-4 border-white/10 shadow-2xl flex-shrink-0 group">
-            <img
+            <SafeImage
               src={avatar}
+              fallbackType="artist"
+              artistName={selectedArtist.name}
               alt={selectedArtist.name}
-              onError={() => setImgErr(true)}
+              size={300}
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
           </div>

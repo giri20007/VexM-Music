@@ -5,6 +5,7 @@ import { TrackCard } from '../components/library/TrackCard';
 import { TrackRow } from '../components/library/TrackRow';
 import { AlbumCard } from '../components/library/AlbumCard';
 import { ArtistCard } from '../components/library/ArtistCard';
+import { SafeImage } from '../components/ui/SafeImage';
 import { getArtworkSrc, getTrackArtworkUrl } from '../utils/artworkGenerator';
 
 export function HomePage({ lib, onNavigate }) {
@@ -96,10 +97,11 @@ export function HomePage({ lib, onNavigate }) {
               className="group relative aspect-[4/3] w-full rounded-3xl overflow-hidden bg-bg-card border border-white/10 shadow-2xl cursor-pointer"
             >
               {/* Image */}
-              <img
+              <SafeImage
                 src={heroCover}
+                track={newestTrack}
                 alt={newestTrack.title}
-                onError={() => setHeroImgErr(true)}
+                size={600}
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
 

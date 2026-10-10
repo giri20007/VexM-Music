@@ -510,6 +510,7 @@ export function usePlayer() {
       currentTime: 0,
       duration: trackDur,
       isBuffering: true,
+      status: 'loading',
       error: null,
     });
 
@@ -521,9 +522,22 @@ export function usePlayer() {
       if (audioCtx && audioCtx.state === 'suspended') {
         audioCtx.resume().catch(() => {});
       }
-      audio.play().catch(e => {
-        console.warn('Autoplay prevented or streaming issue:', e.message);
-      });
+      const p = audio.play();
+      if (p !== undefined) {
+        p.catch(e => {
+          console.warn('[AudioEngine] Initial audio.play() rejected:', e.name, e.message);
+          if (e.name === 'NotAllowedError') {
+            useAudioStore.getState().set({ isPlaying: false, isBuffering: false, status: 'paused' });
+          } else if (e.name !== 'AbortError') {
+            useAudioStore.getState().set({
+              isPlaying: false,
+              isBuffering: false,
+              status: 'error',
+              error: `Unable to start playback: ${e.message}`,
+            });
+          }
+        });
+      }
     }
 
     // MediaSession API Integration (Lockscreen controls & artwork)
@@ -551,14 +565,29 @@ export function usePlayer() {
     }
   }, [track?.id]);
 
-  // 3. Play / Pause State
+  // 3. Play / Pause State Controller
   useEffect(() => {
     if (!audio || !track) return;
     if (isPlaying && audio.paused) {
       if (audioCtx && audioCtx.state === 'suspended') {
-        audioCtx.resume();
+        audioCtx.resume().catch(() => {});
       }
-      audio.play().catch(() => {});
+      const p = audio.play();
+      if (p !== undefined) {
+        p.catch(e => {
+          console.warn('[AudioEngine] Playback promise error on toggle:', e.name, e.message);
+          if (e.name === 'NotAllowedError') {
+            useAudioStore.getState().set({ isPlaying: false, isBuffering: false, status: 'paused' });
+          } else if (e.name !== 'AbortError') {
+            useAudioStore.getState().set({
+              isPlaying: false,
+              isBuffering: false,
+              status: 'error',
+              error: `Unable to start playback: ${e.message}`,
+            });
+          }
+        });
+      }
     }
     if (!isPlaying && !audio.paused) {
       audio.pause();

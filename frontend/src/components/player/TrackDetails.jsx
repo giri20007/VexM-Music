@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { formatDuration, formatFileSize, formatDate } from '../../utils/formatters';
 import { getDetailedDiagnostics } from '../../hooks/usePlayer';
-import { Database, FileAudio, Headphones, Radio, Sparkles, Activity, Wifi, Gauge } from 'lucide-react';
+import { IsolatedAudioTest } from './IsolatedAudioTest';
+import { Database, FileAudio, Headphones, Radio, Sparkles, Activity, Wifi, Gauge, Terminal } from 'lucide-react';
 
 export function TrackDetails({ track }) {
   if (!track) return null;
 
   const [diagnostics, setDiagnostics] = useState(getDetailedDiagnostics());
+  const [showIsolatedTest, setShowIsolatedTest] = useState(false);
 
   useEffect(() => {
     setDiagnostics(getDetailedDiagnostics());
@@ -32,6 +34,15 @@ export function TrackDetails({ track }) {
 
   return (
     <div className="h-full overflow-y-auto pr-2 space-y-4 no-scrollbar select-none text-xs font-sans">
+      {/* Isolated Test Modal Trigger */}
+      {showIsolatedTest && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
+          <div className="w-full max-w-4xl max-h-[90vh] overflow-y-auto no-scrollbar">
+            <IsolatedAudioTest track={track} onClose={() => setShowIsolatedTest(false)} />
+          </div>
+        </div>
+      )}
+
       {/* 1. Real-time Stream & Buffer Diagnostics */}
       <div className="p-3.5 rounded-2xl bg-gradient-to-br from-bg-card to-bg-secondary border border-cyan-500/20 space-y-3">
         <div className="flex items-center justify-between">
@@ -39,10 +50,13 @@ export function TrackDetails({ track }) {
             <Wifi className="w-4 h-4" />
             <span>Network & Buffer Pipeline</span>
           </div>
-          <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-[10px] font-semibold border border-emerald-500/20">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            HTTP 206 Partial Content
-          </span>
+          <button
+            onClick={() => setShowIsolatedTest(true)}
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 text-[10px] font-bold border border-cyan-500/30 transition shadow"
+          >
+            <Terminal className="w-3 h-3" />
+            <span>Isolated Audio Test</span>
+          </button>
         </div>
 
         <div className="grid grid-cols-2 gap-2">

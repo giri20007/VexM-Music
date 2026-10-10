@@ -23,6 +23,7 @@ import { useSettingsStore } from '../../store/useSettingsStore';
 import { seek } from '../../hooks/usePlayer';
 import { formatDuration, formatQualityBadge } from '../../utils/formatters';
 import { getArtworkSrc } from '../../utils/artworkGenerator';
+import { SafeImage } from '../ui/SafeImage';
 import { AudioVisualizer } from './AudioVisualizer';
 import { LyricsView } from './LyricsView';
 
@@ -259,7 +260,13 @@ export function FullscreenVisualizerModal({ isOpen, onClose }) {
           {/* Left: Floating Track Pill with Thumbnail */}
           <div className="flex items-center gap-3 min-w-0 max-w-xs">
             <div className="w-11 h-11 rounded-xl overflow-hidden bg-bg-card border border-white/10 shadow-lg flex-shrink-0">
-              <img src={coverSrc} alt={currentTrack.title} className="w-full h-full object-cover" />
+              <SafeImage
+                src={coverSrc}
+                track={currentTrack}
+                alt={currentTrack.title}
+                size={100}
+                className="w-full h-full object-cover"
+              />
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">

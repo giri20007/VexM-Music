@@ -18,6 +18,7 @@ import {
   Menu,
   X,
   Sparkles,
+  Activity,
 } from 'lucide-react';
 import { useAdminStore } from '../store/useAdminStore';
 import { AdminLogin } from '../components/admin/AdminLogin';
@@ -33,6 +34,7 @@ import { AdminTelegram } from '../components/admin/AdminTelegram';
 import { AdminCache } from '../components/admin/AdminCache';
 import { AdminSystem } from '../components/admin/AdminSystem';
 import { AdminLogs } from '../components/admin/AdminLogs';
+import { IsolatedAudioTest } from '../components/player/IsolatedAudioTest';
 
 export function AdminPage({ onBackToApp }) {
   const isAuthenticated = useAdminStore(s => s.isAuthenticated);
@@ -72,6 +74,7 @@ export function AdminPage({ onBackToApp }) {
     { id: 'playlists', label: 'Playlists', icon: ListMusic },
     { id: 'users', label: 'Users', icon: UserCheck },
     { id: 'telegram', label: 'Telegram & Sync', icon: Radio },
+    { id: 'diagnostics', label: 'Audio Pipeline Diagnostic', icon: Activity },
     { id: 'cache', label: 'Cache Manager', icon: Database },
     { id: 'system', label: 'System Logs', icon: Server },
   ];
@@ -209,6 +212,7 @@ export function AdminPage({ onBackToApp }) {
           {activeTab === 'playlists' && <AdminPlaylists />}
           {activeTab === 'users' && <AdminUsers />}
           {activeTab === 'telegram' && <AdminTelegram />}
+          {activeTab === 'diagnostics' && <IsolatedAudioTest />}
           {activeTab === 'cache' && <AdminCache />}
           {activeTab === 'system' && (
             <div className="space-y-8">

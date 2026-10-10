@@ -5,6 +5,7 @@ import { TrackRow } from '../components/library/TrackRow';
 import { AlbumCard } from '../components/library/AlbumCard';
 import { formatDuration, formatQualityBadge } from '../utils/formatters';
 import { getArtworkSrc } from '../utils/artworkGenerator';
+import { SafeImage } from '../components/ui/SafeImage';
 
 export function AlbumsPage({ lib, selectedAlbumName, onNavigate, onBack }) {
   const playTrack = useAudioStore(s => s.playTrack);
@@ -106,17 +107,12 @@ export function AlbumsPage({ lib, selectedAlbumName, onNavigate, onBack }) {
 
           {/* High-Res Artwork */}
           <div className="relative w-36 h-36 sm:w-48 sm:h-48 rounded-2xl overflow-hidden bg-bg-card border border-white/10 shadow-2xl flex-shrink-0 group">
-            {coverSrc ? (
-              <img
-                src={coverSrc}
-                alt={selectedAlbum.name}
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-accent/40 bg-gradient-to-br from-[#24130d] to-bg-card">
-                <Disc3 className="w-20 h-20" />
-              </div>
-            )}
+            <SafeImage
+              src={coverSrc}
+              alt={selectedAlbum.name}
+              size={400}
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
 
             {isTelegramCover && (
               <div
