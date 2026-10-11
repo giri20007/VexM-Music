@@ -2,7 +2,6 @@ import React from 'react';
 import { Heart, Play, Shuffle } from 'lucide-react';
 import { useAudioStore } from '../store/useAudioStore';
 import { TrackRow } from '../components/library/TrackRow';
-import { AppFooter } from '../components/layout/AppFooter';
 import { formatDuration } from '../utils/formatters';
 
 export function LikedSongsPage({ allTracks = [], onNavigate }) {
@@ -32,23 +31,23 @@ export function LikedSongsPage({ allTracks = [], onNavigate }) {
   };
 
   return (
-    <div className="flex-1 w-full bg-[#000000] text-white select-none animate-fade-in pb-16">
+    <div className="flex-1 w-full bg-[#000000] text-white select-none animate-fade-in pb-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-8 pt-6 pb-12 space-y-6">
         {/* Header Banner */}
-        <div className="relative overflow-hidden flex flex-col sm:flex-row sm:items-end gap-6 p-6 sm:p-8 rounded-3xl bg-gradient-to-tr from-[#240b10] via-[#150709] to-[#0a0a0a] border border-[#fa2d48]/20 shadow-2xl">
-          <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-2xl bg-gradient-to-br from-[#fa2d48] to-[#990024] flex items-center justify-center text-white shadow-xl shadow-[#fa2d48]/20 flex-shrink-0">
-            <Heart className="w-14 h-14 fill-white stroke-white" />
+        <div className="flex flex-col sm:flex-row sm:items-end gap-6 pt-4 pb-2">
+          <div className="w-36 h-36 sm:w-44 sm:h-44 rounded-2xl bg-gradient-to-br from-[#fa2d48] to-[#670014] flex items-center justify-center text-white shadow-2xl flex-shrink-0">
+            <Heart className="w-16 h-16 fill-white stroke-white" />
           </div>
 
-          <div className="space-y-2 flex-1">
-            <span className="text-[10px] font-black uppercase tracking-widest text-[#fa2d48] px-2.5 py-0.5 rounded-full bg-[#fa2d48]/15 border border-[#fa2d48]/30">
-              Personal Collection
+          <div className="space-y-3 flex-1">
+            <span className="text-xs font-bold uppercase tracking-wider text-white/50">
+              Playlist
             </span>
-            <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
+            <h1 className="text-3xl sm:text-6xl font-black text-white tracking-tight">
               Liked Songs
             </h1>
             <p className="text-xs sm:text-sm text-white/50">
-              {likedTracks.length} tracks · {formatDuration(totalDuration)} total duration
+              {likedTracks.length} tracks · {formatDuration(totalDuration)}
             </p>
 
             {/* Action Buttons */}
@@ -99,9 +98,6 @@ export function LikedSongsPage({ allTracks = [], onNavigate }) {
           </div>
         )}
       </div>
-
-      {/* Global Footer */}
-      <AppFooter onNavigate={onNavigate} />
     </div>
   );
 }

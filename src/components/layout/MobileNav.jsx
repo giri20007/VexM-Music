@@ -1,5 +1,5 @@
 import React from 'react';
-import { Compass, Search, Library, Users, Disc3, Play, Pause, SkipForward, SkipBack, Music2 } from 'lucide-react';
+import { Home, Search, Library, Users, Disc3, Play, Pause, SkipForward, SkipBack, Music2 } from 'lucide-react';
 import { useAudioStore } from '../../store/useAudioStore';
 import { getArtworkSrc } from '../../utils/artworkGenerator';
 
@@ -14,17 +14,17 @@ export function MobileNav({ currentRoute, onNavigate }) {
   const setNowPlayingOpen = useAudioStore(s => s.setNowPlayingOpen);
 
   const navItems = [
-    { id: 'home', label: 'New', icon: Compass },
+    { id: 'home', label: 'Home', icon: Home },
     { id: 'search', label: 'Search', icon: Search },
-    { id: 'library', label: 'Library', icon: Library },
-    { id: 'artists', label: 'Artists', icon: Users },
     { id: 'albums', label: 'Albums', icon: Disc3 },
+    { id: 'artists', label: 'Artists', icon: Users },
+    { id: 'library', label: 'Library', icon: Library },
   ];
 
   const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-bg-secondary/98 backdrop-blur-xl border-t border-white/10 select-none pb-[env(safe-area-inset-bottom,0px)]">
+    <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0a0a0a]/98 backdrop-blur-xl border-t border-white/10 select-none pb-[env(safe-area-inset-bottom,0px)]">
       {/* Mobile Mini-Player Bar (shown when track is loaded) */}
       {currentTrack && (
         <div
@@ -74,13 +74,13 @@ export function MobileNav({ currentRoute, onNavigate }) {
                 e.stopPropagation();
                 togglePlay();
               }}
-              className="w-10 h-10 rounded-full bg-accent text-bg-primary flex items-center justify-center shadow-md shadow-accent/25 active:scale-90 transition"
+              className="w-10 h-10 rounded-full bg-[#fa2d48] text-white flex items-center justify-center shadow-md shadow-[#fa2d48]/25 active:scale-90 transition"
               aria-label={isPlaying ? 'Pause' : 'Play'}
             >
               {isPlaying ? (
-                <Pause className="w-4 h-4 fill-bg-primary stroke-bg-primary" />
+                <Pause className="w-4 h-4 fill-white" />
               ) : (
-                <Play className="w-4 h-4 fill-bg-primary stroke-bg-primary ml-0.5" />
+                <Play className="w-4 h-4 fill-white ml-0.5" />
               )}
             </button>
 
@@ -89,7 +89,7 @@ export function MobileNav({ currentRoute, onNavigate }) {
                 e.stopPropagation();
                 next();
               }}
-              className="w-9 h-9 flex items-center justify-center text-warm-muted hover:text-white rounded-full transition active:scale-95"
+              className="w-9 h-9 flex items-center justify-center text-white/60 hover:text-white rounded-full transition active:scale-95"
               aria-label="Next track"
             >
               <SkipForward className="w-4 h-4 fill-current" />
@@ -98,7 +98,7 @@ export function MobileNav({ currentRoute, onNavigate }) {
         </div>
       )}
 
-      {/* Bottom Navigation Buttons (Home, Search, Library, Artists, Albums) */}
+      {/* Bottom Navigation Buttons */}
       <div className="flex items-center justify-around py-1.5 px-2">
         {navItems.map(item => {
           const Icon = item.icon;
@@ -111,7 +111,7 @@ export function MobileNav({ currentRoute, onNavigate }) {
               key={item.id}
               onClick={() => onNavigate(item.id)}
               className={`flex flex-col items-center justify-center min-w-[56px] min-h-[44px] py-1 px-2 rounded-xl text-[10px] font-bold transition ${
-                isActive ? 'text-accent' : 'text-warm-muted hover:text-warm-white'
+                isActive ? 'text-[#fa2d48]' : 'text-white/50 hover:text-white'
               }`}
             >
               <Icon className={`w-5 h-5 mb-0.5 ${isActive ? 'stroke-[2.5]' : ''}`} />

@@ -60,16 +60,16 @@ export const TrackRow = memo(function TrackRow({
       <div
         onClick={handlePlayClick}
         onContextMenu={handleContextMenu}
-        className={`group relative flex items-center justify-between gap-3 rounded-2xl px-3.5 py-2.5 text-sm transition-all duration-200 cursor-pointer select-none border border-transparent ${
+        className={`group relative flex items-center justify-between gap-3 rounded-xl px-3 py-2 text-sm transition-colors cursor-pointer select-none ${
           isCurrent
-            ? 'bg-bg-active text-white border-accent/20 shadow-sm'
-            : 'hover:bg-bg-card/90 hover:border-white/5 text-warm-white'
+            ? 'bg-white/10 text-white'
+            : 'hover:bg-white/[0.06] text-white'
         }`}
       >
         {/* Left: Index / Play Icon + Cover + Title/Artist */}
         <div className="flex items-center gap-3.5 min-w-0 flex-1">
           {showNumber && (
-            <div className="w-6 text-center text-xs font-mono font-medium text-warm-muted group-hover:text-warm-white flex items-center justify-center flex-shrink-0">
+            <div className="w-6 text-center text-xs font-mono font-medium text-white/40 group-hover:text-white flex items-center justify-center flex-shrink-0">
               <span className="group-hover:hidden">{isCurrentPlaying ? '▶' : index !== undefined ? index + 1 : ''}</span>
               <button
                 onClick={handlePlayClick}
@@ -97,41 +97,40 @@ export const TrackRow = memo(function TrackRow({
           )}
 
           <div className="min-w-0 flex-1">
-            <p className={`truncate font-semibold text-[13.5px] ${isCurrent ? 'text-accent' : 'text-warm-white group-hover:text-warm-white'}`}>
+            <p className={`truncate font-medium text-sm ${isCurrent ? 'text-[#fa2d48]' : 'text-white'}`}>
               {track.title}
             </p>
-            <p className="truncate text-xs text-warm-muted group-hover:text-warm-muted/90">
+            <p className="truncate text-xs text-white/50">
               {track.artist}
-              {showAlbum && track.album && track.album !== 'Unknown Album' ? ` · ${track.album}` : ''}
             </p>
           </div>
         </div>
 
-        {/* Center: Audio Quality Pill */}
-        {quality && (
-          <div className="hidden sm:block flex-shrink-0">
-            <span className={`text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full border shadow-xs ${quality.color}`}>
-              {quality.label}
-            </span>
+        {/* Center: Album Name (Desktop) */}
+        {showAlbum && track.album && (
+          <div className="hidden md:block flex-1 min-w-0 max-w-xs px-4">
+            <p className="truncate text-xs text-white/40 hover:text-white transition-colors">
+              {track.album}
+            </p>
           </div>
         )}
 
         {/* Right: Like + Duration + Actions */}
-        <div className="flex items-center gap-2 sm:gap-3 text-xs text-warm-muted flex-shrink-0">
+        <div className="flex items-center gap-2 sm:gap-3 text-xs text-white/40 flex-shrink-0">
           <button
             onClick={e => {
               e.stopPropagation();
               toggleLike(track.id);
             }}
-            className={`p-1.5 rounded-full transition-transform hover:scale-125 ${
-              isLiked ? 'text-accent fill-accent' : 'opacity-0 group-hover:opacity-100 text-warm-muted hover:text-white'
+            className={`p-1.5 rounded-full transition ${
+              isLiked ? 'text-[#fa2d48]' : 'opacity-0 group-hover:opacity-100 hover:text-white'
             }`}
             aria-label={isLiked ? 'Unlike' : 'Like'}
           >
-            <Heart className={`w-4 h-4 ${isLiked ? 'fill-accent' : ''}`} />
+            <Heart className={`w-4 h-4 ${isLiked ? 'fill-[#fa2d48]' : ''}`} />
           </button>
 
-          <span className="w-12 text-right tabular-nums font-mono text-[11px] text-warm-muted">
+          <span className="w-12 text-right tabular-nums text-xs text-white/40">
             {formatDuration(track.duration)}
           </span>
 
@@ -140,7 +139,7 @@ export const TrackRow = memo(function TrackRow({
               e.stopPropagation();
               enqueue(track);
             }}
-            className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-white/10 text-warm-muted hover:text-white transition"
+            className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-white/10 hover:text-white transition"
             title="Add to queue"
             aria-label="Add to queue"
           >
@@ -149,7 +148,7 @@ export const TrackRow = memo(function TrackRow({
 
           <button
             onClick={handleMoreClick}
-            className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-white/10 text-warm-muted hover:text-white transition"
+            className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-white/10 hover:text-white transition"
             title="More options"
             aria-label="More options"
           >

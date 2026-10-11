@@ -7,7 +7,6 @@ import { searchUnified, fetchSaavnTrending, fetchYouTubeTrending, fetchYouTubeSu
 import { useAudioStore } from '../store/useAudioStore';
 import { useSettingsStore } from '../store/useSettingsStore';
 import { ProviderSourceBar } from '../components/layout/ProviderSourceBar';
-import { AppFooter } from '../components/layout/AppFooter';
 
 export function SearchPage({ lib, onNavigate }) {
   const playTrack = useAudioStore(s => s.playTrack);
@@ -257,9 +256,6 @@ export function SearchPage({ lib, onNavigate }) {
           )}
         </div>
       )}
-
-      {/* Global Apple/Tidal Styled Footer */}
-      <AppFooter onNavigate={onNavigate} />
     </div>
   );
 }

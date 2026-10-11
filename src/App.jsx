@@ -228,17 +228,6 @@ export default function App() {
               />
             )}
 
-            {currentRoute === 'recaps' && (
-              <div className="flex-1 max-w-7xl mx-auto w-full p-6 space-y-6">
-                <h2 className="text-2xl font-black text-warm-white">Your Listening Recap</h2>
-                <div className="p-8 rounded-3xl bg-bg-card border border-white/5 space-y-4">
-                  <p className="text-sm font-semibold text-accent">VexM Music Discovery</p>
-                  <p className="text-xs text-warm-muted leading-relaxed max-w-lg">
-                    You have discovered {lib.total} tracks across {lib.albums.length} albums and {lib.artists.length} artists in your music vault.
-                  </p>
-                </div>
-              </div>
-            )}
 
             {currentRoute.startsWith('settings') && (
               <SettingsPage

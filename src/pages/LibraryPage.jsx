@@ -23,7 +23,6 @@ import { ArtistCard } from '../components/library/ArtistCard';
 import { PlaylistCard } from '../components/library/PlaylistCard';
 import { PlaylistCreationModal } from '../components/library/PlaylistCreationModal';
 import { TrackListSkeleton } from '../components/ui/Skeleton';
-import { AppFooter } from '../components/layout/AppFooter';
 import { formatDuration } from '../utils/formatters';
 
 export function LibraryPage({ lib, onNavigate }) {
@@ -501,9 +500,6 @@ export function LibraryPage({ lib, onNavigate }) {
           onCreated={newPl => onNavigate(`playlist:${newPl.id}`)}
         />
       </div>
-
-      {/* Global Footer */}
-      <AppFooter onNavigate={onNavigate} />
     </div>
   );
 }

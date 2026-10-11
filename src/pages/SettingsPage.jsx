@@ -21,7 +21,6 @@ import {
 import { useSettingsStore } from '../store/useSettingsStore';
 import { useAudioStore } from '../store/useAudioStore';
 import { checkHealth, BASE_URL } from '../utils/api';
-import { AppFooter } from '../components/layout/AppFooter';
 
 export function SettingsPage({ initialTab = 'appearance', onNavigate }) {
   const [activeTab, setActiveTab] = useState(initialTab.replace('settings:', '') || 'appearance');
@@ -481,8 +480,6 @@ export function SettingsPage({ initialTab = 'appearance', onNavigate }) {
           )}
         </div>
       </div>
-
-      <AppFooter onNavigate={onNavigate} />
     </div>
   );
 }

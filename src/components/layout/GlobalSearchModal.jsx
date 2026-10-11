@@ -226,23 +226,8 @@ export function GlobalSearchModal({ allTracks = [], onNavigate }) {
                 </div>
 
                 <div className="flex items-center gap-2 pl-3 flex-shrink-0">
-                  {(t.isOwnTg || t.isTelegram) && (
-                    <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-300 border border-sky-500/30">
-                      OwnTg
-                    </span>
-                  )}
-                  {t.is320k && (
-                    <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                      320k
-                    </span>
-                  )}
-                  {t.isYouTube && (
-                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-red-500/20 text-red-300 border border-red-500/30">
-                      YouTube
-                    </span>
-                  )}
                   {t.duration > 0 && (
-                    <span className="text-xs font-mono text-white/40">
+                    <span className="text-xs text-white/40">
                       {t.durationFormatted || formatDuration(t.duration)}
                     </span>
                   )}
