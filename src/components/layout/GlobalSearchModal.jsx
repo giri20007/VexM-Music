@@ -6,7 +6,7 @@ import { formatDuration } from '../../utils/formatters';
 import { getArtworkSrc } from '../../utils/artworkGenerator';
 import { searchUnified, fetchYouTubeSuggestions } from '../../utils/api';
 import { SafeImage } from '../ui/SafeImage';
-import { ProviderSourceBar } from './ProviderSourceBar';
+import { ProviderSourceButton } from './ProviderSourceButton';
 
 export function GlobalSearchModal({ allTracks = [], onNavigate }) {
   const isSearchModalOpen = useAudioStore(s => s.isSearchModalOpen);
@@ -119,39 +119,38 @@ export function GlobalSearchModal({ allTracks = [], onNavigate }) {
         onClick={e => e.stopPropagation()}
       >
         {/* Search Header */}
-        <div className="relative flex items-center px-4 py-3.5 border-b border-white/5 bg-[#1a1a1a]">
-          <Search className="w-5 h-5 text-[#fa2d48] mr-3 flex-shrink-0" />
+        <div className="relative flex items-center px-4 py-3 border-b border-white/5 bg-[#1a1a1a] gap-2">
+          <Search className="w-4 h-4 text-[#fa2d48] flex-shrink-0" />
           <input
             ref={inputRef}
             type="search"
             value={query}
             onChange={e => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Search any song, artist, or album across sources..."
-            className="flex-1 bg-transparent text-sm sm:text-base text-white placeholder-white/40 focus:outline-none"
+            placeholder="Search any song, artist, or album..."
+            className="flex-1 bg-transparent text-sm sm:text-base text-white placeholder-white/40 focus:outline-none min-w-0"
           />
           {isSearchingYt && (
-            <Loader2 className="w-4 h-4 text-[#fa2d48] animate-spin mr-3 flex-shrink-0" />
+            <Loader2 className="w-4 h-4 text-[#fa2d48] animate-spin flex-shrink-0" />
           )}
           {query && (
             <button
               onClick={() => setQuery('')}
-              className="p-1 rounded-full text-white/50 hover:text-white hover:bg-white/10 transition mr-2"
+              className="p-1 rounded-full text-white/50 hover:text-white hover:bg-white/10 transition flex-shrink-0"
             >
               <X className="w-4 h-4" />
             </button>
           )}
-          <span className="hidden sm:inline-block px-2 py-0.5 rounded bg-white/10 text-[10px] font-mono text-white/50">
-            ESC
-          </span>
-        </div>
 
-        {/* Source Switcher */}
-        <div className="px-3 py-2 bg-[#121212] border-b border-white/5 flex items-center justify-between">
-          <ProviderSourceBar compact />
-          <span className="text-[10px] uppercase font-mono tracking-wider text-white/30 hidden sm:inline">
-            Vex-M Live
-          </span>
+          {/* Compact Single Source Button */}
+          <ProviderSourceButton compact />
+
+          <button
+            onClick={() => setSearchModalOpen(false)}
+            className="hidden sm:inline-block px-2 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-[10px] font-mono text-white/50 hover:text-white transition"
+          >
+            ESC
+          </button>
         </div>
 
         {/* Suggestions chips */}

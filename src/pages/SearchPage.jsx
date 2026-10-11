@@ -6,7 +6,7 @@ import { ArtistCard } from '../components/library/ArtistCard';
 import { searchUnified, fetchSaavnTrending, fetchYouTubeTrending, fetchYouTubeSuggestions } from '../utils/api';
 import { useAudioStore } from '../store/useAudioStore';
 import { useSettingsStore } from '../store/useSettingsStore';
-import { ProviderSourceBar } from '../components/layout/ProviderSourceBar';
+import { ProviderSourceButton } from '../components/layout/ProviderSourceButton';
 
 export function SearchPage({ lib, onNavigate }) {
   const playTrack = useAudioStore(s => s.playTrack);
@@ -85,34 +85,34 @@ export function SearchPage({ lib, onNavigate }) {
   return (
     <div className="flex-1 max-w-7xl mx-auto w-full p-4 sm:p-6 space-y-6 select-none">
       {/* Search Bar Header */}
-      <div className="space-y-3 max-w-2xl">
-        <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#fa2d48]" />
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 max-w-3xl">
+        <div className="relative flex-1">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#fa2d48]" />
           <input
             type="search"
             autoFocus
-            placeholder="Search songs, artists, or albums across all engines..."
+            placeholder="Search songs, artists, or albums..."
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            className="w-full pl-12 pr-12 py-3.5 rounded-2xl bg-[#1c1c1e] hover:bg-[#242426] focus:bg-[#242426] border border-white/10 text-sm sm:text-base text-white placeholder-[#8e8e93] focus:outline-none focus:ring-2 focus:ring-[#fa2d48] transition shadow-xl"
+            className="w-full pl-11 pr-12 py-3 rounded-2xl bg-[#1c1c1e] hover:bg-[#242426] focus:bg-[#242426] border border-white/10 text-xs sm:text-sm text-white placeholder-[#8e8e93] focus:outline-none focus:ring-2 focus:ring-[#fa2d48] transition shadow-lg"
           />
           {isSearching && (
-            <div className="absolute right-12 top-1/2 -translate-y-1/2">
-              <Loader2 className="w-5 h-5 text-[#fa2d48] animate-spin" />
+            <div className="absolute right-10 top-1/2 -translate-y-1/2">
+              <Loader2 className="w-4 h-4 text-[#fa2d48] animate-spin" />
             </div>
           )}
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              className="absolute right-4 top-1/2 -translate-y-1/2 p-1 rounded-full text-[#8e8e93] hover:text-white hover:bg-white/10 transition"
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 rounded-full text-[#8e8e93] hover:text-white hover:bg-white/10 transition text-xs"
             >
               ✕
             </button>
           )}
         </div>
 
-        {/* Source Filter Selector */}
-        <ProviderSourceBar />
+        {/* Single Source Dropdown Button */}
+        <ProviderSourceButton />
       </div>
 
       {/* Suggestion Chips */}

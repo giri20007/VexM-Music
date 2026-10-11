@@ -17,7 +17,7 @@ import { SafeImage } from '../components/ui/SafeImage';
 import { getArtworkSrc } from '../utils/artworkGenerator';
 import { fetchSaavnTrending, searchSaavn, searchYouTube } from '../utils/api';
 import { MUSIC_LANGUAGES } from '../components/modals/LanguagePreferenceModal';
-import { ProviderSourceBar } from '../components/layout/ProviderSourceBar';
+import { ProviderSourceButton } from '../components/layout/ProviderSourceButton';
 
 // Per-language memory cache for instant, zero-flicker switching
 const langCache = {};
@@ -431,42 +431,26 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal }) {
 
   return (
     <div className="flex-1 w-full pb-24 select-none bg-[#000000] text-white">
-      {/* 1. TOP HEADER WITH PREFERRED LANGUAGE PICKER PILL & PROVIDER SOURCE BAR */}
-      <div className="px-4 sm:px-8 pt-8 pb-5 border-b border-white/[0.08] space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-3">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white font-sans">
-                New
-              </h1>
-              {/* Quick Language Pill */}
-              <button
-                onClick={onOpenLanguageModal}
-                className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 hover:bg-[#fa2d48]/20 border border-white/15 hover:border-[#fa2d48]/50 text-xs font-bold text-white transition active:scale-95 group"
-                title="Change preferred music language"
-              >
-                <Globe className="w-3.5 h-3.5 text-[#fa2d48]" />
-                <span>{langConfig.name}</span>
-                <span className="text-[10px] text-[#a1a1a6] font-normal">
-                  ({langConfig.native})
-                </span>
-              </button>
-            </div>
-            <p className="text-xs sm:text-sm text-[#8e8e93] mt-1">
-              {providerSource === 'owntg'
-                ? 'Your personal Telegram cloud storage audio vault and saved BIN tracks'
-                : providerSource === 'saavn'
-                ? `High-fidelity 320 kbps JioSaavn studio catalog for ${langConfig.name}`
-                : providerSource === 'youtube'
-                ? `Worldwide YouTube Music catalog for ${langConfig.name}`
-                : `Latest ${langConfig.name} releases, chartbusters, and featured hits`}
-            </p>
-          </div>
+      {/* 1. CLEAN APPLE MUSIC STYLE HEADER */}
+      <div className="px-4 sm:px-8 pt-6 pb-4 border-b border-white/[0.06] flex items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight text-white font-sans">
+            New
+          </h1>
         </div>
 
-        {/* Source Provider Select Option: All | JioSaavn | YouTube | OwnTg */}
-        <div className="pt-1">
-          <ProviderSourceBar />
+        {/* Action Controls: Language Pill + Single Source Dropdown Button */}
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <button
+            onClick={onOpenLanguageModal}
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#181818] hover:bg-[#222222] border border-white/10 text-xs font-semibold text-white transition active:scale-95 group shadow-sm"
+            title="Change preferred music language"
+          >
+            <Globe className="w-3.5 h-3.5 text-[#fa2d48]" />
+            <span>{langConfig.name}</span>
+          </button>
+
+          <ProviderSourceButton />
         </div>
       </div>
 
