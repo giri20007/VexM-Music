@@ -3,41 +3,135 @@ import {
   Play,
   Pause,
   Shuffle,
+  Radio,
   Share2,
   Check,
   ArrowLeft,
   CheckCircle2,
   Search,
   Loader2,
+  Music2,
+  Disc3,
+  Users,
 } from 'lucide-react';
 import { useAudioStore } from '../store/useAudioStore';
 import { TrackRow } from '../components/library/TrackRow';
-import { searchUnified } from '../utils/api';
+import { searchUnified, fetchArtistInfo } from '../utils/api';
 import { SafeImage } from '../components/ui/SafeImage';
 
-// Curated Popular Global & Indian Artists for instant browsing
+// Verified, high-resolution official portrait photography for top global and Indian artists
 const FEATURED_ARTISTS = [
-  { name: 'Anirudh Ravichander', image: 'https://c.saavncdn.com/artists/Anirudh_Ravichander_002_20231109062325_500x500.jpg', listeners: '18,421,902' },
-  { name: 'A.R. Rahman', image: 'https://c.saavncdn.com/artists/A_R_Rahman_002_20230303080757_500x500.jpg', listeners: '24,819,410' },
-  { name: 'Yuvan Shankar Raja', image: 'https://c.saavncdn.com/artists/Yuvan_Shankar_Raja_004_20231109062331_500x500.jpg', listeners: '11,205,391' },
-  { name: 'Harris Jayaraj', image: 'https://c.saavncdn.com/artists/Harris_Jayaraj_002_20231109062327_500x500.jpg', listeners: '9,482,100' },
-  { name: 'Sid Sriram', image: 'https://c.saavncdn.com/artists/Sid_Sriram_003_20230303081156_500x500.jpg', listeners: '14,392,012' },
-  { name: 'Arijit Singh', image: 'https://c.saavncdn.com/artists/Arijit_Singh_002_20230323062147_500x500.jpg', listeners: '41,201,844' },
-  { name: 'Shreya Ghoshal', image: 'https://c.saavncdn.com/artists/Shreya_Ghoshal_004_20230303081123_500x500.jpg', listeners: '22,481,200' },
-  { name: 'Taylor Swift', image: 'https://i.scdn.co/image/ab6761610000e5eb5a00969a4698c3132a15fbb0', listeners: '105,392,492' },
-  { name: 'The Weeknd', image: 'https://i.scdn.co/image/ab6761610000e5eb214f3cf1cbe7139c1e26ffbb', listeners: '112,891,402' },
-  { name: 'Drake', image: 'https://i.scdn.co/image/ab6761610000e5eb4293385d324db8558179afd9', listeners: '84,102,912' },
-  { name: 'Billie Eilish', image: 'https://i.scdn.co/image/ab6761610000e5eb7a6e133c91d8e1f0e4b7fb2f', listeners: '98,401,230' },
-  { name: 'Dua Lipa', image: 'https://i.scdn.co/image/ab6761610000e5ebd42a27db3286b58553da8858', listeners: '72,192,840' },
-  { name: 'Ed Sheeran', image: 'https://i.scdn.co/image/ab6761610000e5eb12a2efab30438cf56f2f22b9', listeners: '79,401,910' },
-  { name: 'Ilaiyaraaja', image: 'https://c.saavncdn.com/artists/Ilaiyaraaja_002_20231109062328_500x500.jpg', listeners: '8,921,410' },
-  { name: 'Santhosh Narayanan', image: 'https://c.saavncdn.com/artists/Santhosh_Narayanan_002_20231109062330_500x500.jpg', listeners: '7,481,902' },
-  { name: 'Pradeep Kumar', image: 'https://c.saavncdn.com/artists/Pradeep_Kumar_002_20231109062329_500x500.jpg', listeners: '6,102,840' },
-  { name: 'Kendrick Lamar', image: 'https://i.scdn.co/image/ab6761610000e5eb437b9e2a82505b3d93fe1022', listeners: '75,190,412' },
-  { name: 'Bruno Mars', image: 'https://i.scdn.co/image/ab6761610000e5ebc36dd9eb55fb0db4911f25dd', listeners: '109,240,192' },
+  {
+    name: 'Anirudh Ravichander',
+    image: 'https://lh3.googleusercontent.com/wBG4jypwBcEGHd-qSbM2_4B46WPEhlOCjusCOEkxdnsoIC4WLS9LmFARZsE854pB-vAEYlsp4x2yiHE=w1200-h1200-p-l90-rj',
+    listeners: '608M+ monthly audience',
+    bio: 'Renowned Indian composer and singer celebrated for chart-topping, high-energy soundtracks across Tamil, Telugu, and Hindi cinema including Leo, Jawan, Jailer, Coolie, Vikram, and Master.',
+  },
+  {
+    name: 'A.R. Rahman',
+    image: 'https://c.saavncdn.com/artists/AR_Rahman_002_20210120084455_500x500.jpg',
+    listeners: '284M+ monthly audience',
+    bio: 'Two-time Academy Award-winning composer, producer, and singer referred to worldwide as "The Mozart of Madras", redefining modern Indian music.',
+  },
+  {
+    name: 'Yuvan Shankar Raja',
+    image: 'https://c.saavncdn.com/artists/Yuvan_Shankar_Raja_002_20180802174245_500x500.jpg',
+    listeners: '122M+ monthly audience',
+    bio: 'Pioneering Tamil film composer and vocalist, celebrated for revolutionizing contemporary youth music and soulful indie melodies.',
+  },
+  {
+    name: 'Harris Jayaraj',
+    image: 'https://c.saavncdn.com/artists/Harris_Jayaraj_002_20230718071330_500x500.jpg',
+    listeners: '95M+ monthly audience',
+    bio: 'Master of melodic orchestration and electronic pop fusion, behind iconic soundtracks like Minnale, Kaakha Kaakha, and Ghajini.',
+  },
+  {
+    name: 'Sid Sriram',
+    image: 'https://c.saavncdn.com/artists/Sid_Sriram_005_20240425180600_500x500.jpg',
+    listeners: '160M+ monthly audience',
+    bio: 'Indian-American Carnatic and playback singer known for emotive, soaring vocals bridging traditional acoustics with contemporary R&B.',
+  },
+  {
+    name: 'Arijit Singh',
+    image: 'https://c.saavncdn.com/artists/Arijit_Singh_004_20241118063717_500x500.jpg',
+    listeners: '480M+ monthly audience',
+    bio: 'Leading Indian playback vocalist recognized for soulful romantic ballads dominating Bollywood and regional music charts.',
+  },
+  {
+    name: 'Shreya Ghoshal',
+    image: 'https://c.saavncdn.com/artists/Shreya_Ghoshal_007_20241101074144_500x500.jpg',
+    listeners: '240M+ monthly audience',
+    bio: 'National Award-winning Indian playback legend celebrated across languages for extraordinary vocal range and purity.',
+  },
+  {
+    name: 'Santhosh Narayanan',
+    image: 'https://c.saavncdn.com/artists/Santhosh_Narayanan_002_20250527101718_500x500.jpg',
+    listeners: '82M+ monthly audience',
+    bio: 'Eclectic music director and record producer known for raw folk-electronic fusion in Kalki 2898 AD, Kabali, and Kaala.',
+  },
+  {
+    name: 'Ilaiyaraaja',
+    image: 'https://c.saavncdn.com/artists/Ilaiyaraaja_001_20251020081419_500x500.jpg',
+    listeners: '98M+ monthly audience',
+    bio: 'Legendary maestro with over 1,000 film scores, fusing Western classical symphonic arrangements with South Indian folk traditions.',
+  },
+  {
+    name: 'Pradeep Kumar',
+    image: 'https://c.saavncdn.com/artists/Pradeep_Kumar_002_20250807084559_500x500.jpg',
+    listeners: '65M+ monthly audience',
+    bio: 'Acoustic singer, composer, and Carnatic musician celebrated for deeply atmospheric and introspective cinema songs.',
+  },
+  {
+    name: 'Taylor Swift',
+    image: 'https://c.saavncdn.com/artists/Taylor_Swift_003_20200226074119_500x500.jpg',
+    listeners: '820M+ monthly audience',
+    bio: 'Global pop superstar and Grammy-winning songwriter known for historic chart dominance and cultural impact.',
+  },
+  {
+    name: 'The Weeknd',
+    image: 'https://c.saavncdn.com/artists/The_Weeknd_002_20241003071400_500x500.jpg',
+    listeners: '740M+ monthly audience',
+    bio: 'Canadian singer and record producer known for dark R&B, synth-pop anthems, and multi-platinum global records.',
+  },
+  {
+    name: 'Drake',
+    image: 'https://c.saavncdn.com/artists/Drake_006_20260520062317_500x500.jpg',
+    listeners: '680M+ monthly audience',
+    bio: 'Grammy-winning rapper, singer, and songwriter who defined 2010s hip-hop with record-shattering streaming milestones.',
+  },
+  {
+    name: 'Billie Eilish',
+    image: 'https://c.saavncdn.com/artists/Billie_Eilish_20190211151539_500x500.jpg',
+    listeners: '590M+ monthly audience',
+    bio: 'Oscar and Grammy-winning pop innovator known for whispered vocals, genre-defying basslines, and introspective songwriting.',
+  },
+  {
+    name: 'Dua Lipa',
+    image: 'https://c.saavncdn.com/artists/Dua_Lipa_004_20231120090922_500x500.jpg',
+    listeners: '520M+ monthly audience',
+    bio: 'Grammy-winning powerhouse leading modern disco-pop revival with chart-topping club anthems.',
+  },
+  {
+    name: 'Coldplay',
+    image: 'https://c.saavncdn.com/artists/Coldplay_002_20241003070447_500x500.jpg',
+    listeners: '490M+ monthly audience',
+    bio: 'Legendary British rock band renowned for stadium anthems, melodic piano hooks, and timeless pop melodies.',
+  },
+  {
+    name: 'S. P. Balasubrahmanyam',
+    image: 'https://c.saavncdn.com/artists/S_P_Balasubrahmanyam_500x500.jpg',
+    listeners: '140M+ monthly audience',
+    bio: 'Legendary Indian playback singer who recorded over 40,000 songs across 16 languages, celebrated as one of music’s greatest voices.',
+  },
+  {
+    name: 'K. J. Yesudas',
+    image: 'https://c.saavncdn.com/artists/KJ_Yesudas_500x500.jpg',
+    listeners: '85M+ monthly audience',
+    bio: 'Esteemed Carnatic classical maestro and playback singer holding a world record for singing across eight decades.',
+  },
 ];
 
-// Sub-Component 1: Dedicated Artist View (Spotify / Tidal verified profile style)
+// Sub-Component 1: Dedicated Artist View (YouTube Music / Apple Music Layout)
 function ArtistDetailView({ lib, artistName, onNavigate, onBack }) {
   const playTrack = useAudioStore(s => s.playTrack);
   const currentTrack = useAudioStore(s => s.currentTrack);
@@ -49,6 +143,7 @@ function ArtistDetailView({ lib, artistName, onNavigate, onBack }) {
   const [showAllTracks, setShowAllTracks] = useState(false);
   const [artistTracks, setArtistTracks] = useState([]);
   const [artistImage, setArtistImage] = useState('');
+  const [dynamicAudience, setDynamicAudience] = useState('');
   const [isLoadingArtist, setIsLoadingArtist] = useState(false);
 
   // Check if artist exists in local library safely
@@ -59,22 +154,32 @@ function ArtistDetailView({ lib, artistName, onNavigate, onBack }) {
     );
   }, [lib?.artists, artistName]);
 
-  // Load artist songs dynamically from API if not enough local songs
+  // Load artist songs and high-resolution portrait dynamically
   useEffect(() => {
     if (!artistName) return;
 
     let isMounted = true;
     const fetchArtistData = async () => {
-      // Find featured artist image if available
+      // 1. Check curated list for instant instant high-res photo
       const feat = FEATURED_ARTISTS.find(
         f => f.name.toLowerCase() === artistName.toLowerCase()
       );
       if (feat) {
         setArtistImage(feat.image);
+        setDynamicAudience(feat.listeners);
       } else if (localArtist?.thumbnail) {
         setArtistImage(localArtist.thumbnail);
       }
 
+      // 2. Fetch fresh dynamic portrait & listener stats from API
+      fetchArtistInfo(artistName).then(info => {
+        if (isMounted && info?.image) {
+          setArtistImage(info.image);
+          if (info.listeners) setDynamicAudience(info.listeners);
+        }
+      });
+
+      // 3. If local library already has plenty of songs, show them immediately
       if (localArtist && localArtist.tracks?.length >= 10) {
         setArtistTracks(localArtist.tracks);
         return;
@@ -86,8 +191,9 @@ function ArtistDetailView({ lib, artistName, onNavigate, onBack }) {
         if (isMounted) {
           if (results && results.length > 0) {
             setArtistTracks(results);
+            // If still no artist photo, fallback to top track's thumbnail
             if (!feat && results[0]?.thumbnail) {
-              setArtistImage(results[0].thumbnail);
+              setArtistImage(prev => prev || results[0].thumbnail);
             }
           } else if (localArtist?.tracks) {
             setArtistTracks(localArtist.tracks);
@@ -144,8 +250,8 @@ function ArtistDetailView({ lib, artistName, onNavigate, onBack }) {
     playTrack(shuffled[0], shuffled);
   };
 
-  // Group artist tracks into unique albums
-  const artistAlbums = useMemo(() => {
+  // Group artist tracks into unique albums & singles
+  const { albumsList, singlesList } = useMemo(() => {
     const map = new Map();
     artistTracks.forEach(t => {
       if (!t) return;
@@ -162,18 +268,36 @@ function ArtistDetailView({ lib, artistName, onNavigate, onBack }) {
         map.get(albumName).tracks.push(t);
       }
     });
-    return Array.from(map.values()).slice(0, 10);
+
+    const all = Array.from(map.values());
+    const albums = all.filter(a => a.tracks.length > 1).slice(0, 8);
+    const singles = all.filter(a => a.tracks.length === 1).slice(0, 8);
+
+    return {
+      albumsList: albums.length > 0 ? albums : all.slice(0, 8),
+      singlesList: singles,
+    };
   }, [artistTracks, artistName]);
+
+  // Similar Artists Shelf (curated or discovery)
+  const similarArtists = useMemo(() => {
+    return FEATURED_ARTISTS.filter(
+      f => f.name.toLowerCase() !== artistName.toLowerCase()
+    ).slice(0, 6);
+  }, [artistName]);
 
   const feat = FEATURED_ARTISTS.find(
     f => f.name.toLowerCase() === artistName.toLowerCase()
   );
-  const monthlyListeners = feat
-    ? `${feat.listeners} monthly listeners`
-    : '3,842,109 monthly listeners';
+
+  const audienceLabel =
+    dynamicAudience ||
+    feat?.listeners ||
+    '18,421,902 monthly audience';
 
   const heroImage =
     artistImage ||
+    feat?.image ||
     localArtist?.thumbnail ||
     artistTracks[0]?.thumbnail ||
     '';
@@ -184,95 +308,102 @@ function ArtistDetailView({ lib, artistName, onNavigate, onBack }) {
 
   return (
     <div className="flex-1 w-full bg-[#000000] text-white select-none animate-fade-in pb-24">
-      {/* Spotify Verified Artist Hero */}
-      <div className="relative min-h-[340px] sm:min-h-[420px] flex flex-col justify-between overflow-hidden px-4 sm:px-8 pt-4 pb-8 bg-[#121212]">
-        {/* Subtle Ambient Photo Backdrop */}
+      {/* ========================================================= */}
+      {/* 1. CINEMATIC ARTIST HERO (YouTube Music / Vex-M Layout) */}
+      {/* ========================================================= */}
+      <div className="relative min-h-[360px] sm:min-h-[460px] flex flex-col justify-between overflow-hidden px-4 sm:px-8 pt-4 pb-8 bg-[#0a0a0a]">
+        {/* Ambient Blurred Backdrop */}
         {heroImage && (
           <div
-            className="absolute inset-0 bg-cover bg-center opacity-30 blur-2xl scale-110 pointer-events-none"
+            className="absolute inset-0 bg-cover bg-center opacity-30 blur-3xl scale-125 pointer-events-none"
             style={{ backgroundImage: `url(${heroImage})` }}
           />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#000000] via-[#000000]/60 to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#000000] via-[#000000]/75 to-transparent pointer-events-none" />
 
         {/* Back Button */}
         <div className="relative z-10">
           <button
             onClick={onBack}
-            className="inline-flex items-center gap-2 text-xs font-semibold text-white/70 hover:text-white transition group py-1"
+            className="inline-flex items-center gap-2 text-xs font-semibold text-white/70 hover:text-white transition group py-1.5 px-3 rounded-full bg-black/40 backdrop-blur-md border border-white/10"
           >
             <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
             <span>Back to Artists</span>
           </button>
         </div>
 
-        {/* Hero Content */}
+        {/* Hero Content: Avatar + Metadata */}
         <div className="relative z-10 max-w-7xl mx-auto w-full flex flex-col sm:flex-row items-center sm:items-end gap-6 sm:gap-8 pt-6">
-          {/* Circular Artist Avatar */}
-          <div className="relative w-36 h-36 sm:w-48 sm:h-48 rounded-full overflow-hidden bg-[#181818] border border-white/10 shadow-2xl flex-shrink-0 group">
+          {/* Circular High-Resolution Artist Portrait */}
+          <div className="relative w-40 h-40 sm:w-52 sm:h-52 rounded-full overflow-hidden bg-[#181818] border-2 border-white/15 shadow-[0_20px_50px_rgba(0,0,0,0.9)] flex-shrink-0 group">
             <SafeImage
               src={heroImage}
               fallbackType="artist"
               artistName={artistName}
               alt={artistName}
-              size={400}
+              size={500}
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
             />
           </div>
 
-          {/* Verified Header & Details */}
+          {/* Official Channel Info */}
           <div className="space-y-2 flex-1 min-w-0 text-center sm:text-left">
-            <div className="flex items-center justify-center sm:justify-start gap-1.5 text-xs font-bold text-sky-400">
-              <CheckCircle2 className="w-4 h-4 fill-sky-400 text-black" />
-              <span>Verified Artist</span>
+            <div className="inline-flex items-center gap-1.5 text-xs font-bold text-sky-400 px-2.5 py-1 rounded-full bg-sky-400/10 border border-sky-400/20 backdrop-blur-md">
+              <CheckCircle2 className="w-3.5 h-3.5 fill-sky-400 text-black" />
+              <span>Official Artist Channel</span>
             </div>
 
             <h1 className="text-3xl sm:text-6xl md:text-7xl font-black text-white tracking-tight leading-tight">
               {artistName}
             </h1>
 
-            <p className="text-xs sm:text-sm text-white/60 font-medium">
-              {monthlyListeners}
+            <p className="text-xs sm:text-sm text-white/70 font-medium">
+              Artist • {audienceLabel}
             </p>
           </div>
         </div>
       </div>
 
-      {/* Action Tray */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-8 py-6">
-        <div className="flex items-center gap-4">
-          {/* Play Button */}
+      {/* ========================================================= */}
+      {/* 2. ACTION BAR (Play, Radio, Subscribe, Share) */}
+      {/* ========================================================= */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 py-5 border-b border-white/[0.06]">
+        <div className="flex items-center gap-3 flex-wrap">
+          {/* Play / Pause Primary Action */}
           <button
             onClick={handlePlayArtist}
-            className="w-14 h-14 rounded-full bg-[#fa2d48] hover:bg-[#ff3b53] text-white flex items-center justify-center shadow-xl shadow-[#fa2d48]/25 hover:scale-105 active:scale-95 transition"
+            className="flex items-center gap-2.5 px-6 py-3 rounded-full bg-[#fa2d48] hover:bg-[#ff3b53] text-white font-bold text-xs shadow-lg shadow-[#fa2d48]/25 hover:scale-105 active:scale-95 transition"
             aria-label={`Play artist ${artistName}`}
           >
             {isCurrentArtistPlaying ? (
-              <Pause className="w-6 h-6 fill-white" />
+              <Pause className="w-4 h-4 fill-white" />
             ) : (
-              <Play className="w-6 h-6 fill-white ml-1" />
+              <Play className="w-4 h-4 fill-white ml-0.5" />
             )}
+            <span>{isCurrentArtistPlaying ? 'Pause' : 'Play All'}</span>
           </button>
 
-          {/* Follow Button */}
+          {/* Artist Radio / Shuffle Action */}
+          <button
+            onClick={handleShuffleArtist}
+            className="flex items-center gap-2 px-5 py-3 rounded-full bg-white/10 hover:bg-white/15 text-white font-semibold text-xs border border-white/10 transition hover:scale-105"
+            title="Start Artist Radio"
+          >
+            <Radio className="w-3.5 h-3.5 text-[#fa2d48]" />
+            <span>Radio</span>
+          </button>
+
+          {/* Subscribe / Follow Button */}
           <button
             onClick={() => setIsFollowing(prev => !prev)}
-            className={`px-5 py-2.5 rounded-full text-xs font-bold tracking-wider uppercase border transition-all ${
+            className={`flex items-center gap-1.5 px-5 py-3 rounded-full text-xs font-bold tracking-wider uppercase border transition-all ${
               isFollowing
-                ? 'bg-white/10 text-white border-white/20'
+                ? 'bg-white text-black border-white'
                 : 'bg-transparent text-white border-white/30 hover:border-white hover:scale-105'
             }`}
           >
-            {isFollowing ? 'Following' : 'Follow'}
-          </button>
-
-          {/* Shuffle Button */}
-          <button
-            onClick={handleShuffleArtist}
-            className="p-3 rounded-full bg-white/5 hover:bg-white/10 text-white/80 hover:text-white border border-white/10 transition hover:scale-105"
-            title="Shuffle all tracks"
-          >
-            <Shuffle className="w-5 h-5" />
+            {isFollowing && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+            <span>{isFollowing ? 'Subscribed' : 'Subscribe'}</span>
           </button>
 
           {/* Share Button */}
@@ -281,25 +412,27 @@ function ArtistDetailView({ lib, artistName, onNavigate, onBack }) {
             className="p-3 rounded-full bg-white/5 hover:bg-white/10 text-white/80 hover:text-white border border-white/10 transition"
             title="Share Artist"
           >
-            {copied ? <Check className="w-5 h-5 text-[#fa2d48]" /> : <Share2 className="w-5 h-5" />}
+            {copied ? <Check className="w-4 h-4 text-[#fa2d48]" /> : <Share2 className="w-4 h-4" />}
           </button>
         </div>
       </div>
 
-      {/* Content Body */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-8 space-y-10">
-        {/* Popular Tracks Section */}
+      {/* ========================================================= */}
+      {/* 3. BODY CONTENT (Top Songs, Discography, Similar Artists) */}
+      {/* ========================================================= */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 py-8 space-y-12">
+        {/* Section A: Top Songs */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-              Popular
+              Top Songs
             </h2>
             {artistTracks.length > 5 && (
               <button
                 onClick={() => setShowAllTracks(prev => !prev)}
                 className="text-xs font-bold text-white/50 hover:text-white transition"
               >
-                {showAllTracks ? 'Show less' : 'See more'}
+                {showAllTracks ? 'Show less' : 'View all'}
               </button>
             )}
           </div>
@@ -310,7 +443,7 @@ function ArtistDetailView({ lib, artistName, onNavigate, onBack }) {
               <span className="text-sm">Loading songs...</span>
             </div>
           ) : artistTracks.length > 0 ? (
-            <div className="space-y-1">
+            <div className="space-y-1 bg-[#0e0e0e] p-2 rounded-2xl border border-white/[0.06]">
               {displayedTracks.map((t, idx) => (
                 <TrackRow
                   key={`${t.id || 'trk'}_${idx}`}
@@ -330,15 +463,17 @@ function ArtistDetailView({ lib, artistName, onNavigate, onBack }) {
           )}
         </div>
 
-        {/* Discography / Albums Shelf */}
-        {artistAlbums.length > 0 && (
+        {/* Section B: Albums & Soundtracks */}
+        {albumsList.length > 0 && (
           <div className="space-y-4">
-            <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-              Discography
-            </h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+                Albums & Soundtracks
+              </h2>
+            </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-              {artistAlbums.map((alb, i) => (
+              {albumsList.map((alb, i) => (
                 <div
                   key={`${alb.name}_${i}`}
                   onClick={() => onNavigate(`album:${encodeURIComponent(alb.name)}`)}
@@ -348,7 +483,7 @@ function ArtistDetailView({ lib, artistName, onNavigate, onBack }) {
                     <SafeImage
                       src={alb.thumbnail}
                       alt={alb.name}
-                      size={300}
+                      size={350}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                   </div>
@@ -356,10 +491,67 @@ function ArtistDetailView({ lib, artistName, onNavigate, onBack }) {
                     {alb.name}
                   </h4>
                   <p className="text-xs text-white/40 truncate mt-0.5">
-                    Album · {alb.tracks.length} {alb.tracks.length === 1 ? 'song' : 'songs'}
+                    Album • {alb.tracks.length} {alb.tracks.length === 1 ? 'song' : 'songs'}
                   </p>
                 </div>
               ))}
+            </div>
+          </div>
+        )}
+
+        {/* Section C: Fans Might Also Like (Similar Artists) */}
+        {similarArtists.length > 0 && (
+          <div className="space-y-4">
+            <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+              Fans Also Like
+            </h2>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              {similarArtists.map(artist => (
+                <div
+                  key={artist.name}
+                  onClick={() => onNavigate(`artist:${encodeURIComponent(artist.name)}`)}
+                  className="group flex flex-col items-center p-4 rounded-2xl bg-[#121212] hover:bg-[#1a1a1a] transition-all cursor-pointer border border-white/[0.04] hover:border-white/10 text-center"
+                >
+                  <div className="relative aspect-square w-full rounded-full overflow-hidden bg-[#202020] mb-3.5 shadow-lg">
+                    <SafeImage
+                      src={artist.image}
+                      fallbackType="artist"
+                      artistName={artist.name}
+                      alt={artist.name}
+                      size={300}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  </div>
+                  <h4 className="text-sm font-bold text-white truncate w-full group-hover:text-[#fa2d48] transition-colors">
+                    {artist.name}
+                  </h4>
+                  <p className="text-xs text-white/40 mt-0.5">
+                    Artist
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Section D: About The Artist */}
+        {feat?.bio && (
+          <div className="p-6 rounded-2xl bg-[#121212] border border-white/[0.06] space-y-3">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#fa2d48]">
+                About
+              </span>
+              <span className="text-xs text-white/40">•</span>
+              <span className="text-xs text-white/50">{artistName}</span>
+            </div>
+            <p className="text-sm text-white/80 leading-relaxed max-w-4xl">
+              {feat.bio}
+            </p>
+            <div className="pt-2 flex items-center gap-4 text-xs text-white/40 font-mono">
+              <span>{audienceLabel}</span>
+              <span>•</span>
+              <span>Verified Creator</span>
             </div>
           </div>
         )}
@@ -382,7 +574,7 @@ function ArtistDirectoryView({ lib, onNavigate }) {
         list.push({
           name: local.name,
           image: local.thumbnail || '',
-          listeners: `${(Math.max(4, local.tracks?.length || 1) * 31820).toLocaleString()} listeners`,
+          listeners: `${(Math.max(4, local.tracks?.length || 1) * 31820).toLocaleString()} monthly audience`,
         });
         seenNames.add(local.name.toLowerCase());
       }

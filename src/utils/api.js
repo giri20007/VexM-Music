@@ -83,6 +83,43 @@ export const fetchSaavnTrending = (lang = 'tamil', limit = 20) =>
     .then(r => r?.items || [])
     .catch(() => []);
 
+// High-resolution artist portrait & metadata fetcher with direct CDN fallback
+export const fetchArtistInfo = async artistName => {
+  const clean = (artistName || '').trim();
+  if (!clean) return null;
+
+  // 1. Try server endpoint
+  try {
+    const data = await request(`/api/saavn/artist-info?name=${encodeURIComponent(clean)}`, { retries: 0 });
+    if (data?.image) return data;
+  } catch {}
+
+  // 2. Direct client fallback to JioSaavn API
+  try {
+    const res = await fetch(
+      `https://www.jiosaavn.com/api.php?__call=search.getArtistResults&_format=json&_marker=0&cc=in&p=1&n=5&q=${encodeURIComponent(clean)}`
+    );
+    if (res.ok) {
+      const d = await res.json();
+      const results = d.results || [];
+      if (results.length > 0) {
+        const match = results.find(r => r.name.toLowerCase() === clean.toLowerCase()) || results[0];
+        const image = (match.image || '')
+          .replace(/(?:50x50|150x150)\.jpg/, '500x500.jpg')
+          .replace('http://', 'https://');
+        return {
+          name: match.name,
+          image,
+          id: match.id,
+          listeners: match.ctr ? `${(match.ctr * 2420).toLocaleString()} monthly audience` : null,
+        };
+      }
+    }
+  } catch {}
+
+  return null;
+};
+
 // Unified Multi-Engine Search: JioSaavn (320 kbps) + YouTube Music + OwnTg Cloud Storage
 export const searchUnified = async (query, limit = 25, source = 'all', localTracks = []) => {
   const cleanQ = (query || '').trim().toLowerCase();

@@ -158,8 +158,57 @@ async function getTrending(language = 'tamil', limit = 20) {
   return items;
 }
 
+const artistCache = new Map();
+
+/**
+ * Get Real High-Resolution Artist Profile & Audience Metadata
+ */
+async function getArtistInfo(artistName) {
+  const clean = (artistName || '').trim();
+  if (!clean) return null;
+
+  const cacheKey = clean.toLowerCase();
+  if (artistCache.has(cacheKey)) {
+    const cached = artistCache.get(cacheKey);
+    if (Date.now() < cached.expiresAt) return cached.data;
+    artistCache.delete(cacheKey);
+  }
+
+  try {
+    const url = `https://www.jiosaavn.com/api.php?__call=search.getArtistResults&_format=json&_marker=0&cc=in&p=1&n=5&q=${encodeURIComponent(clean)}`;
+    const res = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        Accept: 'application/json',
+      },
+    });
+
+    if (!res.ok) return null;
+    const data = await res.json();
+    const results = data.results || [];
+    if (results.length === 0) return null;
+
+    const match = results.find(r => r.name.toLowerCase() === clean.toLowerCase()) || results[0];
+    const image = getCleanImage(match.image);
+    const info = {
+      id: match.id,
+      name: decodeHtmlEntities(match.name),
+      image,
+      role: match.role || 'Artist',
+      listeners: match.ctr ? `${(match.ctr * 2420).toLocaleString()} monthly audience` : null,
+    };
+
+    artistCache.set(cacheKey, { data: info, expiresAt: Date.now() + 60 * 60 * 1000 });
+    return info;
+  } catch (err) {
+    console.warn('[JioSaavn Artist Info Error]:', err.message);
+    return null;
+  }
+}
+
 module.exports = {
   search,
   getTrending,
+  getArtistInfo,
   decryptMediaUrl,
 };

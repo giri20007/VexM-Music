@@ -1,5 +1,26 @@
 const router = require('express').Router();
-const { search, getTrending } = require('../services/jioSaavn');
+const { search, getTrending, getArtistInfo } = require('../services/jioSaavn');
+
+/**
+ * GET /api/saavn/artist-info?name=<name>
+ */
+router.get('/artist-info', async (req, res) => {
+  const name = (req.query.name || req.query.q || '').trim();
+  if (!name) {
+    return res.status(400).json({ error: true, message: 'Artist name required' });
+  }
+
+  try {
+    const info = await getArtistInfo(name);
+    if (!info) {
+      return res.status(404).json({ error: true, message: 'Artist not found' });
+    }
+    res.setHeader('Cache-Control', 'public, max-age=3600');
+    res.json(info);
+  } catch (err) {
+    res.status(500).json({ error: true, message: 'Failed to fetch artist details' });
+  }
+});
 
 /**
  * GET /api/saavn/search?q=<query>&limit=<limit>
