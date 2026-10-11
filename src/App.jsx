@@ -194,7 +194,7 @@ export default function App() {
   else if (currentRoute === 'recaps') headerTitle = 'Recaps';
 
   return (
-    <div className="relative min-h-screen flex flex-col bg-bg-primary text-warm-white selection:bg-accent selection:text-bg-primary">
+    <div className="relative min-h-screen flex flex-col bg-transparent text-warm-white selection:bg-accent selection:text-bg-primary">
       {/* Dynamic Animated Lively Background */}
       <LivelyBackground />
 

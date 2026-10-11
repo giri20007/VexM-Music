@@ -31,7 +31,7 @@ export function LikedSongsPage({ allTracks = [], onNavigate }) {
   };
 
   return (
-    <div className="flex-1 w-full bg-[#000000] text-white select-none animate-fade-in pb-24">
+    <div className="flex-1 w-full bg-transparent text-white select-none animate-fade-in pb-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-8 pt-6 pb-12 space-y-6">
         {/* Header Banner */}
         <div className="flex flex-col sm:flex-row sm:items-end gap-6 pt-4 pb-2">
@@ -75,7 +75,7 @@ export function LikedSongsPage({ allTracks = [], onNavigate }) {
 
         {/* Track List */}
         {likedTracks.length > 0 ? (
-          <div className="bg-[#0e0e0e] p-2 rounded-2xl border border-white/[0.08] space-y-1">
+          <div className="bg-white/[0.03] backdrop-blur-md p-2 rounded-2xl border border-white/[0.06] space-y-1">
             {likedTracks.map((track, idx) => (
               <TrackRow
                 key={track.id}

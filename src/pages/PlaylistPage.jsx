@@ -15,7 +15,7 @@ export function PlaylistPage({ playlistId, allTracks = [], onBack, onNavigate })
   const playlist = playlists.find(p => p.id === playlistId);
   if (!playlist) {
     return (
-      <div className="flex-1 w-full bg-[#000000] text-white p-12 text-center text-white/50 space-y-4">
+      <div className="flex-1 w-full bg-transparent text-white p-12 text-center text-white/50 space-y-4">
         <p>Playlist not found.</p>
         <button onClick={onBack} className="px-5 py-2 rounded-full bg-white/10 hover:bg-white/15 text-xs text-white">
           Back to Library
@@ -47,7 +47,7 @@ export function PlaylistPage({ playlistId, allTracks = [], onBack, onNavigate })
   };
 
   return (
-    <div className="flex-1 w-full bg-[#000000] text-white select-none animate-fade-in pb-24">
+    <div className="flex-1 w-full bg-transparent text-white select-none animate-fade-in pb-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-8 pt-6 pb-12 space-y-6">
         <button
           onClick={onBack}
@@ -114,7 +114,7 @@ export function PlaylistPage({ playlistId, allTracks = [], onBack, onNavigate })
 
         {/* Playlist Tracks */}
         {tracks.length > 0 ? (
-          <div className="bg-[#0e0e0e] p-2 rounded-2xl border border-white/[0.08] space-y-1">
+          <div className="bg-white/[0.03] backdrop-blur-md p-2 rounded-2xl border border-white/[0.06] space-y-1">
             {tracks.map((track, idx) => (
               <TrackRow
                 key={`${track.id}_${idx}`}

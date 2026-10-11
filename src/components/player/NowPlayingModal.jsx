@@ -231,14 +231,10 @@ export function NowPlayingModal() {
         </button>
 
         {/* Center Now Playing Pill */}
-        <div className="flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full bg-white/[0.08] border border-white/10 backdrop-blur-md">
+        <div className="flex items-center gap-2 px-3.5 sm:px-4 py-1.5 rounded-full bg-white/[0.08] border border-white/10 backdrop-blur-md">
           <span className="w-2 h-2 rounded-full bg-[#fa2d48] animate-pulse" />
           <span className="text-xs font-bold text-white tracking-wide">
             NOW PLAYING
-          </span>
-          <span className="text-white/30 text-xs">•</span>
-          <span className="text-[10px] font-bold text-[#fa2d48] uppercase tracking-wider">
-            Spatial Audio
           </span>
         </div>
 
@@ -290,15 +286,6 @@ export function NowPlayingModal() {
 
               {/* Right / Center: Song Metadata & Quick Action Tray */}
               <div className="flex flex-col items-center lg:items-start text-center lg:text-left max-w-lg min-w-0 flex-1">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="px-2.5 py-0.5 rounded-full bg-white/10 border border-white/15 text-[10px] font-bold text-white/90 uppercase tracking-wider">
-                    {currentTrack?.is320k ? '320 kbps HQ' : 'Lossless'}
-                  </span>
-                  <span className="px-2.5 py-0.5 rounded-full bg-[#fa2d48]/20 border border-[#fa2d48]/40 text-[10px] font-bold text-[#fa2d48] uppercase tracking-wider">
-                    {currentTrack?.isSaavn ? 'JioSaavn Studio' : currentTrack?.isYouTube ? 'YouTube HQ' : 'Apple Digital Master'}
-                  </span>
-                </div>
-
                 <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight leading-tight line-clamp-2">
                   {currentTrack.title}
                 </h1>

@@ -26,7 +26,7 @@ export function AlbumCard({ album, onClick }) {
   return (
     <div
       onClick={onClick}
-      className="group relative flex flex-col p-3 rounded-2xl bg-[#141414] hover:bg-[#1e1e1e] border border-white/[0.06] hover:border-white/15 transition-all duration-300 cursor-pointer shadow-md hover:shadow-2xl"
+      className="group relative flex flex-col p-3 rounded-2xl bg-white/[0.04] backdrop-blur-md hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/20 transition-all duration-300 hover:-translate-y-1 cursor-pointer shadow-md hover:shadow-2xl"
     >
       {/* Artwork Container */}
       <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-[#202020] shadow-lg mb-3">

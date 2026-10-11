@@ -21,7 +21,7 @@ export function PlaylistCard({ playlist, allTracks, onClick, onDelete }) {
   return (
     <div
       onClick={onClick}
-      className="group relative flex flex-col p-3.5 rounded-2xl bg-bg-card hover:bg-bg-cardHover border border-white/5 transition-all duration-200 cursor-pointer"
+      className="group relative flex flex-col p-3.5 rounded-2xl bg-white/[0.04] backdrop-blur-md hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/20 transition-all duration-300 hover:-translate-y-1 cursor-pointer shadow-md hover:shadow-2xl"
     >
       <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-gradient-to-br from-[#2a1711] to-[#160c09] border border-white/5 mb-3 flex items-center justify-center shadow-md">
         {firstTrackThumb ? (

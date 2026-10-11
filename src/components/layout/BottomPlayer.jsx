@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { useAudioStore } from '../../store/useAudioStore';
 import { seek } from '../../hooks/usePlayer';
-import { formatDuration, formatQualityBadge } from '../../utils/formatters';
+import { formatDuration } from '../../utils/formatters';
 import { getArtworkSrc } from '../../utils/artworkGenerator';
 import { SafeImage } from '../ui/SafeImage';
 
@@ -78,7 +78,7 @@ const BottomScrubber = memo(function BottomScrubber() {
         <div className="relative w-full h-1 bg-white/20 rounded-full overflow-hidden transition-all group-hover:h-1.5">
           {/* Active Fill */}
           <div
-            className="absolute top-0 left-0 bottom-0 bg-white group-hover:bg-[#1db954] rounded-full transition-all duration-75"
+            className="absolute top-0 left-0 bottom-0 bg-white group-hover:bg-[#fa2d48] rounded-full transition-all duration-75"
             style={{ width: `${percent}%` }}
           />
           {/* Hover Fill */}
@@ -181,7 +181,6 @@ export const BottomPlayer = memo(function BottomPlayer() {
     );
   }
 
-  const quality = formatQualityBadge(currentTrack);
   const coverSrc = getArtworkSrc(currentTrack);
 
   return (
@@ -209,16 +208,9 @@ export const BottomPlayer = memo(function BottomPlayer() {
           </div>
 
           <div className="min-w-0 flex-1 cursor-pointer overflow-hidden" onClick={() => setNowPlayingOpen(true)}>
-            <div className="flex items-center gap-1.5">
-              <h3 className="truncate text-xs sm:text-sm font-bold text-warm-white hover:text-accent transition-colors">
-                {currentTrack.title}
-              </h3>
-              {quality && (
-                <span className={`hidden lg:inline-block text-[9px] font-black px-1.5 py-0.2 rounded border ${quality.color} flex-shrink-0`}>
-                  {quality.label}
-                </span>
-              )}
-            </div>
+            <h3 className="truncate text-xs sm:text-sm font-bold text-warm-white hover:text-accent transition-colors">
+              {currentTrack.title}
+            </h3>
             <p className="truncate text-[11px] sm:text-xs text-warm-muted/80">
               {currentTrack.artist}
             </p>

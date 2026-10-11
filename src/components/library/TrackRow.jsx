@@ -70,10 +70,22 @@ export const TrackRow = memo(function TrackRow({
         <div className="flex items-center gap-3.5 min-w-0 flex-1">
           {showNumber && (
             <div className="w-6 text-center text-xs font-mono font-medium text-white/40 group-hover:text-white flex items-center justify-center flex-shrink-0">
-              <span className="group-hover:hidden">{isCurrentPlaying ? '▶' : index !== undefined ? index + 1 : ''}</span>
+              <span className="group-hover:hidden">
+                {isCurrentPlaying ? (
+                  <span className="flex items-end justify-center gap-0.5 h-3.5 w-3.5 pb-0.5">
+                    <span className="w-0.5 bg-[#fa2d48] rounded-full animate-eq-1" />
+                    <span className="w-0.5 bg-[#fa2d48] rounded-full animate-eq-2" />
+                    <span className="w-0.5 bg-[#fa2d48] rounded-full animate-eq-3" />
+                  </span>
+                ) : index !== undefined ? (
+                  index + 1
+                ) : (
+                  ''
+                )}
+              </span>
               <button
                 onClick={handlePlayClick}
-                className="hidden group-hover:inline-flex items-center justify-center text-accent transition-transform hover:scale-125"
+                className="hidden group-hover:inline-flex items-center justify-center text-[#fa2d48] transition-transform hover:scale-125"
                 aria-label={isCurrentPlaying ? 'Pause' : 'Play'}
               >
                 {isCurrentPlaying ? <Pause className="w-4 h-4 fill-current" /> : <Play className="w-4 h-4 fill-current ml-0.5" />}

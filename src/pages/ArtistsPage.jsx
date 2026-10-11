@@ -307,11 +307,11 @@ function ArtistDetailView({ lib, artistName, onNavigate, onBack }) {
     : artistTracks.slice(0, 5);
 
   return (
-    <div className="flex-1 w-full bg-[#000000] text-white select-none animate-fade-in pb-24">
+    <div className="flex-1 w-full bg-transparent text-white select-none animate-fade-in pb-24">
       {/* ========================================================= */}
       {/* 1. CINEMATIC ARTIST HERO (YouTube Music / Vex-M Layout) */}
       {/* ========================================================= */}
-      <div className="relative min-h-[360px] sm:min-h-[460px] flex flex-col justify-between overflow-hidden px-4 sm:px-8 pt-4 pb-8 bg-[#0a0a0a]">
+      <div className="relative min-h-[360px] sm:min-h-[460px] flex flex-col justify-between overflow-hidden px-4 sm:px-8 pt-4 pb-8 bg-black/20 backdrop-blur-md">
         {/* Ambient Blurred Backdrop */}
         {heroImage && (
           <div
@@ -319,7 +319,7 @@ function ArtistDetailView({ lib, artistName, onNavigate, onBack }) {
             style={{ backgroundImage: `url(${heroImage})` }}
           />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#000000] via-[#000000]/75 to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-t from-bg-primary via-bg-primary/80 to-transparent pointer-events-none" />
 
         {/* Back Button */}
         <div className="relative z-10">
@@ -590,7 +590,7 @@ function ArtistDirectoryView({ lib, onNavigate }) {
   }, [allAvailableArtists, searchQuery]);
 
   return (
-    <div className="flex-1 w-full bg-[#000000] text-white select-none animate-fade-in pb-24">
+    <div className="flex-1 w-full bg-transparent text-white select-none animate-fade-in pb-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-8 pt-6 pb-12 space-y-6">
         {/* Header & Search */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/[0.06] pb-6">
@@ -611,7 +611,7 @@ function ArtistDirectoryView({ lib, onNavigate }) {
               placeholder="Search any artist..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2.5 rounded-full bg-[#141414] border border-white/10 text-xs text-white placeholder:text-white/40 focus:outline-none focus:border-white/30"
+              className="w-full pl-9 pr-4 py-2.5 rounded-full bg-white/[0.05] border border-white/10 text-xs text-white placeholder:text-white/40 focus:outline-none focus:border-white/30"
             />
           </div>
         </div>
@@ -622,7 +622,7 @@ function ArtistDirectoryView({ lib, onNavigate }) {
             <div
               key={artist.name}
               onClick={() => onNavigate(`artist:${encodeURIComponent(artist.name)}`)}
-              className="group flex flex-col items-center p-4 rounded-2xl bg-[#121212] hover:bg-[#1a1a1a] transition-all cursor-pointer border border-white/[0.04] hover:border-white/10 text-center"
+              className="group flex flex-col items-center p-4 rounded-2xl bg-white/[0.04] backdrop-blur-md hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl cursor-pointer text-center"
             >
               {/* Circular Avatar */}
               <div className="relative aspect-square w-full rounded-full overflow-hidden bg-[#202020] mb-3.5 shadow-lg">

@@ -33,7 +33,7 @@ export function Header({ title = 'Home', onToggleMobileNav, onNavigate }) {
   }, [menuOpen]);
 
   return (
-    <header className="sticky top-0 z-40 flex items-center justify-between gap-2.5 sm:gap-4 px-4 sm:px-8 py-3 bg-[#000000]/95 backdrop-blur-xl border-b border-white/[0.08] select-none font-sans">
+    <header className="sticky top-0 z-40 flex items-center justify-between gap-2.5 sm:gap-4 px-4 sm:px-8 py-3 bg-[#0a0b12]/80 backdrop-blur-2xl border-b border-white/[0.06] select-none font-sans">
       {/* Left: Mobile Menu button + Title */}
       <div className="flex items-center gap-2.5 sm:gap-3 flex-shrink-0">
         <button
@@ -53,7 +53,7 @@ export function Header({ title = 'Home', onToggleMobileNav, onNavigate }) {
       <div className="flex-1 max-w-md mx-1 sm:mx-2 min-w-0">
         <button
           onClick={() => setSearchModalOpen(true)}
-          className="w-full flex items-center justify-between gap-2 px-3.5 py-2 rounded-full bg-[#181818] hover:bg-[#222222] border border-white/[0.08] text-white/40 hover:text-white/70 transition text-left group"
+          className="w-full flex items-center justify-between gap-2 px-3.5 py-2 rounded-full bg-white/[0.05] hover:bg-white/[0.09] border border-white/[0.08] text-white/40 hover:text-white/70 transition text-left group shadow-sm"
         >
           <div className="flex items-center gap-2.5 min-w-0">
             <Search className="w-4 h-4 text-white/40 group-hover:text-white transition-colors flex-shrink-0" />
@@ -82,7 +82,7 @@ export function Header({ title = 'Home', onToggleMobileNav, onNavigate }) {
 
         <button
           onClick={() => setMenuOpen(!menuOpen)}
-          className="group flex items-center gap-1.5 p-1 rounded-full bg-[#181818] hover:bg-[#242424] border border-white/10 transition shadow-sm"
+          className="group flex items-center gap-1.5 p-1 rounded-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 transition shadow-sm"
           title={`Signed in as ${user?.displayName || user?.username || 'Listener'}`}
           aria-label="Account menu"
         >
@@ -97,7 +97,7 @@ export function Header({ title = 'Home', onToggleMobileNav, onNavigate }) {
 
         {/* User Dropdown Menu */}
         {menuOpen && (
-          <div className="absolute right-0 top-12 w-64 rounded-2xl bg-[#141414] border border-white/10 p-2 shadow-2xl space-y-1.5 animate-scale-up z-50">
+          <div className="absolute right-0 top-12 w-64 rounded-2xl bg-[#11131e]/95 backdrop-blur-2xl border border-white/10 p-2 shadow-2xl space-y-1.5 animate-scale-up z-50">
             {/* Header / User Badge */}
             <div className="px-3 py-2 rounded-xl bg-white/5 space-y-0.5">
               <p className="text-xs font-bold text-white truncate">

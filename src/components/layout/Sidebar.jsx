@@ -48,7 +48,7 @@ export function Sidebar({ currentRoute, onNavigate }) {
 
   return (
     <aside
-      className={`hidden md:flex flex-col flex-shrink-0 bg-[#000000] border-r border-white/[0.08] transition-all duration-300 select-none ${
+      className={`hidden md:flex flex-col flex-shrink-0 bg-[#0c0d15]/80 backdrop-blur-2xl border-r border-white/[0.06] transition-all duration-300 select-none ${
         collapsed ? 'w-20' : 'w-60'
       }`}
     >
@@ -147,7 +147,7 @@ export function Sidebar({ currentRoute, onNavigate }) {
               onBlur={() => {
                 if (!newPlaylistName.trim()) setIsCreatingPlaylist(false);
               }}
-              className="w-full text-xs px-2.5 py-1.5 rounded-lg bg-[#181818] border border-white/20 text-white placeholder:text-white/40 focus:outline-none focus:border-[#fa2d48]"
+              className="w-full text-xs px-2.5 py-1.5 rounded-lg bg-white/[0.06] border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:border-[#fa2d48]"
             />
           </form>
         )}

@@ -90,7 +90,7 @@ export function LibraryPage({ lib, onNavigate }) {
   ];
 
   return (
-    <div className="flex-1 w-full bg-[#000000] text-white select-none animate-fade-in pb-24">
+    <div className="flex-1 w-full bg-transparent text-white select-none animate-fade-in pb-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-8 pt-6 pb-12 space-y-6">
         {/* Top Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/[0.06] pb-6">
@@ -136,7 +136,7 @@ export function LibraryPage({ lib, onNavigate }) {
                 className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 ${
                   isActive
                     ? 'bg-white text-black font-bold shadow-md shadow-white/10 scale-[1.02]'
-                    : 'bg-[#141414] text-white/70 hover:text-white hover:bg-[#202020] border border-white/[0.06]'
+                    : 'bg-white/[0.05] text-white/70 hover:text-white hover:bg-white/[0.10] border border-white/[0.08]'
                 }`}
               >
                 <Icon className={`w-3.5 h-3.5 ${isActive ? 'stroke-black' : ''}`} />
@@ -374,7 +374,7 @@ export function LibraryPage({ lib, onNavigate }) {
         {/* ======================================================== */}
         {activeTab === 'cloud' && (
           <div className="space-y-6">
-            <div className="p-5 sm:p-6 rounded-2xl bg-[#121212] border border-white/[0.08] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="p-5 sm:p-6 rounded-2xl bg-white/[0.04] backdrop-blur-md border border-white/[0.08] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <h3 className="text-base sm:text-lg font-bold text-white">
                   Cloud Audio Storage
@@ -409,7 +409,7 @@ export function LibraryPage({ lib, onNavigate }) {
             </div>
 
             {ownTgTracks.length > 0 ? (
-              <div className="bg-[#0e0e0e] p-2 rounded-2xl border border-white/[0.06] space-y-1">
+              <div className="bg-white/[0.03] backdrop-blur-md p-2 rounded-2xl border border-white/[0.06] space-y-1">
                 {ownTgTracks.map((track, idx) => (
                   <TrackRow
                     key={`${track.id || 'vault'}_${idx}`}
@@ -440,7 +440,7 @@ export function LibraryPage({ lib, onNavigate }) {
         {activeTab === 'history' && (
           <div className="space-y-4">
             {historyTracks.length > 0 ? (
-              <div className="bg-[#0e0e0e] p-2 rounded-2xl border border-white/[0.06] space-y-1">
+              <div className="bg-white/[0.03] backdrop-blur-md p-2 rounded-2xl border border-white/[0.06] space-y-1">
                 {historyTracks.map((track, idx) => (
                   <TrackRow
                     key={`${track.id || 'hist'}_${idx}`}

@@ -152,7 +152,7 @@ function AlbumDetailView({ lib, albumName, onNavigate, onBack }) {
   const releaseYear = localAlbum?.year || 2024;
 
   return (
-    <div className="flex-1 w-full bg-[#000000] text-white select-none animate-fade-in pb-24">
+    <div className="flex-1 w-full bg-transparent text-white select-none animate-fade-in pb-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-8 pt-4 pb-8 space-y-8">
         {/* Back button */}
         <button
@@ -324,7 +324,7 @@ function AlbumDirectoryView({ lib, onNavigate }) {
   }, [allAvailableAlbums, searchQuery]);
 
   return (
-    <div className="flex-1 w-full bg-[#000000] text-white select-none animate-fade-in pb-24">
+    <div className="flex-1 w-full bg-transparent text-white select-none animate-fade-in pb-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-8 pt-6 pb-12 space-y-6">
         {/* Header & Search */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/[0.06] pb-6">
@@ -345,7 +345,7 @@ function AlbumDirectoryView({ lib, onNavigate }) {
               placeholder="Search albums..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2.5 rounded-full bg-[#141414] border border-white/10 text-xs text-white placeholder:text-white/40 focus:outline-none focus:border-white/30"
+              className="w-full pl-9 pr-4 py-2.5 rounded-full bg-white/[0.05] border border-white/10 text-xs text-white placeholder:text-white/40 focus:outline-none focus:border-white/30"
             />
           </div>
         </div>
@@ -356,7 +356,7 @@ function AlbumDirectoryView({ lib, onNavigate }) {
             <div
               key={album.name}
               onClick={() => onNavigate(`album:${encodeURIComponent(album.name)}`)}
-              className="group flex flex-col p-3 rounded-2xl bg-[#121212] hover:bg-[#1a1a1a] transition-all cursor-pointer border border-white/[0.04] hover:border-white/10"
+              className="group flex flex-col p-3 rounded-2xl bg-white/[0.04] backdrop-blur-md hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl cursor-pointer"
             >
               <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-[#202020] mb-3 shadow-lg">
                 <SafeImage

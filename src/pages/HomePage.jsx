@@ -25,11 +25,11 @@ const langCache = {};
 // Apple Music Editorial Category Tags
 const EDITORIAL_TAGS = [
   'NEW RELEASE',
+  'TRENDING HIT',
   'FEATURED TRACK',
-  'APPLE MUSIC EXCLUSIVE',
-  'SPATIAL AUDIO',
   'TOP CHARTBUSTER',
   'EDITOR’S CHOICE',
+  'STAFF PICK',
 ];
 
 /**
@@ -67,7 +67,7 @@ function AppleFeaturedHeroCard({ track, index, onPlay, queue = [] }) {
       </div>
 
       {/* Hero Visual Card */}
-      <div className="relative aspect-[2.1/1] w-full rounded-2xl overflow-hidden bg-[#1c1c1e] border border-white/[0.08] shadow-2xl transition-all duration-300 group-hover:shadow-[0_12px_32px_rgba(0,0,0,0.8)] group-hover:border-white/20">
+      <div className="relative aspect-[2.1/1] w-full rounded-2xl overflow-hidden bg-white/[0.04] backdrop-blur-md border border-white/[0.08] shadow-2xl transition-all duration-300 group-hover:shadow-[0_16px_36px_rgba(0,0,0,0.8)] group-hover:border-white/20">
         <SafeImage
           src={cover}
           track={track}
@@ -214,7 +214,7 @@ function AppleSquareCard({ track, onPlay, queue = [] }) {
       onClick={handlePlay}
       className="group flex flex-col cursor-pointer select-none"
     >
-      <div className="relative aspect-square w-full rounded-2xl overflow-hidden bg-[#1c1c1e] border border-white/[0.08] shadow-md transition-all duration-300 group-hover:shadow-2xl group-hover:border-white/20 mb-2">
+      <div className="relative aspect-square w-full rounded-2xl overflow-hidden bg-white/[0.04] backdrop-blur-md border border-white/[0.08] shadow-md transition-all duration-300 group-hover:shadow-[0_16px_36px_rgba(250,45,72,0.15)] group-hover:border-white/20 mb-2">
         <SafeImage
           src={cover}
           track={track}
@@ -430,7 +430,7 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal }) {
   }, [bestSongs, featuredTracks]);
 
   return (
-    <div className="flex-1 w-full pb-24 select-none bg-[#000000] text-white">
+    <div className="flex-1 w-full pb-24 select-none bg-transparent text-white">
       {/* 1. CLEAN APPLE MUSIC STYLE HEADER */}
       <div className="px-4 sm:px-8 pt-6 pb-4 border-b border-white/[0.06] flex items-center justify-between gap-4">
         <div>

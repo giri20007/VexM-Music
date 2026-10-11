@@ -94,7 +94,7 @@ export function SearchPage({ lib, onNavigate }) {
             placeholder="Search songs, artists, or albums..."
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            className="w-full pl-11 pr-12 py-3 rounded-2xl bg-[#1c1c1e] hover:bg-[#242426] focus:bg-[#242426] border border-white/10 text-xs sm:text-sm text-white placeholder-[#8e8e93] focus:outline-none focus:ring-2 focus:ring-[#fa2d48] transition shadow-lg"
+            className="w-full pl-11 pr-12 py-3 rounded-2xl bg-white/[0.06] hover:bg-white/[0.09] focus:bg-white/[0.10] border border-white/10 text-xs sm:text-sm text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-[#fa2d48]/50 transition shadow-lg backdrop-blur-md"
           />
           {isSearching && (
             <div className="absolute right-10 top-1/2 -translate-y-1/2">
@@ -104,7 +104,7 @@ export function SearchPage({ lib, onNavigate }) {
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 rounded-full text-[#8e8e93] hover:text-white hover:bg-white/10 transition text-xs"
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 rounded-full text-white/50 hover:text-white hover:bg-white/10 transition text-xs"
             >
               ✕
             </button>
@@ -118,14 +118,14 @@ export function SearchPage({ lib, onNavigate }) {
       {/* Suggestion Chips */}
       {suggestions.length > 0 && (
         <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
-          <span className="text-xs text-[#8e8e93] font-semibold mr-1 flex items-center gap-1">
+          <span className="text-xs text-white/60 font-semibold mr-1 flex items-center gap-1">
             <Sparkles className="w-3.5 h-3.5 text-[#fa2d48]" /> Related:
           </span>
           {suggestions.map(s => (
             <button
               key={s}
               onClick={() => setSearchQuery(s)}
-              className="px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-xs font-semibold text-white transition whitespace-nowrap"
+              className="px-3.5 py-1.5 rounded-full bg-white/[0.08] hover:bg-white/[0.16] border border-white/10 text-xs font-semibold text-white transition whitespace-nowrap"
             >
               {s}
             </button>
@@ -143,7 +143,7 @@ export function SearchPage({ lib, onNavigate }) {
                 <TrendingUp className="w-5 h-5 text-[#fa2d48]" />
                 <h3 className="text-xl sm:text-2xl font-black text-white">Trending Hits</h3>
               </div>
-              <div className="bg-[#181818] p-3 rounded-xl border border-white/5 space-y-1">
+              <div className="bg-white/[0.03] backdrop-blur-md p-2 rounded-2xl border border-white/[0.06] space-y-1">
                 {trendingTracks.slice(0, 10).map((t, idx) => (
                   <TrackRow
                     key={`trend_${t.id}_${idx}`}
@@ -160,25 +160,38 @@ export function SearchPage({ lib, onNavigate }) {
 
           {/* Browse Categories */}
           <section className="space-y-4">
-            <h3 className="text-xl font-bold text-white">Explore Genres</h3>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div>
+              <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight">Browse All</h3>
+              <p className="text-xs text-white/50 mt-0.5">Explore by genre, vibe, and artist collections</p>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
               {[
-                { label: 'Tamil Hits', color: 'from-[#8400e7] to-[#1e3264]' },
-                { label: 'Bollywood & Hindi', color: 'from-[#e13300] to-[#731300]' },
-                { label: 'Pop & International', color: 'from-[#148a08] to-[#0d5905]' },
-                { label: 'Anirudh Masterpieces', color: 'from-[#e91429] to-[#800b17]' },
-                { label: 'A.R. Rahman Classics', color: 'from-[#503750] to-[#281b28]' },
-                { label: 'Hip Hop & Rap', color: 'from-[#ba5d07] to-[#5d2e03]' },
-                { label: 'Chill & Acoustic', color: 'from-[#056952] to-[#023529]' },
-                { label: 'Workout & Energy', color: 'from-[#777777] to-[#383838]' },
+                { label: 'Tamil Top Hits', query: 'Tamil Top Hits 2026', color: 'from-[#7b1fa2] via-[#512da8] to-[#1a237e]' },
+                { label: 'Bollywood Romance', query: 'Bollywood Romance Hits', color: 'from-[#e65100] via-[#c2185b] to-[#880e4f]' },
+                { label: 'Anirudh Ravichander', query: 'Anirudh Ravichander Hits', color: 'from-[#d32f2f] via-[#c2185b] to-[#4a148c]' },
+                { label: 'A.R. Rahman Classics', query: 'A.R. Rahman Hits', color: 'from-[#4527a0] via-[#283593] to-[#004d40]' },
+                { label: 'Hip Hop & Trap', query: 'Hip Hop Rap Hits', color: 'from-[#f57f17] via-[#e65100] to-[#b71c1c]' },
+                { label: 'Pop & Global Hits', query: 'Global Pop Hits', color: 'from-[#00897b] via-[#00695c] to-[#004d40]' },
+                { label: 'Acoustic & Chill', query: 'Acoustic Chillout Songs', color: 'from-[#0277bd] via-[#00838f] to-[#00695c]' },
+                { label: 'Workout & Energy', query: 'Workout Gym Songs', color: 'from-[#c62828] via-[#ad1457] to-[#6a1b9a]' },
+                { label: 'Telugu Chartbusters', query: 'Telugu Top Hits', color: 'from-[#ad1457] via-[#880e4f] to-[#311b92]' },
+                { label: 'Malayalam Wave', query: 'Malayalam Hits', color: 'from-[#2e7d32] via-[#1b5e20] to-[#004d40]' },
+                { label: '90s & 2000s Nostalgia', query: '90s 2000s Tamil Hindi Hits', color: 'from-[#bf360c] via-[#8d6e63] to-[#3e2723]' },
+                { label: 'Party & Dance', query: 'Party Dance Hits', color: 'from-[#ec407a] via-[#ab47bc] to-[#7e57c2]' },
               ].map(cat => (
                 <div
                   key={cat.label}
-                  onClick={() => setSearchQuery(cat.label)}
-                  className={`p-5 rounded-xl bg-gradient-to-br ${cat.color} cursor-pointer hover:scale-102 active:scale-98 transition-all duration-300 shadow-lg min-h-[110px] flex flex-col justify-between`}
+                  onClick={() => setSearchQuery(cat.query)}
+                  className={`relative p-5 rounded-2xl bg-gradient-to-br ${cat.color} cursor-pointer overflow-hidden transition-all duration-300 hover:scale-[1.03] hover:shadow-2xl shadow-lg min-h-[120px] flex flex-col justify-between group select-none border border-white/10`}
                 >
-                  <h4 className="font-extrabold text-base sm:text-lg text-white">{cat.label}</h4>
-                  <span className="text-[11px] text-white/70 font-semibold">Explore →</span>
+                  <h4 className="font-black text-base sm:text-lg text-white tracking-tight leading-snug drop-shadow-md">
+                    {cat.label}
+                  </h4>
+                  <div className="flex items-center justify-between text-white/80 group-hover:text-white text-xs font-bold pt-4">
+                    <span>Listen Now</span>
+                    <span className="transition-transform group-hover:translate-x-1">→</span>
+                  </div>
                 </div>
               ))}
             </div>
@@ -202,7 +215,7 @@ export function SearchPage({ lib, onNavigate }) {
                 <Music2 className="w-5 h-5 text-[#fa2d48]" />
                 <span>Songs ({allSongResults.length})</span>
               </h3>
-              <div className="bg-[#181818] p-3 rounded-xl border border-white/5 space-y-1">
+              <div className="bg-white/[0.03] backdrop-blur-md p-2 rounded-2xl border border-white/[0.06] space-y-1">
                 {allSongResults.map((t, idx) => (
                   <TrackRow
                     key={`search_${t.id}_${idx}`}
