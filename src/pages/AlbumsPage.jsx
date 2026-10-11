@@ -12,25 +12,25 @@ import {
 } from 'lucide-react';
 import { useAudioStore } from '../store/useAudioStore';
 import { TrackRow } from '../components/library/TrackRow';
-import { searchUnified } from '../utils/api';
+import { searchUnified, fetchAlbumDetails } from '../utils/api';
 import { formatDuration } from '../utils/formatters';
 import { SafeImage } from '../components/ui/SafeImage';
 
 // Curated Popular Soundtracks & Albums for instant browsing
 const FEATURED_ALBUMS = [
-  { name: 'Coolie (Original Motion Picture Soundtrack)', artist: 'Anirudh Ravichander', year: 2024, thumbnail: 'https://c.saavncdn.com/981/Coolie-Disco-From-Coolie-Tamil-2024-20240509170935-500x500.jpg' },
-  { name: 'The Greatest Of All Time (GOAT)', artist: 'Yuvan Shankar Raja', year: 2024, thumbnail: 'https://c.saavncdn.com/829/The-Greatest-Of-All-Time-Tamil-Tamil-2024-20240903191033-500x500.jpg' },
-  { name: 'Devara Part 1', artist: 'Anirudh Ravichander', year: 2024, thumbnail: 'https://c.saavncdn.com/313/Devara-Part-1-Telugu-Telugu-2024-20240926171010-500x500.jpg' },
-  { name: 'Leo', artist: 'Anirudh Ravichander', year: 2023, thumbnail: 'https://c.saavncdn.com/415/Leo-Original-Motion-Picture-Soundtrack-English-2023-20231019170311-500x500.jpg' },
-  { name: 'Jailer', artist: 'Anirudh Ravichander', year: 2023, thumbnail: 'https://c.saavncdn.com/187/Jailer-Tamil-2023-20230728081443-500x500.jpg' },
-  { name: 'Vikram', artist: 'Anirudh Ravichander', year: 2022, thumbnail: 'https://c.saavncdn.com/973/Vikram-Tamil-2022-20220515182605-500x500.jpg' },
-  { name: 'Jawan', artist: 'Anirudh Ravichander', year: 2023, thumbnail: 'https://c.saavncdn.com/047/Jawan-Hindi-2023-20230921190854-500x500.jpg' },
-  { name: 'Kalki 2898 AD', artist: 'Santhosh Narayanan', year: 2024, thumbnail: 'https://c.saavncdn.com/892/Kalki-2898-Ad-Hindi-Hindi-2024-20240712063714-500x500.jpg' },
-  { name: 'Animal', artist: 'Various Artists', year: 2023, thumbnail: 'https://c.saavncdn.com/092/ANIMAL-Hindi-2023-20260724191152-500x500.jpg' },
-  { name: 'Amar Singh Chamkila', artist: 'A.R. Rahman', year: 2024, thumbnail: 'https://c.saavncdn.com/403/Amar-Singh-Chamkila-Hindi-2024-20250130073140-500x500.jpg' },
-  { name: 'Dunki', artist: 'Pritam', year: 2023, thumbnail: 'https://c.saavncdn.com/139/Dunki-Hindi-2023-20231220211003-500x500.jpg' },
-  { name: 'Master', artist: 'Anirudh Ravichander', year: 2020, thumbnail: 'https://c.saavncdn.com/347/Master-Tamil-2020-20200316084627-500x500.jpg' },
-  { name: 'Aavesham', artist: 'Sushin Shyam', year: 2024, thumbnail: 'https://c.saavncdn.com/202/Aavesham-Original-Motion-Picture-Soundtrack-Malayalam-2024-20250910150630-500x500.jpg' },
+  { name: 'Coolie (Original Motion Picture Soundtrack)', albumId: '67199425', query: 'Coolie Anirudh', artist: 'Anirudh Ravichander', year: 2024, thumbnail: 'https://c.saavncdn.com/981/Coolie-Disco-From-Coolie-Tamil-2024-20240509170935-500x500.jpg' },
+  { name: 'The Greatest Of All Time (GOAT)', query: 'The Greatest Of All Time', artist: 'Yuvan Shankar Raja', year: 2024, thumbnail: 'https://c.saavncdn.com/829/The-Greatest-Of-All-Time-Tamil-Tamil-2024-20240903191033-500x500.jpg' },
+  { name: 'Devara Part 1', query: 'Devara Part 1', artist: 'Anirudh Ravichander', year: 2024, thumbnail: 'https://c.saavncdn.com/313/Devara-Part-1-Telugu-Telugu-2024-20240926171010-500x500.jpg' },
+  { name: 'Leo', query: 'Leo Anirudh', artist: 'Anirudh Ravichander', year: 2023, thumbnail: 'https://c.saavncdn.com/415/Leo-Original-Motion-Picture-Soundtrack-English-2023-20231019170311-500x500.jpg' },
+  { name: 'Jailer', query: 'Jailer Anirudh', artist: 'Anirudh Ravichander', year: 2023, thumbnail: 'https://c.saavncdn.com/187/Jailer-Tamil-2023-20230728081443-500x500.jpg' },
+  { name: 'Vikram', query: 'Vikram Anirudh', artist: 'Anirudh Ravichander', year: 2022, thumbnail: 'https://c.saavncdn.com/973/Vikram-Tamil-2022-20220515182605-500x500.jpg' },
+  { name: 'Jawan', query: 'Jawan Anirudh', artist: 'Anirudh Ravichander', year: 2023, thumbnail: 'https://c.saavncdn.com/047/Jawan-Hindi-2023-20230921190854-500x500.jpg' },
+  { name: 'Kalki 2898 AD', query: 'Kalki 2898 AD', artist: 'Santhosh Narayanan', year: 2024, thumbnail: 'https://c.saavncdn.com/892/Kalki-2898-Ad-Hindi-Hindi-2024-20240712063714-500x500.jpg' },
+  { name: 'Animal', query: 'Animal Ranbir', artist: 'Various Artists', year: 2023, thumbnail: 'https://c.saavncdn.com/092/ANIMAL-Hindi-2023-20260724191152-500x500.jpg' },
+  { name: 'Amar Singh Chamkila', query: 'Amar Singh Chamkila', artist: 'A.R. Rahman', year: 2024, thumbnail: 'https://c.saavncdn.com/403/Amar-Singh-Chamkila-Hindi-2024-20250130073140-500x500.jpg' },
+  { name: 'Dunki', query: 'Dunki Pritam', artist: 'Pritam', year: 2023, thumbnail: 'https://c.saavncdn.com/139/Dunki-Hindi-2023-20231220211003-500x500.jpg' },
+  { name: 'Master', query: 'Master Anirudh', artist: 'Anirudh Ravichander', year: 2020, thumbnail: 'https://c.saavncdn.com/347/Master-Tamil-2020-20200316084627-500x500.jpg' },
+  { name: 'Aavesham', query: 'Aavesham', artist: 'Sushin Shyam', year: 2024, thumbnail: 'https://c.saavncdn.com/202/Aavesham-Original-Motion-Picture-Soundtrack-Malayalam-2024-20250910150630-500x500.jpg' },
 ];
 
 // Sub-Component 1: Dedicated Album View (Apple Music Clean Hero & Tracklist)
@@ -72,13 +72,19 @@ function AlbumDetailView({ lib, albumName, onNavigate, onBack }) {
         setAlbumArtist(localAlbum.artist);
       }
 
-      if (localAlbum && localAlbum.tracks?.length >= 4) {
-        setAlbumTracks(localAlbum.tracks);
-        return;
-      }
-
       setIsLoadingAlbum(true);
       try {
+        // 1. Fetch official high-fidelity studio album tracks (320 kbps AAC)
+        const targetQuery = feat?.albumId || feat?.query || albumName;
+        const albumData = await fetchAlbumDetails(targetQuery);
+        if (isMounted && albumData?.songs && albumData.songs.length > 0) {
+          setAlbumTracks(albumData.songs);
+          if (albumData.thumbnail && !feat) setAlbumCover(albumData.thumbnail);
+          if (albumData.artist && !feat) setAlbumArtist(albumData.artist);
+          return;
+        }
+
+        // 2. Fallback to unified search
         const results = await searchUnified(albumName, 25);
         if (isMounted) {
           if (results && results.length > 0) {

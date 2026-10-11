@@ -1,10 +1,9 @@
-import React, { memo, useState } from 'react';
-import { Play, Pause, Heart, Plus, Music2, MoreHorizontal } from 'lucide-react';
+import React, { memo } from 'react';
+import { Play, Pause, Heart, Plus, Music2 } from 'lucide-react';
 import { useAudioStore } from '../../store/useAudioStore';
 import { formatDuration, formatQualityBadge } from '../../utils/formatters';
 import { getArtworkSrc } from '../../utils/artworkGenerator';
 import { SafeImage } from '../ui/SafeImage';
-import { TrackContextMenu } from '../layout/TrackContextMenu';
 
 export const TrackRow = memo(function TrackRow({
   track,
@@ -19,9 +18,6 @@ export const TrackRow = memo(function TrackRow({
   const likedTrackIds = useAudioStore(s => s.likedTrackIds);
   const toggleLike = useAudioStore(s => s.toggleLike);
   const enqueue = useAudioStore(s => s.enqueue);
-
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [menuPos, setMenuPos] = useState({ x: 0, y: 0 });
 
   const isCurrent = currentTrack?.id === track.id;
   const isCurrentPlaying = isCurrent && isPlaying;
@@ -41,28 +37,12 @@ export const TrackRow = memo(function TrackRow({
 
   const coverSrc = getArtworkSrc(track, 120);
 
-  const handleContextMenu = e => {
-    e.preventDefault();
-    e.stopPropagation();
-    setMenuPos({ x: e.clientX, y: e.clientY });
-    setMenuOpen(true);
-  };
-
-  const handleMoreClick = e => {
-    e.stopPropagation();
-    const rect = e.currentTarget.getBoundingClientRect();
-    setMenuPos({ x: rect.left - 180, y: rect.bottom + 5 });
-    setMenuOpen(true);
-  };
-
   return (
-    <>
-      <div
-        onClick={handlePlayClick}
-        onContextMenu={handleContextMenu}
-        className={`group relative flex items-center justify-between gap-3 rounded-xl px-3 py-2 text-sm transition-colors cursor-pointer select-none ${
-          isCurrent
-            ? 'bg-white/10 text-white'
+    <div
+      onClick={handlePlayClick}
+      className={`group relative flex items-center justify-between gap-3 rounded-xl px-3 py-2 text-sm transition-colors cursor-pointer select-none ${
+        isCurrent
+          ? 'bg-white/10 text-white'
             : 'hover:bg-white/[0.06] text-white'
         }`}
       >
@@ -157,24 +137,7 @@ export const TrackRow = memo(function TrackRow({
           >
             <Plus className="w-4 h-4" />
           </button>
-
-          <button
-            onClick={handleMoreClick}
-            className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-white/10 hover:text-white transition"
-            title="More options"
-            aria-label="More options"
-          >
-            <MoreHorizontal className="w-4 h-4" />
-          </button>
         </div>
       </div>
-
-      <TrackContextMenu
-        track={track}
-        isOpen={menuOpen}
-        onClose={() => setMenuOpen(false)}
-        position={menuPos}
-      />
-    </>
   );
 });

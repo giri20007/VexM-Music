@@ -43,9 +43,32 @@ router.get('/:id', async (req, res, next) => {
     return res.redirect(302, item.audioUrl);
   }
 
-  // High-speed multi-worker F2L streaming redirect
+  // If item has a title, resolve authentic high-quality 320k studio stream
+  if (item && item.title) {
+    try {
+      const { search } = require('../services/jioSaavn');
+      const q = `${item.title} ${item.artist || item.album || ''}`.replace(/\[.*?\]|\(.*?\)/g, '').trim();
+      const saavnTracks = await search(q, 3);
+      if (saavnTracks && saavnTracks.length > 0) {
+        const match = saavnTracks.find(t =>
+          t.title.toLowerCase().includes(item.title.toLowerCase()) ||
+          item.title.toLowerCase().includes(t.title.toLowerCase())
+        ) || saavnTracks[0];
+
+        if (match && match.audioUrl) {
+          item.audioUrl = match.audioUrl;
+          return res.redirect(302, match.audioUrl);
+        }
+      }
+    } catch (saavnErr) {
+      console.warn('[Stream /api/stream JioSaavn resolution note]:', saavnErr.message);
+    }
+  }
+
+  // High-speed multi-worker F2L streaming redirect (ONLY for verified audio, NEVER video/movie files)
+  const isVideoFile = item?.fileName && /\.(mkv|mp4|avi|mov|wmv|webm|flv)$/i.test(item.fileName);
   const streamBase = (process.env.STREAM_SERVER_URL || 'https://dl.fxsmovies.live').replace(/\/+$/, '');
-  if (streamBase) {
+  if (streamBase && !isVideoFile && (!item?.size || item.size < 150 * 1024 * 1024)) {
     return res.redirect(302, `${streamBase}/stream/${encodeURIComponent(id)}`);
   }
 

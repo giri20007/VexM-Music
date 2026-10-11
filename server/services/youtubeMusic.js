@@ -97,6 +97,11 @@ async function search(query, limit = 20) {
 
         // Parse artist, album, duration
         const col1Runs = r.flexColumns?.[1]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs || [];
+        const col1Text = col1Runs.map(x => x.text).join('');
+
+        // Skip non-music entities (Episodes, Podcasts, Playlists, Profiles)
+        if (/Episode|Podcast|Playlist|Profile|Artist\s*•/i.test(col1Text)) continue;
+
         let artist = '';
         let album = '';
         let durationStr = '';
@@ -107,7 +112,7 @@ async function search(query, limit = 20) {
             artist = artist ? `${artist}, ${run.text}` : run.text;
           } else if (pageType === 'MUSIC_PAGE_TYPE_ALBUM') {
             album = run.text;
-          } else if (/^\d+:\d+$/.test(run.text.trim())) {
+          } else if (/^\d+(?::\d+)+$/.test(run.text.trim())) {
             durationStr = run.text.trim();
           }
         }
@@ -123,6 +128,30 @@ async function search(query, limit = 20) {
           const parts = durationStr.split(':').map(Number);
           if (parts.length === 2) duration = parts[0] * 60 + parts[1];
           else if (parts.length === 3) duration = parts[0] * 3600 + parts[1] * 60 + parts[2];
+        }
+
+        // STRICT MUSIC-ONLY FILTER:
+        // 1. Never return videos longer than 11 minutes (660 seconds) or with 3 duration parts (1hr+)
+        if (duration > 660 || (durationStr && durationStr.split(':').length >= 3)) {
+          continue;
+        }
+
+        // 2. Reject full movies, jukeboxes, reactions, interviews, and trailers
+        const lowerTitle = title.toLowerCase();
+        if (
+          lowerTitle.includes('full movie') ||
+          lowerTitle.includes('full film') ||
+          lowerTitle.includes('jukebox') ||
+          lowerTitle.includes('all songs') ||
+          lowerTitle.includes('interview') ||
+          lowerTitle.includes('reaction') ||
+          lowerTitle.includes('review') ||
+          lowerTitle.includes('doubts explained') ||
+          lowerTitle.includes('movie scene') ||
+          lowerTitle.includes('trailer') ||
+          lowerTitle.includes('teaser')
+        ) {
+          continue;
         }
 
         // Parse artwork

@@ -166,6 +166,11 @@ export const searchUnified = async (query, limit = 25, source = 'all', localTrac
   }
 
   for (const track of yt) {
+    // Ignore any YouTube track that is a movie (> 11 mins) or contains junk
+    if (track.duration > 660) continue;
+    const lowerTitle = (track.title || '').toLowerCase();
+    if (lowerTitle.includes('full movie') || lowerTitle.includes('jukebox') || lowerTitle.includes('reaction')) continue;
+
     if (!seenTitles.has(track.title.toLowerCase())) {
       seenTitles.add(track.title.toLowerCase());
       combined.push(track);
@@ -173,4 +178,13 @@ export const searchUnified = async (query, limit = 25, source = 'all', localTrac
   }
 
   return combined.slice(0, limit);
+};
+
+// Fetch Full Official Studio Album with 320k tracks
+export const fetchAlbumDetails = idOrName => {
+  const clean = (idOrName || '').trim();
+  if (!clean) return Promise.resolve(null);
+  return request(`/api/saavn/album?name=${encodeURIComponent(clean)}`, { retries: 1 })
+    .then(r => r || null)
+    .catch(() => null);
 };

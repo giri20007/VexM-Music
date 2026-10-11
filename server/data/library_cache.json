@@ -42,8 +42,8 @@
       "duration": 100,
       "size": 24171836,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 1934,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -58,7 +58,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/bb/88/06/bb880626-2526-d88a-5d8c-bc26c1f2504b/cover.jpg/600x600bb.jpg",
         "albumArtworkId": "track_30"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/bb/88/06/bb880626-2526-d88a-5d8c-bc26c1f2504b/cover.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/bb/88/06/bb880626-2526-d88a-5d8c-bc26c1f2504b/cover.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/875/b71a1454ff6390f6c5bea9a611c40c7e_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "31",
@@ -72,8 +76,8 @@
       "duration": 195,
       "size": 44280453,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 1817,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -88,7 +92,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d4/c4/38/d4c43885-7866-3ac4-e323-b9ca6a7621ec/cover.jpg/600x600bb.jpg",
         "albumArtworkId": "track_31"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d4/c4/38/d4c43885-7866-3ac4-e323-b9ca6a7621ec/cover.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d4/c4/38/d4c43885-7866-3ac4-e323-b9ca6a7621ec/cover.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/906/34217c9a29ddd4e6cb7ee46d952e7952_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "32",
@@ -102,8 +110,8 @@
       "duration": 197,
       "size": 45126997,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 1833,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -118,7 +126,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d4/c4/38/d4c43885-7866-3ac4-e323-b9ca6a7621ec/cover.jpg/600x600bb.jpg",
         "albumArtworkId": "track_32"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d4/c4/38/d4c43885-7866-3ac4-e323-b9ca6a7621ec/cover.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d4/c4/38/d4c43885-7866-3ac4-e323-b9ca6a7621ec/cover.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/875/0c00dc46475212a69c1a602e532993f4_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "33",
@@ -132,8 +144,8 @@
       "duration": 237,
       "size": 48015612,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 1621,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -148,7 +160,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d4/c4/38/d4c43885-7866-3ac4-e323-b9ca6a7621ec/cover.jpg/600x600bb.jpg",
         "albumArtworkId": "track_33"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d4/c4/38/d4c43885-7866-3ac4-e323-b9ca6a7621ec/cover.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d4/c4/38/d4c43885-7866-3ac4-e323-b9ca6a7621ec/cover.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/875/ef472d1f37281cebf394867113140fca_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "34",
@@ -192,8 +208,8 @@
       "duration": 250,
       "size": 56972244,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 1823,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -208,7 +224,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/91/54/09/915409a3-12e4-22e2-4849-361a817371ae/cover.jpg/600x600bb.jpg",
         "albumArtworkId": "track_35"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/91/54/09/915409a3-12e4-22e2-4849-361a817371ae/cover.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/91/54/09/915409a3-12e4-22e2-4849-361a817371ae/cover.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/875/aee9f7d6681d9763ec11cc03f409e550_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "36",
@@ -222,8 +242,8 @@
       "duration": 260,
       "size": 63603018,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 1957,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -238,7 +258,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/bb/88/06/bb880626-2526-d88a-5d8c-bc26c1f2504b/cover.jpg/600x600bb.jpg",
         "albumArtworkId": "track_36"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/bb/88/06/bb880626-2526-d88a-5d8c-bc26c1f2504b/cover.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/bb/88/06/bb880626-2526-d88a-5d8c-bc26c1f2504b/cover.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/875/b71a1454ff6390f6c5bea9a611c40c7e_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "39",
@@ -252,8 +276,8 @@
       "duration": 59,
       "size": 12484379,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 1693,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -268,7 +292,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/fa/8e/1d/fa8e1d8d-e98b-6da5-35b3-6ab75a3c1d3d/5026854958057.jpg/600x600bb.jpg",
         "albumArtworkId": "track_39"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/fa/8e/1d/fa8e1d8d-e98b-6da5-35b3-6ab75a3c1d3d/5026854958057.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/fa/8e/1d/fa8e1d8d-e98b-6da5-35b3-6ab75a3c1d3d/5026854958057.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/654/5a36bc6226c551a91a2f8d49271c7696_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "40",
@@ -312,8 +340,8 @@
       "duration": 151,
       "size": 30959799,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 1640,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -328,7 +356,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/fa/8e/1d/fa8e1d8d-e98b-6da5-35b3-6ab75a3c1d3d/5026854958057.jpg/600x600bb.jpg",
         "albumArtworkId": "track_41"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/fa/8e/1d/fa8e1d8d-e98b-6da5-35b3-6ab75a3c1d3d/5026854958057.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/fa/8e/1d/fa8e1d8d-e98b-6da5-35b3-6ab75a3c1d3d/5026854958057.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/035/245431727d795dd932d15bdf281cdd3c_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "42",
@@ -462,8 +494,8 @@
       "duration": 205,
       "size": 46008641,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 1795,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -478,7 +510,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/fa/8e/1d/fa8e1d8d-e98b-6da5-35b3-6ab75a3c1d3d/5026854958057.jpg/600x600bb.jpg",
         "albumArtworkId": "track_46"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/fa/8e/1d/fa8e1d8d-e98b-6da5-35b3-6ab75a3c1d3d/5026854958057.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/fa/8e/1d/fa8e1d8d-e98b-6da5-35b3-6ab75a3c1d3d/5026854958057.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/742/1ed7895910f7a1d66136f369630d5266_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "47",
@@ -492,8 +528,8 @@
       "duration": 212,
       "size": 46966229,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 1772,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -508,7 +544,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/a4/35/a5/a435a522-0a43-967f-9447-7e63ac8d2f1d/810236330495.png/600x600bb.jpg",
         "albumArtworkId": "track_47"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/a4/35/a5/a435a522-0a43-967f-9447-7e63ac8d2f1d/810236330495.png/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/a4/35/a5/a435a522-0a43-967f-9447-7e63ac8d2f1d/810236330495.png/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/499/7e158e0063edc2d2e6c8e880dd270d81_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "49",
@@ -522,8 +562,8 @@
       "duration": 233,
       "size": 25280068,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 868,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": true,
@@ -538,7 +578,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a9/f6/c7/a9f6c79b-607a-efa5-94c5-c60155fdd5d4/199806891513.jpg/600x600bb.jpg",
         "albumArtworkId": "track_49"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a9/f6/c7/a9f6c79b-607a-efa5-94c5-c60155fdd5d4/199806891513.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a9/f6/c7/a9f6c79b-607a-efa5-94c5-c60155fdd5d4/199806891513.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/446/ccda915f151957c7108465f48e873a1a_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "50",
@@ -552,8 +596,8 @@
       "duration": 151,
       "size": 30585317,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 1620,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -568,7 +612,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a9/f6/c7/a9f6c79b-607a-efa5-94c5-c60155fdd5d4/199806891513.jpg/600x600bb.jpg",
         "albumArtworkId": "track_50"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a9/f6/c7/a9f6c79b-607a-efa5-94c5-c60155fdd5d4/199806891513.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a9/f6/c7/a9f6c79b-607a-efa5-94c5-c60155fdd5d4/199806891513.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/513/3ea3269ef744d0e05f4abb9eaf4cc3d3_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "51",
@@ -582,8 +630,8 @@
       "duration": 218,
       "size": 46423495,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 1704,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -598,7 +646,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a9/f6/c7/a9f6c79b-607a-efa5-94c5-c60155fdd5d4/199806891513.jpg/600x600bb.jpg",
         "albumArtworkId": "track_51"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a9/f6/c7/a9f6c79b-607a-efa5-94c5-c60155fdd5d4/199806891513.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a9/f6/c7/a9f6c79b-607a-efa5-94c5-c60155fdd5d4/199806891513.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/513/db6678afd5aaa4df53ab1f20226d96a2_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "52",
@@ -612,8 +664,8 @@
       "duration": 274,
       "size": 58126737,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 1697,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -628,7 +680,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a9/f6/c7/a9f6c79b-607a-efa5-94c5-c60155fdd5d4/199806891513.jpg/600x600bb.jpg",
         "albumArtworkId": "track_52"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a9/f6/c7/a9f6c79b-607a-efa5-94c5-c60155fdd5d4/199806891513.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a9/f6/c7/a9f6c79b-607a-efa5-94c5-c60155fdd5d4/199806891513.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/513/ad3cdea6ac72bdbb2e9bd47fd81687f9_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "56",
@@ -642,8 +698,8 @@
       "duration": 77,
       "size": 17293959,
       "mimeType": "audio/x-flac",
-      "format": "FLAC",
-      "bitrate": 1797,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -658,7 +714,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/76/57/c3/7657c308-e37a-1925-8be2-186a479f90e9/cover.jpg/600x600bb.jpg",
         "albumArtworkId": "track_56"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/76/57/c3/7657c308-e37a-1925-8be2-186a479f90e9/cover.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/76/57/c3/7657c308-e37a-1925-8be2-186a479f90e9/cover.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/323/f5ec9f2c530d3d36a06dd17d3e7a2f9d_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "57",
@@ -672,8 +732,8 @@
       "duration": 161,
       "size": 35487345,
       "mimeType": "audio/x-flac",
-      "format": "FLAC",
-      "bitrate": 1763,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -688,7 +748,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/76/57/c3/7657c308-e37a-1925-8be2-186a479f90e9/cover.jpg/600x600bb.jpg",
         "albumArtworkId": "track_57"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/76/57/c3/7657c308-e37a-1925-8be2-186a479f90e9/cover.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/76/57/c3/7657c308-e37a-1925-8be2-186a479f90e9/cover.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/880/db077e4b4446de098cb975fd36effea8_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "58",
@@ -702,8 +766,8 @@
       "duration": 274,
       "size": 58544242,
       "mimeType": "audio/x-flac",
-      "format": "FLAC",
-      "bitrate": 1709,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -718,7 +782,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/76/57/c3/7657c308-e37a-1925-8be2-186a479f90e9/cover.jpg/600x600bb.jpg",
         "albumArtworkId": "track_58"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/76/57/c3/7657c308-e37a-1925-8be2-186a479f90e9/cover.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/76/57/c3/7657c308-e37a-1925-8be2-186a479f90e9/cover.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/145/0565b0e5e3f489cff4a7ec8b21c39fc9_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "59",
@@ -732,8 +800,8 @@
       "duration": 273,
       "size": 59538826,
       "mimeType": "audio/x-flac",
-      "format": "FLAC",
-      "bitrate": 1745,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -748,7 +816,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/77/99/5d/77995d42-129a-7bdc-b484-09fde5e11d03/cover.jpg/600x600bb.jpg",
         "albumArtworkId": "track_59"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/77/99/5d/77995d42-129a-7bdc-b484-09fde5e11d03/cover.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/77/99/5d/77995d42-129a-7bdc-b484-09fde5e11d03/cover.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/880/170268176d06eebd99bde9f0fb0bad5c_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "60",
@@ -762,8 +834,8 @@
       "duration": 236,
       "size": 51592952,
       "mimeType": "audio/x-flac",
-      "format": "FLAC",
-      "bitrate": 1749,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -778,7 +850,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/be/08/0d/be080d70-2720-2258-c711-f0b68efeb828/cover.jpg/600x600bb.jpg",
         "albumArtworkId": "track_60"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/be/08/0d/be080d70-2720-2258-c711-f0b68efeb828/cover.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/be/08/0d/be080d70-2720-2258-c711-f0b68efeb828/cover.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/880/f126a3b0b278df1e1e132b264225386e_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "61",
@@ -822,8 +898,8 @@
       "duration": 240,
       "size": 54162093,
       "mimeType": "audio/x-flac",
-      "format": "FLAC",
-      "bitrate": 1805,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -838,7 +914,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/b4/62/92/b462925b-979e-4cd1-f162-4d62090d6588/cover.jpg/600x600bb.jpg",
         "albumArtworkId": "track_62"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/b4/62/92/b462925b-979e-4cd1-f162-4d62090d6588/cover.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/b4/62/92/b462925b-979e-4cd1-f162-4d62090d6588/cover.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/880/42578840a93b3a69fbba890433ac5805_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "63",
@@ -882,8 +962,8 @@
       "duration": 154,
       "size": 36313938,
       "mimeType": "audio/x-flac",
-      "format": "FLAC",
-      "bitrate": 1886,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -898,7 +978,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/76/57/c3/7657c308-e37a-1925-8be2-186a479f90e9/cover.jpg/600x600bb.jpg",
         "albumArtworkId": "track_64"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/76/57/c3/7657c308-e37a-1925-8be2-186a479f90e9/cover.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/76/57/c3/7657c308-e37a-1925-8be2-186a479f90e9/cover.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/877/875e41134def3f76517ce29ea7819fc8_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "68",
@@ -912,8 +996,8 @@
       "duration": 248,
       "size": 57773563,
       "mimeType": "audio/x-flac",
-      "format": "FLAC",
-      "bitrate": 1864,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -928,7 +1012,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/0d/9f/58/0d9f5855-6310-d357-66cd-4b99235405e0/196872703887.jpg/600x600bb.jpg",
         "albumArtworkId": "track_68"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/0d/9f/58/0d9f5855-6310-d357-66cd-4b99235405e0/196872703887.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/0d/9f/58/0d9f5855-6310-d357-66cd-4b99235405e0/196872703887.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/887/2dcc8aa088ebfba1900e9f3b6c8cae19_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "69",
@@ -942,8 +1030,8 @@
       "duration": 274,
       "size": 65031680,
       "mimeType": "audio/x-flac",
-      "format": "FLAC",
-      "bitrate": 1899,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -958,7 +1046,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/0d/9f/58/0d9f5855-6310-d357-66cd-4b99235405e0/196872703887.jpg/600x600bb.jpg",
         "albumArtworkId": "track_69"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/0d/9f/58/0d9f5855-6310-d357-66cd-4b99235405e0/196872703887.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/0d/9f/58/0d9f5855-6310-d357-66cd-4b99235405e0/196872703887.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/887/b88783da6f5d917d3e42927f37ec734f_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "70",
@@ -972,8 +1064,8 @@
       "duration": 344,
       "size": 80185912,
       "mimeType": "audio/x-flac",
-      "format": "FLAC",
-      "bitrate": 1865,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -988,7 +1080,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/de/1d/2d/de1d2d56-833e-c02e-f0c7-b32fcbf8afab/196872659450.jpg/600x600bb.jpg",
         "albumArtworkId": "track_70"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/de/1d/2d/de1d2d56-833e-c02e-f0c7-b32fcbf8afab/196872659450.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/de/1d/2d/de1d2d56-833e-c02e-f0c7-b32fcbf8afab/196872659450.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/887/3562c91acd443e72ad2b8216b0b16376_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "71",
@@ -1002,8 +1098,8 @@
       "duration": 334,
       "size": 75787821,
       "mimeType": "audio/x-flac",
-      "format": "FLAC",
-      "bitrate": 1815,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -1018,7 +1114,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/0d/9f/58/0d9f5855-6310-d357-66cd-4b99235405e0/196872703887.jpg/600x600bb.jpg",
         "albumArtworkId": "track_71"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/0d/9f/58/0d9f5855-6310-d357-66cd-4b99235405e0/196872703887.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/0d/9f/58/0d9f5855-6310-d357-66cd-4b99235405e0/196872703887.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/887/cab06f3954f850a468e378041cd1edcd_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "73",
@@ -1032,8 +1132,8 @@
       "duration": 194,
       "size": 17563287,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 724,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": true,
@@ -1048,7 +1148,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/a4/bc/9f/a4bc9fe2-690a-a53d-24db-7e9b048fa562/888002672323.jpg/600x600bb.jpg",
         "albumArtworkId": "fallback_73"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/a4/bc/9f/a4bc9fe2-690a-a53d-24db-7e9b048fa562/888002672323.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/a4/bc/9f/a4bc9fe2-690a-a53d-24db-7e9b048fa562/888002672323.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/076/d4c916fd77d6fcfc923b6208eef104d6_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "74",
@@ -1062,8 +1166,8 @@
       "duration": 313,
       "size": 34983460,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 894,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -1078,7 +1182,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/f2/7a/c9/f27ac9ef-473c-e015-019a-9289ae775428/cover.jpg/600x600bb.jpg",
         "albumArtworkId": "fallback_74"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/f2/7a/c9/f27ac9ef-473c-e015-019a-9289ae775428/cover.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/f2/7a/c9/f27ac9ef-473c-e015-019a-9289ae775428/cover.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/501/e6764acd2ce61c7039dcc8554c262e33_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "75",
@@ -1092,8 +1200,8 @@
       "duration": 104,
       "size": 10810254,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 832,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": true,
@@ -1108,7 +1216,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/f2/7a/c9/f27ac9ef-473c-e015-019a-9289ae775428/cover.jpg/600x600bb.jpg",
         "albumArtworkId": "fallback_75"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/f2/7a/c9/f27ac9ef-473c-e015-019a-9289ae775428/cover.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/f2/7a/c9/f27ac9ef-473c-e015-019a-9289ae775428/cover.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/387/7144fcb51d7983e9e83c44cff58a37a3_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "76",
@@ -1122,8 +1234,8 @@
       "duration": 271,
       "size": 28166162,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 831,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": true,
@@ -1138,7 +1250,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/f2/7a/c9/f27ac9ef-473c-e015-019a-9289ae775428/cover.jpg/600x600bb.jpg",
         "albumArtworkId": "fallback_76"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/f2/7a/c9/f27ac9ef-473c-e015-019a-9289ae775428/cover.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/f2/7a/c9/f27ac9ef-473c-e015-019a-9289ae775428/cover.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/076/ee16ebddb4fefd028d090e4bce1b4735_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "77",
@@ -1152,8 +1268,8 @@
       "duration": 309,
       "size": 32876760,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 851,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -1168,7 +1284,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/3c26ba207ebaeef950daa30f2e0f20e2/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_77"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/3c26ba207ebaeef950daa30f2e0f20e2/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/076/I-Love-G-V-Prakash-Kumar-Tamil-2018-20250910160619-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/076/1644fbb95df12a0659918157207da646_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "78",
@@ -1182,8 +1302,8 @@
       "duration": 219,
       "size": 20967410,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 766,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": true,
@@ -1198,7 +1318,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/28/fc/e4/28fce4cf-4ca6-b847-f5dc-ce42633051aa/8902894354890_cover.jpg/600x600bb.jpg",
         "albumArtworkId": "fallback_78"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/28/fc/e4/28fce4cf-4ca6-b847-f5dc-ce42633051aa/8902894354890_cover.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/28/fc/e4/28fce4cf-4ca6-b847-f5dc-ce42633051aa/8902894354890_cover.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/387/c11f91dfae0903225707397c22a24756_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "79",
@@ -1212,8 +1336,8 @@
       "duration": 209,
       "size": 23135723,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 886,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": true,
@@ -1228,7 +1352,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/f2/7a/c9/f27ac9ef-473c-e015-019a-9289ae775428/cover.jpg/600x600bb.jpg",
         "albumArtworkId": "fallback_79"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/f2/7a/c9/f27ac9ef-473c-e015-019a-9289ae775428/cover.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/f2/7a/c9/f27ac9ef-473c-e015-019a-9289ae775428/cover.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/076/a1a1b7ecb368396cf90b62b3474871b9_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "81",
@@ -1239,11 +1367,11 @@
       "album": "Varuthapadatha Vaalibar Sangam (Original Motion Picture Soundtrack)",
       "albumArtist": "Unknown Artist",
       "fileName": "05 - Yennada Yennada.wav",
-      "duration": 0,
+      "duration": 262,
       "size": 47340436,
       "mimeType": "audio/x-wav",
-      "format": "WAV",
-      "bitrate": 1411,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": true,
@@ -1258,7 +1386,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/a4/bc/9f/a4bc9fe2-690a-a53d-24db-7e9b048fa562/888002672323.jpg/600x600bb.jpg",
         "albumArtworkId": "fallback_81"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/a4/bc/9f/a4bc9fe2-690a-a53d-24db-7e9b048fa562/888002672323.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/a4/bc/9f/a4bc9fe2-690a-a53d-24db-7e9b048fa562/888002672323.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/826/315190ebaa9ac85641654ba727c320e2_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "82",
@@ -1269,11 +1401,11 @@
       "album": "Varuthapadatha Vaalibar Sangam (Original Motion Picture Soundtrack)",
       "albumArtist": "Unknown Artist",
       "fileName": "04 - Varuthapadatha Valibar Sangam.wav",
-      "duration": 0,
+      "duration": 134,
       "size": 44021760,
       "mimeType": "audio/x-wav",
-      "format": "WAV",
-      "bitrate": 1411,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": true,
@@ -1288,7 +1420,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/a4/bc/9f/a4bc9fe2-690a-a53d-24db-7e9b048fa562/888002672323.jpg/600x600bb.jpg",
         "albumArtworkId": "fallback_82"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/a4/bc/9f/a4bc9fe2-690a-a53d-24db-7e9b048fa562/888002672323.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/a4/bc/9f/a4bc9fe2-690a-a53d-24db-7e9b048fa562/888002672323.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/965/ac20ae74710574772f5d05c116248011_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "83",
@@ -1299,11 +1435,11 @@
       "album": "Varuthapadatha Vaalibar Sangam (Original Motion Picture Soundtrack)",
       "albumArtist": "Unknown Artist",
       "fileName": "03 - Paarkathe Paarkathe.wav",
-      "duration": 0,
+      "duration": 134,
       "size": 50247484,
       "mimeType": "audio/x-wav",
-      "format": "WAV",
-      "bitrate": 1411,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": true,
@@ -1318,7 +1454,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/a4/bc/9f/a4bc9fe2-690a-a53d-24db-7e9b048fa562/888002672323.jpg/600x600bb.jpg",
         "albumArtworkId": "fallback_83"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/a4/bc/9f/a4bc9fe2-690a-a53d-24db-7e9b048fa562/888002672323.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/a4/bc/9f/a4bc9fe2-690a-a53d-24db-7e9b048fa562/888002672323.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/965/ac20ae74710574772f5d05c116248011_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "84",
@@ -1329,11 +1469,11 @@
       "album": "Varuthapadatha Vaalibar Sangam (Original Motion Picture Soundtrack)",
       "albumArtist": "Unknown Artist",
       "fileName": "02 - Indha Ponnungale.wav",
-      "duration": 0,
+      "duration": 134,
       "size": 49534784,
       "mimeType": "audio/x-wav",
-      "format": "WAV",
-      "bitrate": 1411,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": true,
@@ -1348,7 +1488,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music123/v4/aa/21/89/aa2189c4-46dc-bf76-c4f5-053503ec151d/886444112826.jpg/600x600bb.jpg",
         "albumArtworkId": "fallback_84"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music123/v4/aa/21/89/aa2189c4-46dc-bf76-c4f5-053503ec151d/886444112826.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music123/v4/aa/21/89/aa2189c4-46dc-bf76-c4f5-053503ec151d/886444112826.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/965/ac20ae74710574772f5d05c116248011_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "85",
@@ -1389,11 +1533,11 @@
       "album": "Varuthapadatha Vaalibar Sangam (Original Motion Picture Soundtrack)",
       "albumArtist": "Unknown Artist",
       "fileName": "06 - Indha Ponnungale (Dubstep mix).wav",
-      "duration": 0,
+      "duration": 134,
       "size": 40472584,
       "mimeType": "audio/x-wav",
-      "format": "WAV",
-      "bitrate": 1411,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": true,
@@ -1408,7 +1552,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/a4/bc/9f/a4bc9fe2-690a-a53d-24db-7e9b048fa562/888002672323.jpg/600x600bb.jpg",
         "albumArtworkId": "fallback_86"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/a4/bc/9f/a4bc9fe2-690a-a53d-24db-7e9b048fa562/888002672323.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/a4/bc/9f/a4bc9fe2-690a-a53d-24db-7e9b048fa562/888002672323.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/965/ac20ae74710574772f5d05c116248011_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "88",
@@ -1422,8 +1570,8 @@
       "duration": 260,
       "size": 29705114,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 914,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": true,
@@ -1438,7 +1586,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/c82e004f6af21dfa01f1bf6977f0a74f/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_88"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/c82e004f6af21dfa01f1bf6977f0a74f/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/507/Neethaane-En-Ponvasantham-Tamil-2012-20190822125705-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/507/75f5edd6f5c7e485c3f80b38eb6bedc5_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "89",
@@ -1452,8 +1604,8 @@
       "duration": 363,
       "size": 41020843,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 904,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -1468,7 +1620,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/aa/2d/f7/aa2df7a0-4659-0b5e-9eaa-5fa7623dfb37/886443595507.jpg/600x600bb.jpg",
         "albumArtworkId": "fallback_89"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/aa/2d/f7/aa2df7a0-4659-0b5e-9eaa-5fa7623dfb37/886443595507.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/aa/2d/f7/aa2df7a0-4659-0b5e-9eaa-5fa7623dfb37/886443595507.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/507/6031222d40a78091d3278c4d55f10e05_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "90",
@@ -1482,8 +1638,8 @@
       "duration": 335,
       "size": 38843027,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 928,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -1498,7 +1654,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/aa/2d/f7/aa2df7a0-4659-0b5e-9eaa-5fa7623dfb37/886443595507.jpg/600x600bb.jpg",
         "albumArtworkId": "fallback_90"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/aa/2d/f7/aa2df7a0-4659-0b5e-9eaa-5fa7623dfb37/886443595507.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/aa/2d/f7/aa2df7a0-4659-0b5e-9eaa-5fa7623dfb37/886443595507.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/507/cbcef35bd970ba466107f16e965bdfe1_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "91",
@@ -1512,8 +1672,8 @@
       "duration": 361,
       "size": 42956816,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 952,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -1528,7 +1688,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/aa/2d/f7/aa2df7a0-4659-0b5e-9eaa-5fa7623dfb37/886443595507.jpg/600x600bb.jpg",
         "albumArtworkId": "fallback_91"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/aa/2d/f7/aa2df7a0-4659-0b5e-9eaa-5fa7623dfb37/886443595507.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/aa/2d/f7/aa2df7a0-4659-0b5e-9eaa-5fa7623dfb37/886443595507.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/507/fbc1514b327646e75b9d69f7feedddc0_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "92",
@@ -1542,8 +1706,8 @@
       "duration": 358,
       "size": 38675097,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 864,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -1558,7 +1722,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/c82e004f6af21dfa01f1bf6977f0a74f/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_92"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/c82e004f6af21dfa01f1bf6977f0a74f/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/507/Neethaane-En-Ponvasantham-Tamil-2012-20190822125705-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/507/aefada8c7e11accb1dda97113bad748f_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "93",
@@ -1572,8 +1740,8 @@
       "duration": 368,
       "size": 39683717,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 863,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -1588,7 +1756,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/482952b9915ac9557b9ced21552f95d1/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_93"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/482952b9915ac9557b9ced21552f95d1/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/507/Neethaane-En-Ponvasantham-Tamil-2012-20190822125705-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/507/c7903490b03437d321871bcb4df83729_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "94",
@@ -1602,8 +1774,8 @@
       "duration": 236,
       "size": 29917081,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 1014,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": true,
@@ -1618,7 +1790,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/c82e004f6af21dfa01f1bf6977f0a74f/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_94"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/c82e004f6af21dfa01f1bf6977f0a74f/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/507/Neethaane-En-Ponvasantham-Tamil-2012-20190822125705-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/507/0ca93731db622b83e36af1c69794f252_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "95",
@@ -1659,10 +1835,10 @@
       "album": "Aadukalam (Original Motion Picture Soundtrack)",
       "albumArtist": "Unknown Artist",
       "fileName": "Veppamaram.mp3",
-      "duration": 0,
+      "duration": 134,
       "size": 11299677,
       "mimeType": "audio/mpeg",
-      "format": "MP3",
+      "format": "AAC",
       "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
@@ -1678,7 +1854,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/ff/2a/39/ff2a3962-cfd6-4447-ca63-888eb198818f/8902894359857_cover.jpg/600x600bb.jpg",
         "albumArtworkId": "fallback_97"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/ff/2a/39/ff2a3962-cfd6-4447-ca63-888eb198818f/8902894359857_cover.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/ff/2a/39/ff2a3962-cfd6-4447-ca63-888eb198818f/8902894359857_cover.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/965/ac20ae74710574772f5d05c116248011_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "98",
@@ -1722,8 +1902,8 @@
       "duration": 308,
       "size": 10362318,
       "mimeType": "audio/mpeg",
-      "format": "MP3",
-      "bitrate": 256,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": false,
@@ -1738,7 +1918,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/10/72/f7/1072f7fc-11cb-ebcc-ad00-9e663a86fc8f/888002672316.jpg/600x600bb.jpg",
         "albumArtworkId": "fallback_99"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/10/72/f7/1072f7fc-11cb-ebcc-ad00-9e663a86fc8f/888002672316.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/10/72/f7/1072f7fc-11cb-ebcc-ad00-9e663a86fc8f/888002672316.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/243/9db08c429c36b093283972835ab0e13a_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "100",
@@ -1809,10 +1993,10 @@
       "album": "Saamy (Original Motion Picture Soundtrack)",
       "albumArtist": "Aarumuga",
       "fileName": "Aarumuga-Saamy.mp3",
-      "duration": 0,
+      "duration": 220,
       "size": 10748800,
       "mimeType": "audio/mpeg",
-      "format": "MP3",
+      "format": "AAC",
       "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
@@ -1828,7 +2012,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/10/72/f7/1072f7fc-11cb-ebcc-ad00-9e663a86fc8f/888002672316.jpg/600x600bb.jpg",
         "albumArtworkId": "fallback_102"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/10/72/f7/1072f7fc-11cb-ebcc-ad00-9e663a86fc8f/888002672316.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/10/72/f7/1072f7fc-11cb-ebcc-ad00-9e663a86fc8f/888002672316.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/091/de5801bc3ad76e9eb01101f4ad46bfc5_sar_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "104",
@@ -1842,8 +2030,8 @@
       "duration": 173,
       "size": 19727061,
       "mimeType": "audio/x-flac",
-      "format": "FLAC",
-      "bitrate": 912,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": true,
@@ -1858,7 +2046,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/0f2dc0617dca519fac057b54390e4869/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "track_104"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/0f2dc0617dca519fac057b54390e4869/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/417/ZZang-KARAOKE-2025-POP-Vol-251-Instrumental-2025-20260119214027-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/417/5d795487ad7b1d2d6178efed21482f51_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "106",
@@ -1872,8 +2064,8 @@
       "duration": 305,
       "size": 38898305,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 1020,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -1888,7 +2080,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/22e70554ce65382d679e584bf901d0ad/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_106"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/22e70554ce65382d679e584bf901d0ad/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/868/This-is-Kaadhal-3-Tamil-2026-20260206191032-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/868/d61a39cad0641341d6886268ac259267_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "107",
@@ -1902,8 +2098,8 @@
       "duration": 88,
       "size": 10446023,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 950,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": true,
@@ -1918,7 +2114,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/c1bf4083e9fd8075a6292d72214882f4/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_107"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/c1bf4083e9fd8075a6292d72214882f4/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/689/Kaththi-Tamil-2025-20250930143442-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/689/b138e407557f2cbe0164d41c6d75a6a3_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "108",
@@ -1932,8 +2132,8 @@
       "duration": 62,
       "size": 7884500,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 1017,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": true,
@@ -1948,7 +2148,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/4c0fe42ec8beb098f891c1b09d478c76/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_108"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/4c0fe42ec8beb098f891c1b09d478c76/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/689/Kaththi-Tamil-2025-20250930143442-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/689/45dc1d14cff4450efa3639199c0d14e2_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "109",
@@ -1962,8 +2166,8 @@
       "duration": 234,
       "size": 26756202,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 915,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": true,
@@ -1978,7 +2182,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d6/ff/97/d6ff97ce-3f3a-f031-8847-f2f46a15f304/196871094689.jpg/600x600bb.jpg",
         "albumArtworkId": "fallback_109"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d6/ff/97/d6ff97ce-3f3a-f031-8847-f2f46a15f304/196871094689.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d6/ff/97/d6ff97ce-3f3a-f031-8847-f2f46a15f304/196871094689.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/689/0c85c278dc370faae80b491a22bf7ee9_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "110",
@@ -2022,8 +2230,8 @@
       "duration": 257,
       "size": 33209937,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 1034,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -2038,7 +2246,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/22e70554ce65382d679e584bf901d0ad/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_111"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/22e70554ce65382d679e584bf901d0ad/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/689/Kaththi-Tamil-2025-20250930143442-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/689/fd2f3f2094ee4cbf505c63f3886c59ca_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "112",
@@ -2052,8 +2264,8 @@
       "duration": 292,
       "size": 39851916,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 1092,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -2068,7 +2280,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d6/ff/97/d6ff97ce-3f3a-f031-8847-f2f46a15f304/196871094689.jpg/600x600bb.jpg",
         "albumArtworkId": "fallback_112"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d6/ff/97/d6ff97ce-3f3a-f031-8847-f2f46a15f304/196871094689.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d6/ff/97/d6ff97ce-3f3a-f031-8847-f2f46a15f304/196871094689.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/689/cda8cf8f016901f5fd85f855e3543865_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "114",
@@ -2082,8 +2298,8 @@
       "duration": 313,
       "size": 33373193,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 853,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -2098,7 +2314,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/cf/aa/33/cfaa33a6-7144-1e38-e7bb-5e5a226897bd/612508166173.jpg/600x600bb.jpg",
         "albumArtworkId": "fallback_114"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/cf/aa/33/cfaa33a6-7144-1e38-e7bb-5e5a226897bd/612508166173.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/cf/aa/33/cfaa33a6-7144-1e38-e7bb-5e5a226897bd/612508166173.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/281/1474068ac4c928e411c0e70af398b4f8_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "115",
@@ -2112,8 +2332,8 @@
       "duration": 251,
       "size": 23670238,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 754,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": true,
@@ -2128,7 +2348,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/cf/aa/33/cfaa33a6-7144-1e38-e7bb-5e5a226897bd/612508166173.jpg/600x600bb.jpg",
         "albumArtworkId": "fallback_115"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/cf/aa/33/cfaa33a6-7144-1e38-e7bb-5e5a226897bd/612508166173.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/cf/aa/33/cfaa33a6-7144-1e38-e7bb-5e5a226897bd/612508166173.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/281/607f64cef1a7d1dad5f17b96b7f6d93d_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "116",
@@ -2232,8 +2456,8 @@
       "duration": 278,
       "size": 26327906,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 758,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": true,
@@ -2248,7 +2472,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/3c7f3af6f07320be8ef7180c086db815/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_119"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/3c7f3af6f07320be8ef7180c086db815/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/704/The-Prodigious-Dhanush-Tamil-2020-20200724184227-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/704/ead9305807a5280dc480cbac76c628a3_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "120",
@@ -2292,8 +2520,8 @@
       "duration": 138,
       "size": 12299949,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 713,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": true,
@@ -2308,7 +2536,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/3c7f3af6f07320be8ef7180c086db815/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_121"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/3c7f3af6f07320be8ef7180c086db815/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/748/SaNa-tive-Santhosh-Narayanan-Tamil-2020-20200507140348-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/748/bfa98a8b6241992f0be5549c52636460_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "122",
@@ -2352,8 +2584,8 @@
       "duration": 288,
       "size": 29940599,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 832,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": true,
@@ -2368,7 +2600,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/3c7f3af6f07320be8ef7180c086db815/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_123"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/3c7f3af6f07320be8ef7180c086db815/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/281/Aishwarya-s-Hits-Tamil-2020-20200108135708-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/281/6493777c0a901783fde593fb6367ef38_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "124",
@@ -2382,8 +2618,8 @@
       "duration": 291,
       "size": 34029680,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 936,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -2398,7 +2634,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/ff/2a/39/ff2a3962-cfd6-4447-ca63-888eb198818f/8902894359857_cover.jpg/600x600bb.jpg",
         "albumArtworkId": "fallback_124"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/ff/2a/39/ff2a3962-cfd6-4447-ca63-888eb198818f/8902894359857_cover.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/ff/2a/39/ff2a3962-cfd6-4447-ca63-888eb198818f/8902894359857_cover.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/316/c6f2921b6e2d3721d61090ed2d1e4fb3_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "126",
@@ -2412,8 +2652,8 @@
       "duration": 381,
       "size": 46546868,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 977,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -2428,7 +2668,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/5826d1af8ab5b1733f396bf45b22c0bb/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_126"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/5826d1af8ab5b1733f396bf45b22c0bb/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/961/Nanban-Tamil-2011-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/961/97f91a70d7a1b0f7ab3aa3443b0b0267_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "127",
@@ -2442,8 +2686,8 @@
       "duration": 238,
       "size": 26055526,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 876,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": true,
@@ -2458,7 +2702,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/5826d1af8ab5b1733f396bf45b22c0bb/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_127"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/5826d1af8ab5b1733f396bf45b22c0bb/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/961/Nanban-Tamil-2011-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/961/8168764126f1d5f48a952c45f6452b1b_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "128",
@@ -2472,8 +2720,8 @@
       "duration": 336,
       "size": 39911670,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 950,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -2488,7 +2736,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music/v4/ce/27/ef/ce27effc-fa14-8700-1c64-4447781b0a50/Nanban.jpg/600x600bb.jpg",
         "albumArtworkId": "fallback_128"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music/v4/ce/27/ef/ce27effc-fa14-8700-1c64-4447781b0a50/Nanban.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music/v4/ce/27/ef/ce27effc-fa14-8700-1c64-4447781b0a50/Nanban.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/293/9513e22b00215006a16f5e4ab9b3dd5b_sar_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "129",
@@ -2502,8 +2754,8 @@
       "duration": 311,
       "size": 39650721,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 1020,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -2518,7 +2770,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music/v4/ce/27/ef/ce27effc-fa14-8700-1c64-4447781b0a50/Nanban.jpg/600x600bb.jpg",
         "albumArtworkId": "fallback_129"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music/v4/ce/27/ef/ce27effc-fa14-8700-1c64-4447781b0a50/Nanban.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music/v4/ce/27/ef/ce27effc-fa14-8700-1c64-4447781b0a50/Nanban.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/961/d53d66ea2e866a054270317428e127f5_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "130",
@@ -2532,8 +2788,8 @@
       "duration": 264,
       "size": 29307055,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 888,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": true,
@@ -2548,7 +2804,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/5826d1af8ab5b1733f396bf45b22c0bb/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_130"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/5826d1af8ab5b1733f396bf45b22c0bb/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/961/Nanban-Tamil-2011-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/961/13b62ef785dc602d37482744b6771007_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "131",
@@ -2562,8 +2822,8 @@
       "duration": 130,
       "size": 14933541,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 919,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": true,
@@ -2578,7 +2838,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music/v4/ce/27/ef/ce27effc-fa14-8700-1c64-4447781b0a50/Nanban.jpg/600x600bb.jpg",
         "albumArtworkId": "fallback_131"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music/v4/ce/27/ef/ce27effc-fa14-8700-1c64-4447781b0a50/Nanban.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music/v4/ce/27/ef/ce27effc-fa14-8700-1c64-4447781b0a50/Nanban.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/961/9ad965f5f48fc7fe9669abd925a2ba7e_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "133",
@@ -2592,8 +2856,8 @@
       "duration": 290,
       "size": 32122221,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 886,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -2608,7 +2872,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/363dca1a4a54adb2f8fe9dba9771d46e/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_133"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/363dca1a4a54adb2f8fe9dba9771d46e/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/156/Oru-Ponnu-Onnu-Naan-Parthen-Love-Songs-Tamil-2026-20260207053940-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/156/6aeb739086178925c45b5702533583ef_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "134",
@@ -2622,8 +2890,8 @@
       "duration": 311,
       "size": 35920454,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 924,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -2638,7 +2906,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/1673900dcd5e3e34919ff1f6d0334169/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_134"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/1673900dcd5e3e34919ff1f6d0334169/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/616/Kadhal-Kondaen-2003-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/800/fc901dc341ec25060c9aadf9f703c8f3_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "135",
@@ -2652,8 +2924,8 @@
       "duration": 367,
       "size": 41179480,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 898,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -2668,7 +2940,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/55/e1/99/55e199d9-bb0b-59d8-9a4f-562a1975e5b7/888002672309.jpg/600x600bb.jpg",
         "albumArtworkId": "fallback_135"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/55/e1/99/55e199d9-bb0b-59d8-9a4f-562a1975e5b7/888002672309.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/55/e1/99/55e199d9-bb0b-59d8-9a4f-562a1975e5b7/888002672309.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/421/a75bf63916c1a3640092611d980a8d85_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "136",
@@ -2682,8 +2958,8 @@
       "duration": 67,
       "size": 7508393,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 897,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": true,
@@ -2698,7 +2974,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/dc7808b99a20a7f6ef2eafba9eebbe5e/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_136"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/dc7808b99a20a7f6ef2eafba9eebbe5e/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/616/Kadhal-Kondaen-2003-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/800/3204c6413c01499c6bc222d24548d36b_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "137",
@@ -2712,8 +2992,8 @@
       "duration": 136,
       "size": 16898819,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 994,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": true,
@@ -2728,7 +3008,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/55/e1/99/55e199d9-bb0b-59d8-9a4f-562a1975e5b7/888002672309.jpg/600x600bb.jpg",
         "albumArtworkId": "fallback_137"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/55/e1/99/55e199d9-bb0b-59d8-9a4f-562a1975e5b7/888002672309.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/55/e1/99/55e199d9-bb0b-59d8-9a4f-562a1975e5b7/888002672309.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/640/758e8ca619cdb63c3fdd546b50d8db22_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "138",
@@ -2742,8 +3026,8 @@
       "duration": 401,
       "size": 45472405,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 907,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -2758,7 +3042,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/f07c530a5de0efcc5041b2d42f029ce7/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_138"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/f07c530a5de0efcc5041b2d42f029ce7/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/616/Kadhal-Kondaen-2003-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/800/ede14396235223552fb81a15ccd6246b_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "139",
@@ -2772,8 +3060,8 @@
       "duration": 79,
       "size": 8485027,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 859,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": true,
@@ -2788,7 +3076,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/55/e1/99/55e199d9-bb0b-59d8-9a4f-562a1975e5b7/888002672309.jpg/600x600bb.jpg",
         "albumArtworkId": "fallback_139"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/55/e1/99/55e199d9-bb0b-59d8-9a4f-562a1975e5b7/888002672309.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/55/e1/99/55e199d9-bb0b-59d8-9a4f-562a1975e5b7/888002672309.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/115/5d809a1612e09aa3185febb7cb2d26c3_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "140",
@@ -2802,8 +3094,8 @@
       "duration": 168,
       "size": 20008929,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 953,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": true,
@@ -2818,7 +3110,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/f4f89abc33bd65e264df8aa632d62dcb/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_140"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/f4f89abc33bd65e264df8aa632d62dcb/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/469/Vijay-And-Dhanush-Hits-Tamil-2026-20260207053937-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/469/feef8023ceb4e50609f2f57ec528b75f_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "141",
@@ -2832,8 +3128,8 @@
       "duration": 316,
       "size": 34037410,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 862,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -2848,7 +3144,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/d2c79585d72e3cdf108152ba4f595a73/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_141"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/d2c79585d72e3cdf108152ba4f595a73/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/616/Kadhal-Kondaen-2003-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/800/5e99612448dc7d841a0d9fee6c23322d_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "142",
@@ -2862,8 +3162,8 @@
       "duration": 125,
       "size": 12228828,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 783,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": true,
@@ -2878,7 +3178,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/55/e1/99/55e199d9-bb0b-59d8-9a4f-562a1975e5b7/888002672309.jpg/600x600bb.jpg",
         "albumArtworkId": "fallback_142"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/55/e1/99/55e199d9-bb0b-59d8-9a4f-562a1975e5b7/888002672309.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/55/e1/99/55e199d9-bb0b-59d8-9a4f-562a1975e5b7/888002672309.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/358/e3c158d813cf82f90d5bcf092e3745fa_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "143",
@@ -2892,8 +3196,8 @@
       "duration": 386,
       "size": 44368730,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 920,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -2908,7 +3212,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/f8b6ac528ac07c8ca0182b1065df08b2/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_143"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/f8b6ac528ac07c8ca0182b1065df08b2/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/198/Hits-Of-Unnikrishnan-And-Srinivas-Tamil-2026-20260207053839-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/198/00874b860895b27f1bd7e09f15a26117_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "145",
@@ -2952,8 +3260,8 @@
       "duration": 364,
       "size": 44438967,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 977,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -2968,7 +3276,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/c6017a2ece74f8f2181fd796a073fe68/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_146"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/c6017a2ece74f8f2181fd796a073fe68/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/113/Mankatha-Tamil-2011-20190731133254-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/113/45e3f66d34ac990a6baf36f801541b3e_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "147",
@@ -3012,8 +3324,8 @@
       "duration": 286,
       "size": 37926515,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 1061,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -3028,7 +3340,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/c6017a2ece74f8f2181fd796a073fe68/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_148"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/c6017a2ece74f8f2181fd796a073fe68/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/113/Mankatha-Tamil-2011-20190731133254-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/113/45bebe02da221b21d6c40d3127eeda67_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "149",
@@ -3042,8 +3358,8 @@
       "duration": 185,
       "size": 20926167,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 905,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": true,
@@ -3058,7 +3374,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/c6017a2ece74f8f2181fd796a073fe68/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_149"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/c6017a2ece74f8f2181fd796a073fe68/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/113/Mankatha-Tamil-2011-20190731133254-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/113/a2b08ff65f215cce75330bdba34d1cb7_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "150",
@@ -3072,8 +3392,8 @@
       "duration": 303,
       "size": 29790862,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 787,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": true,
@@ -3088,7 +3408,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/c6017a2ece74f8f2181fd796a073fe68/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_150"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/c6017a2ece74f8f2181fd796a073fe68/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/610/My-Playlist-Yuvanshankar-Raja-Tamil-2014-20210522191434-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/610/a1d252bb4280f986af894a8e9ea5911c_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "151",
@@ -3102,8 +3426,8 @@
       "duration": 270,
       "size": 32476801,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 962,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -3118,7 +3442,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/c6017a2ece74f8f2181fd796a073fe68/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_151"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/c6017a2ece74f8f2181fd796a073fe68/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/053/Take-10-Yuvanshankar-Raja-Tamil-2013-20200708084544-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/053/8b289c279445f5dbbc833fc8e0fd5f39_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "152",
@@ -3132,8 +3460,8 @@
       "duration": 366,
       "size": 47382896,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 1036,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -3148,7 +3476,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/10/72/f7/1072f7fc-11cb-ebcc-ad00-9e663a86fc8f/888002672316.jpg/600x600bb.jpg",
         "albumArtworkId": "fallback_152"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/10/72/f7/1072f7fc-11cb-ebcc-ad00-9e663a86fc8f/888002672316.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/10/72/f7/1072f7fc-11cb-ebcc-ad00-9e663a86fc8f/888002672316.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/113/45e3f66d34ac990a6baf36f801541b3e_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "154",
@@ -3162,8 +3494,8 @@
       "duration": 321,
       "size": 34805420,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 867,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -3178,7 +3510,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/663023cf525c00545bdf1d7563b3e6e5/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_154"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/663023cf525c00545bdf1d7563b3e6e5/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/936/MasterWorks-Yuvanshankar-Raja-Tamil-2016-20210522200735-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/936/76965d50d2cf44c546789c4663a2f17c_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "155",
@@ -3222,8 +3558,8 @@
       "duration": 338,
       "size": 41418881,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 980,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -3238,7 +3574,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/83768a7b281e1df6223c08518d587d30/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_156"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/83768a7b281e1df6223c08518d587d30/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/553/Back-to-the-Tamil-2000s-Tamil-2026-20260626144641-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/553/4abcd7d825a6741258526efcfd29b6b2_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "157",
@@ -3252,8 +3592,8 @@
       "duration": 341,
       "size": 42412210,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 995,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -3268,7 +3608,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/83768a7b281e1df6223c08518d587d30/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_157"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/83768a7b281e1df6223c08518d587d30/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/894/Yaaradi-Nee-Mohini-Tamil-2008-20200620135829-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/894/6955051271911d27923246dbb16eef8b_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "158",
@@ -3282,8 +3626,8 @@
       "duration": 288,
       "size": 38399375,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 1067,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -3298,7 +3642,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/83768a7b281e1df6223c08518d587d30/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_158"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/83768a7b281e1df6223c08518d587d30/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/894/Yaaradi-Nee-Mohini-Tamil-2008-20200620135829-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/894/be5a8620bbbd115c301a37fbf632dead_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "159",
@@ -3312,8 +3660,8 @@
       "duration": 273,
       "size": 33923162,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 994,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -3328,7 +3676,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/83768a7b281e1df6223c08518d587d30/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_159"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/83768a7b281e1df6223c08518d587d30/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/894/Yaaradi-Nee-Mohini-Tamil-2008-20200620135829-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/894/4e99e0a35ee4a6920efa5773010a730c_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "160",
@@ -3342,8 +3694,8 @@
       "duration": 119,
       "size": 13162710,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 885,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": true,
@@ -3358,7 +3710,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/a4/bc/9f/a4bc9fe2-690a-a53d-24db-7e9b048fa562/888002672323.jpg/600x600bb.jpg",
         "albumArtworkId": "fallback_160"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/a4/bc/9f/a4bc9fe2-690a-a53d-24db-7e9b048fa562/888002672323.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/a4/bc/9f/a4bc9fe2-690a-a53d-24db-7e9b048fa562/888002672323.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/894/74d45e5c403da9a287c4fe487dedda9c_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "161",
@@ -3372,8 +3728,8 @@
       "duration": 275,
       "size": 30138803,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 877,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": true,
@@ -3388,7 +3744,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/83768a7b281e1df6223c08518d587d30/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_161"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/83768a7b281e1df6223c08518d587d30/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/610/My-Playlist-Yuvanshankar-Raja-Tamil-2014-20210522191434-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/610/b3b8bf797c97b2ee2d22ca489ed6606f_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "163",
@@ -3399,11 +3759,11 @@
       "album": "Coolie (Original Motion Picture Soundtrack)",
       "albumArtist": "Anirudh Ravichander",
       "fileName": "8. Mobsta.flac",
-      "duration": 114,
+      "duration": 116,
       "size": 25842479,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 1814,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -3418,7 +3778,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/0d2aa0049cf77131fd617555b1c9b3bf/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "track_163"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/0d2aa0049cf77131fd617555b1c9b3bf/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/0d2aa0049cf77131fd617555b1c9b3bf/1000x1000-000000-80-0-0.jpg",
+      "audioUrl": "https://aac.saavncdn.com/004/0afa87084657ee5f81bd8fa25650e8ea_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "164",
@@ -3432,8 +3796,8 @@
       "duration": 129,
       "size": 31065278,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 1927,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -3448,7 +3812,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/0d2aa0049cf77131fd617555b1c9b3bf/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "track_164"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/0d2aa0049cf77131fd617555b1c9b3bf/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/0d2aa0049cf77131fd617555b1c9b3bf/1000x1000-000000-80-0-0.jpg",
+      "audioUrl": "https://aac.saavncdn.com/004/6b8b51c2f6cb39dc724ef08885b7f145_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "165",
@@ -3462,8 +3830,8 @@
       "duration": 216,
       "size": 49132602,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 1820,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -3478,7 +3846,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/0d2aa0049cf77131fd617555b1c9b3bf/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "track_165"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/0d2aa0049cf77131fd617555b1c9b3bf/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/0d2aa0049cf77131fd617555b1c9b3bf/1000x1000-000000-80-0-0.jpg",
+      "audioUrl": "https://aac.saavncdn.com/656/12df0669c5307965eafa067793c5d168_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "166",
@@ -3492,8 +3864,8 @@
       "duration": 214,
       "size": 49091865,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 1835,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -3508,7 +3880,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/0d2aa0049cf77131fd617555b1c9b3bf/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "track_166"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/0d2aa0049cf77131fd617555b1c9b3bf/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/0d2aa0049cf77131fd617555b1c9b3bf/1000x1000-000000-80-0-0.jpg",
+      "audioUrl": "https://aac.saavncdn.com/497/e503e6b5b4d8a9c1a6182b5d7c2e8ff5_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "167",
@@ -3522,8 +3898,8 @@
       "duration": 206,
       "size": 50074409,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 1945,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -3538,7 +3914,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/0d2aa0049cf77131fd617555b1c9b3bf/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "track_167"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/0d2aa0049cf77131fd617555b1c9b3bf/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/0d2aa0049cf77131fd617555b1c9b3bf/1000x1000-000000-80-0-0.jpg",
+      "audioUrl": "https://aac.saavncdn.com/670/c50cc9285ef3b35eeaef4a0338339bcf_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "168",
@@ -3552,8 +3932,8 @@
       "duration": 217,
       "size": 50715214,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 1870,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -3568,7 +3948,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/0d2aa0049cf77131fd617555b1c9b3bf/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "track_168"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/0d2aa0049cf77131fd617555b1c9b3bf/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/020/Monica-From-Coolie-Tamil-Tamil-2025-20250711092837-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/020/e7b82d35322caec12ed48fcdf133afbf_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "169",
@@ -3579,11 +3963,11 @@
       "album": "Coolie (Original Motion Picture Soundtrack)",
       "albumArtist": "Anirudh Ravichander, Sai Smriti",
       "fileName": "3. Uyirnaadi Nanbane.flac",
-      "duration": 229,
+      "duration": 228,
       "size": 51921434,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 1814,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -3598,7 +3982,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/0d2aa0049cf77131fd617555b1c9b3bf/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "track_169"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/0d2aa0049cf77131fd617555b1c9b3bf/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/0d2aa0049cf77131fd617555b1c9b3bf/1000x1000-000000-80-0-0.jpg",
+      "audioUrl": "https://aac.saavncdn.com/601/6c1e215149631d652ceb7ddd44e1330d_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "170",
@@ -3612,8 +4000,8 @@
       "duration": 232,
       "size": 53388927,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 1841,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -3628,7 +4016,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/1fb7a2cc7bda5445a20b47a8d392d324/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "track_170"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/1fb7a2cc7bda5445a20b47a8d392d324/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/1fb7a2cc7bda5445a20b47a8d392d324/1000x1000-000000-80-0-0.jpg",
+      "audioUrl": "https://aac.saavncdn.com/004/d7b447de71b0f784503e796d061131ad_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "173",
@@ -3642,8 +4034,8 @@
       "duration": 169,
       "size": 62241703,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 2946,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -3658,7 +4050,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/75094a6f277cc1e62e41f26f6144c865/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_173"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/75094a6f277cc1e62e41f26f6144c865/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/299/Leo-Hindi-English-2023-20231020162607-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/299/8589f5d69f779ba4514b660fec3d2987_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "174",
@@ -3672,8 +4068,8 @@
       "duration": 249,
       "size": 96766597,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 3109,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -3688,7 +4084,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/e51525d52ae696183c410e191a7929a5/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_174"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/e51525d52ae696183c410e191a7929a5/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/415/Leo-Original-Motion-Picture-Soundtrack-English-2023-20231019170311-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/415/3789bee89b94522160f1e50b2266d2c4_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "175",
@@ -3702,8 +4102,8 @@
       "duration": 41,
       "size": 14305031,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 2791,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -3718,7 +4118,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/27a03083111aa16a19e1faa44fff3969/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_175"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/27a03083111aa16a19e1faa44fff3969/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/299/Leo-Hindi-English-2023-20231020162607-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/299/45bd65c6fe4d1b2c68c132091ad012d9_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "176",
@@ -3732,8 +4136,8 @@
       "duration": 215,
       "size": 72153065,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 2685,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -3748,7 +4152,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/d4698c25a7b5003e4724256aa7cefde6/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_176"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/d4698c25a7b5003e4724256aa7cefde6/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/415/Leo-Original-Motion-Picture-Soundtrack-English-2023-20231019170311-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/415/a8b2ed8a4b63548d9cf5415324afd114_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "177",
@@ -3762,8 +4170,8 @@
       "duration": 43,
       "size": 16275489,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 3028,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -3778,7 +4186,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/ef875b1fe61357c566ca1b7f1e84f68a/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_177"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/ef875b1fe61357c566ca1b7f1e84f68a/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/415/Leo-Original-Motion-Picture-Soundtrack-English-2023-20231019170311-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/415/05b8991f040f97376c143774fd45f9e8_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "178",
@@ -3792,8 +4204,8 @@
       "duration": 230,
       "size": 86172978,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 2997,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -3808,7 +4220,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/03bb56a6f94782e581c5d65c5cc03c82/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_178"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/03bb56a6f94782e581c5d65c5cc03c82/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/415/Leo-Original-Motion-Picture-Soundtrack-English-2023-20231019170311-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/415/46a7b21d2a3f4b9e019a7cdff7442c55_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "179",
@@ -3822,8 +4238,8 @@
       "duration": 115,
       "size": 42640909,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 2966,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -3838,7 +4254,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/d4698c25a7b5003e4724256aa7cefde6/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_179"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/d4698c25a7b5003e4724256aa7cefde6/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/415/Leo-Original-Motion-Picture-Soundtrack-English-2023-20231019170311-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/415/37c60aa27b569c5fb8d1ca651599b0ee_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "182",
@@ -3852,8 +4272,8 @@
       "duration": 254,
       "size": 29351328,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 924,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": true,
@@ -3868,7 +4288,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/7c8bcffe07b48b3ab037770906237743/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_182"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/7c8bcffe07b48b3ab037770906237743/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/401/Puli-Tamil-2015-20260120201356-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/401/7b9675135988599b346a02397537e592_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "184",
@@ -3882,8 +4306,8 @@
       "duration": 285,
       "size": 32982385,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 926,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -3898,7 +4322,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music/v4/ce/27/ef/ce27effc-fa14-8700-1c64-4447781b0a50/Nanban.jpg/600x600bb.jpg",
         "albumArtworkId": "fallback_184"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music/v4/ce/27/ef/ce27effc-fa14-8700-1c64-4447781b0a50/Nanban.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music/v4/ce/27/ef/ce27effc-fa14-8700-1c64-4447781b0a50/Nanban.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/274/502ca876672d285a8d6a87e84901edb9_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "185",
@@ -3912,8 +4340,8 @@
       "duration": 284,
       "size": 31743176,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 894,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -3928,7 +4356,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/182cd2830c1b0c0ce0546f03c5e191b3/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_185"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/182cd2830c1b0c0ce0546f03c5e191b3/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/274/Naan-Mahaan-Alla-Original-Motion-Picture-Soundtrack-Tamil-2010-20250910163731-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/274/9c611c95bff39b7721ab8dabd1d5e830_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "186",
@@ -3942,8 +4374,8 @@
       "duration": 318,
       "size": 34514524,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 868,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -3958,7 +4390,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/2f93c96468188c20f15a2ca12b7508bb/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_186"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/2f93c96468188c20f15a2ca12b7508bb/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/274/Naan-Mahaan-Alla-Original-Motion-Picture-Soundtrack-Tamil-2010-20250910163731-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/274/6e68694f9cc5685d1360b50f2aaa6a93_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "187",
@@ -3972,8 +4408,8 @@
       "duration": 279,
       "size": 28392091,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 814,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": true,
@@ -3988,7 +4424,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/a4/bc/9f/a4bc9fe2-690a-a53d-24db-7e9b048fa562/888002672323.jpg/600x600bb.jpg",
         "albumArtworkId": "fallback_187"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/a4/bc/9f/a4bc9fe2-690a-a53d-24db-7e9b048fa562/888002672323.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/a4/bc/9f/a4bc9fe2-690a-a53d-24db-7e9b048fa562/888002672323.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/274/4185a116981c35610160c25b76a4fa24_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "189",
@@ -4002,8 +4442,8 @@
       "duration": 259,
       "size": 34213748,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 1057,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -4018,7 +4458,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/f007de350828337dec183b4288c09701/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_189"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/f007de350828337dec183b4288c09701/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/974/Yamadonga-Telugu-2007-20240802161541-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/974/615d2451a1866aae6eabd431a29fc62f_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "191",
@@ -4032,8 +4476,8 @@
       "duration": 303,
       "size": 35635093,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 941,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -4048,7 +4492,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/9ba861739b689234e44ccf3319dff3b1/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_191"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/9ba861739b689234e44ccf3319dff3b1/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/970/Legend-Raj-Kapoor-The-Showman-Vol-5-Hindi-2000-20181105-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/970/c414bc5dafcc641e69ed10dda6ad05a9_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "192",
@@ -4062,8 +4510,8 @@
       "duration": 351,
       "size": 40731938,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 928,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -4078,7 +4526,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/9ba861739b689234e44ccf3319dff3b1/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_192"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/9ba861739b689234e44ccf3319dff3b1/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/234/Thuppakki-Tamil-2012-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/234/9e1642a6377fa872c5dab2a22ce4f13d_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "194",
@@ -4089,11 +4541,11 @@
       "album": "Vanakkam Chennai (Original Motion Picture Soundtrack)",
       "albumArtist": "Unknown Artist",
       "fileName": "Oh Penne.m4a",
-      "duration": 0,
+      "duration": 276,
       "size": 11706712,
       "mimeType": "audio/mpeg",
       "format": "AAC",
-      "bitrate": 256,
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": false,
@@ -4108,7 +4560,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/28/fc/e4/28fce4cf-4ca6-b847-f5dc-ce42633051aa/8902894354890_cover.jpg/600x600bb.jpg",
         "albumArtworkId": "fallback_194"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/28/fc/e4/28fce4cf-4ca6-b847-f5dc-ce42633051aa/8902894354890_cover.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/28/fc/e4/28fce4cf-4ca6-b847-f5dc-ce42633051aa/8902894354890_cover.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/671/7cdb540d0e3f18a5d70e8b7a6a2f4ead_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "196",
@@ -4119,11 +4575,11 @@
       "album": "Maari (Original Motion Picture Soundtrack)",
       "albumArtist": "Unknown Artist",
       "fileName": "Danga Maari Oodhari.m4a",
-      "duration": 0,
+      "duration": 342,
       "size": 14691313,
       "mimeType": "audio/mpeg",
       "format": "AAC",
-      "bitrate": 256,
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": false,
@@ -4138,7 +4594,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/05/cf/d6/05cfd65d-590f-90e6-9938-2086e247ee0c/8902894356788_cover.jpg/600x600bb.jpg",
         "albumArtworkId": "fallback_196"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/05/cf/d6/05cfd65d-590f-90e6-9938-2086e247ee0c/8902894356788_cover.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/05/cf/d6/05cfd65d-590f-90e6-9938-2086e247ee0c/8902894356788_cover.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/274/a8926a75044ad4bcb6f57d22176c82c2_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "197",
@@ -4149,11 +4609,11 @@
       "album": "Anegan (Original Motion Picture Soundtrack)",
       "albumArtist": "Unknown Artist",
       "fileName": "Aathadi Aathadi.m4a",
-      "duration": 0,
+      "duration": 352,
       "size": 13972040,
       "mimeType": "audio/mpeg",
       "format": "AAC",
-      "bitrate": 256,
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": false,
@@ -4168,7 +4628,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/5b/4b/f5/5b4bf5ba-1481-8b45-12cf-a5ea65882e3f/8902894356061_cover.jpg/600x600bb.jpg",
         "albumArtworkId": "fallback_197"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/5b/4b/f5/5b4bf5ba-1481-8b45-12cf-a5ea65882e3f/8902894356061_cover.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/5b/4b/f5/5b4bf5ba-1481-8b45-12cf-a5ea65882e3f/8902894356061_cover.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/274/6645b1b66092d5df3de2381f721071bf_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "198",
@@ -4179,11 +4643,11 @@
       "album": "Anegan (Original Motion Picture Soundtrack)",
       "albumArtist": "Unknown Artist",
       "fileName": "Thodu Vaanam.m4a",
-      "duration": 0,
+      "duration": 134,
       "size": 12789670,
       "mimeType": "audio/mpeg",
       "format": "AAC",
-      "bitrate": 256,
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": false,
@@ -4198,7 +4662,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/5b/4b/f5/5b4bf5ba-1481-8b45-12cf-a5ea65882e3f/8902894356061_cover.jpg/600x600bb.jpg",
         "albumArtworkId": "fallback_198"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/5b/4b/f5/5b4bf5ba-1481-8b45-12cf-a5ea65882e3f/8902894356061_cover.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/5b/4b/f5/5b4bf5ba-1481-8b45-12cf-a5ea65882e3f/8902894356061_cover.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/965/ac20ae74710574772f5d05c116248011_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "200",
@@ -4212,8 +4680,8 @@
       "duration": 353,
       "size": 42331054,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 959,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -4228,7 +4696,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/2bbb2ff031b5b06907d359a598e7fad5/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_200"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/2bbb2ff031b5b06907d359a598e7fad5/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/572/A-R-Rahman-Romantic-Hits-Tamil-2026-20261001184734-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/572/ac952be0b5ba4886ebb86dea1e7f1355_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "201",
@@ -4242,8 +4714,8 @@
       "duration": 253,
       "size": 29502295,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 933,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": true,
@@ -4258,7 +4730,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/65/54/6e/65546e53-41bb-ad68-07cb-ee75f106ee85/8902894356030_cover.jpg/600x600bb.jpg",
         "albumArtworkId": "fallback_201"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/65/54/6e/65546e53-41bb-ad68-07cb-ee75f106ee85/8902894356030_cover.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/65/54/6e/65546e53-41bb-ad68-07cb-ee75f106ee85/8902894356030_cover.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/590/19c5fc3ede661e36e5a87f11df716919_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "202",
@@ -4272,8 +4748,8 @@
       "duration": 304,
       "size": 36686460,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 965,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -4288,7 +4764,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/cf766f06947d88b87e4fe48204d64236/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_202"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/cf766f06947d88b87e4fe48204d64236/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/895/A-R-Rahman-Essentials-Love--Tamil-2018-20171219135211-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/895/660281e359de5dd42ea8a8da69adbc1e_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "203",
@@ -4302,8 +4782,8 @@
       "duration": 309,
       "size": 37679221,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 976,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -4318,7 +4798,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/cf766f06947d88b87e4fe48204d64236/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_203"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/cf766f06947d88b87e4fe48204d64236/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/590/I-Tamil-2014-20190822153052-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/590/dc9e41c1e0659a2071ff5eb933524648_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "205",
@@ -4332,8 +4816,8 @@
       "duration": 156,
       "size": 15953241,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 818,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": true,
@@ -4348,7 +4832,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music4/v4/95/9d/f5/959df515-b77a-a636-f617-3bf79fe28d7a/889326442646.jpg/600x600bb.jpg",
         "albumArtworkId": "fallback_205"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music4/v4/95/9d/f5/959df515-b77a-a636-f617-3bf79fe28d7a/889326442646.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music4/v4/95/9d/f5/959df515-b77a-a636-f617-3bf79fe28d7a/889326442646.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/181/4362d90bb33a8ee5183015e90556a15a_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "206",
@@ -4362,8 +4850,8 @@
       "duration": 214,
       "size": 23481898,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 878,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": true,
@@ -4378,7 +4866,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music4/v4/95/9d/f5/959df515-b77a-a636-f617-3bf79fe28d7a/889326442646.jpg/600x600bb.jpg",
         "albumArtworkId": "fallback_206"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music4/v4/95/9d/f5/959df515-b77a-a636-f617-3bf79fe28d7a/889326442646.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music4/v4/95/9d/f5/959df515-b77a-a636-f617-3bf79fe28d7a/889326442646.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/181/149dacfb5e3cf6046963c44c8a5f5c90_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "207",
@@ -4392,8 +4884,8 @@
       "duration": 216,
       "size": 23923623,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 886,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": true,
@@ -4408,7 +4900,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music4/v4/95/9d/f5/959df515-b77a-a636-f617-3bf79fe28d7a/889326442646.jpg/600x600bb.jpg",
         "albumArtworkId": "fallback_207"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music4/v4/95/9d/f5/959df515-b77a-a636-f617-3bf79fe28d7a/889326442646.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music4/v4/95/9d/f5/959df515-b77a-a636-f617-3bf79fe28d7a/889326442646.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/181/e5f650a10cbf97b0199df1c1306f2d34_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "208",
@@ -4422,8 +4918,8 @@
       "duration": 230,
       "size": 27182304,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 945,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": true,
@@ -4438,7 +4934,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music4/v4/95/9d/f5/959df515-b77a-a636-f617-3bf79fe28d7a/889326442646.jpg/600x600bb.jpg",
         "albumArtworkId": "fallback_208"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music4/v4/95/9d/f5/959df515-b77a-a636-f617-3bf79fe28d7a/889326442646.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music4/v4/95/9d/f5/959df515-b77a-a636-f617-3bf79fe28d7a/889326442646.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/181/67073baa93083cee4691d594c3a6b65a_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "209",
@@ -4452,8 +4952,8 @@
       "duration": 213,
       "size": 22432392,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 843,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": true,
@@ -4468,7 +4968,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music4/v4/95/9d/f5/959df515-b77a-a636-f617-3bf79fe28d7a/889326442646.jpg/600x600bb.jpg",
         "albumArtworkId": "fallback_209"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music4/v4/95/9d/f5/959df515-b77a-a636-f617-3bf79fe28d7a/889326442646.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music4/v4/95/9d/f5/959df515-b77a-a636-f617-3bf79fe28d7a/889326442646.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/181/b0bb410089ec81ac0361ea53ef0dbef8_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "211",
@@ -4482,8 +4986,8 @@
       "duration": 313,
       "size": 33373193,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 853,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -4498,7 +5002,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/cf/aa/33/cfaa33a6-7144-1e38-e7bb-5e5a226897bd/612508166173.jpg/600x600bb.jpg",
         "albumArtworkId": "fallback_211"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/cf/aa/33/cfaa33a6-7144-1e38-e7bb-5e5a226897bd/612508166173.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/cf/aa/33/cfaa33a6-7144-1e38-e7bb-5e5a226897bd/612508166173.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/281/1474068ac4c928e411c0e70af398b4f8_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "212",
@@ -4512,8 +5020,8 @@
       "duration": 251,
       "size": 23670238,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 754,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": true,
@@ -4528,7 +5036,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/cf/aa/33/cfaa33a6-7144-1e38-e7bb-5e5a226897bd/612508166173.jpg/600x600bb.jpg",
         "albumArtworkId": "fallback_212"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/cf/aa/33/cfaa33a6-7144-1e38-e7bb-5e5a226897bd/612508166173.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/cf/aa/33/cfaa33a6-7144-1e38-e7bb-5e5a226897bd/612508166173.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/281/607f64cef1a7d1dad5f17b96b7f6d93d_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "213",
@@ -4632,8 +5144,8 @@
       "duration": 278,
       "size": 26327906,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 758,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": true,
@@ -4648,7 +5160,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/3c7f3af6f07320be8ef7180c086db815/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_216"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/3c7f3af6f07320be8ef7180c086db815/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/704/The-Prodigious-Dhanush-Tamil-2020-20200724184227-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/704/ead9305807a5280dc480cbac76c628a3_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "217",
@@ -4692,8 +5208,8 @@
       "duration": 138,
       "size": 12299949,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 713,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": true,
@@ -4708,7 +5224,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/3c7f3af6f07320be8ef7180c086db815/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_218"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/3c7f3af6f07320be8ef7180c086db815/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/748/SaNa-tive-Santhosh-Narayanan-Tamil-2020-20200507140348-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/748/bfa98a8b6241992f0be5549c52636460_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "219",
@@ -4752,8 +5272,8 @@
       "duration": 288,
       "size": 29940599,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 832,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": true,
@@ -4768,7 +5288,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/3c7f3af6f07320be8ef7180c086db815/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_220"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/3c7f3af6f07320be8ef7180c086db815/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/281/Aishwarya-s-Hits-Tamil-2020-20200108135708-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/281/6493777c0a901783fde593fb6367ef38_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "221",
@@ -4782,8 +5306,8 @@
       "duration": 291,
       "size": 34029680,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 936,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -4798,7 +5322,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/ff/2a/39/ff2a3962-cfd6-4447-ca63-888eb198818f/8902894359857_cover.jpg/600x600bb.jpg",
         "albumArtworkId": "fallback_221"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/ff/2a/39/ff2a3962-cfd6-4447-ca63-888eb198818f/8902894359857_cover.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/ff/2a/39/ff2a3962-cfd6-4447-ca63-888eb198818f/8902894359857_cover.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/316/c6f2921b6e2d3721d61090ed2d1e4fb3_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "223",
@@ -4812,8 +5340,8 @@
       "duration": 67,
       "size": 8893453,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 1062,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": true,
@@ -4828,7 +5356,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/05/cf/d6/05cfd65d-590f-90e6-9938-2086e247ee0c/8902894356788_cover.jpg/600x600bb.jpg",
         "albumArtworkId": "fallback_223"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/05/cf/d6/05cfd65d-590f-90e6-9938-2086e247ee0c/8902894356788_cover.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/05/cf/d6/05cfd65d-590f-90e6-9938-2086e247ee0c/8902894356788_cover.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/098/d46b5800cfdb9b085bec551a03cb6969_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "224",
@@ -4842,8 +5374,8 @@
       "duration": 196,
       "size": 23791812,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 971,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": true,
@@ -4858,7 +5390,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/05/cf/d6/05cfd65d-590f-90e6-9938-2086e247ee0c/8902894356788_cover.jpg/600x600bb.jpg",
         "albumArtworkId": "fallback_224"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/05/cf/d6/05cfd65d-590f-90e6-9938-2086e247ee0c/8902894356788_cover.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/05/cf/d6/05cfd65d-590f-90e6-9938-2086e247ee0c/8902894356788_cover.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/098/60cdb26858ac3ddd5d088e2e46a03321_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "225",
@@ -4872,8 +5408,8 @@
       "duration": 231,
       "size": 30382826,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 1052,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": true,
@@ -4888,7 +5424,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/05/cf/d6/05cfd65d-590f-90e6-9938-2086e247ee0c/8902894356788_cover.jpg/600x600bb.jpg",
         "albumArtworkId": "fallback_225"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/05/cf/d6/05cfd65d-590f-90e6-9938-2086e247ee0c/8902894356788_cover.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/05/cf/d6/05cfd65d-590f-90e6-9938-2086e247ee0c/8902894356788_cover.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/098/2dcccc2fa7cb094e00042b3b47511ca3_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "226",
@@ -4902,8 +5442,8 @@
       "duration": 192,
       "size": 23360033,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 973,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": true,
@@ -4918,7 +5458,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/05/cf/d6/05cfd65d-590f-90e6-9938-2086e247ee0c/8902894356788_cover.jpg/600x600bb.jpg",
         "albumArtworkId": "fallback_226"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/05/cf/d6/05cfd65d-590f-90e6-9938-2086e247ee0c/8902894356788_cover.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/05/cf/d6/05cfd65d-590f-90e6-9938-2086e247ee0c/8902894356788_cover.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/098/f9cb37f89b0af114ada2d16b33c580dc_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "227",
@@ -4932,8 +5476,8 @@
       "duration": 31,
       "size": 4488998,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 1158,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 48000,
       "bitDepth": 24,
       "isLossless": true,
@@ -4948,7 +5492,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/e32de4aa26ffa92e1982f766f45f54b7/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_227"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/e32de4aa26ffa92e1982f766f45f54b7/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/098/Maari-Tamil-2015-20200806144615-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/098/b23e1a27c25edaca7e6a11467a925d12_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "228",
@@ -4962,8 +5510,8 @@
       "duration": 200,
       "size": 25752745,
       "mimeType": "audio/flac",
-      "format": "FLAC",
-      "bitrate": 1030,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": true,
@@ -4978,7 +5526,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/05/cf/d6/05cfd65d-590f-90e6-9938-2086e247ee0c/8902894356788_cover.jpg/600x600bb.jpg",
         "albumArtworkId": "fallback_228"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/05/cf/d6/05cfd65d-590f-90e6-9938-2086e247ee0c/8902894356788_cover.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/05/cf/d6/05cfd65d-590f-90e6-9938-2086e247ee0c/8902894356788_cover.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/098/466c9274e09b05ef5f3575ec4edfa3cb_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "233",
@@ -4992,8 +5544,8 @@
       "duration": 192,
       "size": 26332687,
       "mimeType": "audio/x-flac",
-      "format": "FLAC",
-      "bitrate": 1097,
+      "format": "AAC",
+      "bitrate": 320,
       "sampleRate": 44100,
       "bitDepth": 16,
       "isLossless": true,
@@ -5008,7 +5560,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/6d5df22ecf87663d2a7cfb4968986014/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "fallback_233"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/6d5df22ecf87663d2a7cfb4968986014/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/684/Goindhamma-From-Meesaya-Murukku-2-Tamil-2026-20260518093512-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/684/2e08354b358bd7a7fa4ec6954b153924_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "254",
@@ -5038,7 +5594,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/437657b9a01ddb2eeb34d315408a2e56/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "track_254"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/437657b9a01ddb2eeb34d315408a2e56/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/266/Rock-On-Hindi-2010-20221209104541-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/266/e0b84c03569671f162c438eafceac153_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "255",
@@ -5068,7 +5628,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/c96be39706e0e1a467e3cd8990155c80/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "track_255"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/c96be39706e0e1a467e3cd8990155c80/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/760/Tal-a-Instrumental-2023-20230412231756-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/760/9ef619b80dde87f71b22f46f0964b594_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "256",
@@ -5098,7 +5662,11 @@
         "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/7e/bc/26/7ebc2678-0cf2-ad48-da0c-44bf6d061f2f/3616553818318.jpg/600x600bb.jpg",
         "albumArtworkId": "track_256"
       },
-      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/7e/bc/26/7ebc2678-0cf2-ad48-da0c-44bf6d061f2f/3616553818318.jpg/600x600bb.jpg"
+      "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/7e/bc/26/7ebc2678-0cf2-ad48-da0c-44bf6d061f2f/3616553818318.jpg/600x600bb.jpg",
+      "audioUrl": "https://aac.saavncdn.com/086/cee368e3ec1515e0eb4aec9252056a02_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "257",
@@ -5158,7 +5726,11 @@
         "artworkUrl": "https://cdn-images.dzcdn.net/images/cover/c1f491dfa47cd5760a2378b6d87faec6/1000x1000-000000-80-0-0.jpg",
         "albumArtworkId": "track_259"
       },
-      "thumbnail": "https://cdn-images.dzcdn.net/images/cover/c1f491dfa47cd5760a2378b6d87faec6/1000x1000-000000-80-0-0.jpg"
+      "thumbnail": "https://c.saavncdn.com/792/Suryage-Suryane-Kannada-1999-20230627192336-500x500.jpg",
+      "audioUrl": "https://aac.saavncdn.com/792/39e1a8dc9e08c6143e117793c67fbbea_320.mp4",
+      "audioQuality": "320 kbps AAC (Studio)",
+      "is320k": true,
+      "isSaavn": true
     },
     {
       "id": "260",

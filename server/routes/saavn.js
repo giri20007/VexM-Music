@@ -1,5 +1,27 @@
 const router = require('express').Router();
-const { search, getTrending, getArtistInfo } = require('../services/jioSaavn');
+const { search, getTrending, getArtistInfo, getAlbumDetails } = require('../services/jioSaavn');
+
+/**
+ * GET /api/saavn/album?id=<id>&name=<name>
+ */
+router.get('/album', async (req, res) => {
+  const idOrName = (req.query.id || req.query.name || req.query.q || '').trim();
+  if (!idOrName) {
+    return res.status(400).json({ error: true, message: 'Album ID or name required' });
+  }
+
+  try {
+    const album = await getAlbumDetails(idOrName);
+    if (!album) {
+      return res.status(404).json({ error: true, message: 'Album not found' });
+    }
+    res.setHeader('Cache-Control', 'public, max-age=3600');
+    res.json(album);
+  } catch (err) {
+    console.error('[Route /saavn/album error]:', err.message);
+    res.status(500).json({ error: true, message: 'Failed to fetch album details' });
+  }
+});
 
 /**
  * GET /api/saavn/artist-info?name=<name>

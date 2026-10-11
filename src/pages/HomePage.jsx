@@ -8,7 +8,6 @@ import {
   Flame,
   Globe,
   Heart,
-  MoreHorizontal,
   Disc3,
 } from 'lucide-react';
 import { useAudioStore } from '../store/useAudioStore';
@@ -180,14 +179,6 @@ function AppleSongRowItem({ track, onPlay, queue = [] }) {
           aria-label="Favorite"
         >
           <Heart className={`w-3.5 h-3.5 ${isLiked ? 'fill-current' : ''}`} />
-        </button>
-
-        <button
-          onClick={handlePlay}
-          className="p-1.5 rounded-full hover:bg-white/10 text-[#8e8e93] hover:text-white transition"
-          aria-label="Play song"
-        >
-          <MoreHorizontal className="w-3.5 h-3.5" />
         </button>
       </div>
     </div>

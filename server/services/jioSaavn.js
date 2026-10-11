@@ -206,9 +206,107 @@ async function getArtistInfo(artistName) {
   }
 }
 
+/**
+ * Get Official Full Album Tracklist & Metadata
+ */
+async function getAlbumDetails(albumIdOrQuery) {
+  const query = (albumIdOrQuery || '').trim();
+  if (!query) return null;
+
+  let albumId = query;
+  // If not purely numeric, search for the album first
+  if (!/^\d+$/.test(query)) {
+    try {
+      const searchUrl = `https://www.jiosaavn.com/api.php?__call=search.getAlbumResults&_format=json&_marker=0&cc=in&p=1&n=5&q=${encodeURIComponent(query)}`;
+      const res = await fetch(searchUrl, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          Accept: 'application/json',
+        },
+      });
+      if (res.ok) {
+        const d = await res.json();
+        const results = d.results || [];
+        const match =
+          results.find(r => r.title.toLowerCase().includes(query.toLowerCase())) ||
+          results.find(r => query.toLowerCase().includes(r.title.toLowerCase())) ||
+          results[0];
+        if (match) {
+          albumId = match.albumid || match.id;
+        }
+      }
+    } catch (err) {
+      console.warn('[JioSaavn Album Search Error]:', err.message);
+    }
+  }
+
+  if (!albumId || !/^\d+$/.test(albumId)) return null;
+
+  try {
+    const detailUrl = `https://www.jiosaavn.com/api.php?__call=content.getAlbumDetails&_format=json&_marker=0&cc=in&albumid=${albumId}`;
+    const res = await fetch(detailUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        Accept: 'application/json',
+      },
+    });
+
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (!data || !data.songs) return null;
+
+    const songs = [];
+    for (const item of data.songs) {
+      const audioUrl = decryptMediaUrl(item.encrypted_media_url);
+      if (!audioUrl) continue;
+
+      const title = decodeHtmlEntities(item.song || item.title || 'Unknown Track');
+      const artist = decodeHtmlEntities(item.primary_artists || item.singers || data.primary_artists || 'Unknown Artist');
+      const album = decodeHtmlEntities(data.title || item.album || title);
+      const thumbnail = getCleanImage(item.image || data.image);
+      const duration = parseInt(item.duration, 10) || 0;
+
+      songs.push({
+        id: `saavn_${item.id}`,
+        saavnId: item.id,
+        title,
+        artist,
+        album,
+        albumArtist: decodeHtmlEntities(data.primary_artists || artist),
+        thumbnail,
+        audioUrl,
+        audioQuality: '320 kbps AAC (Studio)',
+        bitrate: 320,
+        format: 'AAC',
+        is320k: true,
+        isSaavn: true,
+        duration,
+        durationFormatted: `${Math.floor(duration / 60)}:${String(duration % 60).padStart(2, '0')}`,
+        year: data.year || item.year || '',
+        language: data.language || item.language || '',
+        source: 'jiosaavn_320k',
+      });
+    }
+
+    return {
+      id: albumId,
+      title: decodeHtmlEntities(data.title || query),
+      artist: decodeHtmlEntities(data.primary_artists || ''),
+      thumbnail: getCleanImage(data.image),
+      year: data.year || '',
+      totalTracks: songs.length,
+      songs,
+    };
+  } catch (err) {
+    console.error('[JioSaavn Album Details Error]:', err.message);
+    return null;
+  }
+}
+
 module.exports = {
   search,
   getTrending,
   getArtistInfo,
+  getAlbumDetails,
   decryptMediaUrl,
 };
