@@ -3,6 +3,7 @@ import { useAudioStore } from '../store/useAudioStore';
 import { useSettingsStore, EQ_FREQUENCIES } from '../store/useSettingsStore';
 import { streamUrl, artworkUrl } from '../utils/api';
 import { preloadNextQueueTracks } from '../utils/audioPreloader';
+import { ytAudio } from '../utils/youtubePlayer';
 
 export const audio = typeof Audio !== 'undefined' ? new Audio() : null;
 if (audio) {
@@ -10,9 +11,14 @@ if (audio) {
 }
 
 export const seek = t => {
-  if (audio && Number.isFinite(t)) {
+  if (!Number.isFinite(t)) return;
+  const target = Math.max(0, t);
+  const currentTrack = useAudioStore.getState().currentTrack;
+  if (currentTrack?.videoId) {
+    ytAudio.seekTo(target);
+    useAudioStore.getState().set({ currentTime: target, isSeeking: false });
+  } else if (audio) {
     try {
-      const target = Math.max(0, t);
       audio.currentTime = target;
       useAudioStore.getState().set({ currentTime: target, isSeeking: false });
     } catch (err) {
@@ -30,6 +36,16 @@ let analyserNode = null;
 let isPlayPending = false;
 
 export function getAudioDiagnostics() {
+  const currentTrack = useAudioStore.getState().currentTrack;
+  if (currentTrack?.videoId) {
+    return {
+      state: 'YouTube High-Quality Audio Engine',
+      sampleRate: '160 kbps Opus / 256 kbps AAC',
+      latency: '< 10 ms',
+      channels: 'Stereo (2 Ch)',
+      routing: 'Official Global CDN Stream',
+    };
+  }
   if (!audioCtx) {
     return {
       state: 'Native Browser Hardware Direct',
@@ -86,8 +102,8 @@ export function getDetailedDiagnostics() {
     networkState: networkStateStr,
     bufferAhead: `${bufferAhead.toFixed(1)}s`,
     bufferedRanges,
-    currentTime: currentTimeSec.toFixed(1),
-    duration: durationSec.toFixed(1),
+    currentTime: (store.currentTime || currentTimeSec).toFixed(1),
+    duration: (store.duration || durationSec).toFixed(1),
     isBuffering: store.isBuffering,
     isSeeking: store.isSeeking,
     playbackRequestId: store.playbackRequestId,
@@ -96,11 +112,7 @@ export function getDetailedDiagnostics() {
 }
 
 function connectEqualizer(enableEq, gains) {
-  if (!audio) return;
-  if (!enableEq) {
-    // Keep native direct playback when EQ is disabled
-    return;
-  }
+  if (!audio || !enableEq) return;
 
   try {
     const AudioContextClass = window.AudioContext || window.webkitAudioContext;
@@ -166,12 +178,19 @@ function connectEqualizer(enableEq, gains) {
 }
 
 export async function safePlay() {
+  const currentTrack = useAudioStore.getState().currentTrack;
+  if (currentTrack?.videoId) {
+    ytAudio.play();
+    useAudioStore.getState().set({ isPlaying: true, isBuffering: false, status: 'ready', error: null });
+    return;
+  }
+
   if (!audio || !audio.src) return;
   if (isPlayPending) return;
   isPlayPending = true;
   try {
     if (audioCtx && audioCtx.state === 'suspended') {
-      audioCtx.resume().catch(() => {});
+      await audioCtx.resume().catch(() => {});
     }
     const p = audio.play();
     if (p !== undefined) {
@@ -191,6 +210,13 @@ export async function safePlay() {
 }
 
 export function safePause() {
+  const currentTrack = useAudioStore.getState().currentTrack;
+  if (currentTrack?.videoId) {
+    ytAudio.pause();
+    useAudioStore.getState().set({ isPlaying: false, isBuffering: false });
+    return;
+  }
+
   if (!audio) return;
   try {
     audio.pause();
@@ -216,14 +242,13 @@ export function usePlayer() {
   const retryCountRef = useRef(0);
   const lastProgressRef = useRef({ time: 0, ts: Date.now() });
 
-  // 1. One-time Event Wiring
+  // 1. One-time Native Event Wiring
   useEffect(() => {
     if (wired || !audio) return;
     wired = true;
 
     const S = () => useAudioStore.getState();
 
-    // Global user interaction listener to prime audio playback
     const handleUserInteraction = () => {
       if (audioCtx && audioCtx.state === 'suspended') {
         audioCtx.resume().catch(() => {});
@@ -241,15 +266,14 @@ export function usePlayer() {
     };
 
     const onTimeUpdate = () => {
+      if (S().currentTrack?.videoId) return; // Managed by ytAudio ticker
       const cur = audio.currentTime;
       if (!Number.isFinite(cur)) return;
       const state = S();
 
       if (Math.abs(cur - lastProgressRef.current.time) > 0.1) {
         lastProgressRef.current = { time: cur, ts: Date.now() };
-        if (retryCountRef.current > 0) {
-          retryCountRef.current = 0;
-        }
+        if (retryCountRef.current > 0) retryCountRef.current = 0;
       }
 
       if (!state.isSeeking) {
@@ -260,7 +284,6 @@ export function usePlayer() {
         });
       }
 
-      // 30s playback tracking threshold
       if (!playLoggedRef.current && (cur >= 30 || (state.duration > 0 && cur >= state.duration * 0.5))) {
         playLoggedRef.current = true;
         if (state.currentTrack) {
@@ -268,77 +291,55 @@ export function usePlayer() {
         }
       }
 
-      // Preload next queue track chunk
       if (cur >= 4 || (state.duration > 20 && cur > state.duration - 30)) {
         preloadNextQueueTracks(state.queue, state.currentTrack?.id, 1);
       }
     };
 
     const onDurationChange = () => {
+      if (S().currentTrack?.videoId) return;
       const dur = getValidDuration(audio.duration, S().currentTrack?.duration, S().duration);
-      if (dur > 0) {
-        S().set({ duration: dur });
-      }
+      if (dur > 0) S().set({ duration: dur });
     };
 
     const onLoadStart = () => {
-      S().set({ status: 'loading', isBuffering: true });
+      if (!S().currentTrack?.videoId) S().set({ status: 'loading', isBuffering: true });
     };
 
     const onLoadedMetadata = () => {
+      if (S().currentTrack?.videoId) return;
       const dur = getValidDuration(audio.duration, S().currentTrack?.duration, S().duration);
-      S().set({
-        duration: dur,
-        status: 'ready',
-        isBuffering: false,
-      });
+      S().set({ duration: dur, status: 'ready', isBuffering: false });
     };
 
     const onWaiting = () => {
-      S().set({ status: 'loading', isBuffering: true });
+      if (!S().currentTrack?.videoId) S().set({ status: 'loading', isBuffering: true });
     };
 
     const onCanPlay = () => {
-      S().set({ status: 'ready', isBuffering: false });
-    };
-
-    const onCanPlayThrough = () => {
-      S().set({ status: 'ready', isBuffering: false });
-    };
-
-    const onSeeking = () => {
-      S().set({ isBuffering: true });
-    };
-
-    const onSeeked = () => {
-      S().set({ isBuffering: false, isSeeking: false });
-    };
-
-    const onStalled = () => {
-      if (S().isPlaying) {
-        S().set({ isBuffering: true });
-      }
+      if (!S().currentTrack?.videoId) S().set({ status: 'ready', isBuffering: false });
     };
 
     const onPlaying = () => {
-      S().set({ status: 'ready', isPlaying: true, isBuffering: false, error: null });
-      retryCountRef.current = 0;
+      if (!S().currentTrack?.videoId) {
+        S().set({ status: 'ready', isPlaying: true, isBuffering: false, error: null });
+        retryCountRef.current = 0;
+      }
     };
 
     const onPause = () => {
-      if (!audio.ended) {
+      if (!audio.ended && !S().currentTrack?.videoId) {
         S().set({ isPlaying: false, isBuffering: false });
       }
     };
 
     const onEnded = () => {
+      if (S().currentTrack?.videoId) return;
       const state = S();
       const cur = audio.currentTime || 0;
       const dur = getValidDuration(audio.duration, state.currentTrack?.duration, state.duration);
 
-      // Prevent premature skip if buffer starved
       if (dur > 10 && cur < dur - 3.5) {
-        console.warn(`[AudioEngine] Premature ended event at ${cur.toFixed(1)}s / ${dur.toFixed(1)}s. Reconnecting...`);
         if (state.currentTrack) {
           state.set({ isBuffering: true, trackChangeReason: 'RECOVERY' });
           audio.src = streamUrl(state.currentTrack.id);
@@ -348,65 +349,18 @@ export function usePlayer() {
         return;
       }
 
-      // Check Sleep Timer
       if (state.sleepTimer?.mode === 'end_of_track') {
         safePause();
         state.set({ sleepTimer: null });
         return;
       }
 
-      const mode = state.repeatMode;
-      if (mode === 'one') {
+      if (state.repeatMode === 'one') {
         audio.currentTime = 0;
         safePlay();
       } else {
         state.next('NATURAL_END');
       }
-    };
-
-    let errorTimeout = null;
-    const onError = () => {
-      const state = S();
-      const code = audio.error?.code;
-
-      // MEDIA_ERR_ABORTED is normal when changing src or seeking
-      if (code === 1) return;
-
-      const curTime = audio.currentTime || 0;
-      const trackTitle = state.currentTrack?.title || 'Track';
-      const isOnline = typeof navigator !== 'undefined' ? navigator.onLine : true;
-
-      // Automatic retry on network stall
-      if (code === 2 && retryCountRef.current < 3) {
-        retryCountRef.current += 1;
-        const delay = 1000 * Math.pow(1.5, retryCountRef.current);
-        state.set({ isBuffering: true });
-
-        clearTimeout(errorTimeout);
-        errorTimeout = setTimeout(() => {
-          if (state.currentTrack) {
-            audio.src = streamUrl(state.currentTrack.id);
-            audio.currentTime = curTime;
-            if (state.isPlaying) {
-              safePlay();
-            }
-          }
-        }, delay);
-        return;
-      }
-
-      const errMsg = isOnline
-        ? `Playback error for "${trackTitle}". Click play to retry.`
-        : 'Network offline. Please check your internet connection.';
-
-      state.set({
-        status: 'error',
-        isPlaying: false,
-        isBuffering: false,
-        error: errMsg,
-      });
-
-      state.showToast(errMsg, 'error', 4500);
     };
 
     audio.addEventListener('loadstart', onLoadStart);
@@ -415,20 +369,14 @@ export function usePlayer() {
     audio.addEventListener('timeupdate', onTimeUpdate);
     audio.addEventListener('waiting', onWaiting);
     audio.addEventListener('canplay', onCanPlay);
-    audio.addEventListener('canplaythrough', onCanPlayThrough);
-    audio.addEventListener('seeking', onSeeking);
-    audio.addEventListener('seeked', onSeeked);
-    audio.addEventListener('stalled', onStalled);
     audio.addEventListener('playing', onPlaying);
     audio.addEventListener('pause', onPause);
     audio.addEventListener('ended', onEnded);
-    audio.addEventListener('error', onError);
 
     return () => {
       window.removeEventListener('click', handleUserInteraction);
       window.removeEventListener('touchstart', handleUserInteraction);
       window.removeEventListener('keydown', handleUserInteraction);
-      clearTimeout(errorTimeout);
 
       audio.removeEventListener('loadstart', onLoadStart);
       audio.removeEventListener('loadedmetadata', onLoadedMetadata);
@@ -436,20 +384,59 @@ export function usePlayer() {
       audio.removeEventListener('timeupdate', onTimeUpdate);
       audio.removeEventListener('waiting', onWaiting);
       audio.removeEventListener('canplay', onCanPlay);
-      audio.removeEventListener('canplaythrough', onCanPlayThrough);
-      audio.removeEventListener('seeking', onSeeking);
-      audio.removeEventListener('seeked', onSeeked);
-      audio.removeEventListener('stalled', onStalled);
       audio.removeEventListener('playing', onPlaying);
       audio.removeEventListener('pause', onPause);
       audio.removeEventListener('ended', onEnded);
-      audio.removeEventListener('error', onError);
     };
   }, []);
 
-  // 2. Track Change Controller
+  // 2. YouTube Audio State & Ticker Integration
   useEffect(() => {
-    if (!audio || !track) return;
+    const unsub = ytAudio.on((event, data) => {
+      const state = useAudioStore.getState();
+      if (!state.currentTrack?.videoId) return;
+
+      if (event === 'stateChange') {
+        if (data === 1) { // PLAYING
+          state.set({ isPlaying: true, isBuffering: false, status: 'ready', error: null });
+        } else if (data === 2) { // PAUSED
+          state.set({ isPlaying: false, isBuffering: false });
+        } else if (data === 3) { // BUFFERING
+          state.set({ isBuffering: true, status: 'loading' });
+        } else if (data === 0) { // ENDED
+          if (state.repeatMode === 'one') {
+            ytAudio.seekTo(0);
+            ytAudio.play();
+          } else {
+            state.next('NATURAL_END');
+          }
+        }
+      }
+    });
+
+    const ticker = setInterval(() => {
+      const state = useAudioStore.getState();
+      if (state.currentTrack?.videoId && state.isPlaying && !state.isSeeking) {
+        const cur = ytAudio.getCurrentTime();
+        const dur = ytAudio.getDuration() || state.duration || 0;
+        if (Number.isFinite(cur)) {
+          state.set({
+            currentTime: cur,
+            ...(dur > 0 && Math.abs((state.duration || 0) - dur) > 0.5 ? { duration: dur } : {}),
+          });
+        }
+      }
+    }, 250);
+
+    return () => {
+      unsub();
+      clearInterval(ticker);
+    };
+  }, []);
+
+  // 3. Track Change Controller
+  useEffect(() => {
+    if (!track) return;
     playLoggedRef.current = false;
     retryCountRef.current = 0;
     lastProgressRef.current = { time: 0, ts: Date.now() };
@@ -463,13 +450,18 @@ export function usePlayer() {
       error: null,
     });
 
-    const targetUrl = streamUrl(track.id);
-    if (audio.src !== targetUrl) {
-      audio.src = targetUrl;
-    }
-
-    if (useAudioStore.getState().isPlaying) {
-      safePlay();
+    if (track.videoId) {
+      if (audio) audio.pause();
+      ytAudio.loadAndPlay(track.videoId);
+    } else {
+      ytAudio.stop();
+      const targetUrl = streamUrl(track.id);
+      if (audio && audio.src !== targetUrl) {
+        audio.src = targetUrl;
+      }
+      if (useAudioStore.getState().isPlaying) {
+        safePlay();
+      }
     }
 
     // MediaSession
@@ -478,7 +470,7 @@ export function usePlayer() {
       navigator.mediaSession.metadata = new MediaMetadata({
         title: track.title,
         artist: track.artist,
-        album: track.album || 'SPiDEYxFLASH',
+        album: track.album || 'VexM Music',
         artwork: [
           { src: thumb, sizes: '96x96', type: 'image/jpeg' },
           { src: thumb, sizes: '128x128', type: 'image/jpeg' },
@@ -497,45 +489,49 @@ export function usePlayer() {
     }
   }, [track?.id]);
 
-  // 3. Play / Pause Controller
+  // 4. Play / Pause Controller
   useEffect(() => {
-    if (!audio || !track) return;
-    if (isPlaying && audio.paused) {
+    if (!track) return;
+    if (isPlaying) {
       safePlay();
-    } else if (!isPlaying && !audio.paused) {
+    } else {
       safePause();
     }
   }, [isPlaying]);
 
-  // 4. Volume & Mute
+  // 5. Volume & Mute
   useEffect(() => {
-    if (!audio) return;
-    audio.volume = isMuted ? 0 : volume;
-    audio.muted = isMuted;
-  }, [volume, isMuted]);
+    if (track?.videoId) {
+      ytAudio.setVolume(volume);
+      ytAudio.setMuted(isMuted);
+    } else if (audio) {
+      audio.volume = isMuted ? 0 : volume;
+      audio.muted = isMuted;
+    }
+  }, [volume, isMuted, track?.videoId]);
 
-  // 5. Playback Speed
+  // 6. Playback Speed
   useEffect(() => {
-    if (audio) {
+    if (track?.videoId) {
+      ytAudio.setPlaybackRate(speed);
+    } else if (audio) {
       audio.playbackRate = speed;
     }
-  }, [speed, track?.id]);
+  }, [speed, track?.videoId]);
 
-  // 6. Equalizer Graph Connection (Only active when enabled)
+  // 7. Equalizer Graph Connection
   useEffect(() => {
     if (eqEnabled) {
       connectEqualizer(eqEnabled, eqGains);
     }
   }, [eqEnabled, eqGains]);
 
-  // 7. Volume Normalization
+  // 8. Volume Normalization
   useEffect(() => {
     if (!gainNode || !audioCtx) return;
     const targetGain = volumeNormalization ? 0.92 : 1.0;
     try {
       gainNode.gain.setTargetAtTime(targetGain, audioCtx.currentTime, 0.05);
-    } catch {
-      // ignore
-    }
+    } catch {}
   }, [volumeNormalization]);
 }

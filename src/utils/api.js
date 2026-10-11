@@ -55,3 +55,18 @@ export const fetchTrackMetadata = id =>
 
 export const checkHealth = () =>
   request('/api/health', { retries: 1 });
+
+export const searchYouTube = (query, limit = 25) =>
+  request(`/api/yt/search?q=${encodeURIComponent(query)}&limit=${limit}`, { retries: 1 })
+    .then(r => r?.items || [])
+    .catch(() => []);
+
+export const fetchYouTubeTrending = (limit = 25) =>
+  request(`/api/yt/trending?limit=${limit}`, { retries: 1 })
+    .then(r => r?.items || [])
+    .catch(() => []);
+
+export const fetchYouTubeSuggestions = query =>
+  request(`/api/yt/suggest?q=${encodeURIComponent(query)}`, { retries: 0 })
+    .then(r => r?.suggestions || [])
+    .catch(() => []);

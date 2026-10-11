@@ -28,7 +28,11 @@ export function getArtworkSrc(track, size = null) {
     }
     return `${BASE_URL}/api/artwork/${track.id}${sizeParam}`;
   }
-  if (track.id) {
+  const ytId = track.videoId || (track.id && String(track.id).startsWith('yt_') ? String(track.id).replace('yt_', '') : null);
+  if (ytId) {
+    return `https://i.ytimg.com/vi/${ytId}/hqdefault.jpg`;
+  }
+  if (track.id && !String(track.id).startsWith('yt_')) {
     return `${BASE_URL}/api/artwork/${track.id}${sizeParam}`;
   }
   return getTrackArtworkUrl(track, size || 400);
