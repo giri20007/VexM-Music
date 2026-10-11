@@ -67,12 +67,17 @@ export const useSettingsStore = create(
 
       // User Profile
       account: {
-        username: 'SPIDERMÄN',
-        handle: '@Strieee',
-        telegramUserId: '5216415651',
-        memberSince: '9/18/2026',
+        username: 'Listener',
+        handle: '@vexm',
+        userId: '007',
+        memberSince: '2026',
         avatarUrl: null,
       },
+
+      // Language Preference
+      preferredLanguage: null,
+      hasConfiguredLanguage: false,
+      setPreferredLanguage: lang => set({ preferredLanguage: lang, hasConfiguredLanguage: true }),
 
       // Theme Actions
       setTheme: theme => {

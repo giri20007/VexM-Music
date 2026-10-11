@@ -13,6 +13,7 @@ import { NowPlayingModal } from './components/player/NowPlayingModal';
 import { QueueDrawer } from './components/player/QueueDrawer';
 import { EqualizerModal } from './components/player/EqualizerModal';
 import { SleepTimerModal } from './components/player/SleepTimerModal';
+import { LanguagePreferenceModal } from './components/modals/LanguagePreferenceModal';
 
 import { HomePage } from './pages/HomePage';
 import { LibraryPage } from './pages/LibraryPage';
@@ -48,17 +49,28 @@ export default function App() {
   // Route state (e.g. 'home', 'library', 'search', 'albums', 'artists', 'liked', 'album:Name', 'artist:Name', 'playlist:id', 'settings:account', 'admin')
   const [currentRoute, setCurrentRoute] = useState('home');
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [languageModalOpen, setLanguageModalOpen] = useState(false);
 
   // Apply saved theme and accent colors on mount
   const theme = useSettingsStore(s => s.theme);
   const accentColor = useSettingsStore(s => s.accentColor);
   const setTheme = useSettingsStore(s => s.setTheme);
   const setAccentColor = useSettingsStore(s => s.setAccentColor);
+  const hasConfiguredLanguage = useSettingsStore(s => s.hasConfiguredLanguage);
+  const preferredLanguage = useSettingsStore(s => s.preferredLanguage);
 
   useEffect(() => {
     setTheme(theme);
     setAccentColor(accentColor);
     checkAuth();
+
+    // Check if user has selected music language previously
+    try {
+      const savedLang = localStorage.getItem('vexm_preferred_language');
+      if (!savedLang && !preferredLanguage && !hasConfiguredLanguage) {
+        setLanguageModalOpen(true);
+      }
+    } catch {}
   }, []);
 
   // Handle URL hash routing if user enters /#admin or /#settings
@@ -170,7 +182,11 @@ export default function App() {
 
           <main className="flex-1 flex flex-col">
             {currentRoute === 'home' && (
-              <HomePage lib={lib} onNavigate={navigate} />
+              <HomePage
+                lib={lib}
+                onNavigate={navigate}
+                onOpenLanguageModal={() => setLanguageModalOpen(true)}
+              />
             )}
 
             {currentRoute === 'library' && (
@@ -215,9 +231,9 @@ export default function App() {
               <div className="flex-1 max-w-7xl mx-auto w-full p-6 space-y-6">
                 <h2 className="text-2xl font-black text-warm-white">Your Listening Recap</h2>
                 <div className="p-8 rounded-3xl bg-bg-card border border-white/5 space-y-4">
-                  <p className="text-sm font-semibold text-accent">SPiDEYxFLASH Discovery</p>
+                  <p className="text-sm font-semibold text-accent">VexM Music Discovery</p>
                   <p className="text-xs text-warm-muted leading-relaxed max-w-lg">
-                    You have discovered {lib.total} tracks across {lib.albums.length} albums and {lib.artists.length} artists in your Telegram collection.
+                    You have discovered {lib.total} tracks across {lib.albums.length} albums and {lib.artists.length} artists in your music vault.
                   </p>
                 </div>
               </div>
@@ -246,6 +262,12 @@ export default function App() {
 
       {/* Fullscreen Now Playing Modal */}
       <NowPlayingModal />
+
+      {/* Preferred Music Language Modal (Prompts once on initial launch & via pill) */}
+      <LanguagePreferenceModal
+        isOpen={languageModalOpen}
+        onClose={() => setLanguageModalOpen(false)}
+      />
 
       {/* Up Next / Queue Drawer */}
       <QueueDrawer />
