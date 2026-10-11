@@ -49,12 +49,17 @@ async function search(query, limit = 20) {
   };
 
   try {
+    const headers = {
+      'Content-Type': 'application/json',
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+    };
+    if (process.env.YTM_COOKIE) {
+      headers.Cookie = process.env.YTM_COOKIE;
+    }
+
     const res = await fetch('https://music.youtube.com/youtubei/v1/search', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-      },
+      headers,
       body: JSON.stringify(payload),
     });
 
@@ -178,12 +183,17 @@ async function getTrending(limit = 20) {
   };
 
   try {
+    const headers = {
+      'Content-Type': 'application/json',
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+    };
+    if (process.env.YTM_COOKIE) {
+      headers.Cookie = process.env.YTM_COOKIE;
+    }
+
     const res = await fetch('https://music.youtube.com/youtubei/v1/browse', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-      },
+      headers,
       body: JSON.stringify(payload),
     });
 

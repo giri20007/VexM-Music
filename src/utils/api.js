@@ -71,3 +71,37 @@ export const fetchYouTubeSuggestions = query =>
   request(`/api/yt/suggest?q=${encodeURIComponent(query)}`, { retries: 0 })
     .then(r => r?.suggestions || [])
     .catch(() => []);
+
+// JioSaavn (320 kbps Studio Quality)
+export const searchSaavn = (query, limit = 20) =>
+  request(`/api/saavn/search?q=${encodeURIComponent(query)}&limit=${limit}`, { retries: 1 })
+    .then(r => r?.items || [])
+    .catch(() => []);
+
+export const fetchSaavnTrending = (lang = 'tamil', limit = 20) =>
+  request(`/api/saavn/trending?lang=${encodeURIComponent(lang)}&limit=${limit}`, { retries: 1 })
+    .then(r => r?.items || [])
+    .catch(() => []);
+
+// Unified Dual-Engine Search: JioSaavn (320 kbps) + YouTube Music
+export const searchUnified = async (query, limit = 25) => {
+  const [saavnResults, ytResults] = await Promise.allSettled([
+    searchSaavn(query, limit),
+    searchYouTube(query, Math.floor(limit / 2)),
+  ]);
+
+  const saavn = saavnResults.status === 'fulfilled' ? saavnResults.value : [];
+  const yt = ytResults.status === 'fulfilled' ? ytResults.value : [];
+
+  // JioSaavn 320 kbps takes priority, followed by unique YouTube tracks
+  const seenTitles = new Set(saavn.map(t => t.title.toLowerCase()));
+  const combined = [...saavn];
+
+  for (const track of yt) {
+    if (!seenTitles.has(track.title.toLowerCase())) {
+      combined.push(track);
+    }
+  }
+
+  return combined.slice(0, limit);
+};

@@ -15,7 +15,7 @@ import { useAudioStore } from '../store/useAudioStore';
 import { useSettingsStore } from '../store/useSettingsStore';
 import { SafeImage } from '../components/ui/SafeImage';
 import { getArtworkSrc } from '../utils/artworkGenerator';
-import { fetchYouTubeTrending, searchYouTube } from '../utils/api';
+import { fetchSaavnTrending, searchSaavn, searchYouTube } from '../utils/api';
 import { MUSIC_LANGUAGES } from '../components/modals/LanguagePreferenceModal';
 
 // Per-language memory cache for instant, zero-flicker switching
@@ -100,10 +100,10 @@ function AppleFeaturedHeroCard({ track, index, onPlay, queue = [] }) {
         {/* Apple Music Lossless / Spatial badge on bottom-left */}
         <div className="absolute left-4 bottom-4 flex items-center gap-1.5">
           <span className="px-2 py-0.5 rounded bg-black/60 backdrop-blur-md text-[10px] font-bold text-white/90 border border-white/10 uppercase tracking-wider">
-            Spatial Audio
+            {track.is320k ? '320 kbps Studio' : 'Spatial Audio'}
           </span>
           <span className="px-2 py-0.5 rounded bg-black/60 backdrop-blur-md text-[10px] font-bold text-[#fa2d48] border border-[#fa2d48]/20 uppercase tracking-wider">
-            Lossless
+            {track.is320k ? 'Master Audio' : 'Lossless'}
           </span>
         </div>
       </div>
@@ -171,9 +171,19 @@ function AppleSongRowItem({ track, onPlay, queue = [] }) {
             {track.title}
           </p>
           <div className="flex items-center gap-1.5 mt-0.5">
-            <span className="inline-flex items-center justify-center px-1 py-0.2 rounded bg-white/10 text-[9px] font-bold text-[#a1a1a6]">
-              E
-            </span>
+            {track.is320k ? (
+              <span className="inline-flex items-center justify-center px-1.5 py-0.2 rounded bg-emerald-500/20 text-[9px] font-black text-emerald-300 border border-emerald-500/30">
+                320k HQ
+              </span>
+            ) : track.isYouTube ? (
+              <span className="inline-flex items-center justify-center px-1.5 py-0.2 rounded bg-red-500/20 text-[9px] font-bold text-red-300 border border-red-500/30">
+                YouTube
+              </span>
+            ) : (
+              <span className="inline-flex items-center justify-center px-1 py-0.2 rounded bg-white/10 text-[9px] font-bold text-[#a1a1a6]">
+                E
+              </span>
+            )}
             <p className="text-[11px] text-[#8e8e93] truncate">
               {track.artist}
             </p>
@@ -236,6 +246,14 @@ function AppleSquareCard({ track, onPlay, queue = [] }) {
           size={360}
           className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
         />
+
+        {track.is320k && (
+          <div className="absolute left-2.5 top-2.5 z-10 pointer-events-none">
+            <span className="px-2 py-0.5 rounded-full bg-black/75 backdrop-blur-md text-[9px] font-black text-emerald-300 border border-emerald-500/40 uppercase tracking-wider">
+              320 kbps
+            </span>
+          </div>
+        )}
 
         <button
           onClick={handlePlay}
@@ -321,10 +339,23 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal }) {
     const bestQuery = `Top 20 ${langConfig.name} Songs 2026 Hits`;
     const releaseQuery = `Latest ${langConfig.name} Movie Songs 2026 Releases`;
 
+    // High-Fidelity JioSaavn 320 kbps loader with YouTube fallback
+    const fetchRowWithFallback = async (saavnPromise, ytQuery, count = 12) => {
+      try {
+        const saavnItems = await saavnPromise;
+        if (saavnItems && saavnItems.length >= 6) return saavnItems.slice(0, count);
+        const ytItems = await searchYouTube(ytQuery, count);
+        const combined = [...(saavnItems || []), ...ytItems];
+        return combined.slice(0, count);
+      } catch {
+        return searchYouTube(ytQuery, count).catch(() => []);
+      }
+    };
+
     Promise.allSettled([
-      searchYouTube(langQuery, 12),
-      searchYouTube(bestQuery, 12),
-      searchYouTube(releaseQuery, 12),
+      fetchRowWithFallback(fetchSaavnTrending(preferredLanguage, 14), langQuery, 12),
+      fetchRowWithFallback(searchSaavn(bestQuery, 14), bestQuery, 12),
+      fetchRowWithFallback(searchSaavn(releaseQuery, 14), releaseQuery, 12),
     ]).then(([featRes, bestRes, relRes]) => {
       if (!isMounted) return;
 

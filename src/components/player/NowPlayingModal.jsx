@@ -292,10 +292,10 @@ export function NowPlayingModal() {
               <div className="flex flex-col items-center lg:items-start text-center lg:text-left max-w-lg min-w-0 flex-1">
                 <div className="flex items-center gap-2 mb-2">
                   <span className="px-2.5 py-0.5 rounded-full bg-white/10 border border-white/15 text-[10px] font-bold text-white/90 uppercase tracking-wider">
-                    Lossless
+                    {currentTrack?.is320k ? '320 kbps HQ' : 'Lossless'}
                   </span>
                   <span className="px-2.5 py-0.5 rounded-full bg-[#fa2d48]/20 border border-[#fa2d48]/40 text-[10px] font-bold text-[#fa2d48] uppercase tracking-wider">
-                    Apple Digital Master
+                    {currentTrack?.isSaavn ? 'JioSaavn Studio' : currentTrack?.isYouTube ? 'YouTube HQ' : 'Apple Digital Master'}
                   </span>
                 </div>
 

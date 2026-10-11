@@ -22,6 +22,24 @@ export function formatFileSize(bytes) {
 export function formatQualityBadge(track) {
   if (!track) return null;
 
+  if (track.is320k || track.isSaavn || track.source === 'jiosaavn_320k' || track.bitrate === 320) {
+    return {
+      label: '320 kbps HQ',
+      fullLabel: '320 kbps Studio AAC',
+      isLossless: false,
+      color: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 shadow-sm shadow-emerald-500/10',
+    };
+  }
+
+  if (track.isYouTube || (track.videoId && !track.audioUrl)) {
+    return {
+      label: 'YouTube HQ',
+      fullLabel: 'YouTube Premium HQ Stream',
+      isLossless: false,
+      color: 'bg-red-500/20 text-red-300 border-red-500/30',
+    };
+  }
+
   const format = (track.format || 'MP3').toUpperCase();
   const bitrate = track.bitrate;
   const bitDepth = track.bitDepth || (track.isLossless ? 24 : 16);

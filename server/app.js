@@ -63,9 +63,10 @@ app.use(['/api/lyrics', '/lyrics'], require('./routes/lyrics'));
 app.use(['/api/artwork', '/artwork'], require('./routes/artwork'));
 app.use(['/api/admin', '/admin'], require('./routes/admin'));
 app.use(['/api/yt', '/yt'], require('./routes/youtube'));
+app.use(['/api/saavn', '/saavn'], require('./routes/saavn'));
 
 // 404 for unmatched API routes
-app.use(['/api', '/auth', '/library', '/stream', '/lyrics', '/artwork', '/admin', '/yt'], (_req, res) => {
+app.use(['/api', '/auth', '/library', '/stream', '/lyrics', '/artwork', '/admin', '/yt', '/saavn'], (_req, res) => {
   res.status(404).json({
     error: true,
     code: 'NOT_FOUND',

@@ -3,7 +3,7 @@ import { Search, X, Music2, Disc3, User, Play, Loader2, Sparkles } from 'lucide-
 import { useAudioStore } from '../../store/useAudioStore';
 import { formatDuration } from '../../utils/formatters';
 import { getArtworkSrc } from '../../utils/artworkGenerator';
-import { searchYouTube, fetchYouTubeSuggestions } from '../../utils/api';
+import { searchUnified, fetchYouTubeSuggestions } from '../../utils/api';
 import { SafeImage } from '../ui/SafeImage';
 
 export function GlobalSearchModal({ allTracks = [], onNavigate }) {
@@ -50,7 +50,7 @@ export function GlobalSearchModal({ allTracks = [], onNavigate }) {
     const timer = setTimeout(async () => {
       try {
         const [songs, suggests] = await Promise.all([
-          searchYouTube(cleanQuery, 8),
+          searchUnified(cleanQuery, 10),
           fetchYouTubeSuggestions(cleanQuery),
         ]);
         setYtResults(songs);
@@ -215,6 +215,11 @@ export function GlobalSearchModal({ allTracks = [], onNavigate }) {
                 </div>
 
                 <div className="flex items-center gap-2 pl-3 flex-shrink-0">
+                  {t.is320k && (
+                    <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                      320k
+                    </span>
+                  )}
                   {t.isYouTube && (
                     <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-red-500/20 text-red-300 border border-red-500/30">
                       YouTube

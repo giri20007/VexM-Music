@@ -3,11 +3,13 @@ import { Search, Music2, Disc3, Users, Loader2, Sparkles, TrendingUp } from 'luc
 import { TrackRow } from '../components/library/TrackRow';
 import { AlbumCard } from '../components/library/AlbumCard';
 import { ArtistCard } from '../components/library/ArtistCard';
-import { searchYouTube, fetchYouTubeTrending, fetchYouTubeSuggestions } from '../utils/api';
+import { searchUnified, fetchSaavnTrending, fetchYouTubeTrending, fetchYouTubeSuggestions } from '../utils/api';
 import { useAudioStore } from '../store/useAudioStore';
+import { useSettingsStore } from '../store/useSettingsStore';
 
 export function SearchPage({ lib, onNavigate }) {
   const playTrack = useAudioStore(s => s.playTrack);
+  const preferredLanguage = useSettingsStore(s => s.preferredLanguage) || 'tamil';
 
   const [searchQuery, setSearchQuery] = useState('');
   const [ytResults, setYtResults] = useState([]);
@@ -17,12 +19,23 @@ export function SearchPage({ lib, onNavigate }) {
 
   const clean = searchQuery.trim().toLowerCase();
 
-  // Load trending music on mount
+  // Load trending music on mount (JioSaavn 320k + YouTube fallback)
   useEffect(() => {
-    fetchYouTubeTrending(16).then(items => {
-      if (items && items.length > 0) setTrendingTracks(items);
-    }).catch(() => {});
-  }, []);
+    fetchSaavnTrending(preferredLanguage, 16)
+      .then(async items => {
+        if (items && items.length >= 6) {
+          setTrendingTracks(items);
+        } else {
+          const ytItems = await fetchYouTubeTrending(16);
+          setTrendingTracks(ytItems || []);
+        }
+      })
+      .catch(() => {
+        fetchYouTubeTrending(16).then(items => {
+          if (items && items.length > 0) setTrendingTracks(items);
+        }).catch(() => {});
+      });
+  }, [preferredLanguage]);
 
   // Debounced live search
   useEffect(() => {
@@ -37,7 +50,7 @@ export function SearchPage({ lib, onNavigate }) {
     const timer = setTimeout(async () => {
       try {
         const [songs, suggests] = await Promise.all([
-          searchYouTube(clean, 20),
+          searchUnified(clean, 25),
           fetchYouTubeSuggestions(clean),
         ]);
         setYtResults(songs);

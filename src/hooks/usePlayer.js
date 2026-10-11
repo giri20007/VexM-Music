@@ -14,7 +14,7 @@ export const seek = t => {
   if (!Number.isFinite(t)) return;
   const target = Math.max(0, t);
   const currentTrack = useAudioStore.getState().currentTrack;
-  if (currentTrack?.videoId) {
+  if (currentTrack?.videoId && !currentTrack?.audioUrl) {
     ytAudio.seekTo(target);
     useAudioStore.getState().set({ currentTime: target, isSeeking: false });
   } else if (audio) {
@@ -37,7 +37,16 @@ let isPlayPending = false;
 
 export function getAudioDiagnostics() {
   const currentTrack = useAudioStore.getState().currentTrack;
-  if (currentTrack?.videoId) {
+  if (currentTrack?.is320k || currentTrack?.isSaavn || currentTrack?.source === 'jiosaavn_320k') {
+    return {
+      state: 'JioSaavn Studio Master (320 kbps)',
+      sampleRate: '320 kbps AAC / 44.1 kHz',
+      latency: '< 2 ms (Hardware Direct)',
+      channels: 'Stereo (2 Ch)',
+      routing: 'Native Bit-Perfect 320kbps CDN Stream',
+    };
+  }
+  if (currentTrack?.videoId && !currentTrack?.audioUrl) {
     return {
       state: 'YouTube High-Quality Audio Engine',
       sampleRate: '160 kbps Opus / 256 kbps AAC',
@@ -179,7 +188,7 @@ function connectEqualizer(enableEq, gains) {
 
 export async function safePlay() {
   const currentTrack = useAudioStore.getState().currentTrack;
-  if (currentTrack?.videoId) {
+  if (currentTrack?.videoId && !currentTrack?.audioUrl) {
     ytAudio.play();
     useAudioStore.getState().set({ isPlaying: true, isBuffering: false, status: 'ready', error: null });
     return;
@@ -211,7 +220,7 @@ export async function safePlay() {
 
 export function safePause() {
   const currentTrack = useAudioStore.getState().currentTrack;
-  if (currentTrack?.videoId) {
+  if (currentTrack?.videoId && !currentTrack?.audioUrl) {
     ytAudio.pause();
     useAudioStore.getState().set({ isPlaying: false, isBuffering: false });
     return;
@@ -265,8 +274,13 @@ export function usePlayer() {
       return 0;
     };
 
+    const isYtActive = () => {
+      const t = S().currentTrack;
+      return t?.videoId && !t?.audioUrl;
+    };
+
     const onTimeUpdate = () => {
-      if (S().currentTrack?.videoId) return; // Managed by ytAudio ticker
+      if (isYtActive()) return; // Managed by ytAudio ticker
       const cur = audio.currentTime;
       if (!Number.isFinite(cur)) return;
       const state = S();
@@ -297,44 +311,44 @@ export function usePlayer() {
     };
 
     const onDurationChange = () => {
-      if (S().currentTrack?.videoId) return;
+      if (isYtActive()) return;
       const dur = getValidDuration(audio.duration, S().currentTrack?.duration, S().duration);
       if (dur > 0) S().set({ duration: dur });
     };
 
     const onLoadStart = () => {
-      if (!S().currentTrack?.videoId) S().set({ status: 'loading', isBuffering: true });
+      if (!isYtActive()) S().set({ status: 'loading', isBuffering: true });
     };
 
     const onLoadedMetadata = () => {
-      if (S().currentTrack?.videoId) return;
+      if (isYtActive()) return;
       const dur = getValidDuration(audio.duration, S().currentTrack?.duration, S().duration);
       S().set({ duration: dur, status: 'ready', isBuffering: false });
     };
 
     const onWaiting = () => {
-      if (!S().currentTrack?.videoId) S().set({ status: 'loading', isBuffering: true });
+      if (!isYtActive()) S().set({ status: 'loading', isBuffering: true });
     };
 
     const onCanPlay = () => {
-      if (!S().currentTrack?.videoId) S().set({ status: 'ready', isBuffering: false });
+      if (!isYtActive()) S().set({ status: 'ready', isBuffering: false });
     };
 
     const onPlaying = () => {
-      if (!S().currentTrack?.videoId) {
+      if (!isYtActive()) {
         S().set({ status: 'ready', isPlaying: true, isBuffering: false, error: null });
         retryCountRef.current = 0;
       }
     };
 
     const onPause = () => {
-      if (!audio.ended && !S().currentTrack?.videoId) {
+      if (!audio.ended && !isYtActive()) {
         S().set({ isPlaying: false, isBuffering: false });
       }
     };
 
     const onEnded = () => {
-      if (S().currentTrack?.videoId) return;
+      if (isYtActive()) return;
       const state = S();
       const cur = audio.currentTime || 0;
       const dur = getValidDuration(audio.duration, state.currentTrack?.duration, state.duration);
@@ -394,7 +408,7 @@ export function usePlayer() {
   useEffect(() => {
     const unsub = ytAudio.on((event, data) => {
       const state = useAudioStore.getState();
-      if (!state.currentTrack?.videoId) return;
+      if (!state.currentTrack?.videoId || state.currentTrack?.audioUrl) return;
 
       if (event === 'stateChange') {
         if (data === 1) { // PLAYING
@@ -416,7 +430,7 @@ export function usePlayer() {
 
     const ticker = setInterval(() => {
       const state = useAudioStore.getState();
-      if (state.currentTrack?.videoId && state.isPlaying && !state.isSeeking) {
+      if (state.currentTrack?.videoId && !state.currentTrack?.audioUrl && state.isPlaying && !state.isSeeking) {
         const cur = ytAudio.getCurrentTime();
         const dur = ytAudio.getDuration() || state.duration || 0;
         if (Number.isFinite(cur)) {
@@ -450,7 +464,15 @@ export function usePlayer() {
       error: null,
     });
 
-    if (track.videoId) {
+    if (track.audioUrl) {
+      ytAudio.stop();
+      if (audio && audio.src !== track.audioUrl) {
+        audio.src = track.audioUrl;
+      }
+      if (useAudioStore.getState().isPlaying) {
+        safePlay();
+      }
+    } else if (track.videoId) {
       if (audio) audio.pause();
       ytAudio.loadAndPlay(track.videoId);
     } else {
@@ -501,23 +523,23 @@ export function usePlayer() {
 
   // 5. Volume & Mute
   useEffect(() => {
-    if (track?.videoId) {
+    if (track?.videoId && !track?.audioUrl) {
       ytAudio.setVolume(volume);
       ytAudio.setMuted(isMuted);
     } else if (audio) {
       audio.volume = isMuted ? 0 : volume;
       audio.muted = isMuted;
     }
-  }, [volume, isMuted, track?.videoId]);
+  }, [volume, isMuted, track?.videoId, track?.audioUrl]);
 
   // 6. Playback Speed
   useEffect(() => {
-    if (track?.videoId) {
+    if (track?.videoId && !track?.audioUrl) {
       ytAudio.setPlaybackRate(speed);
     } else if (audio) {
       audio.playbackRate = speed;
     }
-  }, [speed, track?.videoId]);
+  }, [speed, track?.videoId, track?.audioUrl]);
 
   // 7. Equalizer Graph Connection
   useEffect(() => {
