@@ -611,8 +611,16 @@ function ArtistDirectoryView({ lib, onNavigate }) {
               placeholder="Search any artist..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2.5 rounded-full bg-white/[0.05] border border-white/10 text-xs text-white placeholder:text-white/40 focus:outline-none focus:border-white/30"
+              className="w-full pl-9 pr-9 py-2.5 rounded-full bg-white/[0.05] border border-white/10 text-xs text-white placeholder:text-white/40 focus:outline-none focus:border-white/30"
             />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white p-1 text-xs"
+              >
+                ✕
+              </button>
+            )}
           </div>
         </div>
 

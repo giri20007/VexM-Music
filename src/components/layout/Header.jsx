@@ -4,7 +4,7 @@ import { useAudioStore } from '../../store/useAudioStore';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useSettingsStore } from '../../store/useSettingsStore';
 
-export function Header({ title = 'Home', onToggleMobileNav, onNavigate }) {
+export function Header({ title = 'Home', currentRoute = 'home', onToggleMobileNav, onNavigate }) {
   const setSearchModalOpen = useAudioStore(s => s.setSearchModalOpen);
   const user = useAuthStore(s => s.user);
   const logout = useAuthStore(s => s.logout);
@@ -49,8 +49,8 @@ export function Header({ title = 'Home', onToggleMobileNav, onNavigate }) {
         </h1>
       </div>
 
-      {/* Center: Global Search Bar */}
-      <div className="flex-1 max-w-md mx-1 sm:mx-2 min-w-0">
+      {/* Center: Global Search Bar (Desktop only, hidden on search page) */}
+      <div className={`hidden md:flex flex-1 max-w-md mx-2 min-w-0 ${currentRoute === 'search' ? 'invisible pointer-events-none' : ''}`}>
         <button
           onClick={() => setSearchModalOpen(true)}
           className="w-full flex items-center justify-between gap-2 px-3.5 py-2 rounded-full bg-white/[0.05] hover:bg-white/[0.09] border border-white/[0.08] text-white/40 hover:text-white/70 transition text-left group shadow-sm"

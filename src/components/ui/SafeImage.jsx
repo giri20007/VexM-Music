@@ -1,29 +1,36 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { getTrackArtworkUrl, getArtistAvatarUrl } from '../../utils/artworkGenerator';
 
 /**
  * Resilient Image Component with Instant Deterministic Fallback
- * Traps 404s, CORS failures, and broken URLs and smoothly falls back to a stylized SVG placeholder.
+ * Uses referrerPolicy="no-referrer" to prevent CDN hotlink blocks on mobile carriers,
+ * and eliminates opacity-0 dead square issues on mobile browsers.
  */
 export function SafeImage({
   src,
-  alt = 'Track Artwork',
+  alt = 'Artwork',
   fallbackType = 'track', // 'track' | 'artist' | 'disc'
   track = null,
   artistName = '',
   size = 300,
   className = '',
-  loading = 'lazy',
+  loading = 'eager',
   onLoad,
+  onError,
   ...props
 }) {
   const [hasError, setHasError] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const imgRef = useRef(null);
 
-  // Reset error state when source URL changes
+  // Reset error state and check if image is already cached
   useEffect(() => {
     setHasError(false);
     setIsLoaded(false);
+
+    if (imgRef.current && imgRef.current.complete && imgRef.current.naturalWidth > 0) {
+      setIsLoaded(true);
+    }
   }, [src]);
 
   // Generate deterministic SVG fallback
@@ -37,27 +44,35 @@ export function SafeImage({
   const effectiveSrc = hasError || !src ? fallbackSvgUrl : src;
 
   return (
-    <div className={`relative overflow-hidden bg-bg-card flex items-center justify-center ${className}`}>
-      {/* Background Skeleton / Placeholder until loaded */}
-      {!isLoaded && !hasError && (
-        <div className="absolute inset-0 bg-white/5 animate-pulse" />
+    <div className={`relative overflow-hidden bg-white/[0.04] flex items-center justify-center ${className}`}>
+      {/* Background skeleton only while genuinely waiting */}
+      {!isLoaded && !hasError && src && (
+        <div className="absolute inset-0 bg-white/5 animate-pulse pointer-events-none" />
       )}
 
       <img
+        ref={imgRef}
         src={effectiveSrc}
         alt={alt}
         loading={loading}
+        referrerPolicy="no-referrer"
+        crossOrigin="anonymous"
         onLoad={e => {
           setIsLoaded(true);
           if (onLoad) onLoad(e);
         }}
-        onError={() => {
+        onError={e => {
+          // If crossOrigin fails or CDN rejects, retry once without crossOrigin
+          if (e.currentTarget.getAttribute('crossorigin')) {
+            e.currentTarget.removeAttribute('crossorigin');
+            e.currentTarget.src = effectiveSrc;
+            return;
+          }
           setHasError(true);
           setIsLoaded(true);
+          if (onError) onError(e);
         }}
-        className={`w-full h-full object-cover transition-opacity duration-300 ${
-          isLoaded || hasError ? 'opacity-100' : 'opacity-0'
-        }`}
+        className="w-full h-full object-cover"
         {...props}
       />
     </div>

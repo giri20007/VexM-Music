@@ -384,11 +384,22 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal }) {
       fetchRowWithFallback(searchSaavn(bestQuery, 14), bestQuery, 12),
       fetchRowWithFallback(searchSaavn(releaseQuery, 14), releaseQuery, 12),
     ]).then(([featRes, bestRes, relRes]) => {
-      if (!isMounted) return;
+      const dedupeList = list => {
+        const seen = new Set();
+        const res = [];
+        for (const t of (list || [])) {
+          const key = (t.title || '').toLowerCase().replace(/\s*\(from.*?\)/gi, '').trim();
+          if (!seen.has(key)) {
+            seen.add(key);
+            res.push(t);
+          }
+        }
+        return res;
+      };
 
-      const feat = featRes.status === 'fulfilled' && featRes.value?.length ? featRes.value : [];
-      const best = bestRes.status === 'fulfilled' && bestRes.value?.length ? bestRes.value : [];
-      const rel = relRes.status === 'fulfilled' && relRes.value?.length ? relRes.value : [];
+      const feat = featRes.status === 'fulfilled' && featRes.value?.length ? dedupeList(featRes.value) : [];
+      const best = bestRes.status === 'fulfilled' && bestRes.value?.length ? dedupeList(bestRes.value) : [];
+      const rel = relRes.status === 'fulfilled' && relRes.value?.length ? dedupeList(relRes.value) : [];
 
       langCache[preferredLanguage] = { featured: feat, best, releases: rel };
 

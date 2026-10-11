@@ -23,17 +23,30 @@ export function SearchPage({ lib, onNavigate }) {
 
   // Load trending music on mount (JioSaavn 320k + YouTube fallback)
   useEffect(() => {
-    fetchSaavnTrending(preferredLanguage, 16)
+    fetchSaavnTrending(preferredLanguage, 30)
       .then(async items => {
         if (items && items.length >= 6) {
-          setTrendingTracks(items);
+          const seen = new Set();
+          const unique = [];
+          for (const t of items) {
+            const cleanTitle = (t.title || '')
+              .toLowerCase()
+              .replace(/\s*\(from.*?\)/gi, '')
+              .replace(/\s*-\s*\(.*?\)/gi, '')
+              .trim();
+            if (!seen.has(cleanTitle)) {
+              seen.add(cleanTitle);
+              unique.push(t);
+            }
+          }
+          setTrendingTracks(unique.slice(0, 15));
         } else {
-          const ytItems = await fetchYouTubeTrending(16);
+          const ytItems = await fetchYouTubeTrending(20);
           setTrendingTracks(ytItems || []);
         }
       })
       .catch(() => {
-        fetchYouTubeTrending(16).then(items => {
+        fetchYouTubeTrending(20).then(items => {
           if (items && items.length > 0) setTrendingTracks(items);
         }).catch(() => {});
       });
@@ -85,16 +98,15 @@ export function SearchPage({ lib, onNavigate }) {
   return (
     <div className="flex-1 max-w-7xl mx-auto w-full p-4 sm:p-6 space-y-6 select-none">
       {/* Search Bar Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center gap-3 max-w-3xl">
+      <div className="flex items-center gap-2.5 max-w-3xl">
         <div className="relative flex-1">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#fa2d48]" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/50" />
           <input
             type="search"
-            autoFocus
             placeholder="Search songs, artists, or albums..."
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            className="w-full pl-11 pr-12 py-3 rounded-2xl bg-white/[0.06] hover:bg-white/[0.09] focus:bg-white/[0.10] border border-white/10 text-xs sm:text-sm text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-[#fa2d48]/50 transition shadow-lg backdrop-blur-md"
+            className="w-full pl-11 pr-12 py-3 rounded-2xl bg-white/[0.06] hover:bg-white/[0.09] focus:bg-white/[0.10] border border-white/10 text-xs sm:text-sm text-white placeholder-white/40 focus:outline-none focus:border-white/30 focus:ring-1 focus:ring-white/20 transition shadow-lg backdrop-blur-md"
           />
           {isSearching && (
             <div className="absolute right-10 top-1/2 -translate-y-1/2">

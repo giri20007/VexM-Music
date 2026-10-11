@@ -217,6 +217,7 @@ export default function App() {
         <div className="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto pb-28 md:pb-24">
           <Header
             title={headerTitle}
+            currentRoute={currentRoute}
             onToggleMobileNav={() => setMobileNavOpen(true)}
             onNavigate={navigate}
           />

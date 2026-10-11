@@ -18,18 +18,19 @@ import { SafeImage } from '../components/ui/SafeImage';
 
 // Curated Popular Soundtracks & Albums for instant browsing
 const FEATURED_ALBUMS = [
-  { name: 'Coolie (Original Motion Picture Soundtrack)', artist: 'Anirudh Ravichander', year: 2024, thumbnail: 'https://c.saavncdn.com/974/Coolie-Disco-From-Coolie-Tamil-2024-20240424174004-500x500.jpg' },
-  { name: 'The Greatest Of All Time (GOAT)', artist: 'Yuvan Shankar Raja', year: 2024, thumbnail: 'https://c.saavncdn.com/393/The-Greatest-Of-All-Time-Tamil-2024-20240905183424-500x500.jpg' },
-  { name: 'Devara Part 1', artist: 'Anirudh Ravichander', year: 2024, thumbnail: 'https://c.saavncdn.com/670/Devara-Part-1-Tamil-2024-20240924183412-500x500.jpg' },
-  { name: 'Leo', artist: 'Anirudh Ravichander', year: 2023, thumbnail: 'https://c.saavncdn.com/008/Leo-Tamil-2023-20231019183415-500x500.jpg' },
-  { name: 'Jailer', artist: 'Anirudh Ravichander', year: 2023, thumbnail: 'https://c.saavncdn.com/593/Jailer-Tamil-2023-20230810183414-500x500.jpg' },
-  { name: 'Vikram', artist: 'Anirudh Ravichander', year: 2022, thumbnail: 'https://c.saavncdn.com/333/Vikram-Tamil-2022-20220515183412-500x500.jpg' },
-  { name: 'Amar Singh Chamkila', artist: 'A.R. Rahman', year: 2024, thumbnail: 'https://c.saavncdn.com/832/Amar-Singh-Chamkila-Hindi-2024-20240328183412-500x500.jpg' },
-  { name: 'Dunki', artist: 'Pritam', year: 2023, thumbnail: 'https://c.saavncdn.com/052/Dunki-Hindi-2023-20231221183412-500x500.jpg' },
-  { name: 'Animal', artist: 'Various Artists', year: 2023, thumbnail: 'https://c.saavncdn.com/034/Animal-Hindi-2023-20231124183412-500x500.jpg' },
-  { name: 'Master', artist: 'Anirudh Ravichander', year: 2020, thumbnail: 'https://c.saavncdn.com/319/Master-Tamil-2020-20201217183412-500x500.jpg' },
-  { name: 'Aavesham', artist: 'Sushin Shyam', year: 2024, thumbnail: 'https://c.saavncdn.com/712/Aavesham-Malayalam-2024-20240411183412-500x500.jpg' },
-  { name: 'Kaithi', artist: 'Sam C.S.', year: 2019, thumbnail: 'https://c.saavncdn.com/911/Kaithi-Tamil-2019-20191022183412-500x500.jpg' },
+  { name: 'Coolie (Original Motion Picture Soundtrack)', artist: 'Anirudh Ravichander', year: 2024, thumbnail: 'https://c.saavncdn.com/981/Coolie-Disco-From-Coolie-Tamil-2024-20240509170935-500x500.jpg' },
+  { name: 'The Greatest Of All Time (GOAT)', artist: 'Yuvan Shankar Raja', year: 2024, thumbnail: 'https://c.saavncdn.com/829/The-Greatest-Of-All-Time-Tamil-Tamil-2024-20240903191033-500x500.jpg' },
+  { name: 'Devara Part 1', artist: 'Anirudh Ravichander', year: 2024, thumbnail: 'https://c.saavncdn.com/313/Devara-Part-1-Telugu-Telugu-2024-20240926171010-500x500.jpg' },
+  { name: 'Leo', artist: 'Anirudh Ravichander', year: 2023, thumbnail: 'https://c.saavncdn.com/415/Leo-Original-Motion-Picture-Soundtrack-English-2023-20231019170311-500x500.jpg' },
+  { name: 'Jailer', artist: 'Anirudh Ravichander', year: 2023, thumbnail: 'https://c.saavncdn.com/187/Jailer-Tamil-2023-20230728081443-500x500.jpg' },
+  { name: 'Vikram', artist: 'Anirudh Ravichander', year: 2022, thumbnail: 'https://c.saavncdn.com/973/Vikram-Tamil-2022-20220515182605-500x500.jpg' },
+  { name: 'Jawan', artist: 'Anirudh Ravichander', year: 2023, thumbnail: 'https://c.saavncdn.com/047/Jawan-Hindi-2023-20230921190854-500x500.jpg' },
+  { name: 'Kalki 2898 AD', artist: 'Santhosh Narayanan', year: 2024, thumbnail: 'https://c.saavncdn.com/892/Kalki-2898-Ad-Hindi-Hindi-2024-20240712063714-500x500.jpg' },
+  { name: 'Animal', artist: 'Various Artists', year: 2023, thumbnail: 'https://c.saavncdn.com/092/ANIMAL-Hindi-2023-20260724191152-500x500.jpg' },
+  { name: 'Amar Singh Chamkila', artist: 'A.R. Rahman', year: 2024, thumbnail: 'https://c.saavncdn.com/403/Amar-Singh-Chamkila-Hindi-2024-20250130073140-500x500.jpg' },
+  { name: 'Dunki', artist: 'Pritam', year: 2023, thumbnail: 'https://c.saavncdn.com/139/Dunki-Hindi-2023-20231220211003-500x500.jpg' },
+  { name: 'Master', artist: 'Anirudh Ravichander', year: 2020, thumbnail: 'https://c.saavncdn.com/347/Master-Tamil-2020-20200316084627-500x500.jpg' },
+  { name: 'Aavesham', artist: 'Sushin Shyam', year: 2024, thumbnail: 'https://c.saavncdn.com/202/Aavesham-Original-Motion-Picture-Soundtrack-Malayalam-2024-20250910150630-500x500.jpg' },
 ];
 
 // Sub-Component 1: Dedicated Album View (Apple Music Clean Hero & Tracklist)
@@ -345,8 +346,16 @@ function AlbumDirectoryView({ lib, onNavigate }) {
               placeholder="Search albums..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2.5 rounded-full bg-white/[0.05] border border-white/10 text-xs text-white placeholder:text-white/40 focus:outline-none focus:border-white/30"
+              className="w-full pl-9 pr-9 py-2.5 rounded-full bg-white/[0.05] border border-white/10 text-xs text-white placeholder:text-white/40 focus:outline-none focus:border-white/30"
             />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white p-1 text-xs"
+              >
+                ✕
+              </button>
+            )}
           </div>
         </div>
 
