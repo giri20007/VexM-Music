@@ -1,4 +1,4 @@
-﻿import React, { memo } from 'react';
+import React, { memo } from 'react';
 import { Sparkles, Play, X } from 'lucide-react';
 
 export const NewTracksBanner = memo(function NewTracksBanner({
@@ -26,7 +26,7 @@ export const NewTracksBanner = memo(function NewTracksBanner({
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
               <span className="text-xs font-black uppercase tracking-wider text-accent">
-                Telegram Channel Update
+                New Music Discovery
               </span>
               <span className="w-1.5 h-1.5 rounded-full bg-accent animate-ping" />
             </div>

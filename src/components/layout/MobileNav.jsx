@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, Search, Library, Users, Disc3, Play, Pause, SkipForward, SkipBack, Music2 } from 'lucide-react';
+import { Compass, Search, Library, Users, Disc3, Play, Pause, SkipForward, SkipBack, Music2 } from 'lucide-react';
 import { useAudioStore } from '../../store/useAudioStore';
 import { getArtworkSrc } from '../../utils/artworkGenerator';
 
@@ -14,7 +14,7 @@ export function MobileNav({ currentRoute, onNavigate }) {
   const setNowPlayingOpen = useAudioStore(s => s.setNowPlayingOpen);
 
   const navItems = [
-    { id: 'home', label: 'Home', icon: Home },
+    { id: 'home', label: 'New', icon: Compass },
     { id: 'search', label: 'Search', icon: Search },
     { id: 'library', label: 'Library', icon: Library },
     { id: 'artists', label: 'Artists', icon: Users },

@@ -16,6 +16,7 @@ import {
   ListMusic,
   LogOut,
   Sparkles,
+  Compass,
 } from 'lucide-react';
 import { useAudioStore } from '../../store/useAudioStore';
 import { useAuthStore } from '../../store/useAuthStore';
@@ -41,10 +42,9 @@ export function Sidebar({ currentRoute, onNavigate }) {
   };
 
   const navItems = [
-    { id: 'home', label: 'Home', icon: Home },
+    { id: 'home', label: 'New / Browse', icon: Compass },
     { id: 'search', label: 'Search', icon: Search },
     { id: 'library', label: 'Library', icon: Library },
-    { id: 'recaps', label: 'Recaps', icon: Clock },
     { id: 'albums', label: 'Albums', icon: Disc3 },
     { id: 'artists', label: 'Artists', icon: Users },
   ];
@@ -68,15 +68,15 @@ export function Sidebar({ currentRoute, onNavigate }) {
             <div className="flex flex-col">
               <div className="flex items-center gap-1.5">
                 <span className="brand-text-neon text-base tracking-tight select-none">
-                  SPiDEY<span className="brand-x-neon">x</span>FLASH
+                  VexM <span className="text-[#fa2d48]">Music</span>
                 </span>
                 {user?.isAdmin ? (
-                  <span className="brand-tag-neon text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-accent/25 border border-accent/40 text-accent">
+                  <span className="brand-tag-neon text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-[#fa2d48]/25 border border-[#fa2d48]/40 text-[#fa2d48]">
                     ADMIN
                   </span>
                 ) : (
-                  <span className="brand-tag-neon text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md">
-                    PRO
+                  <span className="brand-tag-neon text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md text-[#fa2d48] border border-[#fa2d48]/30">
+                    NEW
                   </span>
                 )}
               </div>

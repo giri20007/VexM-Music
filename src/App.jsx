@@ -130,7 +130,7 @@ export default function App() {
   }
 
   // Derive header title
-  let headerTitle = 'Home';
+  let headerTitle = 'New';
   if (currentRoute === 'library') headerTitle = 'Library';
   else if (currentRoute === 'search') headerTitle = 'Search';
   else if (currentRoute.startsWith('albums') || currentRoute.startsWith('album:')) headerTitle = 'Albums';

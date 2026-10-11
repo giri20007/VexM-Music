@@ -246,7 +246,7 @@ export function SettingsPage({ initialTab = 'appearance' }) {
                     <div className="flex items-center gap-2 text-xs text-warm-muted mt-0.5">
                       <span>{settings.account.handle}</span>
                       <span className="px-1.5 py-0.2 rounded bg-white/5 border border-white/10 font-mono text-[10px]">
-                        ID {settings.account.telegramUserId}
+                        ID #{settings.account.telegramUserId || '007'}
                       </span>
                     </div>
                     <p className="text-[11px] text-warm-muted/70 mt-1">
@@ -268,12 +268,12 @@ export function SettingsPage({ initialTab = 'appearance' }) {
                   <div className="flex items-center gap-3">
                     <span className="text-lg font-mono text-warm-muted">#</span>
                     <div>
-                      <p className="text-xs font-semibold text-warm-white">Telegram User ID</p>
-                      <p className="text-[11px] text-warm-muted">Your linked Telegram account identifier</p>
+                      <p className="text-xs font-semibold text-warm-white">User Identifier</p>
+                      <p className="text-[11px] text-warm-muted">Your verified listener account identifier</p>
                     </div>
                   </div>
                   <span className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 font-mono text-xs text-warm-white">
-                    ID {settings.account.telegramUserId}
+                    ID #{settings.account.telegramUserId || '007'}
                   </span>
                 </div>
 
@@ -469,11 +469,11 @@ export function SettingsPage({ initialTab = 'appearance' }) {
           {/* TAB: ABOUT */}
           {activeTab === 'about' && (
             <div className="space-y-6 animate-fade-in">
-              <h2 className="text-2xl font-bold tracking-tight text-warm-white">About SPiDEYxFLASH</h2>
+              <h2 className="text-2xl font-bold tracking-tight text-warm-white">About VexM Music</h2>
               <div className="p-5 rounded-2xl bg-bg-card border border-white/5 space-y-3 text-xs leading-relaxed text-warm-muted">
-                <p className="text-sm font-semibold text-warm-white">SPiDEYxFLASH Audio Player v2.1</p>
+                <p className="text-sm font-semibold text-warm-white">VexM Music Web Player v2.0</p>
                 <p>
-                  High-performance music streaming web application powered by Telegram media storage, Express backend on Render, and React on Vercel.
+                  High-performance on-demand streaming web application powered by next-generation music APIs and modern serverless architecture.
                 </p>
               </div>
             </div>

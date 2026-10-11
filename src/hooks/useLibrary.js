@@ -73,11 +73,7 @@ export function useLibrary() {
       setState('ready');
     } catch (e) {
       if (!silent) {
-        setError(
-          e.status === 503
-            ? 'Telegram connection unavailable. Check credentials on Render.'
-            : e.message || 'Could not reach SPiDEYxFLASH backend'
-        );
+        setError(e.message || 'Could not load library collection');
         setState('error');
       }
     } finally {
@@ -88,25 +84,6 @@ export function useLibrary() {
   // Initial load
   useEffect(() => {
     load(false, false);
-  }, [load]);
-
-  // Background Auto-Discovery: Check for new Telegram tracks every 20 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      load(false, true); // Silent background poll
-    }, 20 * 1000);
-
-    const onVisibility = () => {
-      if (document.visibilityState === 'visible') {
-        load(false, true);
-      }
-    };
-    document.addEventListener('visibilitychange', onVisibility);
-
-    return () => {
-      clearInterval(interval);
-      document.removeEventListener('visibilitychange', onVisibility);
-    };
   }, [load]);
 
   useEffect(() => {

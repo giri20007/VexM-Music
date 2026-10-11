@@ -1,120 +1,268 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { Play, Pause, Disc, Sparkles, RefreshCw, ChevronRight, Flame, Music, Headphones } from 'lucide-react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import {
+  Play,
+  Pause,
+  ChevronLeft,
+  ChevronRight,
+  Sparkles,
+  Flame,
+  Radio,
+  Headphones,
+  Music2,
+  Heart,
+  MoreHorizontal,
+  Compass,
+  Disc3,
+  ListPlus,
+} from 'lucide-react';
 import { useAudioStore } from '../store/useAudioStore';
-import { AlbumCard } from '../components/library/AlbumCard';
-import { ArtistCard } from '../components/library/ArtistCard';
-import { TrackRow } from '../components/library/TrackRow';
 import { SafeImage } from '../components/ui/SafeImage';
 import { getArtworkSrc } from '../utils/artworkGenerator';
 import { fetchYouTubeTrending, searchYouTube } from '../utils/api';
 
-function getGreeting() {
-  const hour = new Date().getHours();
-  if (hour >= 5 && hour < 12) return 'Good morning';
-  if (hour >= 12 && hour < 18) return 'Good afternoon';
-  return 'Good evening';
-}
+// Memory cache for zero flicker navigation
+let cachedTrending = null;
+let cachedTopHits = null;
+let cachedNewReleases = null;
+let cachedChill = null;
 
-// Module-level cache so navigating between tabs is instant without re-fetching
-let cachedYtTrending = null;
-let cachedYtTopHits = null;
-let cachedYtChill = null;
+// Apple Music Editorial Category Tags
+const EDITORIAL_TAGS = [
+  'NEW RELEASE',
+  'FEATURED PLAYLIST',
+  'APPLE MUSIC EXCLUSIVE',
+  'SPATIAL AUDIO',
+  'UP NEXT',
+  'EDITOR’S CHOICE',
+];
 
-// 1. Spotify Top 6 Quick-Access Card
-function SpotifyQuickAccessCard({ track, onPlay, queue = [] }) {
+// Apple Music Genre Colors
+const GENRE_CATEGORIES = [
+  { id: 'pop', name: 'Pop Hits', query: 'Top Pop Hits 2026', gradient: 'from-[#ff2d55] to-[#ff375f]' },
+  { id: 'hiphop', name: 'Hip-Hop / Rap', query: 'Hip Hop Rap Chartbusters', gradient: 'from-[#ff9500] to-[#ff3b30]' },
+  { id: 'rnb', name: 'R&B Now', query: 'R&B Soul contemporary', gradient: 'from-[#af52de] to-[#5856d6]' },
+  { id: 'spatial', name: 'Spatial Audio', query: 'Spatial Audio Dolby Atmos hits', gradient: 'from-[#00c7be] to-[#007aff]' },
+  { id: 'dance', name: 'Dance & EDM', query: 'Dance Electronic party hits', gradient: 'from-[#32d74b] to-[#30d158]' },
+  { id: 'chill', name: 'Chill Waves', query: 'Chill Acoustic lofi relaxing', gradient: 'from-[#30b0c7] to-[#5856d6]' },
+  { id: 'rock', name: 'Rock & Alt', query: 'Rock Alternative classics hits', gradient: 'from-[#ff453a] to-[#bf5af2]' },
+  { id: 'top100', name: 'Global Top 100', query: 'Top 100 Global Billboard', gradient: 'from-[#ffd60a] to-[#ff9f0a]' },
+];
+
+/**
+ * 1. Apple Music Large Featured Editorial Hero Card
+ */
+function AppleFeaturedHeroCard({ track, index, onPlay, queue = [] }) {
   const currentTrack = useAudioStore(s => s.currentTrack);
   const isPlaying = useAudioStore(s => s.isPlaying);
   const isThisPlaying = currentTrack?.id === track.id && isPlaying;
+
+  const tag = EDITORIAL_TAGS[index % EDITORIAL_TAGS.length];
+  const cover = getArtworkSrc(track, 800);
 
   const handlePlay = e => {
     e.stopPropagation();
     onPlay(track, queue);
   };
 
-  const cover = getArtworkSrc(track, 120);
-
   return (
     <div
       onClick={handlePlay}
-      className={`group relative flex items-center h-16 sm:h-20 rounded-[6px] bg-white/[0.08] hover:bg-white/[0.16] transition-all duration-200 cursor-pointer overflow-hidden shadow-md hover:shadow-xl ${
-        currentTrack?.id === track.id ? 'bg-white/[0.14]' : ''
-      }`}
+      className="group flex-shrink-0 w-[300px] sm:w-[460px] md:w-[540px] lg:w-[600px] flex flex-col cursor-pointer select-none snap-start"
     >
-      {/* Artwork Left */}
-      <div className="h-full aspect-square flex-shrink-0 bg-[#242424] shadow-md">
-        <SafeImage
-          src={cover}
-          track={track}
-          alt={track.title}
-          size={120}
-          className="w-full h-full object-cover"
-        />
-      </div>
-
-      {/* Title & Artist */}
-      <div className="flex-1 min-w-0 px-3 sm:px-4">
-        <p className="text-xs sm:text-sm font-bold text-white truncate group-hover:text-white">
-          {track.title}
+      {/* Top Editorial Headline Header */}
+      <div className="mb-2.5 px-0.5">
+        <p className="text-[11px] font-bold tracking-wider uppercase text-[#a1a1a6]">
+          {tag}
         </p>
-        <p className="text-[11px] text-[#b3b3b3] truncate mt-0.5">
+        <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-white tracking-tight truncate group-hover:text-[#fa2d48] transition-colors">
+          {track.title}
+        </h3>
+        <p className="text-xs sm:text-sm text-[#8e8e93] truncate">
           {track.artist}
         </p>
       </div>
 
-      {/* Spotify Green Play Button */}
-      <div className="pr-3 sm:pr-4">
+      {/* Hero Visual Card */}
+      <div className="relative aspect-[2.1/1] w-full rounded-2xl overflow-hidden bg-[#1c1c1e] border border-white/[0.08] shadow-2xl transition-all duration-300 group-hover:shadow-[0_12px_32px_rgba(0,0,0,0.8)] group-hover:border-white/20">
+        <SafeImage
+          src={cover}
+          track={track}
+          alt={track.title}
+          size={800}
+          className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+        />
+
+        {/* Ambient Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+
+        {/* Apple Music Floating Play Badge */}
+        <div className="absolute right-4 bottom-4">
+          <button
+            onClick={handlePlay}
+            className={`w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-xl shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 ${
+              isThisPlaying
+                ? 'bg-[#fa2d48] text-white opacity-100 scale-100'
+                : 'bg-black/60 hover:bg-[#fa2d48] text-white border border-white/20 hover:border-transparent opacity-90 group-hover:opacity-100'
+            }`}
+            aria-label={`Play ${track.title}`}
+          >
+            {isThisPlaying ? (
+              <Pause className="w-5 h-5 fill-current" />
+            ) : (
+              <Play className="w-5 h-5 fill-current ml-0.5" />
+            )}
+          </button>
+        </div>
+
+        {/* Apple Music Lossless / Spatial badge on bottom-left */}
+        <div className="absolute left-4 bottom-4 flex items-center gap-1.5">
+          <span className="px-2 py-0.5 rounded bg-black/60 backdrop-blur-md text-[10px] font-bold text-white/90 border border-white/10 uppercase tracking-wider">
+            Spatial Audio
+          </span>
+          <span className="px-2 py-0.5 rounded bg-black/60 backdrop-blur-md text-[10px] font-bold text-[#fa2d48] border border-[#fa2d48]/20 uppercase tracking-wider">
+            Lossless
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * 2. Apple Music "Best New Songs" Row Item (3-Row Stacked Grid Item)
+ */
+function AppleSongRowItem({ track, onPlay, queue = [] }) {
+  const currentTrack = useAudioStore(s => s.currentTrack);
+  const isPlaying = useAudioStore(s => s.isPlaying);
+  const isThisPlaying = currentTrack?.id === track.id && isPlaying;
+  const toggleLike = useAudioStore(s => s.toggleLike);
+  const likedTrackIds = useAudioStore(s => s.likedTrackIds);
+  const isLiked = likedTrackIds.includes(String(track.id));
+
+  const cover = getArtworkSrc(track, 120);
+
+  const handlePlay = e => {
+    e.stopPropagation();
+    onPlay(track, queue);
+  };
+
+  return (
+    <div
+      onClick={handlePlay}
+      className={`group relative flex items-center justify-between h-14 px-2 rounded-xl transition-all duration-200 cursor-pointer border-b border-white/[0.04] last:border-0 hover:bg-white/[0.08] ${
+        currentTrack?.id === track.id ? 'bg-white/[0.06]' : ''
+      }`}
+    >
+      {/* Left: Thumbnail + Title + Artist */}
+      <div className="flex items-center gap-3 min-w-0 flex-1 pr-2">
+        {/* Cover Art with Hover Play */}
+        <div className="relative w-11 h-11 rounded-lg overflow-hidden flex-shrink-0 bg-[#242426] shadow-sm">
+          <SafeImage
+            src={cover}
+            track={track}
+            alt={track.title}
+            size={120}
+            className="w-full h-full object-cover"
+          />
+
+          {/* Hover Play Button Overlay */}
+          <div
+            className={`absolute inset-0 bg-black/50 backdrop-blur-[2px] flex items-center justify-center transition-opacity duration-200 ${
+              isThisPlaying ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+            }`}
+          >
+            {isThisPlaying ? (
+              <Pause className="w-4 h-4 fill-white text-white" />
+            ) : (
+              <Play className="w-4 h-4 fill-white text-white ml-0.5" />
+            )}
+          </div>
+        </div>
+
+        {/* Title & Artist */}
+        <div className="min-w-0 flex-1">
+          <p
+            className={`text-xs sm:text-sm font-semibold truncate transition-colors ${
+              currentTrack?.id === track.id ? 'text-[#fa2d48]' : 'text-white group-hover:text-white'
+            }`}
+          >
+            {track.title}
+          </p>
+          <div className="flex items-center gap-1.5 mt-0.5">
+            <span className="inline-flex items-center justify-center px-1 py-0.2 rounded bg-white/10 text-[9px] font-bold text-[#a1a1a6]">
+              E
+            </span>
+            <p className="text-[11px] text-[#8e8e93] truncate">
+              {track.artist}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Right: Actions */}
+      <div className="flex items-center gap-1 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+        <button
+          onClick={e => {
+            e.stopPropagation();
+            toggleLike(track.id);
+          }}
+          className={`p-1.5 rounded-full hover:bg-white/10 transition ${
+            isLiked ? 'text-[#fa2d48] opacity-100' : 'text-[#8e8e93] hover:text-white'
+          }`}
+          aria-label="Favorite"
+        >
+          <Heart className={`w-3.5 h-3.5 ${isLiked ? 'fill-current' : ''}`} />
+        </button>
+
         <button
           onClick={handlePlay}
-          className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#1db954] hover:bg-[#1ed760] text-black flex items-center justify-center shadow-xl shadow-black/50 transition-all duration-200 hover:scale-105 active:scale-95 ${
-            isThisPlaying
-              ? 'opacity-100 translate-y-0 scale-100'
-              : 'opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0'
-          }`}
-          aria-label={`Play ${track.title}`}
+          className="p-1.5 rounded-full hover:bg-white/10 text-[#8e8e93] hover:text-white transition"
+          aria-label="Play song"
         >
-          {isThisPlaying ? (
-            <Pause className="w-5 h-5 fill-black stroke-black" />
-          ) : (
-            <Play className="w-5 h-5 fill-black stroke-black ml-0.5" />
-          )}
+          <MoreHorizontal className="w-3.5 h-3.5" />
         </button>
       </div>
     </div>
   );
 }
 
-// 2. Spotify Square Album / Track Card
-function SpotifySquareCard({ track, onPlay, queue = [] }) {
+/**
+ * 3. Apple Music Square Album / Release Card
+ */
+function AppleSquareCard({ track, onPlay, queue = [] }) {
   const currentTrack = useAudioStore(s => s.currentTrack);
   const isPlaying = useAudioStore(s => s.isPlaying);
   const isThisPlaying = currentTrack?.id === track.id && isPlaying;
+
+  const cover = getArtworkSrc(track, 360);
 
   const handlePlay = e => {
     e.stopPropagation();
     onPlay(track, queue);
   };
 
-  const cover = getArtworkSrc(track, 300);
-
   return (
     <div
       onClick={handlePlay}
-      className="group relative flex flex-col p-3 sm:p-3.5 rounded-lg bg-[#181818] hover:bg-[#282828] transition-all duration-300 cursor-pointer shadow-md hover:shadow-2xl"
+      className="group flex flex-col cursor-pointer select-none"
     >
       {/* Square Artwork */}
-      <div className="relative aspect-square w-full rounded-md overflow-hidden bg-[#242424] shadow-lg mb-3">
+      <div className="relative aspect-square w-full rounded-2xl overflow-hidden bg-[#1c1c1e] border border-white/[0.08] shadow-md transition-all duration-300 group-hover:shadow-2xl group-hover:border-white/20 mb-2.5">
         <SafeImage
           src={cover}
           track={track}
           alt={track.title}
-          size={300}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          size={360}
+          className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
         />
 
-        {/* Floating Green Play Button */}
+        {/* Gradient Shadow */}
+        <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+
+        {/* Floating Apple Red Play Button */}
         <button
           onClick={handlePlay}
-          className={`absolute right-2.5 bottom-2.5 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#1db954] hover:bg-[#1ed760] text-black flex items-center justify-center shadow-xl shadow-black/60 transition-all duration-300 hover:scale-105 active:scale-95 z-10 ${
+          className={`absolute right-3 bottom-3 w-10 h-10 rounded-full bg-[#fa2d48] hover:bg-[#fc3c44] text-white flex items-center justify-center shadow-xl shadow-black/60 transition-all duration-300 hover:scale-105 active:scale-95 z-10 ${
             isThisPlaying
               ? 'opacity-100 translate-y-0 scale-100'
               : 'opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0'
@@ -122,99 +270,118 @@ function SpotifySquareCard({ track, onPlay, queue = [] }) {
           aria-label={`Play ${track.title}`}
         >
           {isThisPlaying ? (
-            <Pause className="w-5 h-5 fill-black stroke-black" />
+            <Pause className="w-4 h-4 fill-white" />
           ) : (
-            <Play className="w-5 h-5 fill-black stroke-black ml-0.5" />
+            <Play className="w-4 h-4 fill-white ml-0.5" />
           )}
         </button>
-
-        {track.isLossless && (
-          <span className="absolute top-2 left-2 px-1.5 py-0.5 rounded bg-black/75 backdrop-blur-md text-[9px] font-black tracking-widest text-[#1db954] border border-[#1db954]/30">
-            FLAC
-          </span>
-        )}
-
-        {track.isYouTube && (
-          <span className="absolute top-2 left-2 px-1.5 py-0.5 rounded bg-black/75 backdrop-blur-md text-[9px] font-bold tracking-wide text-red-400 border border-red-500/20">
-            YT MUSIC
-          </span>
-        )}
       </div>
 
-      {/* Info */}
-      <h4 className="truncate text-xs sm:text-sm font-bold text-white group-hover:underline">
+      {/* Typography */}
+      <h4 className="text-xs sm:text-sm font-semibold text-white truncate group-hover:underline">
         {track.title}
       </h4>
-      <p className="truncate text-[11px] sm:text-xs text-[#b3b3b3] mt-1">
+      <p className="text-[11px] sm:text-xs text-[#8e8e93] truncate mt-0.5">
         {track.artist}
       </p>
     </div>
   );
 }
 
-// 3. Skeleton Loading Cards
-function QuickAccessSkeleton() {
+/**
+ * 4. Apple Music Category / Genre Tile Card
+ */
+function AppleGenreTile({ category, onSelect }) {
   return (
-    <div className="flex items-center h-16 sm:h-20 rounded-[6px] bg-white/[0.05] animate-pulse overflow-hidden">
-      <div className="h-full aspect-square bg-white/[0.08]" />
-      <div className="flex-1 px-4 space-y-2">
-        <div className="h-3.5 bg-white/[0.1] rounded w-3/4" />
-        <div className="h-2.5 bg-white/[0.06] rounded w-1/2" />
+    <div
+      onClick={() => onSelect(category.query)}
+      className={`relative h-28 sm:h-32 rounded-2xl p-4 bg-gradient-to-br ${category.gradient} shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer overflow-hidden group hover:scale-[1.02] flex flex-col justify-between`}
+    >
+      <span className="text-base sm:text-lg font-black text-white tracking-tight drop-shadow-md">
+        {category.name}
+      </span>
+      <div className="flex items-center justify-between text-white/80">
+        <span className="text-[10px] font-bold uppercase tracking-wider">Explore</span>
+        <div className="w-7 h-7 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center group-hover:bg-white text-white group-hover:text-black transition">
+          <ChevronRight className="w-4 h-4" />
+        </div>
       </div>
     </div>
   );
 }
 
-function CardSkeleton() {
+/**
+ * Skeleton Card for Apple Music UI
+ */
+function SkeletonHero() {
   return (
-    <div className="flex flex-col p-3 sm:p-3.5 rounded-lg bg-[#181818] animate-pulse">
-      <div className="aspect-square w-full rounded-md bg-white/[0.06] mb-3" />
-      <div className="h-3.5 bg-white/[0.1] rounded w-3/4 mb-2" />
-      <div className="h-2.5 bg-white/[0.06] rounded w-1/2" />
+    <div className="w-[300px] sm:w-[460px] md:w-[540px] flex-shrink-0 animate-pulse">
+      <div className="h-3 w-24 bg-white/10 rounded mb-2" />
+      <div className="h-5 w-48 bg-white/10 rounded mb-1" />
+      <div className="h-3.5 w-32 bg-white/5 rounded mb-3" />
+      <div className="aspect-[2.1/1] w-full bg-white/[0.06] rounded-2xl" />
     </div>
   );
 }
 
+function SkeletonSquare() {
+  return (
+    <div className="flex flex-col animate-pulse">
+      <div className="aspect-square w-full rounded-2xl bg-white/[0.06] mb-2.5" />
+      <div className="h-3.5 w-3/4 bg-white/10 rounded mb-1" />
+      <div className="h-3 w-1/2 bg-white/5 rounded" />
+    </div>
+  );
+}
+
+/**
+ * MAIN APPLE MUSIC "NEW" BROWSE PAGE
+ */
 export function HomePage({ lib, onNavigate }) {
-  const recentlyPlayed = useAudioStore(s => s.recentlyPlayed);
   const currentTrack = useAudioStore(s => s.currentTrack);
-  const isPlaying = useAudioStore(s => s.isPlaying);
   const playTrack = useAudioStore(s => s.playTrack);
   const togglePlay = useAudioStore(s => s.togglePlay);
 
-  const [activeFilter, setActiveFilter] = useState('all'); // all | trending | tophits | chill | albums | artists | lossless
-  const [ytTrending, setYtTrending] = useState(cachedYtTrending || []);
-  const [ytTopHits, setYtTopHits] = useState(cachedYtTopHits || []);
-  const [ytChill, setYtChill] = useState(cachedYtChill || []);
-  const [isLoadingYt, setIsLoadingYt] = useState(!cachedYtTrending);
+  const [activeTab, setActiveTab] = useState('all'); // all | featured | bestnew | releases | categories
+  const [trendingTracks, setTrendingTracks] = useState(cachedTrending || []);
+  const [topHits, setTopHits] = useState(cachedTopHits || []);
+  const [newReleases, setNewReleases] = useState(cachedNewReleases || []);
+  const [chillTracks, setChillTracks] = useState(cachedChill || []);
+  const [isLoading, setIsLoading] = useState(!cachedTrending);
 
-  const items = lib.allItems || [];
+  const heroScrollRef = useRef(null);
 
-  // Fetch YouTube Music trending hits on mount
+  // Load curated sets on mount
   useEffect(() => {
     let isMounted = true;
-    if (cachedYtTrending && cachedYtTopHits) return;
+    if (cachedTrending && cachedTopHits) return;
 
-    setIsLoadingYt(true);
+    setIsLoading(true);
     Promise.allSettled([
       fetchYouTubeTrending(24),
-      searchYouTube('Today Top Hits Global 2024', 18),
-      searchYouTube('Chill lofi acoustic vibes', 18),
-    ]).then(([trendRes, hitsRes, chillRes]) => {
+      searchYouTube('Apple Music Today Hits New Music', 20),
+      searchYouTube('New Music Friday Best Releases', 18),
+      searchYouTube('Acoustic Chill Focus Vibes', 18),
+    ]).then(([trendRes, hitsRes, releaseRes, chillRes]) => {
       if (!isMounted) return;
+
       if (trendRes.status === 'fulfilled' && trendRes.value?.length) {
-        cachedYtTrending = trendRes.value;
-        setYtTrending(trendRes.value);
+        cachedTrending = trendRes.value;
+        setTrendingTracks(trendRes.value);
       }
       if (hitsRes.status === 'fulfilled' && hitsRes.value?.length) {
-        cachedYtTopHits = hitsRes.value;
-        setYtTopHits(hitsRes.value);
+        cachedTopHits = hitsRes.value;
+        setTopHits(hitsRes.value);
+      }
+      if (releaseRes.status === 'fulfilled' && releaseRes.value?.length) {
+        cachedNewReleases = releaseRes.value;
+        setNewReleases(releaseRes.value);
       }
       if (chillRes.status === 'fulfilled' && chillRes.value?.length) {
-        cachedYtChill = chillRes.value;
-        setYtChill(chillRes.value);
+        cachedChill = chillRes.value;
+        setChillTracks(chillRes.value);
       }
-      setIsLoadingYt(false);
+      setIsLoading(false);
     });
 
     return () => {
@@ -222,331 +389,278 @@ export function HomePage({ lib, onNavigate }) {
     };
   }, []);
 
-  // Top 6 Quick-Access items (recently played -> local library -> trending YouTube)
-  const quickAccessList = useMemo(() => {
-    const list = [...recentlyPlayed];
-    for (const t of items) {
-      if (list.length >= 6) break;
-      if (!list.some(x => x.id === t.id)) list.push(t);
-    }
-    for (const t of ytTrending) {
-      if (list.length >= 6) break;
-      if (!list.some(x => x.id === t.id)) list.push(t);
-    }
-    return list.slice(0, 6);
-  }, [recentlyPlayed, items, ytTrending]);
-
-  // Jump Back In items
-  const jumpBackInList = useMemo(() => {
-    if (recentlyPlayed.length > 0) {
-      return recentlyPlayed.slice(0, 8);
-    }
-    return items.slice(0, 8);
-  }, [recentlyPlayed, items]);
-
-  // Lossless tracks highlight
-  const losslessTracks = useMemo(() => {
-    return items.filter(t => t.isLossless || t.format === 'FLAC').slice(0, 10);
-  }, [items]);
-
-  // Handle Play Track
-  const handlePlayTrack = (track, queue = null) => {
+  const handlePlayTrack = (track, queue = []) => {
     if (currentTrack?.id === track.id) {
       togglePlay();
     } else {
-      const activeQueue = queue && queue.length ? queue : (items.length ? items : [track]);
+      const activeQueue = queue && queue.length ? queue : [track];
       playTrack(track, activeQueue);
     }
   };
 
+  const handleScrollHero = direction => {
+    if (heroScrollRef.current) {
+      const offset = direction === 'left' ? -520 : 520;
+      heroScrollRef.current.scrollBy({ left: offset, behavior: 'smooth' });
+    }
+  };
+
+  // Best New Songs: Slice into 4 columns of 3 rows (Total 12 items)
+  const bestNewSongColumns = useMemo(() => {
+    const list = trendingTracks.length >= 12 ? trendingTracks.slice(0, 12) : topHits.slice(0, 12);
+    const columns = [];
+    for (let i = 0; i < list.length; i += 3) {
+      columns.push(list.slice(i, i + 3));
+    }
+    return columns;
+  }, [trendingTracks, topHits]);
+
   return (
-    <div className="flex-1 w-full pb-16 select-none">
-      {/* Ambient Gradient Header Banner */}
-      <div className="relative pt-6 px-4 sm:px-8 pb-6 bg-gradient-to-b from-[#1e3b2e]/50 via-[#121212]/95 to-[#121212]">
-        {/* Dynamic Greeting & Filter Pills */}
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-white">
-              {getGreeting()}
+    <div className="flex-1 w-full pb-24 select-none bg-[#000000] text-white">
+      {/* 1. APPLE MUSIC TOP PAGE HEADER */}
+      <div className="px-4 sm:px-8 pt-8 pb-4 border-b border-white/[0.08]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white font-sans">
+              New
             </h1>
-            <div className="flex items-center gap-2">
-              <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[11px] font-semibold text-[#b3b3b3]">
-                <Flame className="w-3.5 h-3.5 text-red-400" />
-                Live Streaming Engine
-              </span>
-            </div>
+            <p className="text-xs sm:text-sm text-[#8e8e93] mt-1">
+              Discover the latest releases, featured music, and top streaming charts
+            </p>
           </div>
 
-          {/* Filter Pills */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+          {/* Apple Music Pill Filter Tabs */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
             {[
               { id: 'all', label: 'All' },
-              { id: 'trending', label: 'Trending Hits' },
-              { id: 'tophits', label: "Today's Top Hits" },
-              { id: 'chill', label: 'Chill & Relax' },
-              ...(items.length > 0 ? [{ id: 'library', label: 'My Vault' }] : []),
-              ...(losslessTracks.length > 0 ? [{ id: 'lossless', label: 'Lossless Hi-Res' }] : []),
-              ...(lib.albums?.length > 0 ? [{ id: 'albums', label: 'Albums' }] : []),
-              ...(lib.artists?.length > 0 ? [{ id: 'artists', label: 'Artists' }] : []),
-            ].map(f => (
+              { id: 'featured', label: 'Featured' },
+              { id: 'bestnew', label: 'Best New Songs' },
+              { id: 'releases', label: 'New Releases' },
+              { id: 'categories', label: 'Genres & Moods' },
+            ].map(tab => (
               <button
-                key={f.id}
-                onClick={() => setActiveFilter(f.id)}
-                className={`px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 whitespace-nowrap ${
-                  activeFilter === f.id
-                    ? 'bg-white text-black shadow-md'
-                    : 'bg-white/[0.08] hover:bg-white/[0.14] text-white'
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap ${
+                  activeTab === tab.id
+                    ? 'bg-white text-black shadow-sm'
+                    : 'bg-white/[0.08] hover:bg-white/[0.14] text-[#d1d1d6]'
                 }`}
               >
-                {f.label}
+                {tab.label}
               </button>
             ))}
           </div>
         </div>
-
-        {/* Spotify 2x3 Quick-Access Grid */}
-        {activeFilter === 'all' && (
-          <div className="mt-6">
-            {isLoadingYt && quickAccessList.length === 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3">
-                {[...Array(6)].map((_, i) => (
-                  <QuickAccessSkeleton key={`skeleton_quick_${i}`} />
-                ))}
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3">
-                {quickAccessList.map((t, idx) => (
-                  <SpotifyQuickAccessCard
-                    key={`${t.id}_quick_${idx}`}
-                    track={t}
-                    onPlay={handlePlayTrack}
-                    queue={quickAccessList}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-        )}
       </div>
 
-      {/* Main Content Sections */}
-      <div className="px-4 sm:px-8 space-y-10 mt-4">
-        {/* 1. SECTION: TRENDING ON YOUTUBE MUSIC */}
-        {(activeFilter === 'all' || activeFilter === 'trending') && (
+      <div className="px-4 sm:px-8 space-y-12 mt-6">
+        {/* 2. SECTION: FEATURED EDITORIAL CAROUSEL */}
+        {(activeTab === 'all' || activeTab === 'featured') && (
           <section className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Flame className="w-5 h-5 text-red-500" />
+                <Sparkles className="w-5 h-5 text-[#fa2d48]" />
+                <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
+                  Featured
+                </h2>
+              </div>
+
+              {/* Carousel Left / Right Arrow Buttons */}
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={() => handleScrollHero('left')}
+                  className="w-8 h-8 rounded-full bg-white/[0.08] hover:bg-white/[0.16] border border-white/10 flex items-center justify-center text-white transition active:scale-95"
+                  aria-label="Previous Featured"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => handleScrollHero('right')}
+                  className="w-8 h-8 rounded-full bg-white/[0.08] hover:bg-white/[0.16] border border-white/10 flex items-center justify-center text-white transition active:scale-95"
+                  aria-label="Next Featured"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Scrollable Hero Carousel Container */}
+            <div
+              ref={heroScrollRef}
+              className="flex gap-5 overflow-x-auto pb-4 pt-1 no-scrollbar snap-x snap-mandatory scroll-smooth"
+            >
+              {isLoading && trendingTracks.length === 0 ? (
+                <>
+                  <SkeletonHero />
+                  <SkeletonHero />
+                  <SkeletonHero />
+                </>
+              ) : (
+                trendingTracks.slice(0, 10).map((t, idx) => (
+                  <AppleFeaturedHeroCard
+                    key={`hero_${t.id}_${idx}`}
+                    track={t}
+                    index={idx}
+                    onPlay={handlePlayTrack}
+                    queue={trendingTracks}
+                  />
+                ))
+              )}
+            </div>
+          </section>
+        )}
+
+        {/* 3. SECTION: BEST NEW SONGS (Apple Music Multi-Column 3-Row Layout) */}
+        {(activeTab === 'all' || activeTab === 'bestnew') && (
+          <section className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Flame className="w-5 h-5 text-[#fa2d48]" />
                 <div>
                   <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
-                    Trending on YouTube Music
+                    Best New Songs
                   </h2>
-                  <p className="text-xs text-[#b3b3b3] mt-0.5">Top chartbusters streaming worldwide right now</p>
+                  <p className="text-xs text-[#8e8e93]">The most essential new tracks streaming right now</p>
                 </div>
               </div>
               <button
                 onClick={() => onNavigate('search')}
-                className="text-xs font-bold text-[#b3b3b3] hover:text-white transition flex items-center gap-1"
+                className="text-xs font-semibold text-[#fa2d48] hover:underline flex items-center gap-0.5"
               >
-                <span>Search more</span>
+                <span>See All</span>
                 <ChevronRight className="w-3.5 h-3.5" />
               </button>
             </div>
 
-            {isLoadingYt && ytTrending.length === 0 ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-                {[...Array(6)].map((_, i) => (
-                  <CardSkeleton key={`skeleton_trend_${i}`} />
-                ))}
+            {/* 4 Columns x 3 Rows Multi-Column Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-1">
+              {bestNewSongColumns.map((colGroup, colIdx) => (
+                <div key={`col_${colIdx}`} className="flex flex-col">
+                  {colGroup.map((track, rowIdx) => (
+                    <AppleSongRowItem
+                      key={`bns_${track.id}_${colIdx}_${rowIdx}`}
+                      track={track}
+                      onPlay={handlePlayTrack}
+                      queue={trendingTracks}
+                    />
+                  ))}
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* 4. SECTION: NEW RELEASES (Apple Square Card Grid) */}
+        {(activeTab === 'all' || activeTab === 'releases') && (
+          <section className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
+                  New Releases
+                </h2>
+                <p className="text-xs text-[#8e8e93]">Fresh albums, EPs, and worldwide drops</p>
               </div>
-            ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-                {ytTrending.slice(0, 12).map((t, idx) => (
-                  <SpotifySquareCard
-                    key={`${t.id}_trend_${idx}`}
+              <button
+                onClick={() => onNavigate('search')}
+                className="text-xs font-semibold text-[#fa2d48] hover:underline flex items-center gap-0.5"
+              >
+                <span>See All</span>
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-5">
+              {isLoading && topHits.length === 0 ? (
+                [...Array(6)].map((_, i) => <SkeletonSquare key={`sk_${i}`} />)
+              ) : (
+                (newReleases.length ? newReleases : topHits).slice(0, 12).map((t, idx) => (
+                  <AppleSquareCard
+                    key={`release_${t.id}_${idx}`}
                     track={t}
                     onPlay={handlePlayTrack}
-                    queue={ytTrending}
+                    queue={newReleases}
                   />
-                ))}
-              </div>
-            )}
+                ))
+              )}
+            </div>
           </section>
         )}
 
-        {/* 2. SECTION: TODAY'S TOP HITS */}
-        {(activeFilter === 'all' || activeFilter === 'tophits') && ytTopHits.length > 0 && (
+        {/* 5. SECTION: TODAY'S HITS (Curated Anthems) */}
+        {activeTab === 'all' && topHits.length > 0 && (
+          <section className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
+                  Today's Hits
+                </h2>
+                <p className="text-xs text-[#8e8e93]">The biggest tracks across every chart</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-5">
+              {topHits.slice(0, 12).map((t, idx) => (
+                <AppleSquareCard
+                  key={`tophits_${t.id}_${idx}`}
+                  track={t}
+                  onPlay={handlePlayTrack}
+                  queue={topHits}
+                />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* 6. SECTION: BROWSE BY CATEGORY & GENRES */}
+        {(activeTab === 'all' || activeTab === 'categories') && (
           <section className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-[#1db954]" />
-                <div>
-                  <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
-                    Today's Top Hits
-                  </h2>
-                  <p className="text-xs text-[#b3b3b3] mt-0.5">The biggest tracks and viral anthems</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-              {ytTopHits.slice(0, 12).map((t, idx) => (
-                <SpotifySquareCard
-                  key={`${t.id}_tophits_${idx}`}
-                  track={t}
-                  onPlay={handlePlayTrack}
-                  queue={ytTopHits}
-                />
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* 3. SECTION: JUMP BACK IN / RECENTLY PLAYED */}
-        {(activeFilter === 'all' || activeFilter === 'library') && jumpBackInList.length > 0 && (
-          <section className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white hover:underline cursor-pointer" onClick={() => onNavigate('library')}>
-                  Jump back in
+                <Compass className="w-5 h-5 text-[#fa2d48]" />
+                <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
+                  Browse by Category
                 </h2>
-                <p className="text-xs text-[#b3b3b3] mt-0.5">Your recent listening history</p>
               </div>
-              <button
-                onClick={() => onNavigate('library')}
-                className="text-xs font-bold text-[#b3b3b3] hover:text-white transition flex items-center gap-1"
-              >
-                <span>Show all</span>
-                <ChevronRight className="w-3.5 h-3.5" />
-              </button>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-              {jumpBackInList.slice(0, 6).map((t, idx) => (
-                <SpotifySquareCard
-                  key={`${t.id}_jump_${idx}`}
-                  track={t}
-                  onPlay={handlePlayTrack}
-                  queue={jumpBackInList}
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3.5 sm:gap-4">
+              {GENRE_CATEGORIES.map(category => (
+                <AppleGenreTile
+                  key={category.id}
+                  category={category}
+                  onSelect={query => {
+                    // Navigate to search with this genre
+                    onNavigate('search');
+                  }}
                 />
               ))}
             </div>
           </section>
         )}
 
-        {/* 4. SECTION: CHILL & RELAX */}
-        {(activeFilter === 'all' || activeFilter === 'chill') && ytChill.length > 0 && (
+        {/* 7. SECTION: CHILL & RELAXING SOUNDS */}
+        {activeTab === 'all' && chillTracks.length > 0 && (
           <section className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Headphones className="w-5 h-5 text-sky-400" />
+                <Headphones className="w-5 h-5 text-[#30b0c7]" />
                 <div>
                   <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
-                    Chill & Mellow Vibes
+                    Peaceful & Relaxing Sounds
                   </h2>
-                  <p className="text-xs text-[#b3b3b3] mt-0.5">Soft melodies, lofi beats, and acoustic songs</p>
+                  <p className="text-xs text-[#8e8e93]">Atmospheric lofi, chill acoustics, and mellow frequencies</p>
                 </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-              {ytChill.slice(0, 12).map((t, idx) => (
-                <SpotifySquareCard
-                  key={`${t.id}_chill_${idx}`}
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-5">
+              {chillTracks.slice(0, 6).map((t, idx) => (
+                <AppleSquareCard
+                  key={`chill_${t.id}_${idx}`}
                   track={t}
                   onPlay={handlePlayTrack}
-                  queue={ytChill}
-                />
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* 5. SECTION: POPULAR ALBUMS (From Vault) */}
-        {(activeFilter === 'all' || activeFilter === 'albums') && lib.albums?.length > 0 && (
-          <section className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white hover:underline cursor-pointer" onClick={() => onNavigate('albums')}>
-                  Popular albums
-                </h2>
-                <p className="text-xs text-[#b3b3b3] mt-0.5">Studio releases and collections</p>
-              </div>
-              <button
-                onClick={() => onNavigate('albums')}
-                className="text-xs font-bold text-[#b3b3b3] hover:text-white transition flex items-center gap-1"
-              >
-                <span>Show all ({lib.albums.length})</span>
-                <ChevronRight className="w-3.5 h-3.5" />
-              </button>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-              {lib.albums.slice(0, 6).map(album => (
-                <AlbumCard
-                  key={album.name}
-                  album={album}
-                  onClick={() => onNavigate(`album:${album.name}`)}
-                />
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* 6. SECTION: FEATURED ARTISTS (From Vault) */}
-        {(activeFilter === 'all' || activeFilter === 'artists') && lib.artists?.length > 0 && (
-          <section className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white hover:underline cursor-pointer" onClick={() => onNavigate('artists')}>
-                  Popular artists
-                </h2>
-                <p className="text-xs text-[#b3b3b3] mt-0.5">Musicians you love</p>
-              </div>
-              <button
-                onClick={() => onNavigate('artists')}
-                className="text-xs font-bold text-[#b3b3b3] hover:text-white transition flex items-center gap-1"
-              >
-                <span>Show all ({lib.artists.length})</span>
-                <ChevronRight className="w-3.5 h-3.5" />
-              </button>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-              {lib.artists.slice(0, 6).map(artist => (
-                <ArtistCard
-                  key={artist.name}
-                  artist={artist}
-                  onClick={() => onNavigate(`artist:${artist.name}`)}
-                />
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* 7. SECTION: LOSSLESS MASTERPIECES */}
-        {(activeFilter === 'all' || activeFilter === 'lossless') && losslessTracks.length > 0 && (
-          <section className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <Disc className="w-5 h-5 text-[#1db954]" />
-                <div>
-                  <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
-                    Lossless Audio Vault
-                  </h2>
-                  <p className="text-xs text-[#b3b3b3] mt-0.5">Bit-perfect 24-bit / 48kHz studio audio</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-[#181818] p-3 rounded-lg border border-white/5 space-y-1">
-              {losslessTracks.slice(0, 8).map((t, idx) => (
-                <TrackRow
-                  key={`lossless_${t.id}_${idx}`}
-                  track={t}
-                  index={idx}
-                  showNumber={true}
-                  showCover={true}
+                  queue={chillTracks}
                 />
               ))}
             </div>

@@ -212,7 +212,7 @@ export function ArtistsPage({ lib, selectedArtistName, onNavigate, onBack }) {
             Artists ({lib.artists.length})
           </h1>
           <p className="text-xs text-warm-muted mt-0.5">
-            Discover and explore all artists featured in your Telegram music collection
+            Discover and explore all artists featured in your music collection
           </p>
         </div>
 
