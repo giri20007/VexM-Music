@@ -9,7 +9,6 @@ import {
   Search,
   Loader2,
   Clock,
-  Heart,
 } from 'lucide-react';
 import { useAudioStore } from '../store/useAudioStore';
 import { TrackRow } from '../components/library/TrackRow';
@@ -33,36 +32,36 @@ const FEATURED_ALBUMS = [
   { name: 'Kaithi', artist: 'Sam C.S.', year: 2019, thumbnail: 'https://c.saavncdn.com/911/Kaithi-Tamil-2019-20191022183412-500x500.jpg' },
 ];
 
-export function AlbumsPage({ lib, selectedAlbumName, onNavigate, onBack }) {
+// Sub-Component 1: Dedicated Album View (Apple Music Clean Hero & Tracklist)
+function AlbumDetailView({ lib, albumName, onNavigate, onBack }) {
   const playTrack = useAudioStore(s => s.playTrack);
   const currentTrack = useAudioStore(s => s.currentTrack);
   const isPlaying = useAudioStore(s => s.isPlaying);
   const togglePlay = useAudioStore(s => s.togglePlay);
 
   const [copied, setCopied] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
   const [albumTracks, setAlbumTracks] = useState([]);
   const [albumCover, setAlbumCover] = useState('');
   const [albumArtist, setAlbumArtist] = useState('');
   const [isLoadingAlbum, setIsLoadingAlbum] = useState(false);
 
-  // Check if album is in local library
+  // Check if album is in local library safely
   const localAlbum = useMemo(() => {
-    if (!selectedAlbumName) return null;
-    return (lib.albums || []).find(
-      a => a.name.toLowerCase() === selectedAlbumName.toLowerCase()
+    if (!albumName) return null;
+    return (lib?.albums || []).find(
+      a => a?.name && a.name.toLowerCase() === albumName.toLowerCase()
     );
-  }, [lib.albums, selectedAlbumName]);
+  }, [lib?.albums, albumName]);
 
   // Load album songs dynamically from API if not enough local songs
   useEffect(() => {
-    if (!selectedAlbumName) return;
+    if (!albumName) return;
 
     let isMounted = true;
     const fetchAlbumData = async () => {
       // Find featured album metadata if available
       const feat = FEATURED_ALBUMS.find(
-        f => f.name.toLowerCase() === selectedAlbumName.toLowerCase()
+        f => f.name.toLowerCase() === albumName.toLowerCase()
       );
       if (feat) {
         setAlbumCover(feat.thumbnail);
@@ -72,27 +71,27 @@ export function AlbumsPage({ lib, selectedAlbumName, onNavigate, onBack }) {
         setAlbumArtist(localAlbum.artist);
       }
 
-      if (localAlbum && localAlbum.tracks.length >= 4) {
+      if (localAlbum && localAlbum.tracks?.length >= 4) {
         setAlbumTracks(localAlbum.tracks);
         return;
       }
 
       setIsLoadingAlbum(true);
       try {
-        const results = await searchUnified(`${selectedAlbumName}`, 25);
+        const results = await searchUnified(albumName, 25);
         if (isMounted) {
-          if (results.length > 0) {
+          if (results && results.length > 0) {
             setAlbumTracks(results);
             if (!feat && results[0]?.thumbnail) {
               setAlbumCover(results[0].thumbnail);
               setAlbumArtist(results[0].artist);
             }
-          } else if (localAlbum) {
+          } else if (localAlbum?.tracks) {
             setAlbumTracks(localAlbum.tracks);
           }
         }
-      } catch (e) {
-        if (isMounted && localAlbum) {
+      } catch {
+        if (isMounted && localAlbum?.tracks) {
           setAlbumTracks(localAlbum.tracks);
         }
       } finally {
@@ -104,15 +103,15 @@ export function AlbumsPage({ lib, selectedAlbumName, onNavigate, onBack }) {
     return () => {
       isMounted = false;
     };
-  }, [selectedAlbumName, localAlbum]);
+  }, [albumName, localAlbum]);
 
   const handleShare = async () => {
-    const url = `${window.location.origin}/#album:${encodeURIComponent(selectedAlbumName)}`;
+    const url = `${window.location.origin}/#album:${encodeURIComponent(albumName)}`;
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `${selectedAlbumName} - Vex-M`,
-          text: `Listen to "${selectedAlbumName}" on Vex-M`,
+          title: `${albumName} - Vex-M`,
+          text: `Listen to "${albumName}" on Vex-M`,
           url,
         });
         return;
@@ -126,7 +125,7 @@ export function AlbumsPage({ lib, selectedAlbumName, onNavigate, onBack }) {
   };
 
   const isAlbumPlaying =
-    albumTracks.some(t => t.id === currentTrack?.id) && isPlaying;
+    albumTracks.some(t => t?.id === currentTrack?.id) && isPlaying;
 
   const handlePlayAlbum = () => {
     if (isAlbumPlaying) {
@@ -142,168 +141,165 @@ export function AlbumsPage({ lib, selectedAlbumName, onNavigate, onBack }) {
     playTrack(shuffled[0], shuffled);
   };
 
-  // ==========================================
-  // 1. SPECIFIC ALBUM VIEW (Apple Music Style)
-  // ==========================================
-  if (selectedAlbumName) {
-    const totalDuration = albumTracks.reduce((s, t) => s + (t.duration || 0), 0);
-    const coverSrc =
-      albumCover ||
-      (localAlbum?.thumbnail) ||
-      (albumTracks[0]?.thumbnail) ||
-      '';
+  const totalDuration = albumTracks.reduce((s, t) => s + (t?.duration || 0), 0);
+  const coverSrc =
+    albumCover ||
+    localAlbum?.thumbnail ||
+    albumTracks[0]?.thumbnail ||
+    '';
 
-    const artistName = albumArtist || localAlbum?.artist || albumTracks[0]?.artist || 'Various Artists';
-    const releaseYear = localAlbum?.year || 2024;
+  const artistName = albumArtist || localAlbum?.artist || albumTracks[0]?.artist || 'Various Artists';
+  const releaseYear = localAlbum?.year || 2024;
 
-    return (
-      <div className="flex-1 w-full bg-[#000000] text-white select-none animate-fade-in pb-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-8 pt-4 pb-8 space-y-8">
-          {/* Back button */}
-          <button
-            onClick={onBack}
-            className="inline-flex items-center gap-2 text-xs font-semibold text-white/60 hover:text-white transition group py-1"
-          >
-            <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
-            <span>Back to Albums</span>
-          </button>
+  return (
+    <div className="flex-1 w-full bg-[#000000] text-white select-none animate-fade-in pb-24">
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 pt-4 pb-8 space-y-8">
+        {/* Back button */}
+        <button
+          onClick={onBack}
+          className="inline-flex items-center gap-2 text-xs font-semibold text-white/60 hover:text-white transition group py-1"
+        >
+          <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
+          <span>Back to Albums</span>
+        </button>
 
-          {/* Apple Music Hero Layout */}
-          <div className="flex flex-col md:flex-row items-center md:items-end gap-8 pt-2">
-            {/* Glossy Album Artwork */}
-            <div className="relative w-56 h-56 sm:w-64 sm:h-64 rounded-2xl overflow-hidden bg-[#181818] border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.8)] flex-shrink-0 group">
-              <SafeImage
-                src={coverSrc}
-                alt={selectedAlbumName}
-                size={600}
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-              />
+        {/* Apple Music Hero Layout */}
+        <div className="flex flex-col md:flex-row items-center md:items-end gap-8 pt-2">
+          {/* Glossy Album Artwork */}
+          <div className="relative w-56 h-56 sm:w-64 sm:h-64 rounded-2xl overflow-hidden bg-[#181818] border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.8)] flex-shrink-0 group">
+            <SafeImage
+              src={coverSrc}
+              alt={albumName}
+              size={600}
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            />
+          </div>
+
+          {/* Album Metadata & Actions */}
+          <div className="space-y-4 flex-1 min-w-0 text-center md:text-left">
+            <div>
+              <span className="text-xs font-bold uppercase tracking-widest text-[#fa2d48]">
+                Album
+              </span>
+              <h1 className="text-2xl sm:text-4xl md:text-5xl font-black text-white tracking-tight leading-tight mt-1">
+                {albumName}
+              </h1>
             </div>
 
-            {/* Album Metadata & Actions */}
-            <div className="space-y-4 flex-1 min-w-0 text-center md:text-left">
-              <div>
-                <span className="text-xs font-bold uppercase tracking-widest text-[#fa2d48]">
-                  Album
-                </span>
-                <h1 className="text-2xl sm:text-4xl md:text-5xl font-black text-white tracking-tight leading-tight mt-1">
-                  {selectedAlbumName}
-                </h1>
-              </div>
+            {/* Artist link & Details */}
+            <div className="flex items-center justify-center md:justify-start gap-2 text-sm text-white/60 flex-wrap">
+              <button
+                onClick={() => onNavigate && onNavigate(`artist:${encodeURIComponent(artistName)}`)}
+                className="text-white font-bold hover:text-[#fa2d48] transition-colors"
+              >
+                {artistName}
+              </button>
+              <span>·</span>
+              <span>{releaseYear}</span>
+              <span>·</span>
+              <span>{albumTracks.length} songs</span>
+              {totalDuration > 0 && (
+                <>
+                  <span>·</span>
+                  <span>{formatDuration(totalDuration)}</span>
+                </>
+              )}
+            </div>
 
-              {/* Artist link & Details */}
-              <div className="flex items-center justify-center md:justify-start gap-2 text-sm text-white/60 flex-wrap">
-                <button
-                  onClick={() => onNavigate && onNavigate(`artist:${artistName}`)}
-                  className="text-white font-bold hover:text-[#fa2d48] transition-colors"
-                >
-                  {artistName}
-                </button>
-                <span>·</span>
-                <span>{releaseYear}</span>
-                <span>·</span>
-                <span>{albumTracks.length} songs</span>
-                {totalDuration > 0 && (
-                  <>
-                    <span>·</span>
-                    <span>{formatDuration(totalDuration)}</span>
-                  </>
+            {/* Action Buttons */}
+            <div className="flex items-center justify-center md:justify-start gap-3 pt-2">
+              <button
+                onClick={handlePlayAlbum}
+                className="flex items-center gap-2 px-8 py-3 rounded-full bg-[#fa2d48] hover:bg-[#ff3b53] text-white font-bold text-sm shadow-xl shadow-[#fa2d48]/25 hover:scale-105 active:scale-95 transition"
+              >
+                {isAlbumPlaying ? (
+                  <Pause className="w-4 h-4 fill-white" />
+                ) : (
+                  <Play className="w-4 h-4 fill-white ml-0.5" />
                 )}
-              </div>
+                <span>{isAlbumPlaying ? 'Pause' : 'Play'}</span>
+              </button>
 
-              {/* Action Buttons */}
-              <div className="flex items-center justify-center md:justify-start gap-3 pt-2">
-                <button
-                  onClick={handlePlayAlbum}
-                  className="flex items-center gap-2 px-8 py-3 rounded-full bg-[#fa2d48] hover:bg-[#ff3b53] text-white font-bold text-sm shadow-xl shadow-[#fa2d48]/25 hover:scale-105 active:scale-95 transition"
-                >
-                  {isAlbumPlaying ? (
-                    <Pause className="w-4 h-4 fill-white" />
-                  ) : (
-                    <Play className="w-4 h-4 fill-white ml-0.5" />
-                  )}
-                  <span>{isAlbumPlaying ? 'Pause' : 'Play'}</span>
-                </button>
+              <button
+                onClick={handleShuffleAlbum}
+                className="flex items-center gap-2 px-6 py-3 rounded-full bg-white/10 hover:bg-white/15 text-white font-semibold text-sm transition hover:scale-105"
+                title="Shuffle album"
+              >
+                <Shuffle className="w-4 h-4" />
+                <span>Shuffle</span>
+              </button>
 
-                <button
-                  onClick={handleShuffleAlbum}
-                  className="flex items-center gap-2 px-6 py-3 rounded-full bg-white/10 hover:bg-white/15 text-white font-semibold text-sm transition hover:scale-105"
-                  title="Shuffle album"
-                >
-                  <Shuffle className="w-4 h-4" />
-                  <span>Shuffle</span>
-                </button>
-
-                <button
-                  onClick={handleShare}
-                  className="p-3 rounded-full bg-white/5 hover:bg-white/10 text-white/70 hover:text-white border border-white/10 transition"
-                  title="Share Album"
-                >
-                  {copied ? <Check className="w-4 h-4 text-[#fa2d48]" /> : <Share2 className="w-4 h-4" />}
-                </button>
-              </div>
+              <button
+                onClick={handleShare}
+                className="p-3 rounded-full bg-white/5 hover:bg-white/10 text-white/70 hover:text-white border border-white/10 transition"
+                title="Share Album"
+              >
+                {copied ? <Check className="w-4 h-4 text-[#fa2d48]" /> : <Share2 className="w-4 h-4" />}
+              </button>
             </div>
-          </div>
-
-          {/* Tracklist Table */}
-          <div className="space-y-2 pt-4">
-            <div className="flex items-center justify-between px-3 text-xs font-bold uppercase tracking-wider text-white/40 border-b border-white/5 pb-2">
-              <div className="flex items-center gap-4">
-                <span className="w-6 text-center">#</span>
-                <span>Title</span>
-              </div>
-              <Clock className="w-4 h-4" />
-            </div>
-
-            {isLoadingAlbum && albumTracks.length === 0 ? (
-              <div className="flex items-center justify-center p-12 text-white/40">
-                <Loader2 className="w-6 h-6 animate-spin text-[#fa2d48] mr-2" />
-                <span className="text-sm">Loading album tracks...</span>
-              </div>
-            ) : albumTracks.length > 0 ? (
-              <div className="space-y-1">
-                {albumTracks.map((t, idx) => (
-                  <TrackRow
-                    key={`${t.id}_${idx}`}
-                    track={t}
-                    index={idx}
-                    showNumber={true}
-                    showCover={false}
-                    showAlbum={false}
-                    onPlay={trk => playTrack(trk, albumTracks)}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="p-8 text-center text-white/40 text-sm">
-                No songs found in this album.
-              </div>
-            )}
-          </div>
-
-          {/* Clean Album Copyright Notice */}
-          <div className="pt-8 border-t border-white/[0.06] text-xs text-white/40 space-y-1">
-            <p>
-              Released {releaseYear} · {albumTracks.length} Songs, {formatDuration(totalDuration)}
-            </p>
-            <p className="text-[11px] text-white/30">
-              ℗ {releaseYear} {artistName}
-            </p>
           </div>
         </div>
-      </div>
-    );
-  }
 
-  // ==========================================
-  // 2. ALL ALBUMS DIRECTORY
-  // ==========================================
+        {/* Tracklist Table */}
+        <div className="space-y-2 pt-4">
+          <div className="flex items-center justify-between px-3 text-xs font-bold uppercase tracking-wider text-white/40 border-b border-white/5 pb-2">
+            <div className="flex items-center gap-4">
+              <span className="w-6 text-center">#</span>
+              <span>Title</span>
+            </div>
+            <Clock className="w-4 h-4" />
+          </div>
+
+          {isLoadingAlbum && albumTracks.length === 0 ? (
+            <div className="flex items-center justify-center p-12 text-white/40">
+              <Loader2 className="w-6 h-6 animate-spin text-[#fa2d48] mr-2" />
+              <span className="text-sm">Loading album tracks...</span>
+            </div>
+          ) : albumTracks.length > 0 ? (
+            <div className="space-y-1">
+              {albumTracks.map((t, idx) => (
+                <TrackRow
+                  key={`${t?.id || 'trk'}_${idx}`}
+                  track={t}
+                  index={idx}
+                  showNumber={true}
+                  showCover={false}
+                  showAlbum={false}
+                  onPlay={trk => playTrack(trk, albumTracks)}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="p-8 text-center text-white/40 text-sm">
+              No songs found in this album.
+            </div>
+          )}
+        </div>
+
+        {/* Clean Album Copyright Notice */}
+        <div className="pt-8 border-t border-white/[0.06] text-xs text-white/40 space-y-1">
+          <p>
+            Released {releaseYear} · {albumTracks.length} Songs{totalDuration > 0 ? `, ${formatDuration(totalDuration)}` : ''}
+          </p>
+          <p className="text-[11px] text-white/30">
+            ℗ {releaseYear} {artistName}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Sub-Component 2: All Albums Directory (Curated + Library Albums Grid)
+function AlbumDirectoryView({ lib, onNavigate }) {
+  const [searchQuery, setSearchQuery] = useState('');
+
   const allAvailableAlbums = useMemo(() => {
     const list = [...FEATURED_ALBUMS];
     const seenNames = new Set(list.map(a => a.name.toLowerCase()));
 
-    (lib.albums || []).forEach(local => {
-      if (!seenNames.has(local.name.toLowerCase())) {
+    (lib?.albums || []).forEach(local => {
+      if (local?.name && !seenNames.has(local.name.toLowerCase())) {
         list.push({
           name: local.name,
           artist: local.artist || 'Various Artists',
@@ -315,15 +311,15 @@ export function AlbumsPage({ lib, selectedAlbumName, onNavigate, onBack }) {
     });
 
     return list;
-  }, [lib.albums]);
+  }, [lib?.albums]);
 
   const filteredAlbums = useMemo(() => {
-    const q = searchQuery.trim().toLowerCase();
+    const q = (searchQuery || '').trim().toLowerCase();
     if (!q) return allAvailableAlbums;
     return allAvailableAlbums.filter(
       a =>
-        a.name.toLowerCase().includes(q) ||
-        a.artist.toLowerCase().includes(q)
+        (a?.name && a.name.toLowerCase().includes(q)) ||
+        (a?.artist && a.artist.toLowerCase().includes(q))
     );
   }, [allAvailableAlbums, searchQuery]);
 
@@ -359,7 +355,7 @@ export function AlbumsPage({ lib, selectedAlbumName, onNavigate, onBack }) {
           {filteredAlbums.map(album => (
             <div
               key={album.name}
-              onClick={() => onNavigate(`album:${album.name}`)}
+              onClick={() => onNavigate(`album:${encodeURIComponent(album.name)}`)}
               className="group flex flex-col p-3 rounded-2xl bg-[#121212] hover:bg-[#1a1a1a] transition-all cursor-pointer border border-white/[0.04] hover:border-white/10"
             >
               <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-[#202020] mb-3 shadow-lg">
@@ -387,5 +383,35 @@ export function AlbumsPage({ lib, selectedAlbumName, onNavigate, onBack }) {
         </div>
       </div>
     </div>
+  );
+}
+
+// Master Albums Page (Zero Conditional Hooks, Guaranteed Render Safety)
+export function AlbumsPage({ lib, selectedAlbumName, onNavigate, onBack }) {
+  const safeAlbumName = useMemo(() => {
+    if (!selectedAlbumName) return null;
+    try {
+      return decodeURIComponent(selectedAlbumName).trim();
+    } catch {
+      return String(selectedAlbumName).trim();
+    }
+  }, [selectedAlbumName]);
+
+  if (safeAlbumName) {
+    return (
+      <AlbumDetailView
+        lib={lib}
+        albumName={safeAlbumName}
+        onNavigate={onNavigate}
+        onBack={onBack}
+      />
+    );
+  }
+
+  return (
+    <AlbumDirectoryView
+      lib={lib}
+      onNavigate={onNavigate}
+    />
   );
 }

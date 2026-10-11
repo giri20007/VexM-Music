@@ -7,11 +7,8 @@ import {
   Check,
   ArrowLeft,
   CheckCircle2,
-  Heart,
   Search,
   Loader2,
-  Plus,
-  MoreHorizontal,
 } from 'lucide-react';
 import { useAudioStore } from '../store/useAudioStore';
 import { TrackRow } from '../components/library/TrackRow';
@@ -40,7 +37,8 @@ const FEATURED_ARTISTS = [
   { name: 'Bruno Mars', image: 'https://i.scdn.co/image/ab6761610000e5ebc36dd9eb55fb0db4911f25dd', listeners: '109,240,192' },
 ];
 
-export function ArtistsPage({ lib, selectedArtistName, onNavigate, onBack }) {
+// Sub-Component 1: Dedicated Artist View (Spotify / Tidal verified profile style)
+function ArtistDetailView({ lib, artistName, onNavigate, onBack }) {
   const playTrack = useAudioStore(s => s.playTrack);
   const currentTrack = useAudioStore(s => s.currentTrack);
   const isPlaying = useAudioStore(s => s.isPlaying);
@@ -49,30 +47,27 @@ export function ArtistsPage({ lib, selectedArtistName, onNavigate, onBack }) {
   const [copied, setCopied] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
   const [showAllTracks, setShowAllTracks] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-
-  // Dynamic artist songs state for seamless loading of any artist in the world
   const [artistTracks, setArtistTracks] = useState([]);
   const [artistImage, setArtistImage] = useState('');
   const [isLoadingArtist, setIsLoadingArtist] = useState(false);
 
-  // Check if artist exists in local library
+  // Check if artist exists in local library safely
   const localArtist = useMemo(() => {
-    if (!selectedArtistName) return null;
-    return (lib.artists || []).find(
-      a => a.name.toLowerCase() === selectedArtistName.toLowerCase()
+    if (!artistName) return null;
+    return (lib?.artists || []).find(
+      a => a?.name && a.name.toLowerCase() === artistName.toLowerCase()
     );
-  }, [lib.artists, selectedArtistName]);
+  }, [lib?.artists, artistName]);
 
   // Load artist songs dynamically from API if not enough local songs
   useEffect(() => {
-    if (!selectedArtistName) return;
+    if (!artistName) return;
 
     let isMounted = true;
     const fetchArtistData = async () => {
       // Find featured artist image if available
       const feat = FEATURED_ARTISTS.find(
-        f => f.name.toLowerCase() === selectedArtistName.toLowerCase()
+        f => f.name.toLowerCase() === artistName.toLowerCase()
       );
       if (feat) {
         setArtistImage(feat.image);
@@ -80,26 +75,26 @@ export function ArtistsPage({ lib, selectedArtistName, onNavigate, onBack }) {
         setArtistImage(localArtist.thumbnail);
       }
 
-      if (localArtist && localArtist.tracks.length >= 10) {
+      if (localArtist && localArtist.tracks?.length >= 10) {
         setArtistTracks(localArtist.tracks);
         return;
       }
 
       setIsLoadingArtist(true);
       try {
-        const results = await searchUnified(`${selectedArtistName}`, 25);
+        const results = await searchUnified(artistName, 25);
         if (isMounted) {
-          if (results.length > 0) {
+          if (results && results.length > 0) {
             setArtistTracks(results);
             if (!feat && results[0]?.thumbnail) {
               setArtistImage(results[0].thumbnail);
             }
-          } else if (localArtist) {
+          } else if (localArtist?.tracks) {
             setArtistTracks(localArtist.tracks);
           }
         }
-      } catch (e) {
-        if (isMounted && localArtist) {
+      } catch {
+        if (isMounted && localArtist?.tracks) {
           setArtistTracks(localArtist.tracks);
         }
       } finally {
@@ -111,15 +106,15 @@ export function ArtistsPage({ lib, selectedArtistName, onNavigate, onBack }) {
     return () => {
       isMounted = false;
     };
-  }, [selectedArtistName, localArtist]);
+  }, [artistName, localArtist]);
 
   const handleShare = async () => {
-    const url = `${window.location.origin}/#artist:${encodeURIComponent(selectedArtistName)}`;
+    const url = `${window.location.origin}/#artist:${encodeURIComponent(artistName)}`;
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `${selectedArtistName} - Vex-M`,
-          text: `Listen to ${selectedArtistName} on Vex-M`,
+          title: `${artistName} - Vex-M`,
+          text: `Listen to ${artistName} on Vex-M`,
           url,
         });
         return;
@@ -133,7 +128,7 @@ export function ArtistsPage({ lib, selectedArtistName, onNavigate, onBack }) {
   };
 
   const isCurrentArtistPlaying =
-    artistTracks.some(t => t.id === currentTrack?.id) && isPlaying;
+    artistTracks.some(t => t?.id === currentTrack?.id) && isPlaying;
 
   const handlePlayArtist = () => {
     if (isCurrentArtistPlaying) {
@@ -153,253 +148,253 @@ export function ArtistsPage({ lib, selectedArtistName, onNavigate, onBack }) {
   const artistAlbums = useMemo(() => {
     const map = new Map();
     artistTracks.forEach(t => {
+      if (!t) return;
       const albumName = t.album || t.title;
-      if (!map.has(albumName)) {
+      if (albumName && !map.has(albumName)) {
         map.set(albumName, {
           name: albumName,
-          artist: t.artist || selectedArtistName,
+          artist: t.artist || artistName,
           thumbnail: t.thumbnail,
           tracks: [],
         });
       }
-      map.get(albumName).tracks.push(t);
+      if (albumName && map.has(albumName)) {
+        map.get(albumName).tracks.push(t);
+      }
     });
     return Array.from(map.values()).slice(0, 10);
-  }, [artistTracks, selectedArtistName]);
+  }, [artistTracks, artistName]);
 
-  // ==========================================
-  // 1. SPECIFIC ARTIST PAGE (Spotify / Tidal style)
-  // ==========================================
-  if (selectedArtistName) {
-    const feat = FEATURED_ARTISTS.find(
-      f => f.name.toLowerCase() === selectedArtistName.toLowerCase()
-    );
-    const monthlyListeners = feat
-      ? `${feat.listeners} monthly listeners`
-      : '3,842,109 monthly listeners';
+  const feat = FEATURED_ARTISTS.find(
+    f => f.name.toLowerCase() === artistName.toLowerCase()
+  );
+  const monthlyListeners = feat
+    ? `${feat.listeners} monthly listeners`
+    : '3,842,109 monthly listeners';
 
-    const heroImage =
-      artistImage ||
-      (localArtist?.thumbnail) ||
-      (artistTracks[0]?.thumbnail) ||
-      '';
+  const heroImage =
+    artistImage ||
+    localArtist?.thumbnail ||
+    artistTracks[0]?.thumbnail ||
+    '';
 
-    const displayedTracks = showAllTracks
-      ? artistTracks
-      : artistTracks.slice(0, 5);
+  const displayedTracks = showAllTracks
+    ? artistTracks
+    : artistTracks.slice(0, 5);
 
-    return (
-      <div className="flex-1 w-full bg-[#000000] text-white select-none animate-fade-in pb-24">
-        {/* Spotify Verified Artist Hero */}
-        <div className="relative min-h-[340px] sm:min-h-[420px] flex flex-col justify-between overflow-hidden px-4 sm:px-8 pt-4 pb-8 bg-[#121212]">
-          {/* Subtle Ambient Photo Backdrop */}
-          {heroImage && (
-            <div
-              className="absolute inset-0 bg-cover bg-center opacity-30 blur-2xl scale-110 pointer-events-none"
-              style={{ backgroundImage: `url(${heroImage})` }}
+  return (
+    <div className="flex-1 w-full bg-[#000000] text-white select-none animate-fade-in pb-24">
+      {/* Spotify Verified Artist Hero */}
+      <div className="relative min-h-[340px] sm:min-h-[420px] flex flex-col justify-between overflow-hidden px-4 sm:px-8 pt-4 pb-8 bg-[#121212]">
+        {/* Subtle Ambient Photo Backdrop */}
+        {heroImage && (
+          <div
+            className="absolute inset-0 bg-cover bg-center opacity-30 blur-2xl scale-110 pointer-events-none"
+            style={{ backgroundImage: `url(${heroImage})` }}
+          />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#000000] via-[#000000]/60 to-transparent pointer-events-none" />
+
+        {/* Back Button */}
+        <div className="relative z-10">
+          <button
+            onClick={onBack}
+            className="inline-flex items-center gap-2 text-xs font-semibold text-white/70 hover:text-white transition group py-1"
+          >
+            <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
+            <span>Back to Artists</span>
+          </button>
+        </div>
+
+        {/* Hero Content */}
+        <div className="relative z-10 max-w-7xl mx-auto w-full flex flex-col sm:flex-row items-center sm:items-end gap-6 sm:gap-8 pt-6">
+          {/* Circular Artist Avatar */}
+          <div className="relative w-36 h-36 sm:w-48 sm:h-48 rounded-full overflow-hidden bg-[#181818] border border-white/10 shadow-2xl flex-shrink-0 group">
+            <SafeImage
+              src={heroImage}
+              fallbackType="artist"
+              artistName={artistName}
+              alt={artistName}
+              size={400}
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
             />
-          )}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#000000] via-[#000000]/60 to-transparent pointer-events-none" />
-
-          {/* Back Button */}
-          <div className="relative z-10">
-            <button
-              onClick={onBack}
-              className="inline-flex items-center gap-2 text-xs font-semibold text-white/70 hover:text-white transition group py-1"
-            >
-              <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
-              <span>Back to Artists</span>
-            </button>
           </div>
 
-          {/* Hero Content */}
-          <div className="relative z-10 max-w-7xl mx-auto w-full flex flex-col sm:flex-row items-center sm:items-end gap-6 sm:gap-8 pt-6">
-            {/* Circular Artist Avatar */}
-            <div className="relative w-36 h-36 sm:w-48 sm:h-48 rounded-full overflow-hidden bg-[#181818] border border-white/10 shadow-2xl flex-shrink-0 group">
-              <SafeImage
-                src={heroImage}
-                fallbackType="artist"
-                artistName={selectedArtistName}
-                alt={selectedArtistName}
-                size={400}
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-              />
+          {/* Verified Header & Details */}
+          <div className="space-y-2 flex-1 min-w-0 text-center sm:text-left">
+            <div className="flex items-center justify-center sm:justify-start gap-1.5 text-xs font-bold text-sky-400">
+              <CheckCircle2 className="w-4 h-4 fill-sky-400 text-black" />
+              <span>Verified Artist</span>
             </div>
 
-            {/* Verified Header & Details */}
-            <div className="space-y-2 flex-1 min-w-0 text-center sm:text-left">
-              <div className="flex items-center justify-center sm:justify-start gap-1.5 text-xs font-bold text-sky-400">
-                <CheckCircle2 className="w-4 h-4 fill-sky-400 text-black" />
-                <span>Verified Artist</span>
-              </div>
+            <h1 className="text-3xl sm:text-6xl md:text-7xl font-black text-white tracking-tight leading-tight">
+              {artistName}
+            </h1>
 
-              <h1 className="text-3xl sm:text-6xl md:text-7xl font-black text-white tracking-tight leading-tight">
-                {selectedArtistName}
-              </h1>
-
-              <p className="text-xs sm:text-sm text-white/60 font-medium">
-                {monthlyListeners}
-              </p>
-            </div>
+            <p className="text-xs sm:text-sm text-white/60 font-medium">
+              {monthlyListeners}
+            </p>
           </div>
         </div>
+      </div>
 
-        {/* Action Tray */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-8 py-6">
-          <div className="flex items-center gap-4">
-            {/* Play Button */}
-            <button
-              onClick={handlePlayArtist}
-              className="w-14 h-14 rounded-full bg-[#fa2d48] hover:bg-[#ff3b53] text-white flex items-center justify-center shadow-xl shadow-[#fa2d48]/25 hover:scale-105 active:scale-95 transition"
-              aria-label={`Play artist ${selectedArtistName}`}
-            >
-              {isCurrentArtistPlaying ? (
-                <Pause className="w-6 h-6 fill-white" />
-              ) : (
-                <Play className="w-6 h-6 fill-white ml-1" />
-              )}
-            </button>
-
-            {/* Follow Button */}
-            <button
-              onClick={() => setIsFollowing(prev => !prev)}
-              className={`px-5 py-2.5 rounded-full text-xs font-bold tracking-wider uppercase border transition-all ${
-                isFollowing
-                  ? 'bg-white/10 text-white border-white/20'
-                  : 'bg-transparent text-white border-white/30 hover:border-white hover:scale-105'
-              }`}
-            >
-              {isFollowing ? 'Following' : 'Follow'}
-            </button>
-
-            {/* Shuffle Button */}
-            <button
-              onClick={handleShuffleArtist}
-              className="p-3 rounded-full bg-white/5 hover:bg-white/10 text-white/80 hover:text-white border border-white/10 transition hover:scale-105"
-              title="Shuffle all tracks"
-            >
-              <Shuffle className="w-5 h-5" />
-            </button>
-
-            {/* Share Button */}
-            <button
-              onClick={handleShare}
-              className="p-3 rounded-full bg-white/5 hover:bg-white/10 text-white/80 hover:text-white border border-white/10 transition"
-              title="Share Artist"
-            >
-              {copied ? <Check className="w-5 h-5 text-[#fa2d48]" /> : <Share2 className="w-5 h-5" />}
-            </button>
-          </div>
-        </div>
-
-        {/* Content Body */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-8 space-y-10">
-          {/* Popular Tracks Section */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-                Popular
-              </h2>
-              {artistTracks.length > 5 && (
-                <button
-                  onClick={() => setShowAllTracks(prev => !prev)}
-                  className="text-xs font-bold text-white/50 hover:text-white transition"
-                >
-                  {showAllTracks ? 'Show less' : 'See more'}
-                </button>
-              )}
-            </div>
-
-            {isLoadingArtist && artistTracks.length === 0 ? (
-              <div className="flex items-center justify-center p-12 text-white/40">
-                <Loader2 className="w-6 h-6 animate-spin text-[#fa2d48] mr-2" />
-                <span className="text-sm">Loading songs...</span>
-              </div>
-            ) : artistTracks.length > 0 ? (
-              <div className="space-y-1">
-                {displayedTracks.map((t, idx) => (
-                  <TrackRow
-                    key={`${t.id}_${idx}`}
-                    track={t}
-                    index={idx}
-                    showNumber={true}
-                    showCover={true}
-                    showAlbum={true}
-                    onPlay={trk => playTrack(trk, artistTracks)}
-                  />
-                ))}
-              </div>
+      {/* Action Tray */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 py-6">
+        <div className="flex items-center gap-4">
+          {/* Play Button */}
+          <button
+            onClick={handlePlayArtist}
+            className="w-14 h-14 rounded-full bg-[#fa2d48] hover:bg-[#ff3b53] text-white flex items-center justify-center shadow-xl shadow-[#fa2d48]/25 hover:scale-105 active:scale-95 transition"
+            aria-label={`Play artist ${artistName}`}
+          >
+            {isCurrentArtistPlaying ? (
+              <Pause className="w-6 h-6 fill-white" />
             ) : (
-              <div className="p-8 text-center text-white/40 text-sm">
-                No songs found for this artist.
-              </div>
+              <Play className="w-6 h-6 fill-white ml-1" />
+            )}
+          </button>
+
+          {/* Follow Button */}
+          <button
+            onClick={() => setIsFollowing(prev => !prev)}
+            className={`px-5 py-2.5 rounded-full text-xs font-bold tracking-wider uppercase border transition-all ${
+              isFollowing
+                ? 'bg-white/10 text-white border-white/20'
+                : 'bg-transparent text-white border-white/30 hover:border-white hover:scale-105'
+            }`}
+          >
+            {isFollowing ? 'Following' : 'Follow'}
+          </button>
+
+          {/* Shuffle Button */}
+          <button
+            onClick={handleShuffleArtist}
+            className="p-3 rounded-full bg-white/5 hover:bg-white/10 text-white/80 hover:text-white border border-white/10 transition hover:scale-105"
+            title="Shuffle all tracks"
+          >
+            <Shuffle className="w-5 h-5" />
+          </button>
+
+          {/* Share Button */}
+          <button
+            onClick={handleShare}
+            className="p-3 rounded-full bg-white/5 hover:bg-white/10 text-white/80 hover:text-white border border-white/10 transition"
+            title="Share Artist"
+          >
+            {copied ? <Check className="w-5 h-5 text-[#fa2d48]" /> : <Share2 className="w-5 h-5" />}
+          </button>
+        </div>
+      </div>
+
+      {/* Content Body */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 space-y-10">
+        {/* Popular Tracks Section */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+              Popular
+            </h2>
+            {artistTracks.length > 5 && (
+              <button
+                onClick={() => setShowAllTracks(prev => !prev)}
+                className="text-xs font-bold text-white/50 hover:text-white transition"
+              >
+                {showAllTracks ? 'Show less' : 'See more'}
+              </button>
             )}
           </div>
 
-          {/* Discography / Albums Shelf */}
-          {artistAlbums.length > 0 && (
-            <div className="space-y-4">
-              <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-                Discography
-              </h2>
-
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                {artistAlbums.map((alb, i) => (
-                  <div
-                    key={`${alb.name}_${i}`}
-                    onClick={() => onNavigate(`album:${alb.name}`)}
-                    className="group flex flex-col p-3 rounded-2xl bg-[#121212] hover:bg-[#1a1a1a] transition-all cursor-pointer border border-white/[0.04] hover:border-white/10"
-                  >
-                    <div className="aspect-square w-full rounded-xl overflow-hidden bg-[#202020] mb-3 relative shadow-md">
-                      <SafeImage
-                        src={alb.thumbnail}
-                        alt={alb.name}
-                        size={300}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
-                    </div>
-                    <h4 className="text-sm font-semibold text-white truncate group-hover:text-[#fa2d48] transition-colors">
-                      {alb.name}
-                    </h4>
-                    <p className="text-xs text-white/40 truncate mt-0.5">
-                      Album · {alb.tracks.length} {alb.tracks.length === 1 ? 'song' : 'songs'}
-                    </p>
-                  </div>
-                ))}
-              </div>
+          {isLoadingArtist && artistTracks.length === 0 ? (
+            <div className="flex items-center justify-center p-12 text-white/40">
+              <Loader2 className="w-6 h-6 animate-spin text-[#fa2d48] mr-2" />
+              <span className="text-sm">Loading songs...</span>
+            </div>
+          ) : artistTracks.length > 0 ? (
+            <div className="space-y-1">
+              {displayedTracks.map((t, idx) => (
+                <TrackRow
+                  key={`${t.id || 'trk'}_${idx}`}
+                  track={t}
+                  index={idx}
+                  showNumber={true}
+                  showCover={true}
+                  showAlbum={true}
+                  onPlay={trk => playTrack(trk, artistTracks)}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="p-8 text-center text-white/40 text-sm">
+              No songs found for this artist.
             </div>
           )}
         </div>
-      </div>
-    );
-  }
 
-  // ==========================================
-  // 2. ALL ARTISTS DIRECTORY (Spotify Style)
-  // ==========================================
-  // Combine featured global artists with any local library artists
+        {/* Discography / Albums Shelf */}
+        {artistAlbums.length > 0 && (
+          <div className="space-y-4">
+            <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+              Discography
+            </h2>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              {artistAlbums.map((alb, i) => (
+                <div
+                  key={`${alb.name}_${i}`}
+                  onClick={() => onNavigate(`album:${encodeURIComponent(alb.name)}`)}
+                  className="group flex flex-col p-3 rounded-2xl bg-[#121212] hover:bg-[#1a1a1a] transition-all cursor-pointer border border-white/[0.04] hover:border-white/10"
+                >
+                  <div className="aspect-square w-full rounded-xl overflow-hidden bg-[#202020] mb-3 relative shadow-md">
+                    <SafeImage
+                      src={alb.thumbnail}
+                      alt={alb.name}
+                      size={300}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  </div>
+                  <h4 className="text-sm font-semibold text-white truncate group-hover:text-[#fa2d48] transition-colors">
+                    {alb.name}
+                  </h4>
+                  <p className="text-xs text-white/40 truncate mt-0.5">
+                    Album · {alb.tracks.length} {alb.tracks.length === 1 ? 'song' : 'songs'}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// Sub-Component 2: All Artists Directory (Spotify / Tidal Style Directory)
+function ArtistDirectoryView({ lib, onNavigate }) {
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Combine featured global artists with any local library artists safely
   const allAvailableArtists = useMemo(() => {
     const list = [...FEATURED_ARTISTS];
     const seenNames = new Set(list.map(a => a.name.toLowerCase()));
 
-    (lib.artists || []).forEach(local => {
-      if (!seenNames.has(local.name.toLowerCase())) {
+    (lib?.artists || []).forEach(local => {
+      if (local?.name && !seenNames.has(local.name.toLowerCase())) {
         list.push({
           name: local.name,
           image: local.thumbnail || '',
-          listeners: `${(Math.max(4, local.tracks.length) * 31820).toLocaleString()} listeners`,
+          listeners: `${(Math.max(4, local.tracks?.length || 1) * 31820).toLocaleString()} listeners`,
         });
         seenNames.add(local.name.toLowerCase());
       }
     });
 
     return list;
-  }, [lib.artists]);
+  }, [lib?.artists]);
 
   const filteredArtists = useMemo(() => {
-    const q = searchQuery.trim().toLowerCase();
+    const q = (searchQuery || '').trim().toLowerCase();
     if (!q) return allAvailableArtists;
-    return allAvailableArtists.filter(a => a.name.toLowerCase().includes(q));
+    return allAvailableArtists.filter(a => a?.name && a.name.toLowerCase().includes(q));
   }, [allAvailableArtists, searchQuery]);
 
   return (
@@ -434,7 +429,7 @@ export function ArtistsPage({ lib, selectedArtistName, onNavigate, onBack }) {
           {filteredArtists.map(artist => (
             <div
               key={artist.name}
-              onClick={() => onNavigate(`artist:${artist.name}`)}
+              onClick={() => onNavigate(`artist:${encodeURIComponent(artist.name)}`)}
               className="group flex flex-col items-center p-4 rounded-2xl bg-[#121212] hover:bg-[#1a1a1a] transition-all cursor-pointer border border-white/[0.04] hover:border-white/10 text-center"
             >
               {/* Circular Avatar */}
@@ -466,5 +461,35 @@ export function ArtistsPage({ lib, selectedArtistName, onNavigate, onBack }) {
         </div>
       </div>
     </div>
+  );
+}
+
+// Master Artists Page (Zero Conditional Hooks, Guaranteed Render Safety)
+export function ArtistsPage({ lib, selectedArtistName, onNavigate, onBack }) {
+  const safeArtistName = useMemo(() => {
+    if (!selectedArtistName) return null;
+    try {
+      return decodeURIComponent(selectedArtistName).trim();
+    } catch {
+      return String(selectedArtistName).trim();
+    }
+  }, [selectedArtistName]);
+
+  if (safeArtistName) {
+    return (
+      <ArtistDetailView
+        lib={lib}
+        artistName={safeArtistName}
+        onNavigate={onNavigate}
+        onBack={onBack}
+      />
+    );
+  }
+
+  return (
+    <ArtistDirectoryView
+      lib={lib}
+      onNavigate={onNavigate}
+    />
   );
 }

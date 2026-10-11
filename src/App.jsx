@@ -33,6 +33,47 @@ import { useAudioStore } from './store/useAudioStore';
 import { useAuthStore } from './store/useAuthStore';
 import { Radio, RefreshCw, ShieldAlert, ArrowLeft } from 'lucide-react';
 
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('Vex-M App ErrorBoundary caught error:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="flex-1 flex flex-col items-center justify-center min-h-[50vh] p-8 text-center text-white space-y-4">
+          <div className="w-14 h-14 rounded-2xl bg-[#fa2d48]/15 border border-[#fa2d48]/30 flex items-center justify-center text-[#fa2d48]">
+            <Radio className="w-7 h-7" />
+          </div>
+          <h2 className="text-xl font-bold">Something went wrong</h2>
+          <p className="text-xs text-white/50 max-w-md">
+            {this.state.error?.message || 'Vex-M encountered a problem rendering this section.'}
+          </p>
+          <button
+            onClick={() => {
+              this.setState({ hasError: false, error: null });
+              if (this.props.onReset) this.props.onReset();
+            }}
+            className="px-5 py-2.5 rounded-full bg-[#fa2d48] text-white text-xs font-bold hover:bg-[#ff3b53] transition"
+          >
+            Return to Home
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 export default function App() {
   const isAuthenticated = useAuthStore(s => s.isAuthenticated);
   const isCheckingAuth = useAuthStore(s => s.isCheckingAuth);
@@ -181,60 +222,61 @@ export default function App() {
           />
 
           <main className="flex-1 flex flex-col">
-            {currentRoute === 'home' && (
-              <HomePage
-                lib={lib}
-                onNavigate={navigate}
-                onOpenLanguageModal={() => setLanguageModalOpen(true)}
-              />
-            )}
+            <ErrorBoundary onReset={() => navigate('home')}>
+              {currentRoute === 'home' && (
+                <HomePage
+                  lib={lib}
+                  onNavigate={navigate}
+                  onOpenLanguageModal={() => setLanguageModalOpen(true)}
+                />
+              )}
 
-            {currentRoute === 'library' && (
-              <LibraryPage lib={lib} onNavigate={navigate} />
-            )}
+              {currentRoute === 'library' && (
+                <LibraryPage lib={lib} onNavigate={navigate} />
+              )}
 
-            {currentRoute === 'search' && (
-              <SearchPage lib={lib} onNavigate={navigate} />
-            )}
+              {currentRoute === 'search' && (
+                <SearchPage lib={lib} onNavigate={navigate} />
+              )}
 
-            {currentRoute === 'liked' && (
-              <LikedSongsPage allTracks={lib.allItems} onNavigate={navigate} />
-            )}
+              {currentRoute === 'liked' && (
+                <LikedSongsPage allTracks={lib.allItems} onNavigate={navigate} />
+              )}
 
-            {(currentRoute === 'albums' || currentRoute.startsWith('album:')) && (
-              <AlbumsPage
-                lib={lib}
-                selectedAlbumName={currentRoute.startsWith('album:') ? currentRoute.replace('album:', '') : null}
-                onNavigate={navigate}
-                onBack={() => navigate('albums')}
-              />
-            )}
+              {(currentRoute === 'albums' || currentRoute.startsWith('album:')) && (
+                <AlbumsPage
+                  lib={lib}
+                  selectedAlbumName={currentRoute.startsWith('album:') ? currentRoute.slice(6) : null}
+                  onNavigate={navigate}
+                  onBack={() => navigate('albums')}
+                />
+              )}
 
-            {(currentRoute === 'artists' || currentRoute.startsWith('artist:')) && (
-              <ArtistsPage
-                lib={lib}
-                selectedArtistName={currentRoute.startsWith('artist:') ? currentRoute.replace('artist:', '') : null}
-                onNavigate={navigate}
-                onBack={() => navigate('artists')}
-              />
-            )}
+              {(currentRoute === 'artists' || currentRoute.startsWith('artist:')) && (
+                <ArtistsPage
+                  lib={lib}
+                  selectedArtistName={currentRoute.startsWith('artist:') ? currentRoute.slice(7) : null}
+                  onNavigate={navigate}
+                  onBack={() => navigate('artists')}
+                />
+              )}
 
-            {currentRoute.startsWith('playlist:') && (
-              <PlaylistPage
-                playlistId={currentRoute.replace('playlist:', '')}
-                allTracks={lib.allItems}
-                onBack={() => navigate('library')}
-                onNavigate={navigate}
-              />
-            )}
+              {currentRoute.startsWith('playlist:') && (
+                <PlaylistPage
+                  playlistId={currentRoute.slice(9)}
+                  allTracks={lib.allItems}
+                  onBack={() => navigate('library')}
+                  onNavigate={navigate}
+                />
+              )}
 
-
-            {currentRoute.startsWith('settings') && (
-              <SettingsPage
-                initialTab={currentRoute}
-                onNavigate={navigate}
-              />
-            )}
+              {currentRoute.startsWith('settings') && (
+                <SettingsPage
+                  initialTab={currentRoute}
+                  onNavigate={navigate}
+                />
+              )}
+            </ErrorBoundary>
           </main>
         </div>
       </div>
