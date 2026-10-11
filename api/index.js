@@ -1,4 +1,4 @@
-const app = require('../frontend/api/server/server');
+const app = require('./app');
 
 module.exports = (req, res) => {
   return app(req, res);

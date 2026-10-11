@@ -1,13 +1,17 @@
 {
-  "name": "spx-music-player",
-  "version": "2.0.0",
+  "name": "vexm-music",
   "private": true,
+  "version": "2.0.0",
+  "type": "module",
   "scripts": {
-    "build": "npm --prefix frontend install && npm --prefix frontend run build",
-    "start": "node backend/server.js"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "start": "node -e \"require('./api/app').listen(process.env.PORT || 8000, () => console.log('VexM Server running on port 8000'))\""
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
+    "big-integer": "^1.6.52",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
@@ -15,8 +19,19 @@
     "express-rate-limit": "^7.4.0",
     "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.3",
+    "lucide-react": "^1.53.0",
     "mongodb": "^7.7.0",
     "music-metadata": "^7.14.0",
-    "pg": "^8.23.1"
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "telegram": "^2.26.22",
+    "zustand": "^4.5.5"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.1",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.13",
+    "vite": "^5.4.8"
   }
 }

@@ -4,8 +4,6 @@ const cors = require('cors');
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
 const rateLimit = require('express-rate-limit');
-const path = require('path');
-const fs = require('fs');
 
 const prod = process.env.NODE_ENV === 'production';
 
@@ -48,15 +46,15 @@ app.use(async (_req, _res, next) => {
   next();
 });
 
-// Public Health Endpoint
+// Health check
 app.get(['/api/health', '/health'], (_req, res) => res.json({
   status: 'ok',
-  service: 'SPiDEYxFLASH Audio Player',
+  service: 'VexM Audio Player',
   version: '2.0.0',
   timestamp: new Date().toISOString(),
 }));
 
-// Route Handlers
+// API Routes
 app.use(['/api/auth', '/auth'], require('./routes/auth'));
 app.use(['/api/library', '/library'], require('./routes/library').router);
 app.use(['/api/metadata', '/metadata'], require('./routes/metadata'));
@@ -66,28 +64,15 @@ app.use(['/api/artwork', '/artwork'], require('./routes/artwork'));
 app.use(['/api/admin', '/admin'], require('./routes/admin'));
 
 // 404 for unmatched API routes
-app.use(['/api', '/'], (_req, res, next) => {
-  if (_req.path.startsWith('/api') || _req.path.startsWith('/auth') || _req.path.startsWith('/library')) {
-    return res.status(404).json({
-      error: true,
-      code: 'NOT_FOUND',
-      message: 'API route not found',
-    });
-  }
-  next();
+app.use(['/api', '/auth', '/library', '/stream', '/lyrics', '/artwork', '/admin'], (_req, res) => {
+  res.status(404).json({
+    error: true,
+    code: 'NOT_FOUND',
+    message: 'API route not found',
+  });
 });
 
-// Serve frontend static files if built locally
-const frontendDist = path.join(__dirname, '../../dist');
-if (fs.existsSync(frontendDist)) {
-  app.use(express.static(frontendDist));
-  app.get('*', (req, res, next) => {
-    if (req.path.startsWith('/api')) return next();
-    res.sendFile(path.join(frontendDist, 'index.html'));
-  });
-}
-
-// Global Error Handler
+// Error handler
 app.use((err, _req, res, _next) => {
   const status = err.status || 500;
   if (status >= 500) {
@@ -102,17 +87,5 @@ app.use((err, _req, res, _next) => {
     });
   }
 });
-
-if (!process.env.VERCEL) {
-  const port = process.env.PORT || 8000;
-  app.listen(port, async () => {
-    console.log(`[SPiDEYxFLASH] API running on http://localhost:${port}`);
-    try {
-      await seedOwnerAndMigrate();
-    } catch (err) {
-      console.error('[DATABASE INIT ERROR]', err.message);
-    }
-  });
-}
 
 module.exports = app;

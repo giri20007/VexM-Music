@@ -6,9 +6,7 @@ node_modules/
 # Environment Variables
 .env
 .env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*.local
 *.env
 
 # Production Build
@@ -25,14 +23,9 @@ logs/
 # Runtime data & temp files
 tmp/
 *.tmp
-data/spx-session.txt
-backend/data/spx-session.txt
-backend/data/artwork_cache/
-backend/data/cache/
-backend/data/*.json
-backend/data/*.txt
-frontend/api/server/data/spx-session.txt
-frontend/api/server/data/artwork_cache/
+api/data/spx-session.txt
+api/data/artwork_cache/
+api/data/cache/
 
 .DS_Store
 Thumbs.db
