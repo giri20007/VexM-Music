@@ -1,18 +1,22 @@
 import React, { useState, useMemo } from 'react';
-import { Disc3, Play, Shuffle, Share2, Check, ArrowLeft, Search, Sparkles, SlidersHorizontal } from 'lucide-react';
+import { Disc3, Play, Shuffle, Share2, Check, ArrowLeft, Search, Sparkles, Music2, Clock, Volume2 } from 'lucide-react';
 import { useAudioStore } from '../store/useAudioStore';
 import { TrackRow } from '../components/library/TrackRow';
 import { AlbumCard } from '../components/library/AlbumCard';
+import { AppFooter } from '../components/layout/AppFooter';
 import { formatDuration, formatQualityBadge } from '../utils/formatters';
 import { getArtworkSrc } from '../utils/artworkGenerator';
 import { SafeImage } from '../components/ui/SafeImage';
 
 export function AlbumsPage({ lib, selectedAlbumName, onNavigate, onBack }) {
   const playTrack = useAudioStore(s => s.playTrack);
+  const currentTrack = useAudioStore(s => s.currentTrack);
+  const isPlaying = useAudioStore(s => s.isPlaying);
+  const togglePlay = useAudioStore(s => s.togglePlay);
+
   const [copied, setCopied] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterPill, setFilterPill] = useState('all'); // all | recent | title | artist | year
-  const [sortBy, setSortBy] = useState('recent'); // recent | alpha | artist | trackCount
+  const [filterPill, setFilterPill] = useState('all');
 
   const selectedAlbum = selectedAlbumName
     ? lib.albums.find(a => a.name === selectedAlbumName)
@@ -24,7 +28,7 @@ export function AlbumsPage({ lib, selectedAlbumName, onNavigate, onBack }) {
       try {
         await navigator.share({
           title: `${album.name} - ${album.artist}`,
-          text: `Listen to album "${album.name}" on SPiDEYxFLASH`,
+          text: `Listen to "${album.name}" on Vex-M`,
           url,
         });
         return;
@@ -62,7 +66,6 @@ export function AlbumsPage({ lib, selectedAlbumName, onNavigate, onBack }) {
     }
 
     if (filterPill === 'recent') {
-      // Sort by recent
       result.sort((a, b) => (b.tracks?.[0]?.date || 0) - (a.tracks?.[0]?.date || 0));
     } else if (filterPill === 'title') {
       result.sort((a, b) => a.name.localeCompare(b.name));
@@ -70,215 +73,269 @@ export function AlbumsPage({ lib, selectedAlbumName, onNavigate, onBack }) {
       result.sort((a, b) => a.artist.localeCompare(b.artist));
     } else if (filterPill === 'year') {
       result.sort((a, b) => (b.year || 0) - (a.year || 0));
-    } else {
-      if (sortBy === 'alpha') {
-        result.sort((a, b) => a.name.localeCompare(b.name));
-      } else if (sortBy === 'artist') {
-        result.sort((a, b) => a.artist.localeCompare(b.artist));
-      } else if (sortBy === 'trackCount') {
-        result.sort((a, b) => (b.tracks?.length || 0) - (a.tracks?.length || 0));
-      }
     }
 
     return result;
-  }, [lib.albums, searchQuery, filterPill, sortBy]);
+  }, [lib.albums, searchQuery, filterPill]);
 
+  // If a specific album is chosen (Apple Music / Tidal style layout)
   if (selectedAlbum) {
     const firstTrack = selectedAlbum.tracks[0];
-    const coverSrc = getArtworkSrc(firstTrack, 600) || selectedAlbum.thumbnail;
+    const coverSrc = getArtworkSrc(firstTrack, 800) || selectedAlbum.thumbnail;
     const totalDuration = selectedAlbum.tracks.reduce((s, t) => s + (t.duration || 0), 0);
-    const qualityBadge = firstTrack ? formatQualityBadge(firstTrack) : null;
-    const isTelegramCover = firstTrack?.artworkConfidence >= 60;
+    const isThisAlbumPlaying = selectedAlbum.tracks.some(t => t.id === currentTrack?.id) && isPlaying;
+    const isTelegramCover = firstTrack?.artworkConfidence >= 60 || firstTrack?.isOwnTg || firstTrack?.isTelegram;
 
     return (
-      <div className="flex-1 max-w-7xl mx-auto w-full p-4 sm:p-6 space-y-6 select-none animate-fade-in">
-        <button
-          onClick={onBack}
-          className="flex items-center gap-2 text-xs font-semibold text-warm-muted hover:text-white transition group"
-        >
-          <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
-          <span>Back to Albums</span>
-        </button>
+      <div className="flex-1 w-full bg-[#000000] text-white select-none animate-fade-in pb-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 pt-4 pb-8 space-y-8">
+          {/* Back button */}
+          <button
+            onClick={onBack}
+            className="inline-flex items-center gap-2 text-xs font-semibold text-white/60 hover:text-white transition group py-1"
+          >
+            <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
+            <span>Back to Albums</span>
+          </button>
 
-        {/* Album Banner */}
-        <div className="relative overflow-hidden flex flex-col sm:flex-row sm:items-end gap-6 p-6 sm:p-8 rounded-3xl bg-gradient-to-tr from-bg-card via-bg-secondary to-bg-card border border-white/8 shadow-2xl">
-          {/* Subtle Ambient Background Glow */}
-          <div className="absolute -top-24 -left-24 w-72 h-72 rounded-full bg-accent/15 blur-3xl pointer-events-none" />
-
-          {/* High-Res Artwork */}
-          <div className="relative w-36 h-36 sm:w-48 sm:h-48 rounded-2xl overflow-hidden bg-bg-card border border-white/10 shadow-2xl flex-shrink-0 group">
-            <SafeImage
-              src={coverSrc}
-              alt={selectedAlbum.name}
-              size={400}
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          {/* Apple Music Hero Card */}
+          <div className="relative overflow-hidden rounded-3xl bg-[#0d0d0d] border border-white/[0.08] p-6 sm:p-10 shadow-2xl">
+            {/* Ambient Background Glow from Cover */}
+            <div
+              className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-[#fa2d48]/15 blur-3xl pointer-events-none"
+              style={{
+                backgroundImage: coverSrc ? `radial-gradient(circle, #fa2d48 0%, transparent 70%)` : undefined,
+              }}
             />
 
-            {isTelegramCover && (
-              <div
-                className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md border border-white/10 flex items-center gap-1 text-[10px] font-bold text-accent shadow"
-                title="Verified Telegram Cover Artwork"
-              >
-                <Sparkles className="w-3 h-3" />
-                <span>Verified Art</span>
+            <div className="relative z-10 flex flex-col md:flex-row items-center md:items-end gap-8">
+              {/* Glossy Album Artwork */}
+              <div className="relative w-48 h-48 sm:w-64 sm:h-64 rounded-2xl overflow-hidden bg-[#181818] border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.8)] flex-shrink-0 group">
+                <SafeImage
+                  src={coverSrc}
+                  alt={selectedAlbum.name}
+                  size={600}
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+
+                {isTelegramCover && (
+                  <div
+                    className="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-full bg-black/70 backdrop-blur-md border border-sky-500/30 flex items-center gap-1.5 text-[10px] font-bold text-sky-300 shadow"
+                    title="Verified Cloud Art"
+                  >
+                    <Sparkles className="w-3 h-3 text-sky-400" />
+                    <span>OwnTg Vault</span>
+                  </div>
+                )}
               </div>
-            )}
+
+              {/* Album Details */}
+              <div className="space-y-4 flex-1 min-w-0 text-center md:text-left">
+                {/* Badges Row */}
+                <div className="flex items-center justify-center md:justify-start gap-2 flex-wrap">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-[#fa2d48] px-2.5 py-0.5 rounded-full bg-[#fa2d48]/15 border border-[#fa2d48]/30">
+                    Album
+                  </span>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                    320 kbps Studio
+                  </span>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/10 text-white/70 border border-white/10">
+                    Lossless Master
+                  </span>
+                  {selectedAlbum.year && (
+                    <span className="text-[11px] font-mono text-white/50">
+                      {selectedAlbum.year}
+                    </span>
+                  )}
+                </div>
+
+                {/* Album Title */}
+                <h1 className="text-2xl sm:text-4xl md:text-5xl font-black text-white tracking-tight leading-tight">
+                  {selectedAlbum.name}
+                </h1>
+
+                {/* Artist & Metas */}
+                <div className="flex items-center justify-center md:justify-start gap-2 text-sm text-white/70 flex-wrap">
+                  <button
+                    onClick={() => onNavigate && onNavigate(`artist:${selectedAlbum.artist}`)}
+                    className="text-white font-bold hover:text-[#fa2d48] transition-colors underline-offset-2 hover:underline"
+                  >
+                    {selectedAlbum.artist}
+                  </button>
+                  <span className="text-white/30">·</span>
+                  <span className="text-white/60">{selectedAlbum.tracks.length} tracks</span>
+                  <span className="text-white/30">·</span>
+                  <span className="text-white/60 font-mono">{formatDuration(totalDuration)}</span>
+                </div>
+
+                {/* High-Impact Actions */}
+                <div className="flex items-center justify-center md:justify-start gap-3 pt-2 flex-wrap">
+                  <button
+                    onClick={() => {
+                      if (isThisAlbumPlaying) {
+                        togglePlay();
+                      } else {
+                        playTrack(selectedAlbum.tracks[0], selectedAlbum.tracks);
+                      }
+                    }}
+                    className="flex items-center gap-2 px-8 py-3 rounded-full bg-[#fa2d48] hover:bg-[#ff3b53] text-white font-bold text-sm shadow-xl shadow-[#fa2d48]/30 hover:scale-105 active:scale-95 transition"
+                  >
+                    <Play className="w-4 h-4 fill-white ml-0.5" />
+                    <span>{isThisAlbumPlaying ? 'Pause' : 'Play Album'}</span>
+                  </button>
+
+                  <button
+                    onClick={() => handleShuffleAlbum(selectedAlbum)}
+                    className="flex items-center gap-2 px-5 py-3 rounded-full bg-white/10 hover:bg-white/15 text-white font-semibold text-sm border border-white/10 hover:scale-105 active:scale-95 transition"
+                    title="Shuffle tracks"
+                  >
+                    <Shuffle className="w-4 h-4 text-white/80" />
+                    <span className="hidden sm:inline">Shuffle</span>
+                  </button>
+
+                  <button
+                    onClick={() => handleShare(selectedAlbum)}
+                    className="p-3 rounded-full bg-white/5 hover:bg-white/10 text-white/70 hover:text-white border border-white/10 transition"
+                    title="Share Album"
+                  >
+                    {copied ? <Check className="w-4 h-4 text-[#fa2d48]" /> : <Share2 className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* Album Information */}
-          <div className="space-y-3 flex-1 min-w-0 z-10">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-[11px] font-black uppercase tracking-wider text-accent px-2.5 py-0.5 rounded-md bg-accent/15 border border-accent/20 shadow-sm">
-                Album
-              </span>
-              {qualityBadge && (
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${qualityBadge.color}`}>
-                  {qualityBadge.label}
-                </span>
-              )}
-              {selectedAlbum.year && (
-                <span className="text-[11px] font-bold text-warm-muted">
-                  {selectedAlbum.year}
-                </span>
-              )}
+          {/* Tracklist Header */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between px-3 pt-4 text-xs font-bold uppercase tracking-wider text-white/40 border-b border-white/5 pb-2">
+              <div className="flex items-center gap-4">
+                <span className="w-6 text-center">#</span>
+                <span>Title</span>
+              </div>
+              <div className="flex items-center gap-6">
+                <span className="hidden md:inline">Quality</span>
+                <Clock className="w-4 h-4" />
+              </div>
             </div>
 
-            <h1 className="text-2xl sm:text-4xl font-black text-warm-white tracking-tight truncate">
-              {selectedAlbum.name}
-            </h1>
+            {/* Apple / Tidal Track Rows */}
+            <div className="space-y-1">
+              {selectedAlbum.tracks.map((t, idx) => (
+                <TrackRow
+                  key={t.id || idx}
+                  track={t}
+                  index={idx}
+                  showNumber={true}
+                  showCover={false}
+                  showAlbum={false}
+                  onPlay={trk => playTrack(trk, selectedAlbum.tracks)}
+                />
+              ))}
+            </div>
+          </div>
 
-            <p className="text-xs sm:text-sm text-warm-muted">
-              <span className="text-warm-white font-semibold">{selectedAlbum.artist}</span> · {selectedAlbum.tracks.length} tracks · {formatDuration(totalDuration)}
+          {/* Album Footer & Copyright */}
+          <div className="pt-8 border-t border-white/10 text-xs text-white/40 space-y-2">
+            <p className="font-mono">
+              Released {selectedAlbum.year || '2024'} · {selectedAlbum.tracks.length} Songs, {formatDuration(totalDuration)}
             </p>
-
-            {/* Action Buttons */}
-            <div className="flex items-center gap-3 pt-2 flex-wrap">
-              <button
-                onClick={() => playTrack(selectedAlbum.tracks[0], selectedAlbum.tracks)}
-                className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-accent text-bg-primary font-bold text-xs shadow-lg shadow-accent/25 hover:scale-105 active:scale-95 transition"
-              >
-                <Play className="w-4 h-4 fill-current ml-0.5" />
-                <span>Play Album</span>
-              </button>
-
-              <button
-                onClick={() => handleShuffleAlbum(selectedAlbum)}
-                className="p-2.5 rounded-full bg-white/5 hover:bg-white/10 text-warm-white border border-white/8 hover:scale-105 active:scale-95 transition"
-                title="Shuffle Album"
-              >
-                <Shuffle className="w-4 h-4" />
-              </button>
-
-              <button
-                onClick={() => handleShare(selectedAlbum)}
-                className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-white/5 hover:bg-white/10 text-warm-muted hover:text-white border border-white/8 text-xs font-semibold transition"
-                title="Share Album"
-              >
-                {copied ? <Check className="w-4 h-4 text-accent" /> : <Share2 className="w-4 h-4" />}
-                <span>{copied ? 'Copied!' : 'Share'}</span>
-              </button>
-            </div>
+            <p className="text-[11px] text-white/30">
+              ℗ {selectedAlbum.year || '2024'} {selectedAlbum.artist} · Produced & Streamed via Vex-M High-Fidelity Audio Vault
+            </p>
           </div>
         </div>
 
-        {/* Album Tracklist */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between px-2 pt-2">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-warm-muted">Tracks</h3>
-            <span className="text-xs text-warm-muted font-mono">{selectedAlbum.tracks.length} songs</span>
-          </div>
-
-          <div className="bg-bg-secondary/40 p-2 rounded-2xl border border-white/8 space-y-1">
-            {selectedAlbum.tracks.map((t, idx) => (
-              <TrackRow
-                key={t.id}
-                track={t}
-                index={idx}
-                showNumber={true}
-                showCover={false}
-                showAlbum={false}
-              />
-            ))}
-          </div>
-        </div>
+        {/* Global Footer */}
+        <AppFooter onNavigate={onNavigate} />
       </div>
     );
   }
 
+  // All Albums Grid View
   return (
-    <div className="flex-1 max-w-7xl mx-auto w-full p-4 sm:p-6 space-y-6 select-none">
-      {/* Header & Search */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-black tracking-tight text-warm-white">
-            Albums ({filteredAlbums.length})
-          </h1>
-          <p className="text-xs text-warm-muted mt-0.5">
-            Auto-grouped from your library collection with matched high-res artwork
-          </p>
-        </div>
+    <div className="flex-1 w-full bg-[#000000] text-white select-none animate-fade-in pb-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 pt-6 pb-12 space-y-6">
+        {/* Header & Search */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] font-black uppercase tracking-wider text-[#fa2d48] px-2.5 py-0.5 rounded-full bg-[#fa2d48]/15 border border-[#fa2d48]/30">
+                Discography
+              </span>
+              <span className="text-xs font-mono text-white/40">
+                {filteredAlbums.length} {filteredAlbums.length === 1 ? 'Album' : 'Albums'}
+              </span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white mt-1">
+              Albums & Soundtracks
+            </h1>
+            <p className="text-xs text-white/50 mt-0.5">
+              High-fidelity studio collections curated from your library, YouTube, and OwnTg vault
+            </p>
+          </div>
 
-        {/* Search Bar with Ctrl+K shortcut cue */}
-        <div className="relative w-full md:w-80">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-warm-muted" />
-          <input
-            type="search"
-            placeholder="Search albums, artists, years..."
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-16 py-2 rounded-xl bg-bg-card border border-white/8 text-xs text-warm-white placeholder:text-warm-muted/50 focus:outline-none focus:ring-1 focus:ring-accent/50 shadow-sm"
-          />
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-[10px] font-mono text-warm-muted/60 pointer-events-none hidden sm:inline">
-            ⌘K
-          </span>
-        </div>
-      </div>
-
-      {/* Filter Pill Carousel */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar flex-wrap">
-        {[
-          { id: 'all', label: 'All Albums' },
-          { id: 'recent', label: 'Recently Added' },
-          { id: 'title', label: 'Title (A–Z)' },
-          { id: 'artist', label: 'By Artist' },
-          { id: 'year', label: 'By Release Year' },
-        ].map(pill => (
-          <button
-            key={pill.id}
-            onClick={() => setFilterPill(pill.id)}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
-              filterPill === pill.id
-                ? 'bg-accent text-bg-primary font-bold shadow-md shadow-accent/20'
-                : 'bg-bg-card hover:bg-bg-cardHover text-warm-muted hover:text-white border border-white/8'
-            }`}
-          >
-            {pill.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Responsive Album Grid (2 to 6 columns) */}
-      {filteredAlbums.length > 0 ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-          {filteredAlbums.map(album => (
-            <AlbumCard
-              key={album.name}
-              album={album}
-              onClick={() => onNavigate(`album:${album.name}`)}
+          {/* Search Bar */}
+          <div className="relative w-full md:w-80">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+            <input
+              type="search"
+              placeholder="Filter by album, artist, or year..."
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              className="w-full pl-9 pr-10 py-2.5 rounded-xl bg-[#141414] border border-white/10 text-xs text-white placeholder:text-white/40 focus:outline-none focus:border-[#fa2d48]/50 shadow-sm"
             />
+          </div>
+        </div>
+
+        {/* Filter Pills */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar flex-wrap">
+          {[
+            { id: 'all', label: 'All Albums' },
+            { id: 'recent', label: 'Recently Added' },
+            { id: 'title', label: 'Title (A–Z)' },
+            { id: 'artist', label: 'By Artist' },
+            { id: 'year', label: 'Release Year' },
+          ].map(pill => (
+            <button
+              key={pill.id}
+              onClick={() => setFilterPill(pill.id)}
+              className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
+                filterPill === pill.id
+                  ? 'bg-[#fa2d48] text-white font-bold shadow-md shadow-[#fa2d48]/20'
+                  : 'bg-[#141414] hover:bg-[#1f1f1f] text-white/70 hover:text-white border border-white/5'
+              }`}
+            >
+              {pill.label}
+            </button>
           ))}
         </div>
-      ) : (
-        <div className="p-16 text-center text-warm-muted text-sm border border-dashed border-white/10 rounded-3xl space-y-3">
-          <Disc3 className="w-12 h-12 text-warm-muted/40 mx-auto" />
-          <p className="font-bold text-warm-white">No albums found</p>
-          <p className="text-xs text-warm-muted max-w-sm mx-auto">
-            {searchQuery
-              ? `No albums match your search query "${searchQuery}".`
-              : 'Add audio files to your library to automatically generate albums.'}
-          </p>
-        </div>
-      )}
+
+        {/* Responsive Album Grid */}
+        {filteredAlbums.length > 0 ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            {filteredAlbums.map(album => (
+              <AlbumCard
+                key={album.name}
+                album={album}
+                onClick={() => onNavigate(`album:${album.name}`)}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="p-16 text-center text-white/40 text-sm border border-dashed border-white/10 rounded-3xl space-y-3">
+            <Disc3 className="w-12 h-12 text-white/20 mx-auto" />
+            <p className="font-bold text-white">No albums found</p>
+            <p className="text-xs text-white/40 max-w-sm mx-auto">
+              {searchQuery
+                ? `No albums match your search query "${searchQuery}".`
+                : 'Add audio files or stream any track to populate albums automatically.'}
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Global Footer */}
+      <AppFooter onNavigate={onNavigate} />
     </div>
   );
 }

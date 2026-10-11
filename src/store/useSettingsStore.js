@@ -79,6 +79,10 @@ export const useSettingsStore = create(
       hasConfiguredLanguage: false,
       setPreferredLanguage: lang => set({ preferredLanguage: lang, hasConfiguredLanguage: true }),
 
+      // Provider Source: 'all' | 'saavn' | 'youtube' | 'owntg'
+      providerSource: 'all',
+      setProviderSource: source => set({ providerSource: source }),
+
       // Theme Actions
       setTheme: theme => {
         THEME_CLASSES.forEach(cls => document.body.classList.remove(cls));
@@ -163,12 +167,13 @@ export const useSettingsStore = create(
       },
 
       resetSettings: () => {
+        localStorage.removeItem('vexm_settings');
         localStorage.removeItem('spideyxflash_settings');
         window.location.reload();
       },
     }),
     {
-      name: 'spideyxflash_settings',
+      name: 'vexm_settings',
     }
   )
 );

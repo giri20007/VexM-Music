@@ -107,7 +107,7 @@ export function AdminPage({ onBackToApp }) {
         }`}
       >
         <div className="space-y-5">
-          {/* Brand Header: SPiDEYxFLASH ADMIN • OWNER • @Spidey */}
+          {/* Brand Header: Vex-M ADMIN • OWNER */}
           <div className="flex items-center justify-between px-2 pt-2 border-b border-white/5 pb-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-accent via-rose-500 to-fuchsia-600 flex items-center justify-center text-bg-primary shadow-lg shadow-accent/25 relative group">
@@ -116,7 +116,7 @@ export function AdminPage({ onBackToApp }) {
               </div>
               <div>
                 <span className="font-black text-xs tracking-wide text-warm-white block">
-                  SPiDEY<span className="text-accent">x</span>FLASH ADMIN
+                  Vex<span className="text-[#fa2d48]">-</span>M ADMIN
                 </span>
                 <div className="flex items-center gap-1.5 mt-0.5">
                   <span className="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 text-[9px] font-black tracking-wider border border-amber-500/30">
@@ -192,7 +192,7 @@ export function AdminPage({ onBackToApp }) {
             >
               <Menu className="w-5 h-5" />
             </button>
-            <span className="font-bold text-sm text-warm-white">SPiDEYxFLASH Admin</span>
+            <span className="font-bold text-sm text-warm-white">Vex-M Admin</span>
           </div>
           <button
             onClick={onBackToApp}

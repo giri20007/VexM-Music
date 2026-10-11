@@ -21,8 +21,9 @@ import {
 import { useSettingsStore } from '../store/useSettingsStore';
 import { useAudioStore } from '../store/useAudioStore';
 import { checkHealth, BASE_URL } from '../utils/api';
+import { AppFooter } from '../components/layout/AppFooter';
 
-export function SettingsPage({ initialTab = 'appearance' }) {
+export function SettingsPage({ initialTab = 'appearance', onNavigate }) {
   const [activeTab, setActiveTab] = useState(initialTab.replace('settings:', '') || 'appearance');
   const [copiedToken, setCopiedToken] = useState(false);
   const [backendHealth, setBackendHealth] = useState({ status: 'checking', message: '' });
@@ -35,7 +36,7 @@ export function SettingsPage({ initialTab = 'appearance' }) {
     setIsTestingServer(true);
     try {
       const data = await checkHealth();
-      setBackendHealth({ status: 'connected', message: `Connected to ${data.service || 'SPiDEYxFLASH API'}` });
+      setBackendHealth({ status: 'connected', message: `Connected to ${data.service || 'Vex-M API'}` });
     } catch (err) {
       setBackendHealth({ status: 'error', message: err.message || 'Could not connect to backend' });
     } finally {
@@ -48,7 +49,7 @@ export function SettingsPage({ initialTab = 'appearance' }) {
   }, []);
 
   const handleCopyToken = () => {
-    const fakeToken = 'v1.eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.spideyxflash_session_token_verified.9f8a8b...';
+    const fakeToken = 'v1.eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.vexm_session_token_verified.9f8a8b...';
     navigator.clipboard?.writeText(fakeToken);
     setCopiedToken(true);
     setTimeout(() => setCopiedToken(false), 2500);
@@ -469,9 +470,9 @@ export function SettingsPage({ initialTab = 'appearance' }) {
           {/* TAB: ABOUT */}
           {activeTab === 'about' && (
             <div className="space-y-6 animate-fade-in">
-              <h2 className="text-2xl font-bold tracking-tight text-warm-white">About VexM Music</h2>
-              <div className="p-5 rounded-2xl bg-bg-card border border-white/5 space-y-3 text-xs leading-relaxed text-warm-muted">
-                <p className="text-sm font-semibold text-warm-white">VexM Music Web Player v2.0</p>
+              <h2 className="text-2xl font-bold tracking-tight text-white">About Vex-M Music</h2>
+              <div className="p-5 rounded-2xl bg-[#141414] border border-white/10 space-y-3 text-xs leading-relaxed text-white/60">
+                <p className="text-sm font-semibold text-white">Vex-M Web Player v2.0</p>
                 <p>
                   High-performance on-demand streaming web application powered by next-generation music APIs and modern serverless architecture.
                 </p>
@@ -480,6 +481,8 @@ export function SettingsPage({ initialTab = 'appearance' }) {
           )}
         </div>
       </div>
+
+      <AppFooter onNavigate={onNavigate} />
     </div>
   );
 }

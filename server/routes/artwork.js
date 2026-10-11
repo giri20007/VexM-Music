@@ -31,7 +31,7 @@ function stringHash(str = '') {
   return Math.abs(hash);
 }
 
-function generatePlaceholderSvg(title = 'SPiDEYxFLASH', artist = '') {
+function generatePlaceholderSvg(title = 'Vex-M', artist = '') {
   const hash = stringHash(`${title}_${artist}`);
   const pal = PALETTES[hash % PALETTES.length];
   const initial = (title[0] || '♪').toUpperCase();
@@ -59,7 +59,7 @@ function generatePlaceholderSvg(title = 'SPiDEYxFLASH', artist = '') {
 
 router.get('/:id', async (req, res) => {
   const { id } = req.params;
-  const title = req.query.title || 'SPiDEYxFLASH';
+  const title = req.query.title || 'Vex-M';
   const artist = req.query.artist || '';
   const size = req.query.size || null;
 
@@ -182,7 +182,7 @@ router.get('/:id', async (req, res) => {
       .replace(/^\d+[\.\s_-]*/, '')
       .trim();
     const cleanArtist = (artist || '').split(/[,&]/)[0].trim();
-    if (cleanTitle && cleanTitle !== 'SPiDEYxFLASH') {
+    if (cleanTitle && cleanTitle !== 'Vex-M') {
       const q = `${cleanTitle} ${cleanArtist}`.trim();
       const itunesRes = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(q)}&entity=song&limit=1`, {
         headers: { 'User-Agent': 'Mozilla/5.0' },

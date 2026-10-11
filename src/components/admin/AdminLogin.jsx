@@ -36,7 +36,7 @@ export function AdminLogin({ onBackToApp }) {
           className="flex items-center gap-1.5 text-xs text-warm-muted hover:text-white transition"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
-          <span>Back to SPiDEYxFLASH</span>
+          <span>Back to Vex-M</span>
         </button>
 
         {/* Header Branding */}
@@ -45,7 +45,7 @@ export function AdminLogin({ onBackToApp }) {
             <Shield className="w-7 h-7 fill-bg-primary stroke-bg-primary" />
           </div>
           <h2 className="text-2xl font-black tracking-tight text-warm-white">
-            SPiDEY<span className="text-accent">x</span>FLASH
+            Vex<span className="text-[#fa2d48]">-</span>M
           </h2>
           <p className="text-xs uppercase tracking-widest font-semibold text-accent">
             Owner Admin Panel

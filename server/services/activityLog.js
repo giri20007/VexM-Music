@@ -1,4 +1,4 @@
-// Bounded in-memory activity logger for SPiDEYxFLASH Admin
+// Bounded in-memory activity logger for Vex-M Admin
 const MAX_LOGS = 250;
 const logs = [];
 
@@ -27,7 +27,7 @@ function clearLogs() {
 }
 
 // Initial system start entry
-logActivity('SYSTEM_START', { description: 'SPiDEYxFLASH backend service initialized' });
+logActivity('SYSTEM_START', { description: 'Vex-M backend service initialized' });
 
 module.exports = {
   logActivity,

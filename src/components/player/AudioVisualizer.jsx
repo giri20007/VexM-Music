@@ -425,7 +425,7 @@ export function AudioVisualizer({
         ctx.rotate(rot * 0.55); // Rotates smoothly with 33 RPM feel
 
         const textRadius = (hudInnerRadius + hudOuterRadius) / 2;
-        const brandString = '✦ HIGH FIDELITY • 360° AUDIO LAB • SPiDEYxFLASH ✦ ';
+        const brandString = '✦ HIGH FIDELITY • 360° AUDIO LAB • VEX-M ✦ ';
         const textLen = brandString.length;
         ctx.font = `600 ${Math.max(8, 9 * dpr)}px "SF Mono", "Fira Code", monospace, sans-serif`;
         ctx.fillStyle = `rgba(255, 255, 255, ${0.65 + bass * 0.25})`;
@@ -496,10 +496,10 @@ export function AudioVisualizer({
           ctx.font = `bold ${Math.max(8, labelRadius * 0.22)}px sans-serif`;
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
-          ctx.fillText('SPiDEY', 0, -labelRadius * 0.2);
-          ctx.fillStyle = '#06b6d4';
+          ctx.fillText('VEX', 0, -labelRadius * 0.2);
+          ctx.fillStyle = '#fa2d48';
           ctx.font = `bold ${Math.max(7, labelRadius * 0.18)}px sans-serif`;
-          ctx.fillText('xFLASH', 0, labelRadius * 0.2);
+          ctx.fillText('-M', 0, labelRadius * 0.2);
         }
 
         // Inner Vinyl Label Ring

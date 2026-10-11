@@ -83,8 +83,33 @@ export const fetchSaavnTrending = (lang = 'tamil', limit = 20) =>
     .then(r => r?.items || [])
     .catch(() => []);
 
-// Unified Dual-Engine Search: JioSaavn (320 kbps) + YouTube Music
-export const searchUnified = async (query, limit = 25) => {
+// Unified Multi-Engine Search: JioSaavn (320 kbps) + YouTube Music + OwnTg Cloud Storage
+export const searchUnified = async (query, limit = 25, source = 'all', localTracks = []) => {
+  const cleanQ = (query || '').trim().toLowerCase();
+  if (!cleanQ) return [];
+
+  // 1. If OwnTg selected, search local Telegram storage exclusively
+  if (source === 'owntg') {
+    return localTracks
+      .filter(t => `${t.title} ${t.artist} ${t.album || ''}`.toLowerCase().includes(cleanQ))
+      .slice(0, limit);
+  }
+
+  // 2. If JioSaavn selected exclusively
+  if (source === 'saavn') {
+    return searchSaavn(query, limit);
+  }
+
+  // 3. If YouTube selected exclusively
+  if (source === 'youtube') {
+    return searchYouTube(query, limit);
+  }
+
+  // 4. Default 'all': Match local OwnTg tracks first, then JioSaavn 320k, then YouTube
+  const localMatches = (localTracks || [])
+    .filter(t => `${t.title} ${t.artist} ${t.album || ''}`.toLowerCase().includes(cleanQ))
+    .slice(0, 5);
+
   const [saavnResults, ytResults] = await Promise.allSettled([
     searchSaavn(query, limit),
     searchYouTube(query, Math.floor(limit / 2)),
@@ -93,12 +118,19 @@ export const searchUnified = async (query, limit = 25) => {
   const saavn = saavnResults.status === 'fulfilled' ? saavnResults.value : [];
   const yt = ytResults.status === 'fulfilled' ? ytResults.value : [];
 
-  // JioSaavn 320 kbps takes priority, followed by unique YouTube tracks
-  const seenTitles = new Set(saavn.map(t => t.title.toLowerCase()));
-  const combined = [...saavn];
+  const seenTitles = new Set(localMatches.map(t => t.title.toLowerCase()));
+  const combined = [...localMatches];
+
+  for (const track of saavn) {
+    if (!seenTitles.has(track.title.toLowerCase())) {
+      seenTitles.add(track.title.toLowerCase());
+      combined.push(track);
+    }
+  }
 
   for (const track of yt) {
     if (!seenTitles.has(track.title.toLowerCase())) {
+      seenTitles.add(track.title.toLowerCase());
       combined.push(track);
     }
   }

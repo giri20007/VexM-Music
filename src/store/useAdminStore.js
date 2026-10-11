@@ -53,7 +53,7 @@ export const useAdminStore = create((set, get) => ({
     try {
       const res = await adminLogin(username, password);
       set({ isAuthenticated: true, adminUser: res.user });
-      get().showToast('Welcome to SPiDEYxFLASH Admin', 'success');
+      get().showToast('Welcome to Vex-M Admin', 'success');
       get().fetchStats();
       return { success: true };
     } catch (err) {

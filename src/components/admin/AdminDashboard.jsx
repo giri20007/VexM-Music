@@ -73,7 +73,7 @@ export function AdminDashboard({ onNavigateTab }) {
             System Overview
           </h2>
           <p className="text-xs text-warm-muted">
-            Live telemetry and statistics from SPiDEYxFLASH
+            Live telemetry and statistics from Vex-M
           </p>
         </div>
 

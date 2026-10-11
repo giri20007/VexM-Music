@@ -101,7 +101,7 @@ export default function App() {
         </div>
         <div className="flex items-center gap-2 text-xs font-semibold text-warm-muted">
           <RefreshCw className="w-4 h-4 animate-spin text-accent" />
-          <span>Verifying SPiDEYxFLASH session...</span>
+          <span>Verifying Vex-M session...</span>
         </div>
       </div>
     );
@@ -124,7 +124,7 @@ export default function App() {
             </div>
             <h2 className="text-xl font-black text-warm-white">Access Denied (403)</h2>
             <p className="text-xs text-warm-muted leading-relaxed">
-              Admin privileges require administrator credentials (<span className="font-mono text-warm-white font-semibold">Spidey</span>). You are currently logged in as a standard listener.
+              Admin privileges require administrator credentials. You are currently logged in as a standard listener.
             </p>
             <button
               onClick={() => navigate('home')}
@@ -198,7 +198,7 @@ export default function App() {
             )}
 
             {currentRoute === 'liked' && (
-              <LikedSongsPage allTracks={lib.allItems} />
+              <LikedSongsPage allTracks={lib.allItems} onNavigate={navigate} />
             )}
 
             {(currentRoute === 'albums' || currentRoute.startsWith('album:')) && (
@@ -224,6 +224,7 @@ export default function App() {
                 playlistId={currentRoute.replace('playlist:', '')}
                 allTracks={lib.allItems}
                 onBack={() => navigate('library')}
+                onNavigate={navigate}
               />
             )}
 
@@ -242,6 +243,7 @@ export default function App() {
             {currentRoute.startsWith('settings') && (
               <SettingsPage
                 initialTab={currentRoute}
+                onNavigate={navigate}
               />
             )}
           </main>
@@ -309,8 +311,8 @@ export default function App() {
                 <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-accent to-[#f43f5e] flex items-center justify-center text-bg-primary font-black shadow-md">
                   <Radio className="w-4 h-4 fill-bg-primary stroke-bg-primary" />
                 </div>
-                <span className="font-bold text-sm text-warm-white tracking-tight">
-                  SPiDEY<span className="text-accent">x</span>FLASH
+                <span className="font-black text-sm text-warm-white tracking-tight">
+                  Vex<span className="text-[#fa2d48]">-</span>M
                 </span>
               </div>
 

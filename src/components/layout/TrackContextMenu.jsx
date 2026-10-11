@@ -65,7 +65,7 @@ export function TrackContextMenu({
       try {
         await navigator.share({
           title: `${track.title} - ${track.artist}`,
-          text: `Listen to "${track.title}" on SPiDEYxFLASH`,
+          text: `Listen to "${track.title}" on Vex-M`,
           url: shareUrl,
         });
         onClose();

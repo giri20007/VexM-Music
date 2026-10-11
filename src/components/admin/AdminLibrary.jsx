@@ -950,7 +950,7 @@ export function AdminLibrary() {
               Remove Track from Library?
             </h3>
             <p className="text-xs text-warm-muted leading-relaxed">
-              This removes <strong className="text-warm-white font-semibold">"{deletingTrack.title}"</strong> from the SPiDEYxFLASH music player index.
+              This removes <strong className="text-warm-white font-semibold">"{deletingTrack.title}"</strong> from the Vex-M music player index.
             </p>
             <p className="text-[11px] p-3 rounded-xl bg-white/5 border border-white/5 text-warm-muted">
               🛡 <strong>Note:</strong> The original audio file will <span className="text-emerald-400">NOT</span> be deleted from your Telegram channel storage.
@@ -991,7 +991,7 @@ export function AdminLibrary() {
                   Artwork Pipeline Diagnostics
                 </h3>
                 <p className="text-[11px] text-warm-muted">
-                  How SPiDEYxFLASH matched this track's real Telegram cover
+                  How Vex-M matched this track's real Telegram cover
                 </p>
               </div>
               <button onClick={() => setDiagTrack(null)} className="text-warm-muted hover:text-white">

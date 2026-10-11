@@ -17,6 +17,8 @@ import { SafeImage } from '../components/ui/SafeImage';
 import { getArtworkSrc } from '../utils/artworkGenerator';
 import { fetchSaavnTrending, searchSaavn, searchYouTube } from '../utils/api';
 import { MUSIC_LANGUAGES } from '../components/modals/LanguagePreferenceModal';
+import { ProviderSourceBar } from '../components/layout/ProviderSourceBar';
+import { AppFooter } from '../components/layout/AppFooter';
 
 // Per-language memory cache for instant, zero-flicker switching
 const langCache = {};
@@ -100,10 +102,10 @@ function AppleFeaturedHeroCard({ track, index, onPlay, queue = [] }) {
         {/* Apple Music Lossless / Spatial badge on bottom-left */}
         <div className="absolute left-4 bottom-4 flex items-center gap-1.5">
           <span className="px-2 py-0.5 rounded bg-black/60 backdrop-blur-md text-[10px] font-bold text-white/90 border border-white/10 uppercase tracking-wider">
-            {track.is320k ? '320 kbps Studio' : 'Spatial Audio'}
+            {track.isOwnTg || track.isTelegram ? 'OwnTg Cloud' : track.is320k ? '320 kbps Studio' : 'Spatial Audio'}
           </span>
           <span className="px-2 py-0.5 rounded bg-black/60 backdrop-blur-md text-[10px] font-bold text-[#fa2d48] border border-[#fa2d48]/20 uppercase tracking-wider">
-            {track.is320k ? 'Master Audio' : 'Lossless'}
+            {track.isOwnTg || track.isTelegram ? 'Telegram Vault' : track.is320k ? 'Master Audio' : 'Lossless'}
           </span>
         </div>
       </div>
@@ -171,7 +173,11 @@ function AppleSongRowItem({ track, onPlay, queue = [] }) {
             {track.title}
           </p>
           <div className="flex items-center gap-1.5 mt-0.5">
-            {track.is320k ? (
+            {track.isOwnTg || track.isTelegram ? (
+              <span className="inline-flex items-center justify-center px-1.5 py-0.2 rounded bg-sky-500/20 text-[9px] font-black text-sky-300 border border-sky-500/30">
+                OwnTg
+              </span>
+            ) : track.is320k ? (
               <span className="inline-flex items-center justify-center px-1.5 py-0.2 rounded bg-emerald-500/20 text-[9px] font-black text-emerald-300 border border-emerald-500/30">
                 320k HQ
               </span>
@@ -247,13 +253,19 @@ function AppleSquareCard({ track, onPlay, queue = [] }) {
           className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
         />
 
-        {track.is320k && (
+        {(track.isOwnTg || track.isTelegram) ? (
+          <div className="absolute left-2.5 top-2.5 z-10 pointer-events-none">
+            <span className="px-2 py-0.5 rounded-full bg-black/75 backdrop-blur-md text-[9px] font-black text-sky-300 border border-sky-500/40 uppercase tracking-wider">
+              OwnTg Cloud
+            </span>
+          </div>
+        ) : track.is320k ? (
           <div className="absolute left-2.5 top-2.5 z-10 pointer-events-none">
             <span className="px-2 py-0.5 rounded-full bg-black/75 backdrop-blur-md text-[9px] font-black text-emerald-300 border border-emerald-500/40 uppercase tracking-wider">
               320 kbps
             </span>
           </div>
-        )}
+        ) : null}
 
         <button
           onClick={handlePlay}
@@ -313,6 +325,7 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal }) {
 
   const preferredLanguage = useSettingsStore(s => s.preferredLanguage) || 'tamil';
   const langConfig = MUSIC_LANGUAGES.find(l => l.id === preferredLanguage) || MUSIC_LANGUAGES[0];
+  const providerSource = useSettingsStore(s => s.providerSource) || 'all';
 
   const cached = langCache[preferredLanguage];
   const [featuredTracks, setFeaturedTracks] = useState(cached?.featured || []);
@@ -322,9 +335,65 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal }) {
 
   const heroScrollRef = useRef(null);
 
-  // Load language-tailored content
+  // Load language-tailored or source-tailored content
   useEffect(() => {
     let isMounted = true;
+
+    // 1. If OwnTg selected: display Telegram cloud vault storage tracks & albums directly
+    if (providerSource === 'owntg') {
+      const all = lib?.allItems || [];
+      const feat = all.slice(0, 8);
+      const best = all.slice(8, 20).length ? all.slice(8, 20) : all.slice(0, 12);
+      const rel = all.slice(20, 32).length ? all.slice(20, 32) : all.slice(0, 12);
+      setFeaturedTracks(feat);
+      setBestSongs(best);
+      setNewReleases(rel);
+      setIsLoading(false);
+      return;
+    }
+
+    // 2. If JioSaavn selected: query JioSaavn 320 kbps directly
+    if (providerSource === 'saavn') {
+      setIsLoading(true);
+      const bestQuery = `Top 20 ${langConfig.name} Songs Hits`;
+      const releaseQuery = `Latest ${langConfig.name} Movie Songs`;
+
+      Promise.allSettled([
+        fetchSaavnTrending(preferredLanguage, 14),
+        searchSaavn(bestQuery, 14),
+        searchSaavn(releaseQuery, 14),
+      ]).then(([featRes, bestRes, relRes]) => {
+        if (!isMounted) return;
+        setFeaturedTracks(featRes.status === 'fulfilled' ? featRes.value || [] : []);
+        setBestSongs(bestRes.status === 'fulfilled' ? bestRes.value || [] : []);
+        setNewReleases(relRes.status === 'fulfilled' ? relRes.value || [] : []);
+        setIsLoading(false);
+      });
+      return;
+    }
+
+    // 3. If YouTube selected: query YouTube Music
+    if (providerSource === 'youtube') {
+      setIsLoading(true);
+      const langQuery = langConfig.query;
+      const bestQuery = `Top 20 ${langConfig.name} Songs Hits`;
+      const releaseQuery = `Latest ${langConfig.name} Songs`;
+
+      Promise.allSettled([
+        searchYouTube(langQuery, 14),
+        searchYouTube(bestQuery, 14),
+        searchYouTube(releaseQuery, 14),
+      ]).then(([featRes, bestRes, relRes]) => {
+        if (!isMounted) return;
+        setFeaturedTracks(featRes.status === 'fulfilled' ? featRes.value || [] : []);
+        setBestSongs(bestRes.status === 'fulfilled' ? bestRes.value || [] : []);
+        setNewReleases(relRes.status === 'fulfilled' ? relRes.value || [] : []);
+        setIsLoading(false);
+      });
+      return;
+    }
+
+    // 4. Default 'all': Smart Unified (JioSaavn 320k Studio + YouTube fallback) with memory cache
     if (langCache[preferredLanguage]) {
       setFeaturedTracks(langCache[preferredLanguage].featured);
       setBestSongs(langCache[preferredLanguage].best);
@@ -374,7 +443,7 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal }) {
     return () => {
       isMounted = false;
     };
-  }, [preferredLanguage, langConfig]);
+  }, [preferredLanguage, langConfig, providerSource, lib?.allItems]);
 
   const handlePlayTrack = (track, queue = []) => {
     if (currentTrack?.id === track.id) {
@@ -404,9 +473,9 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal }) {
 
   return (
     <div className="flex-1 w-full pb-24 select-none bg-[#000000] text-white">
-      {/* 1. TOP HEADER WITH PREFERRED LANGUAGE PICKER PILL */}
-      <div className="px-4 sm:px-8 pt-8 pb-4 border-b border-white/[0.08]">
-        <div className="flex items-center justify-between gap-4">
+      {/* 1. TOP HEADER WITH PREFERRED LANGUAGE PICKER PILL & PROVIDER SOURCE BAR */}
+      <div className="px-4 sm:px-8 pt-8 pb-5 border-b border-white/[0.08] space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-3">
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white font-sans">
@@ -426,9 +495,20 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal }) {
               </button>
             </div>
             <p className="text-xs sm:text-sm text-[#8e8e93] mt-1">
-              Latest {langConfig.name} releases, chartbusters, and featured hits
+              {providerSource === 'owntg'
+                ? 'Your personal Telegram cloud storage audio vault and saved BIN tracks'
+                : providerSource === 'saavn'
+                ? `High-fidelity 320 kbps JioSaavn studio catalog for ${langConfig.name}`
+                : providerSource === 'youtube'
+                ? `Worldwide YouTube Music catalog for ${langConfig.name}`
+                : `Latest ${langConfig.name} releases, chartbusters, and featured hits`}
             </p>
           </div>
+        </div>
+
+        {/* Source Provider Select Option: All | JioSaavn | YouTube | OwnTg */}
+        <div className="pt-1">
+          <ProviderSourceBar />
         </div>
       </div>
 
@@ -541,22 +621,25 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal }) {
             </button>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-5">
-            {isLoading && newReleases.length === 0 ? (
-              [...Array(6)].map((_, i) => <SkeletonSquare key={`sk_${i}`} />)
-            ) : (
-              (newReleases.length ? newReleases : featuredTracks).slice(0, 12).map((t, idx) => (
-                <AppleSquareCard
-                  key={`rel_${t.id}_${idx}`}
-                  track={t}
-                  onPlay={handlePlayTrack}
-                  queue={newReleases}
-                />
-              ))
-            )}
-          </div>
-        </section>
-      </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-5">
+              {isLoading && newReleases.length === 0 ? (
+                [...Array(6)].map((_, i) => <SkeletonSquare key={`sk_${i}`} />)
+              ) : (
+                (newReleases.length ? newReleases : featuredTracks).slice(0, 12).map((t, idx) => (
+                  <AppleSquareCard
+                    key={`rel_${t.id}_${idx}`}
+                    track={t}
+                    onPlay={handlePlayTrack}
+                    queue={newReleases}
+                  />
+                ))
+              )}
+            </div>
+          </section>
+        </div>
+
+      {/* Global Apple/Tidal Inspired Footer */}
+      <AppFooter onNavigate={onNavigate} onOpenLanguageModal={onOpenLanguageModal} />
     </div>
   );
 }

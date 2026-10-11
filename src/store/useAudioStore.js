@@ -388,7 +388,7 @@ export const useAudioStore = create(
       set,
     }),
     {
-      name: 'spideyxflash_audio_state',
+      name: 'vexm_audio_state',
       partialize: state => ({
         currentTrack: state.currentTrack,
         queue: state.queue,

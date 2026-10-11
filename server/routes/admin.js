@@ -339,7 +339,7 @@ router.delete('/tracks/:id', (req, res) => {
   logActivity('TRACK_REMOVED_FROM_LIBRARY', { trackId: id });
   res.json({
     success: true,
-    message: 'Track removed from SPiDEYxFLASH library. Telegram file remains intact.',
+    message: 'Track removed from Vex-M library. Telegram file remains intact.',
   });
 });
 

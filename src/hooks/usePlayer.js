@@ -55,6 +55,15 @@ export function getAudioDiagnostics() {
       routing: 'Official Global CDN Stream',
     };
   }
+  if (currentTrack?.isOwnTg || currentTrack?.isTelegram || currentTrack?.source === 'owntg') {
+    return {
+      state: 'OwnTg Telegram Cloud Storage Vault',
+      sampleRate: `${currentTrack?.format || 'Audio'} · Bit-Perfect Stream`,
+      latency: '< 4 ms (Hardware Direct)',
+      channels: 'Stereo (2 Ch)',
+      routing: 'Personal Telegram Storage Stream',
+    };
+  }
   if (!audioCtx) {
     return {
       state: 'Native Browser Hardware Direct',

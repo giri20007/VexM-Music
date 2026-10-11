@@ -51,6 +51,9 @@ export function useLibrary() {
         }
         return {
           ...t,
+          isTelegram: true,
+          isOwnTg: true,
+          source: t.source || 'owntg',
           thumbnail: thumb || getTrackArtworkUrl(t),
         };
       });

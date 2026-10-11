@@ -6,10 +6,13 @@ import { ArtistCard } from '../components/library/ArtistCard';
 import { searchUnified, fetchSaavnTrending, fetchYouTubeTrending, fetchYouTubeSuggestions } from '../utils/api';
 import { useAudioStore } from '../store/useAudioStore';
 import { useSettingsStore } from '../store/useSettingsStore';
+import { ProviderSourceBar } from '../components/layout/ProviderSourceBar';
+import { AppFooter } from '../components/layout/AppFooter';
 
 export function SearchPage({ lib, onNavigate }) {
   const playTrack = useAudioStore(s => s.playTrack);
   const preferredLanguage = useSettingsStore(s => s.preferredLanguage) || 'tamil';
+  const providerSource = useSettingsStore(s => s.providerSource) || 'all';
 
   const [searchQuery, setSearchQuery] = useState('');
   const [ytResults, setYtResults] = useState([]);
@@ -50,7 +53,7 @@ export function SearchPage({ lib, onNavigate }) {
     const timer = setTimeout(async () => {
       try {
         const [songs, suggests] = await Promise.all([
-          searchUnified(clean, 25),
+          searchUnified(clean, 30, providerSource, lib.allItems),
           fetchYouTubeSuggestions(clean),
         ]);
         setYtResults(songs);
@@ -63,27 +66,12 @@ export function SearchPage({ lib, onNavigate }) {
     }, 280);
 
     return () => clearTimeout(timer);
-  }, [clean]);
+  }, [clean, providerSource, lib.allItems]);
 
-  // Local matches
-  const localMatchingTracks = useMemo(() => {
-    if (!clean) return [];
-    return (lib.allItems || []).filter(t =>
-      `${t.title} ${t.artist} ${t.album}`.toLowerCase().includes(clean)
-    );
-  }, [clean, lib.allItems]);
-
-  // Combined tracks
+  // Combined tracks: ytResults contains multi-engine results from searchUnified
   const allSongResults = useMemo(() => {
-    const list = [...localMatchingTracks];
-    const seenTitles = new Set(list.map(t => t.title.toLowerCase()));
-    ytResults.forEach(yt => {
-      if (!seenTitles.has(yt.title.toLowerCase())) {
-        list.push(yt);
-      }
-    });
-    return list;
-  }, [localMatchingTracks, ytResults]);
+    return ytResults;
+  }, [ytResults]);
 
   const matchingAlbums = useMemo(() => {
     if (!clean) return [];
@@ -96,38 +84,43 @@ export function SearchPage({ lib, onNavigate }) {
   }, [clean, lib.artists]);
 
   return (
-    <div className="flex-1 max-w-7xl mx-auto w-full p-4 sm:p-6 space-y-8 select-none">
+    <div className="flex-1 max-w-7xl mx-auto w-full p-4 sm:p-6 space-y-6 select-none">
       {/* Search Bar Header */}
-      <div className="relative max-w-2xl">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#1db954]" />
-        <input
-          type="search"
-          autoFocus
-          placeholder="What do you want to listen to? (Songs, artists, albums...)"
-          value={searchQuery}
-          onChange={e => setSearchQuery(e.target.value)}
-          className="w-full pl-12 pr-12 py-3.5 rounded-full bg-[#242424] hover:bg-[#2a2a2a] focus:bg-[#2a2a2a] border border-white/10 text-sm sm:text-base text-white placeholder-[#b3b3b3] focus:outline-none focus:ring-2 focus:ring-white transition shadow-xl"
-        />
-        {isSearching && (
-          <div className="absolute right-12 top-1/2 -translate-y-1/2">
-            <Loader2 className="w-5 h-5 text-[#1db954] animate-spin" />
-          </div>
-        )}
-        {searchQuery && (
-          <button
-            onClick={() => setSearchQuery('')}
-            className="absolute right-4 top-1/2 -translate-y-1/2 p-1 rounded-full text-[#b3b3b3] hover:text-white hover:bg-white/10 transition"
-          >
-            ✕
-          </button>
-        )}
+      <div className="space-y-3 max-w-2xl">
+        <div className="relative">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#fa2d48]" />
+          <input
+            type="search"
+            autoFocus
+            placeholder="Search songs, artists, or albums across all engines..."
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            className="w-full pl-12 pr-12 py-3.5 rounded-2xl bg-[#1c1c1e] hover:bg-[#242426] focus:bg-[#242426] border border-white/10 text-sm sm:text-base text-white placeholder-[#8e8e93] focus:outline-none focus:ring-2 focus:ring-[#fa2d48] transition shadow-xl"
+          />
+          {isSearching && (
+            <div className="absolute right-12 top-1/2 -translate-y-1/2">
+              <Loader2 className="w-5 h-5 text-[#fa2d48] animate-spin" />
+            </div>
+          )}
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-4 top-1/2 -translate-y-1/2 p-1 rounded-full text-[#8e8e93] hover:text-white hover:bg-white/10 transition"
+            >
+              ✕
+            </button>
+          )}
+        </div>
+
+        {/* Source Filter Selector */}
+        <ProviderSourceBar />
       </div>
 
       {/* Suggestion Chips */}
       {suggestions.length > 0 && (
         <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
-          <span className="text-xs text-[#808080] font-semibold mr-1 flex items-center gap-1">
-            <Sparkles className="w-3.5 h-3.5 text-[#1db954]" /> Related:
+          <span className="text-xs text-[#8e8e93] font-semibold mr-1 flex items-center gap-1">
+            <Sparkles className="w-3.5 h-3.5 text-[#fa2d48]" /> Related:
           </span>
           {suggestions.map(s => (
             <button
@@ -148,7 +141,7 @@ export function SearchPage({ lib, onNavigate }) {
           {trendingTracks.length > 0 && (
             <section className="space-y-4">
               <div className="flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-[#1db954]" />
+                <TrendingUp className="w-5 h-5 text-[#fa2d48]" />
                 <h3 className="text-xl sm:text-2xl font-black text-white">Trending Hits</h3>
               </div>
               <div className="bg-[#181818] p-3 rounded-xl border border-white/5 space-y-1">
@@ -207,7 +200,7 @@ export function SearchPage({ lib, onNavigate }) {
           {allSongResults.length > 0 && (
             <section className="space-y-4">
               <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                <Music2 className="w-5 h-5 text-[#1db954]" />
+                <Music2 className="w-5 h-5 text-[#fa2d48]" />
                 <span>Songs ({allSongResults.length})</span>
               </h3>
               <div className="bg-[#181818] p-3 rounded-xl border border-white/5 space-y-1">
@@ -229,7 +222,7 @@ export function SearchPage({ lib, onNavigate }) {
           {matchingAlbums.length > 0 && (
             <section className="space-y-4">
               <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                <Disc3 className="w-5 h-5 text-[#1db954]" />
+                <Disc3 className="w-5 h-5 text-[#fa2d48]" />
                 <span>Albums ({matchingAlbums.length})</span>
               </h3>
               <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3">
@@ -248,7 +241,7 @@ export function SearchPage({ lib, onNavigate }) {
           {matchingArtists.length > 0 && (
             <section className="space-y-4">
               <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                <Users className="w-5 h-5 text-[#1db954]" />
+                <Users className="w-5 h-5 text-[#fa2d48]" />
                 <span>Artists ({matchingArtists.length})</span>
               </h3>
               <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3">
@@ -264,6 +257,9 @@ export function SearchPage({ lib, onNavigate }) {
           )}
         </div>
       )}
+
+      {/* Global Apple/Tidal Styled Footer */}
+      <AppFooter onNavigate={onNavigate} />
     </div>
   );
 }

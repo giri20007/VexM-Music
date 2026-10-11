@@ -112,7 +112,7 @@ export function AuthScreen() {
 
           <div className="brand-neon-container inline-block">
             <h1 className="brand-text-neon text-3xl font-black tracking-wider">
-              SPiDEY<span className="brand-x-neon">x</span>FLASH
+              Vex<span className="text-[#fa2d48]">-</span>M
             </h1>
           </div>
 
@@ -329,7 +329,7 @@ export function AuthScreen() {
             <span>High-Fidelity Audio Streaming • Lossless Quality</span>
           </div>
           <p className="text-[10px] text-warm-muted/40 font-mono">
-            SPiDEYxFLASH Audio Lab • Dark Neon Player
+            Vex-M Studio Audio Lab • Ultra Hi-Fi Player
           </p>
         </div>
       </div>

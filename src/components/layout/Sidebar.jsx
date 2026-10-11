@@ -67,8 +67,8 @@ export function Sidebar({ currentRoute, onNavigate }) {
           {!collapsed && (
             <div className="flex flex-col">
               <div className="flex items-center gap-1.5">
-                <span className="brand-text-neon text-base tracking-tight select-none">
-                  VexM <span className="text-[#fa2d48]">Music</span>
+                <span className="brand-text-neon text-base font-black tracking-tight select-none">
+                  Vex<span className="text-[#fa2d48]">-</span>M
                 </span>
                 {user?.isAdmin ? (
                   <span className="brand-tag-neon text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-[#fa2d48]/25 border border-[#fa2d48]/40 text-[#fa2d48]">

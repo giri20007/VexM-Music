@@ -403,7 +403,7 @@ export function LyricsView({ track, isCompact = false }) {
             </div>
             <p className="text-base font-bold text-warm-white">Lyrics Unavailable</p>
             <p className="text-xs text-warm-muted/70 max-w-sm leading-relaxed">
-              Synchronized LRC lyrics can be added or updated for this track via the SPiDEYxFLASH Admin panel.
+              Synchronized LRC lyrics can be added or updated for this track via the Vex-M Admin panel.
             </p>
           </div>
         )}

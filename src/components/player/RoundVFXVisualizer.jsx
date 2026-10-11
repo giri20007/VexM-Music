@@ -312,7 +312,7 @@ export const RoundVFXVisualizer = memo(function RoundVFXVisualizer({
       ctx.rotate(rot * 0.55);
 
       const textRadius = (hudInnerRadius + hudOuterRadius) / 2;
-      const brandString = '✦ HIGH FIDELITY • 360° AUDIO LAB • SPiDEYxFLASH ✦ ';
+      const brandString = '✦ HIGH FIDELITY • 360° AUDIO LAB • VEX-M ✦ ';
       const textLen = brandString.length;
       ctx.font = `600 ${Math.max(8, 9 * dpr)}px "SF Mono", "Fira Code", monospace, sans-serif`;
       ctx.fillStyle = `rgba(255, 255, 255, ${0.65 + bass * 0.25})`;
@@ -381,10 +381,10 @@ export const RoundVFXVisualizer = memo(function RoundVFXVisualizer({
         ctx.font = `bold ${Math.max(8, labelRadius * 0.22)}px sans-serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText('SPiDEY', 0, -labelRadius * 0.2);
-        ctx.fillStyle = '#06b6d4';
+        ctx.fillText('VEX', 0, -labelRadius * 0.2);
+        ctx.fillStyle = '#fa2d48';
         ctx.font = `bold ${Math.max(7, labelRadius * 0.18)}px sans-serif`;
-        ctx.fillText('xFLASH', 0, labelRadius * 0.2);
+        ctx.fillText('-M', 0, labelRadius * 0.2);
       }
 
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
@@ -451,7 +451,7 @@ export const RoundVFXVisualizer = memo(function RoundVFXVisualizer({
       className={`relative flex items-center justify-center select-none rounded-3xl overflow-hidden bg-bg-card/90 border border-white/10 shadow-2xl backdrop-blur-xl group cursor-pointer transition-all duration-300 ${className}`}
       style={{ width: '100%', height: '100%', minHeight: size }}
       role="region"
-      aria-label="SPiDEYxFLASH Round VFX Audio Visualizer"
+      aria-label="Vex-M Round VFX Audio Visualizer"
     >
       <canvas ref={canvasRef} className="w-full h-full pointer-events-none" />
 

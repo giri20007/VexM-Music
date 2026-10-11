@@ -40,6 +40,18 @@ export function formatQualityBadge(track) {
     };
   }
 
+  if (track.isOwnTg || track.isTelegram || track.source === 'owntg') {
+    const isFlac = (track.format || '').toUpperCase() === 'FLAC';
+    return {
+      label: isFlac ? 'OwnTg FLAC' : 'OwnTg Cloud',
+      fullLabel: isFlac ? 'OwnTg Telegram Lossless FLAC' : 'OwnTg Telegram Cloud Storage',
+      isLossless: isFlac,
+      color: isFlac
+        ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+        : 'bg-sky-500/20 text-sky-300 border-sky-500/40 shadow-sm shadow-sky-500/10',
+    };
+  }
+
   const format = (track.format || 'MP3').toUpperCase();
   const bitrate = track.bitrate;
   const bitDepth = track.bitDepth || (track.isLossless ? 24 : 16);

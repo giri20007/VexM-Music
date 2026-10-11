@@ -2,20 +2,23 @@ import React from 'react';
 import { ListMusic, Play, Shuffle, Trash2, ArrowLeft } from 'lucide-react';
 import { useAudioStore } from '../store/useAudioStore';
 import { TrackRow } from '../components/library/TrackRow';
+import { AppFooter } from '../components/layout/AppFooter';
 import { formatDuration } from '../utils/formatters';
 
-export function PlaylistPage({ playlistId, allTracks = [], onBack }) {
+export function PlaylistPage({ playlistId, allTracks = [], onBack, onNavigate }) {
   const playlists = useAudioStore(s => s.playlists);
   const playTrack = useAudioStore(s => s.playTrack);
+  const isPlaying = useAudioStore(s => s.isPlaying);
+  const currentTrack = useAudioStore(s => s.currentTrack);
+  const togglePlay = useAudioStore(s => s.togglePlay);
   const deletePlaylist = useAudioStore(s => s.deletePlaylist);
-  const removeTrackFromPlaylist = useAudioStore(s => s.removeTrackFromPlaylist);
 
   const playlist = playlists.find(p => p.id === playlistId);
   if (!playlist) {
     return (
-      <div className="p-12 text-center text-warm-muted">
+      <div className="flex-1 w-full bg-[#000000] text-white p-12 text-center text-white/50 space-y-4">
         <p>Playlist not found.</p>
-        <button onClick={onBack} className="mt-4 px-4 py-1.5 rounded-full bg-white/10 text-xs text-warm-white">
+        <button onClick={onBack} className="px-5 py-2 rounded-full bg-white/10 hover:bg-white/15 text-xs text-white">
           Back to Library
         </button>
       </div>
@@ -27,9 +30,12 @@ export function PlaylistPage({ playlistId, allTracks = [], onBack }) {
     .filter(Boolean);
 
   const totalDuration = tracks.reduce((sum, t) => sum + (t.duration || 0), 0);
+  const isPlaylistPlaying = tracks.some(t => t.id === currentTrack?.id) && isPlaying;
 
   const handlePlayAll = () => {
-    if (tracks.length > 0) {
+    if (isPlaylistPlaying) {
+      togglePlay();
+    } else if (tracks.length > 0) {
       playTrack(tracks[0], tracks);
     }
   };
@@ -42,90 +48,99 @@ export function PlaylistPage({ playlistId, allTracks = [], onBack }) {
   };
 
   return (
-    <div className="flex-1 max-w-7xl mx-auto w-full p-4 sm:p-6 space-y-6 select-none animate-fade-in">
-      <button
-        onClick={onBack}
-        className="flex items-center gap-2 text-xs font-semibold text-warm-muted hover:text-white transition"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        <span>Back</span>
-      </button>
+    <div className="flex-1 w-full bg-[#000000] text-white select-none animate-fade-in pb-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 pt-6 pb-12 space-y-6">
+        <button
+          onClick={onBack}
+          className="inline-flex items-center gap-2 text-xs font-semibold text-white/60 hover:text-white transition group py-1"
+        >
+          <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
+          <span>Back</span>
+        </button>
 
-      {/* Playlist Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-end gap-6 p-6 sm:p-8 rounded-3xl bg-gradient-to-tr from-[#2a1711] via-[#1d120e] to-bg-card border border-white/5 shadow-2xl">
-        <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-2xl bg-gradient-to-br from-[#3b2017] to-bg-active flex items-center justify-center text-accent shadow-xl flex-shrink-0">
-          <ListMusic className="w-14 h-14" />
-        </div>
+        {/* Playlist Banner */}
+        <div className="relative overflow-hidden flex flex-col sm:flex-row sm:items-end gap-6 p-6 sm:p-8 rounded-3xl bg-gradient-to-tr from-[#1f1012] via-[#140b0d] to-[#0a0a0a] border border-white/10 shadow-2xl">
+          <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-2xl bg-gradient-to-br from-[#fa2d48]/40 to-[#141414] border border-white/10 flex items-center justify-center text-white shadow-xl shadow-black/50 flex-shrink-0">
+            <ListMusic className="w-14 h-14 text-[#fa2d48]" />
+          </div>
 
-        <div className="space-y-2 flex-1">
-          <span className="text-xs font-bold uppercase tracking-wider text-accent">Playlist</span>
-          <h1 className="text-2xl sm:text-4xl font-black text-warm-white tracking-tight">
-            {playlist.name}
-          </h1>
-          <p className="text-xs sm:text-sm text-warm-muted">
-            {tracks.length} tracks · {formatDuration(totalDuration)} total
-          </p>
+          <div className="space-y-2 flex-1">
+            <span className="text-[10px] font-black uppercase tracking-widest text-[#fa2d48] px-2.5 py-0.5 rounded-full bg-[#fa2d48]/15 border border-[#fa2d48]/30">
+              Playlist
+            </span>
+            <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
+              {playlist.name}
+            </h1>
+            <p className="text-xs sm:text-sm text-white/50">
+              {tracks.length} tracks · {formatDuration(totalDuration)} total
+            </p>
 
-          <div className="flex items-center gap-3 pt-2">
-            {tracks.length > 0 && (
-              <>
+            <div className="flex items-center gap-3 pt-2">
+              {tracks.length > 0 && (
+                <>
+                  <button
+                    onClick={handlePlayAll}
+                    className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#fa2d48] hover:bg-[#ff3b53] text-white font-bold text-xs shadow-lg shadow-[#fa2d48]/30 hover:scale-105 active:scale-95 transition"
+                  >
+                    <Play className="w-4 h-4 fill-white ml-0.5" />
+                    <span>{isPlaylistPlaying ? 'Pause' : 'Play'}</span>
+                  </button>
+                  <button
+                    onClick={handleShuffleAll}
+                    className="p-2.5 rounded-full bg-white/10 hover:bg-white/15 text-white border border-white/10 transition"
+                    title="Shuffle"
+                  >
+                    <Shuffle className="w-4 h-4" />
+                  </button>
+                </>
+              )}
+
+              {playlist.id !== 'favorites' && (
                 <button
-                  onClick={handlePlayAll}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-accent text-bg-primary font-bold text-xs shadow-lg shadow-accent/25 hover:scale-105 active:scale-95 transition"
+                  onClick={() => {
+                    if (confirm(`Delete playlist "${playlist.name}"?`)) {
+                      deletePlaylist(playlist.id);
+                      onBack();
+                    }
+                  }}
+                  className="p-2.5 rounded-full bg-white/5 hover:bg-red-500/20 text-white/50 hover:text-red-400 border border-white/10 transition ml-auto"
+                  title="Delete playlist"
                 >
-                  <Play className="w-4 h-4 fill-current ml-0.5" />
-                  <span>Play</span>
+                  <Trash2 className="w-4 h-4" />
                 </button>
-                <button
-                  onClick={handleShuffleAll}
-                  className="p-2.5 rounded-full bg-white/5 hover:bg-white/10 text-warm-white border border-white/5 transition"
-                  title="Shuffle"
-                >
-                  <Shuffle className="w-4 h-4" />
-                </button>
-              </>
-            )}
-
-            {playlist.id !== 'favorites' && (
-              <button
-                onClick={() => {
-                  if (confirm(`Delete playlist "${playlist.name}"?`)) {
-                    deletePlaylist(playlist.id);
-                    onBack();
-                  }
-                }}
-                className="p-2.5 rounded-full bg-white/5 hover:bg-red-500/20 text-warm-muted hover:text-red-400 border border-white/5 transition ml-auto"
-                title="Delete playlist"
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
-            )}
+              )}
+            </div>
           </div>
         </div>
+
+        {/* Playlist Tracks */}
+        {tracks.length > 0 ? (
+          <div className="bg-[#0e0e0e] p-2 rounded-2xl border border-white/[0.08] space-y-1">
+            {tracks.map((track, idx) => (
+              <TrackRow
+                key={`${track.id}_${idx}`}
+                track={track}
+                index={idx}
+                showNumber={true}
+                showAlbum={true}
+                showCover={true}
+                onPlay={trk => playTrack(trk, tracks)}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="p-16 text-center text-white/40 text-sm border border-dashed border-white/10 rounded-3xl space-y-3">
+            <ListMusic className="w-12 h-12 text-white/20 mx-auto" />
+            <p className="font-bold text-white">This playlist is empty</p>
+            <p className="text-xs text-white/40 max-w-sm mx-auto">
+              Add tracks from your Library or Search results to this playlist.
+            </p>
+          </div>
+        )}
       </div>
 
-      {/* Playlist Tracks */}
-      {tracks.length > 0 ? (
-        <div className="bg-bg-secondary/40 p-2 rounded-2xl border border-white/5 space-y-1">
-          {tracks.map((track, idx) => (
-            <TrackRow
-              key={`${track.id}_${idx}`}
-              track={track}
-              index={idx}
-              showNumber={true}
-              showAlbum={true}
-              showCover={true}
-            />
-          ))}
-        </div>
-      ) : (
-        <div className="p-16 text-center text-warm-muted text-sm border border-dashed border-white/5 rounded-2xl space-y-2">
-          <p className="font-semibold text-warm-white">This playlist is empty</p>
-          <p className="text-xs text-warm-muted/70">
-            Add tracks from your Library to this playlist.
-          </p>
-        </div>
-      )}
+      {/* Global Footer */}
+      <AppFooter onNavigate={onNavigate} />
     </div>
   );
 }

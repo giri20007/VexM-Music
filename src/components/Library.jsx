@@ -42,7 +42,7 @@ export default function Library({ lib }) {
       {lib.state === 'connecting' && (
         <div>
           <p role="status" className="mb-3 text-sm text-zinc-400">
-            {lib.retry ? 'Backend is waking up, hang tight…' : 'Connecting to SPiDEYxFLASH...'}
+            {lib.retry ? 'Backend is waking up, hang tight…' : 'Connecting to Vex-M...'}
           </p>
           {[...Array(5)].map((_, i) => <div key={i} className="skeleton mb-2 h-12" />)}
         </div>

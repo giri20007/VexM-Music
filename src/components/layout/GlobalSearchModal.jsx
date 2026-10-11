@@ -1,15 +1,18 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Search, X, Music2, Disc3, User, Play, Loader2, Sparkles } from 'lucide-react';
 import { useAudioStore } from '../../store/useAudioStore';
+import { useSettingsStore } from '../../store/useSettingsStore';
 import { formatDuration } from '../../utils/formatters';
 import { getArtworkSrc } from '../../utils/artworkGenerator';
 import { searchUnified, fetchYouTubeSuggestions } from '../../utils/api';
 import { SafeImage } from '../ui/SafeImage';
+import { ProviderSourceBar } from './ProviderSourceBar';
 
 export function GlobalSearchModal({ allTracks = [], onNavigate }) {
   const isSearchModalOpen = useAudioStore(s => s.isSearchModalOpen);
   const setSearchModalOpen = useAudioStore(s => s.setSearchModalOpen);
   const playTrack = useAudioStore(s => s.playTrack);
+  const providerSource = useSettingsStore(s => s.providerSource) || 'all';
 
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -37,7 +40,7 @@ export function GlobalSearchModal({ allTracks = [], onNavigate }) {
       .slice(0, 4);
   }, [cleanQuery, allTracks]);
 
-  // Debounced live YouTube search
+  // Debounced live search across sources
   useEffect(() => {
     if (!cleanQuery || cleanQuery.length < 2) {
       setYtResults([]);
@@ -50,7 +53,7 @@ export function GlobalSearchModal({ allTracks = [], onNavigate }) {
     const timer = setTimeout(async () => {
       try {
         const [songs, suggests] = await Promise.all([
-          searchUnified(cleanQuery, 10),
+          searchUnified(cleanQuery, 12, providerSource, allTracks),
           fetchYouTubeSuggestions(cleanQuery),
         ]);
         setYtResults(songs);
@@ -63,7 +66,7 @@ export function GlobalSearchModal({ allTracks = [], onNavigate }) {
     }, 280);
 
     return () => clearTimeout(timer);
-  }, [cleanQuery]);
+  }, [cleanQuery, providerSource, allTracks]);
 
   const combinedResults = useMemo(() => {
     const list = [...localMatchingTracks];
@@ -116,44 +119,52 @@ export function GlobalSearchModal({ allTracks = [], onNavigate }) {
         onClick={e => e.stopPropagation()}
       >
         {/* Search Header */}
-        <div className="relative flex items-center px-4 py-3.5 border-b border-white/5 bg-[#202020]">
-          <Search className="w-5 h-5 text-[#1db954] mr-3 flex-shrink-0" />
+        <div className="relative flex items-center px-4 py-3.5 border-b border-white/5 bg-[#1a1a1a]">
+          <Search className="w-5 h-5 text-[#fa2d48] mr-3 flex-shrink-0" />
           <input
             ref={inputRef}
             type="search"
             value={query}
             onChange={e => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Search any song, artist, or album in the world..."
-            className="flex-1 bg-transparent text-sm sm:text-base text-white placeholder-[#b3b3b3] focus:outline-none"
+            placeholder="Search any song, artist, or album across sources..."
+            className="flex-1 bg-transparent text-sm sm:text-base text-white placeholder-white/40 focus:outline-none"
           />
           {isSearchingYt && (
-            <Loader2 className="w-4 h-4 text-[#1db954] animate-spin mr-3 flex-shrink-0" />
+            <Loader2 className="w-4 h-4 text-[#fa2d48] animate-spin mr-3 flex-shrink-0" />
           )}
           {query && (
             <button
               onClick={() => setQuery('')}
-              className="p-1 rounded-full text-[#b3b3b3] hover:text-white hover:bg-white/10 transition mr-2"
+              className="p-1 rounded-full text-white/50 hover:text-white hover:bg-white/10 transition mr-2"
             >
               <X className="w-4 h-4" />
             </button>
           )}
-          <span className="hidden sm:inline-block px-2 py-0.5 rounded bg-white/10 text-[10px] font-mono text-[#b3b3b3]">
+          <span className="hidden sm:inline-block px-2 py-0.5 rounded bg-white/10 text-[10px] font-mono text-white/50">
             ESC
+          </span>
+        </div>
+
+        {/* Source Switcher */}
+        <div className="px-3 py-2 bg-[#121212] border-b border-white/5 flex items-center justify-between">
+          <ProviderSourceBar compact />
+          <span className="text-[10px] uppercase font-mono tracking-wider text-white/30 hidden sm:inline">
+            Vex-M Live
           </span>
         </div>
 
         {/* Suggestions chips */}
         {suggestions.length > 0 && (
-          <div className="flex items-center gap-1.5 px-4 py-2 bg-[#121212] overflow-x-auto border-b border-white/5 no-scrollbar">
-            <span className="text-[11px] text-[#808080] font-medium mr-1 flex items-center gap-1">
-              <Sparkles className="w-3 h-3 text-[#1db954]" /> Suggest:
+          <div className="flex items-center gap-1.5 px-4 py-2 bg-[#0e0e0e] overflow-x-auto border-b border-white/5 no-scrollbar">
+            <span className="text-[11px] text-white/40 font-medium mr-1 flex items-center gap-1">
+              <Sparkles className="w-3 h-3 text-[#fa2d48]" /> Suggest:
             </span>
             {suggestions.map(s => (
               <button
                 key={s}
                 onClick={() => setQuery(s)}
-                className="px-2.5 py-1 rounded-full bg-white/5 hover:bg-white/10 text-xs text-[#b3b3b3] hover:text-white transition whitespace-nowrap"
+                className="px-2.5 py-1 rounded-full bg-white/5 hover:bg-white/10 text-xs text-white/70 hover:text-white transition whitespace-nowrap"
               >
                 {s}
               </button>
@@ -164,16 +175,16 @@ export function GlobalSearchModal({ allTracks = [], onNavigate }) {
         {/* Results Container */}
         <div className="max-h-[60vh] overflow-y-auto p-2 space-y-1">
           {cleanQuery && combinedResults.length === 0 && !isSearchingYt && (
-            <div className="p-8 text-center text-xs text-[#b3b3b3]">
-              No songs found for "{query}". Try a different search term.
+            <div className="p-8 text-center text-xs text-white/50">
+              No songs found for "{query}". Try switching provider source above or search a different keyword.
             </div>
           )}
 
           {!cleanQuery && (
-            <div className="p-6 text-center text-xs text-[#b3b3b3]">
-              <p className="font-semibold text-white">Search Millions of Songs on Demand</p>
-              <p className="text-[11px] mt-1 text-[#808080]">
-                Search any track in Tamil, Hindi, English, Pop, OSTs, or Indie to stream instantly.
+            <div className="p-6 text-center text-xs text-white/50">
+              <p className="font-semibold text-white">Search Across All Connected Engines</p>
+              <p className="text-[11px] mt-1 text-white/40">
+                Switch between JioSaavn 320k Studio, YouTube Global catalog, and OwnTg Personal Cloud Storage.
               </p>
             </div>
           )}
@@ -208,13 +219,18 @@ export function GlobalSearchModal({ allTracks = [], onNavigate }) {
                     <h4 className="text-sm font-semibold text-white truncate">
                       {t.title}
                     </h4>
-                    <p className="text-xs text-[#b3b3b3] truncate mt-0.5">
+                    <p className="text-xs text-white/50 truncate mt-0.5">
                       {t.artist} {t.album && t.album !== t.title ? `· ${t.album}` : ''}
                     </p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2 pl-3 flex-shrink-0">
+                  {(t.isOwnTg || t.isTelegram) && (
+                    <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-300 border border-sky-500/30">
+                      OwnTg
+                    </span>
+                  )}
                   {t.is320k && (
                     <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
                       320k
@@ -226,7 +242,7 @@ export function GlobalSearchModal({ allTracks = [], onNavigate }) {
                     </span>
                   )}
                   {t.duration > 0 && (
-                    <span className="text-xs font-mono text-[#808080]">
+                    <span className="text-xs font-mono text-white/40">
                       {t.durationFormatted || formatDuration(t.duration)}
                     </span>
                   )}
