@@ -4,15 +4,26 @@
 
 @layer base {
   :root {
-    --bg-primary: #090a0f;
-    --bg-secondary: #0e1017;
-    --bg-card: #12141c;
-    --bg-card-hover: #191c26;
-    --bg-active: #222634;
-    --accent-color: #ff7b72;
-    --accent-hover: #ff928a;
-    --accent-glow: rgba(255, 123, 114, 0.3);
-    --accent-muted: rgba(255, 123, 114, 0.15);
+    --bg-primary: #121212;
+    --bg-secondary: #181818;
+    --bg-card: #181818;
+    --bg-card-hover: #282828;
+    --bg-active: #2a2a2a;
+    --accent-color: #1db954;
+    --accent-hover: #1ed760;
+    --accent-glow: rgba(29, 185, 84, 0.35);
+    --accent-muted: rgba(29, 185, 84, 0.15);
+  }
+
+  body.theme-spotify-dark {
+    --bg-primary: #121212;
+    --bg-secondary: #181818;
+    --bg-card: #181818;
+    --bg-card-hover: #282828;
+    --bg-active: #2a2a2a;
+    --accent-color: #1db954;
+    --accent-hover: #1ed760;
+    --accent-glow: rgba(29, 185, 84, 0.35);
   }
 
   /* Themes */

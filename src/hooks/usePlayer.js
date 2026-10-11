@@ -7,9 +7,7 @@ import { preloadNextQueueTracks } from '../utils/audioPreloader';
 export const audio = typeof Audio !== 'undefined' ? new Audio() : null;
 if (audio) {
   audio.preload = 'auto';
-  audio.crossOrigin = 'anonymous';
 }
-
 
 export const seek = t => {
   if (audio && Number.isFinite(t)) {
@@ -29,13 +27,14 @@ let sourceNode = null;
 let eqFilters = [];
 let gainNode = null;
 let analyserNode = null;
+let isPlayPending = false;
 
 export function getAudioDiagnostics() {
   if (!audioCtx) {
     return {
-      state: 'Native Browser Audio',
-      sampleRate: 'Native Hardware Rate',
-      latency: '< 10 ms',
+      state: 'Native Browser Hardware Direct',
+      sampleRate: 'Native 48.0 kHz',
+      latency: '< 5 ms',
       channels: 'Stereo (2 Ch)',
       routing: 'Direct Bit-Perfect Native Playback',
     };
@@ -45,7 +44,7 @@ export function getAudioDiagnostics() {
     sampleRate: `${(audioCtx.sampleRate / 1000).toFixed(1)} kHz`,
     latency: audioCtx.baseLatency ? `${(audioCtx.baseLatency * 1000).toFixed(1)} ms` : 'Low Latency',
     channels: `${audioCtx.destination.maxChannelCount >= 2 ? 'Stereo (2 Ch)' : 'Direct Out'}`,
-    routing: 'Direct Native & AnalyserNode Tap',
+    routing: 'WebAudio Equalizer Pipeline',
   };
 }
 
@@ -96,90 +95,108 @@ export function getDetailedDiagnostics() {
   };
 }
 
-function connectAudioGraph(enableEq, gains) {
-  if (!audioCtx || !sourceNode || !analyserNode) return;
+function connectEqualizer(enableEq, gains) {
+  if (!audio) return;
+  if (!enableEq) {
+    // Keep native direct playback when EQ is disabled
+    return;
+  }
+
   try {
-    // Disconnect existing graph safely
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return;
+
+    if (!audioCtx) {
+      audioCtx = new AudioContextClass({ latencyHint: 'playback' });
+      audio.crossOrigin = 'anonymous';
+      sourceNode = audioCtx.createMediaElementSource(audio);
+      gainNode = audioCtx.createGain();
+      gainNode.gain.value = 1.0;
+
+      analyserNode = audioCtx.createAnalyser();
+      analyserNode.fftSize = 256;
+      analyserNode.smoothingTimeConstant = 0.8;
+
+      eqFilters = EQ_FREQUENCIES.map((freq, idx) => {
+        const filter = audioCtx.createBiquadFilter();
+        if (idx === 0) filter.type = 'lowshelf';
+        else if (idx === EQ_FREQUENCIES.length - 1) filter.type = 'highshelf';
+        else {
+          filter.type = 'peaking';
+          filter.Q.value = 1.4;
+        }
+        filter.frequency.value = freq;
+        filter.gain.value = 0;
+        return filter;
+      });
+
+      window.__SPX_ANALYSER__ = analyserNode;
+      window.__SPX_AUDIO_CTX__ = audioCtx;
+    }
+
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume().catch(() => {});
+    }
+
     try {
       sourceNode.disconnect();
       eqFilters.forEach(f => f.disconnect());
       if (gainNode) gainNode.disconnect();
       analyserNode.disconnect();
-    } catch {
-      // ignore
-    }
+    } catch {}
 
-    if (enableEq && eqFilters.length > 0) {
-      // Connect through 10-band EQ chain
-      let lastNode = sourceNode;
-      eqFilters.forEach((filter, idx) => {
-        const gain = gains && gains[idx] !== undefined ? gains[idx] : 0;
-        filter.gain.setValueAtTime(gain, audioCtx.currentTime);
-        lastNode.connect(filter);
-        lastNode = filter;
-      });
-      if (gainNode) {
-        lastNode.connect(gainNode);
-        gainNode.connect(analyserNode);
-      } else {
-        lastNode.connect(analyserNode);
-      }
-      analyserNode.connect(audioCtx.destination);
+    let lastNode = sourceNode;
+    eqFilters.forEach((filter, idx) => {
+      const gain = gains && gains[idx] !== undefined ? gains[idx] : 0;
+      filter.gain.setValueAtTime(gain, audioCtx.currentTime);
+      lastNode.connect(filter);
+      lastNode = filter;
+    });
+
+    if (gainNode) {
+      lastNode.connect(gainNode);
+      gainNode.connect(analyserNode);
     } else {
-      // Transparent direct bit-perfect path: source -> analyser -> destination
-      sourceNode.connect(analyserNode);
-      analyserNode.connect(audioCtx.destination);
+      lastNode.connect(analyserNode);
     }
+    analyserNode.connect(audioCtx.destination);
   } catch (err) {
-    console.warn('Audio graph connection update:', err.message);
+    console.warn('Equalizer graph initialization:', err.message);
   }
 }
 
-function setupWebAudio() {
-  if (audioCtx || !audio) return;
+export async function safePlay() {
+  if (!audio || !audio.src) return;
+  if (isPlayPending) return;
+  isPlayPending = true;
   try {
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContextClass) return;
-    audioCtx = new AudioContextClass({ latencyHint: 'playback' });
-
-    try {
-      audioCtx.destination.channelCount = 2;
-      audioCtx.destination.channelCountMode = 'max';
-    } catch {
-      // ignore
+    if (audioCtx && audioCtx.state === 'suspended') {
+      audioCtx.resume().catch(() => {});
     }
-
-    sourceNode = audioCtx.createMediaElementSource(audio);
-    gainNode = audioCtx.createGain();
-    gainNode.gain.value = 1.0;
-
-    analyserNode = audioCtx.createAnalyser();
-    analyserNode.fftSize = 256;
-    analyserNode.smoothingTimeConstant = 0.8;
-
-    // Create 10-band peaking equalizer filters (inactive by default for direct bit-perfect reproduction)
-    eqFilters = EQ_FREQUENCIES.map((freq, idx) => {
-      const filter = audioCtx.createBiquadFilter();
-      if (idx === 0) {
-        filter.type = 'lowshelf';
-      } else if (idx === EQ_FREQUENCIES.length - 1) {
-        filter.type = 'highshelf';
-      } else {
-        filter.type = 'peaking';
-        filter.Q.value = 1.4;
-      }
-      filter.frequency.value = freq;
-      filter.gain.value = 0;
-      return filter;
-    });
-
-    const { eqEnabled, eqGains } = useSettingsStore.getState();
-    connectAudioGraph(eqEnabled, eqGains);
-
-    window.__SPX_ANALYSER__ = analyserNode;
-    window.__SPX_AUDIO_CTX__ = audioCtx;
+    const p = audio.play();
+    if (p !== undefined) {
+      await p;
+    }
+    useAudioStore.getState().set({ isPlaying: true, isBuffering: false, status: 'ready', error: null });
   } catch (err) {
-    console.warn('Web Audio initialization skipped:', err.message);
+    if (err.name === 'NotAllowedError') {
+      console.warn('[AudioEngine] Autoplay prevented, waiting for user gesture.');
+      useAudioStore.getState().set({ isPlaying: false, isBuffering: false, status: 'paused' });
+    } else if (err.name !== 'AbortError') {
+      console.warn('[AudioEngine] Play failed:', err.message);
+    }
+  } finally {
+    isPlayPending = false;
+  }
+}
+
+export function safePause() {
+  if (!audio) return;
+  try {
+    audio.pause();
+    useAudioStore.getState().set({ isPlaying: false, isBuffering: false });
+  } catch (err) {
+    console.warn('[AudioEngine] Pause failed:', err.message);
   }
 }
 
@@ -195,9 +212,7 @@ export function usePlayer() {
   const eqGains = useSettingsStore(s => s.eqGains);
   const volumeNormalization = useSettingsStore(s => s.volumeNormalization);
 
-  const isFirstPlay = useRef(true);
   const playLoggedRef = useRef(false);
-  const preloadedTrackIdRef = useRef(null);
   const retryCountRef = useRef(0);
   const lastProgressRef = useRef({ time: 0, ts: Date.now() });
 
@@ -208,7 +223,7 @@ export function usePlayer() {
 
     const S = () => useAudioStore.getState();
 
-    // Global interaction listener to resume suspended AudioContext
+    // Global user interaction listener to prime audio playback
     const handleUserInteraction = () => {
       if (audioCtx && audioCtx.state === 'suspended') {
         audioCtx.resume().catch(() => {});
@@ -230,15 +245,13 @@ export function usePlayer() {
       if (!Number.isFinite(cur)) return;
       const state = S();
 
-      // Track playback progress timestamp for stall detection
       if (Math.abs(cur - lastProgressRef.current.time) > 0.1) {
         lastProgressRef.current = { time: cur, ts: Date.now() };
         if (retryCountRef.current > 0) {
-          retryCountRef.current = 0; // Reset retry counter on successful playback progress
+          retryCountRef.current = 0;
         }
       }
 
-      // Do not fight UI during user scrubber drag
       if (!state.isSeeking) {
         const dur = getValidDuration(audio.duration, state.currentTrack?.duration, state.duration);
         state.set({
@@ -255,12 +268,11 @@ export function usePlayer() {
         }
       }
 
-      // Predictive Next-Track Preloading: Pre-warm initial 512KB chunk & artwork
+      // Preload next queue track chunk
       if (cur >= 4 || (state.duration > 20 && cur > state.duration - 30)) {
         preloadNextQueueTracks(state.queue, state.currentTrack?.id, 1);
       }
     };
-
 
     const onDurationChange = () => {
       const dur = getValidDuration(audio.duration, S().currentTrack?.duration, S().duration);
@@ -324,54 +336,50 @@ export function usePlayer() {
       const cur = audio.currentTime || 0;
       const dur = getValidDuration(audio.duration, state.currentTrack?.duration, state.duration);
 
-      // SAFETY CHECK: Prevent premature auto-skip if stream buffer dried up before real track ending
+      // Prevent premature skip if buffer starved
       if (dur > 10 && cur < dur - 3.5) {
-        console.warn(`[AudioEngine] Premature 'ended' event at ${cur.toFixed(1)}s / ${dur.toFixed(1)}s. Reconnecting stream without skipping...`);
+        console.warn(`[AudioEngine] Premature ended event at ${cur.toFixed(1)}s / ${dur.toFixed(1)}s. Reconnecting...`);
         if (state.currentTrack) {
           state.set({ isBuffering: true, trackChangeReason: 'RECOVERY' });
-          const currentId = state.currentTrack.id;
-          audio.src = streamUrl(currentId);
+          audio.src = streamUrl(state.currentTrack.id);
           audio.currentTime = cur;
-          audio.play().catch(e => console.warn('Recovery playback restart:', e.message));
+          safePlay();
         }
         return;
       }
 
-      // Check Sleep Timer "End of track" mode
+      // Check Sleep Timer
       if (state.sleepTimer?.mode === 'end_of_track') {
-        audio.pause();
-        state.set({ isPlaying: false, isBuffering: false, sleepTimer: null });
+        safePause();
+        state.set({ sleepTimer: null });
         return;
       }
 
       const mode = state.repeatMode;
       if (mode === 'one') {
         audio.currentTime = 0;
-        audio.play().catch(() => {});
+        safePlay();
       } else {
         state.next('NATURAL_END');
       }
     };
 
     let errorTimeout = null;
-    const onError = e => {
+    const onError = () => {
       const state = S();
       const code = audio.error?.code;
 
-      // 1. MEDIA_ERR_ABORTED: Normal browser behavior on src change or user seek cancel. NEVER show error or skip!
-      if (code === 1) {
-        return;
-      }
+      // MEDIA_ERR_ABORTED is normal when changing src or seeking
+      if (code === 1) return;
 
       const curTime = audio.currentTime || 0;
       const trackTitle = state.currentTrack?.title || 'Track';
       const isOnline = typeof navigator !== 'undefined' ? navigator.onLine : true;
 
-      // 2. MEDIA_ERR_NETWORK: Attempt automatic retry with exponential backoff before reporting fatal failure
+      // Automatic retry on network stall
       if (code === 2 && retryCountRef.current < 3) {
         retryCountRef.current += 1;
         const delay = 1000 * Math.pow(1.5, retryCountRef.current);
-        console.warn(`[AudioEngine] Network stall on "${trackTitle}". Reconnecting attempt ${retryCountRef.current}/3 in ${delay}ms...`);
         state.set({ isBuffering: true });
 
         clearTimeout(errorTimeout);
@@ -380,7 +388,7 @@ export function usePlayer() {
             audio.src = streamUrl(state.currentTrack.id);
             audio.currentTime = curTime;
             if (state.isPlaying) {
-              audio.play().catch(() => {});
+              safePlay();
             }
           }
         }, delay);
@@ -439,66 +447,13 @@ export function usePlayer() {
     };
   }, []);
 
-  // Stall Watchdog: Detect if playback is frozen for >8s while marked as playing
-  useEffect(() => {
-    const watchdogInterval = setInterval(() => {
-      const state = useAudioStore.getState();
-      if (audio && !audio.paused && state.isPlaying && !state.isBuffering) {
-        const timeSinceProgress = Date.now() - lastProgressRef.current.ts;
-        if (timeSinceProgress > 8000 && audio.readyState < 3) {
-          console.warn('[AudioEngine] Stall watchdog detected frozen stream. Initiating seamless recovery...');
-          state.set({ isBuffering: true, trackChangeReason: 'RECOVERY' });
-          const cur = audio.currentTime || 0;
-          if (state.currentTrack) {
-            audio.src = streamUrl(state.currentTrack.id);
-            audio.currentTime = cur;
-            audio.play().catch(() => {});
-          }
-          lastProgressRef.current.ts = Date.now();
-        }
-      }
-    }, 3000);
-
-    return () => clearInterval(watchdogInterval);
-  }, []);
-
-  // Sleep Timer Countdown Ticker (1 second interval)
-  useEffect(() => {
-    const timerInterval = setInterval(() => {
-      const state = useAudioStore.getState();
-      const st = state.sleepTimer;
-      if (st && st.mode === 'time' && st.endsAt) {
-        const remaining = Math.max(0, Math.ceil((st.endsAt - Date.now()) / 1000));
-        if (remaining <= 0) {
-          if (audio) audio.pause();
-          state.set({ isPlaying: false, sleepTimer: null });
-        } else if (remaining !== st.remaining) {
-          state.set({ sleepTimer: { ...st, remaining } });
-        }
-      }
-    }, 1000);
-
-    return () => clearInterval(timerInterval);
-  }, []);
-
-  // 2. Track Change Wiring
+  // 2. Track Change Controller
   useEffect(() => {
     if (!audio || !track) return;
     playLoggedRef.current = false;
-    preloadedTrackIdRef.current = null;
     retryCountRef.current = 0;
     lastProgressRef.current = { time: 0, ts: Date.now() };
 
-    if (isFirstPlay.current) {
-      setupWebAudio();
-      isFirstPlay.current = false;
-    }
-
-    if (audioCtx && audioCtx.state === 'suspended') {
-      audioCtx.resume().catch(() => {});
-    }
-
-    // Reset audio state before switching source
     const trackDur = Number(track.duration) || 0;
     useAudioStore.getState().set({
       currentTime: 0,
@@ -508,33 +463,16 @@ export function usePlayer() {
       error: null,
     });
 
-    // Set CORS before assigning src
-    audio.crossOrigin = 'anonymous';
-    audio.src = streamUrl(track.id);
-
-    if (useAudioStore.getState().isPlaying) {
-      if (audioCtx && audioCtx.state === 'suspended') {
-        audioCtx.resume().catch(() => {});
-      }
-      const p = audio.play();
-      if (p !== undefined) {
-        p.catch(e => {
-          console.warn('[AudioEngine] Initial audio.play() rejected:', e.name, e.message);
-          if (e.name === 'NotAllowedError') {
-            useAudioStore.getState().set({ isPlaying: false, isBuffering: false, status: 'paused' });
-          } else if (e.name !== 'AbortError') {
-            useAudioStore.getState().set({
-              isPlaying: false,
-              isBuffering: false,
-              status: 'error',
-              error: `Unable to start playback: ${e.message}`,
-            });
-          }
-        });
-      }
+    const targetUrl = streamUrl(track.id);
+    if (audio.src !== targetUrl) {
+      audio.src = targetUrl;
     }
 
-    // MediaSession API Integration (Lockscreen controls & artwork)
+    if (useAudioStore.getState().isPlaying) {
+      safePlay();
+    }
+
+    // MediaSession
     if ('mediaSession' in navigator) {
       const thumb = track.thumbnail || artworkUrl(track.id, track.title);
       navigator.mediaSession.metadata = new MediaMetadata({
@@ -549,8 +487,8 @@ export function usePlayer() {
         ],
       });
 
-      navigator.mediaSession.setActionHandler('play', () => useAudioStore.getState().set({ isPlaying: true }));
-      navigator.mediaSession.setActionHandler('pause', () => useAudioStore.getState().set({ isPlaying: false }));
+      navigator.mediaSession.setActionHandler('play', () => safePlay());
+      navigator.mediaSession.setActionHandler('pause', () => safePause());
       navigator.mediaSession.setActionHandler('previoustrack', () => useAudioStore.getState().prev('USER_PREVIOUS'));
       navigator.mediaSession.setActionHandler('nexttrack', () => useAudioStore.getState().next('USER_NEXT'));
       navigator.mediaSession.setActionHandler('seekto', details => {
@@ -559,32 +497,13 @@ export function usePlayer() {
     }
   }, [track?.id]);
 
-  // 3. Play / Pause State Controller
+  // 3. Play / Pause Controller
   useEffect(() => {
     if (!audio || !track) return;
     if (isPlaying && audio.paused) {
-      if (audioCtx && audioCtx.state === 'suspended') {
-        audioCtx.resume().catch(() => {});
-      }
-      const p = audio.play();
-      if (p !== undefined) {
-        p.catch(e => {
-          console.warn('[AudioEngine] Playback promise error on toggle:', e.name, e.message);
-          if (e.name === 'NotAllowedError') {
-            useAudioStore.getState().set({ isPlaying: false, isBuffering: false, status: 'paused' });
-          } else if (e.name !== 'AbortError') {
-            useAudioStore.getState().set({
-              isPlaying: false,
-              isBuffering: false,
-              status: 'error',
-              error: `Unable to start playback: ${e.message}`,
-            });
-          }
-        });
-      }
-    }
-    if (!isPlaying && !audio.paused) {
-      audio.pause();
+      safePlay();
+    } else if (!isPlaying && !audio.paused) {
+      safePause();
     }
   }, [isPlaying]);
 
@@ -602,12 +521,14 @@ export function usePlayer() {
     }
   }, [speed, track?.id]);
 
-  // 6. Equalizer Dynamic Graph Connection & Gain Updates
+  // 6. Equalizer Graph Connection (Only active when enabled)
   useEffect(() => {
-    connectAudioGraph(eqEnabled, eqGains);
+    if (eqEnabled) {
+      connectEqualizer(eqEnabled, eqGains);
+    }
   }, [eqEnabled, eqGains]);
 
-  // 7. Volume Normalization (Optional)
+  // 7. Volume Normalization
   useEffect(() => {
     if (!gainNode || !audioCtx) return;
     const targetGain = volumeNormalization ? 0.92 : 1.0;

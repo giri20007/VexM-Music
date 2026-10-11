@@ -85,7 +85,17 @@ router.get('/:id', async (req, res) => {
     }
   } catch { /* ignore */ }
 
-  // 3. Custom artwork override check
+  // 3. Check library cache for real artwork URL
+  try {
+    const libraryCache = require('../data/library_cache.json');
+    const track = libraryCache?.items?.find(t => String(t.id) === String(id) || String(t.messageId) === String(id));
+    if (track && track.thumbnail && track.thumbnail.startsWith('http')) {
+      res.setHeader('Cache-Control', 'public, max-age=604800, immutable');
+      return res.redirect(302, track.thumbnail);
+    }
+  } catch { /* ignore */ }
+
+  // 4. Custom artwork override check
   const custom = getArtwork(id);
   if (custom) {
     if (custom.startsWith('http://') || custom.startsWith('https://')) {
@@ -161,7 +171,34 @@ router.get('/:id', async (req, res) => {
     }
   } catch { /* continue */ }
 
-  // 8. Fallback SVG
+  // 8. Dynamic iTunes / Deezer high-res artwork search
+  try {
+    const cleanTitle = (title || '')
+      .replace(/\s*\(From\s+["'][^"']+["']\)/gi, '')
+      .replace(/\s*\[Theme\]/gi, '')
+      .replace(/\s*\[Reprise\]/gi, '')
+      .replace(/\s*-\s*Extended/gi, '')
+      .replace(/flac$/i, '')
+      .replace(/^\d+[\.\s_-]*/, '')
+      .trim();
+    const cleanArtist = (artist || '').split(/[,&]/)[0].trim();
+    if (cleanTitle && cleanTitle !== 'SPiDEYxFLASH') {
+      const q = `${cleanTitle} ${cleanArtist}`.trim();
+      const itunesRes = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(q)}&entity=song&limit=1`, {
+        headers: { 'User-Agent': 'Mozilla/5.0' },
+      });
+      if (itunesRes.ok) {
+        const data = await itunesRes.json();
+        if (data.results && data.results.length > 0 && data.results[0].artworkUrl100) {
+          const highResArt = data.results[0].artworkUrl100.replace('/100x100bb.jpg', '/600x600bb.jpg');
+          res.setHeader('Cache-Control', 'public, max-age=604800, immutable');
+          return res.redirect(302, highResArt);
+        }
+      }
+    }
+  } catch { /* continue */ }
+
+  // 9. Fallback SVG
   res.setHeader('Content-Type', 'image/svg+xml');
   res.setHeader('Cache-Control', 'public, max-age=86400');
   res.send(generatePlaceholderSvg(title, artist));

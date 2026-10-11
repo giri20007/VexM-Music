@@ -17,7 +17,7 @@ const PALETTES = [
 export function getArtworkSrc(track, size = null) {
   if (!track) return '';
   const sizeParam = size ? `?size=${size}` : '';
-  const thumb = track.thumbnail;
+  const thumb = track.thumbnail || track.artwork?.artworkUrl;
   if (thumb) {
     if (thumb.startsWith('http://') || thumb.startsWith('https://') || thumb.startsWith('data:')) {
       return thumb;

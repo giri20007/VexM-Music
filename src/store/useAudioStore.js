@@ -215,32 +215,9 @@ export const useAudioStore = create(
       },
 
       togglePlay: () => {
-        const { currentTrack } = get();
+        const { currentTrack, isPlaying } = get();
         if (!currentTrack) return;
-        if (!audio) return;
-
-        if (audio.paused) {
-          set({ isBuffering: true, status: 'loading' });
-          const p = audio.play();
-          if (p !== undefined) {
-            p.catch(err => {
-              console.warn('[AudioEngine] audio.play() rejected:', err.name, err.message);
-              if (err.name === 'NotAllowedError') {
-                set({ isPlaying: false, isBuffering: false, status: 'paused' });
-              } else if (err.name !== 'AbortError') {
-                set({
-                  isPlaying: false,
-                  isBuffering: false,
-                  status: 'error',
-                  error: `Unable to start playback: ${err.message}`,
-                });
-              }
-            });
-          }
-        } else {
-          audio.pause();
-          set({ isPlaying: false, isBuffering: false, status: 'paused' });
-        }
+        set({ isPlaying: !isPlaying });
       },
 
       toggleShuffle: () => set(s => ({ shuffle: !s.shuffle })),

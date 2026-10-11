@@ -75,16 +75,16 @@ const BottomScrubber = memo(function BottomScrubber() {
         onMouseLeave={handleMouseLeave}
       >
         {/* Track Bar Background */}
-        <div className="relative w-full h-1 bg-white/10 rounded-full overflow-hidden transition-all group-hover:h-1.5">
+        <div className="relative w-full h-1 bg-white/20 rounded-full overflow-hidden transition-all group-hover:h-1.5">
           {/* Active Fill */}
           <div
-            className="absolute top-0 left-0 bottom-0 bg-gradient-to-r from-[#00f2fe] via-[#4facfe] to-[#f093fb] rounded-full transition-all duration-75"
+            className="absolute top-0 left-0 bottom-0 bg-white group-hover:bg-[#1db954] rounded-full transition-all duration-75"
             style={{ width: `${percent}%` }}
           />
           {/* Hover Fill */}
           {hoverPercent !== null && (
             <div
-              className="absolute top-0 left-0 bottom-0 bg-white/20 rounded-full pointer-events-none"
+              className="absolute top-0 left-0 bottom-0 bg-white/30 rounded-full pointer-events-none"
               style={{ width: `${hoverPercent * 100}%` }}
             />
           )}
@@ -259,20 +259,18 @@ export const BottomPlayer = memo(function BottomPlayer() {
               <SkipBack className="w-4 h-4 sm:w-5 sm:h-5 fill-current" />
             </button>
 
-            {/* Main Glowing Round Play/Pause Button */}
+            {/* Main Round Play/Pause Button */}
             <button
               onClick={togglePlay}
-              className={`w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gradient-to-tr from-[#00f2fe] via-[#f093fb] to-[#ff5858] text-bg-primary flex items-center justify-center shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:scale-105 active:scale-95 transition-all ${
-                isPlaying && !isBuffering ? 'ring-2 ring-cyan-400/30' : ''
-              }`}
+              className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-md"
               aria-label={isBuffering ? 'Buffering' : isPlaying ? 'Pause' : 'Play'}
             >
               {isBuffering ? (
-                <Loader2 className="w-5 h-5 animate-spin text-bg-primary stroke-[2.5]" />
+                <Loader2 className="w-4 h-4 animate-spin text-black stroke-[2.5]" />
               ) : isPlaying ? (
-                <Pause className="w-5 h-5 fill-bg-primary stroke-bg-primary" />
+                <Pause className="w-4 h-4 fill-black stroke-black" />
               ) : (
-                <Play className="w-5 h-5 fill-bg-primary stroke-bg-primary ml-0.5" />
+                <Play className="w-4 h-4 fill-black stroke-black ml-0.5" />
               )}
             </button>
 

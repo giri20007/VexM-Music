@@ -13,6 +13,7 @@ export const EQ_PRESETS = {
 };
 
 const THEME_CLASSES = [
+  'theme-spotify-dark',
   'theme-cyberpunk-neon',
   'theme-midnight-navy',
   'theme-pure-black',
@@ -23,11 +24,11 @@ const THEME_CLASSES = [
 ];
 
 const ACCENT_CLASSES = [
+  'accent-emerald',
   'accent-coral',
   'accent-amber',
   'accent-cyan',
   'accent-violet',
-  'accent-emerald',
   'accent-rose',
   'accent-lime',
   'accent-sky',
@@ -37,8 +38,8 @@ export const useSettingsStore = create(
   persist(
     (set, get) => ({
       // Appearance & Themes
-      theme: 'warm-espresso',
-      accentColor: 'coral',
+      theme: 'spotify-dark',
+      accentColor: 'emerald',
       livelyBackground: 'aurora', // aurora | glow | mesh | off
       density: 'comfortable',
       animations: true,
