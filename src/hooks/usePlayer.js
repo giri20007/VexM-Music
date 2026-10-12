@@ -8,6 +8,7 @@ import { ytAudio } from '../utils/youtubePlayer';
 export const audio = typeof Audio !== 'undefined' ? new Audio() : null;
 if (audio) {
   audio.preload = 'auto';
+  audio.crossOrigin = 'anonymous';
 }
 
 export const seek = t => {
@@ -145,7 +146,7 @@ function connectAudioGraph(enableEq, gains) {
 
       analyserNode = audioCtx.createAnalyser();
       analyserNode.fftSize = 1024;
-      analyserNode.smoothingTimeConstant = 0.65;
+      analyserNode.smoothingTimeConstant = 0.52;
       analyserNode.minDecibels = -90;
       analyserNode.maxDecibels = -10;
 

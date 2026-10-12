@@ -328,7 +328,7 @@ export function NowPlayingModal() {
                     className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 text-white transition active:scale-95 text-xs font-semibold"
                   >
                     <Sparkles className="w-4 h-4 text-cyan-300" />
-                    <span>VFX</span>
+                    <span>Beats</span>
                   </button>
 
                   <button
@@ -343,7 +343,7 @@ export function NowPlayingModal() {
             </div>
           )}
 
-          {/* VIEW: LIVE BEAT-REACTIVE VFX */}
+          {/* VIEW: LIVE BEAT-REACTIVE BEATS ENGINE */}
           {viewMode === 'visualizer' && (
             <div className="relative w-full h-full min-h-[420px] max-h-[72vh] rounded-3xl overflow-hidden bg-black/40 border border-white/10 shadow-2xl">
               <AudioVisualizer
@@ -352,7 +352,7 @@ export function NowPlayingModal() {
                 className="border-0 bg-transparent shadow-none"
               />
               <div className="absolute bottom-4 left-1/2 -translate-x-1/2 pointer-events-none rounded-full border border-white/10 bg-black/50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/60 backdrop-blur-md">
-                Beat-reactive VFX
+                Live Beats Engine
               </div>
             </div>
           )}

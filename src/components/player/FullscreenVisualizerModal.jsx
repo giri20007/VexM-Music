@@ -146,7 +146,7 @@ export function FullscreenVisualizerModal({ isOpen, onClose }) {
         </div>
 
         {/* Center: Mode Switcher */}
-        <div className="hidden sm:flex items-center gap-1.5 p-1 rounded-2xl bg-black/60 backdrop-blur-md border border-white/10 shadow-lg">
+        <div className="hidden md:flex items-center gap-1.5 p-1 rounded-2xl bg-black/60 backdrop-blur-md border border-white/10 shadow-lg">
           <button
             onClick={() => setVisualizerMode('orbital')}
             className={`flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold transition ${
@@ -156,7 +156,19 @@ export function FullscreenVisualizerModal({ isOpen, onClose }) {
             }`}
           >
             <Radio className="w-3.5 h-3.5" />
-            <span>Round VFX</span>
+            <span>Orbit Beats</span>
+          </button>
+
+          <button
+            onClick={() => setVisualizerMode('nova')}
+            className={`flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold transition ${
+              visualizerMode === 'nova'
+                ? 'bg-accent text-bg-primary shadow'
+                : 'text-warm-muted hover:text-white hover:bg-white/10'
+            }`}
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Cosmic Nova</span>
           </button>
 
           <button
@@ -223,6 +235,28 @@ export function FullscreenVisualizerModal({ isOpen, onClose }) {
             mobileTab !== 'visualizer' ? 'hidden lg:flex' : 'flex'
           }`}
         >
+          {/* Mobile Beats Mode Switcher */}
+          <div className="md:hidden absolute top-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1 p-1 rounded-full bg-black/70 backdrop-blur-md border border-white/10 shadow-lg">
+            {[
+              { id: 'orbital', label: 'Orbit' },
+              { id: 'nova', label: 'Nova' },
+              { id: 'spectrum', label: 'Spectrum' },
+              { id: 'wave', label: 'Wave' },
+            ].map(m => (
+              <button
+                key={m.id}
+                onClick={() => setVisualizerMode(m.id)}
+                className={`px-2.5 py-1 rounded-full text-[11px] font-bold transition ${
+                  visualizerMode === m.id
+                    ? 'bg-accent text-bg-primary shadow'
+                    : 'text-warm-muted hover:text-white'
+                }`}
+              >
+                {m.label}
+              </button>
+            ))}
+          </div>
+
           <AudioVisualizer
             mode={visualizerMode}
             interactive={false}

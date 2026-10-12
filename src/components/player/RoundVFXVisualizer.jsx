@@ -1,16 +1,15 @@
 import React, { useEffect, useRef, memo } from 'react';
 import { useAudioStore } from '../../store/useAudioStore';
 import { getArtworkSrc } from '../../utils/artworkGenerator';
-import { Sparkles, Radio, Disc3, Volume2 } from 'lucide-react';
+import { Disc3 } from 'lucide-react';
 
 /**
  * Circular "SPiDEYxFLASH" Round VFX Audio Visualizer
- * Features:
- * - Seamless 360° Conical Colorway (Violet -> Magenta -> Coral -> Cyan -> Blue)
- * - Concentric rotating vinyl turntable platter with active album cover
- * - Audiophile HUD Gauge with dual 1px guide rings & 15° micro-ticks
- * - Monospace curved "✦ HIGH FIDELITY • 360° AUDIO LAB • SPiDEYxFLASH ✦" typography
- * - Smooth frame LERP physics & luminous bloom peak hold caps
+ * Upgraded with:
+ *   - Genuine, zero-latency adaptive sub-bass kick tracking
+ *   - Clamped DPR & zero expensive shadowBlur for 60-120 FPS performance
+ *   - Pre-rendered offscreen vinyl platter & HUD gauge texture
+ *   - No fake robotic sine-wave kicks on fallback mode
  */
 
 const COLOR_STOPS = [
@@ -22,7 +21,7 @@ const COLOR_STOPS = [
   { pos: 1.0, r: 139, g: 92, b: 246 }, // #8B5CF6 Electric Violet wrap
 ];
 
-function getAngularColor(normAngle) {
+function interpolateColor(normAngle) {
   const norm = ((normAngle % 1) + 1) % 1;
   let p1 = COLOR_STOPS[0];
   let p2 = COLOR_STOPS[COLOR_STOPS.length - 1];
@@ -41,28 +40,38 @@ function getAngularColor(normAngle) {
   const r = Math.round(p1.r + (p2.r - p1.r) * ease);
   const g = Math.round(p1.g + (p2.g - p1.g) * ease);
   const b = Math.round(p1.b + (p2.b - p1.b) * ease);
-  return { r, g, b, rgb: `rgb(${r},${g},${b})` };
+  return {
+    r,
+    g,
+    b,
+    rgb: `rgb(${r},${g},${b})`,
+    rgba: a => `rgba(${r},${g},${b},${a})`,
+  };
 }
 
-class HaloParticle {
+const RAY_COUNT = 72;
+const PRECOMPUTED_PALETTE = Array.from({ length: RAY_COUNT }, (_, i) => interpolateColor(i / RAY_COUNT));
+
+class FastParticle {
   constructor(w, h) {
     this.reset(w, h, true);
   }
 
-  reset(w, h, initial = false) {
+  reset(w, h, randomDist = false) {
     this.angle = Math.random() * Math.PI * 2;
-    const baseR = Math.min(w, h) * 0.28;
-    this.dist = initial ? baseR + Math.random() * 40 : baseR;
-    this.speed = 0.4 + Math.random() * 1.3;
-    this.size = 1 + Math.random() * 2.2;
-    this.alpha = 0.2 + Math.random() * 0.6;
-    this.normAngle = this.angle / (Math.PI * 2);
+    const minDim = Math.min(w, h);
+    const baseR = minDim * 0.28;
+    this.dist = randomDist ? baseR + Math.random() * (minDim * 0.22) : baseR;
+    this.speed = 0.5 + Math.random() * 1.2;
+    this.size = 1 + Math.random() * 2.0;
+    this.alpha = 0.3 + Math.random() * 0.6;
+    this.paletteIdx = Math.floor((this.angle / (Math.PI * 2)) * RAY_COUNT) % RAY_COUNT;
   }
 
   update(w, h, bass) {
-    this.dist += this.speed + bass * 3.8;
-    this.alpha -= 0.004;
-    if (this.dist > Math.min(w, h) * 0.58 || this.alpha <= 0) {
+    this.dist += this.speed + bass * 3.2;
+    this.alpha -= 0.005;
+    if (this.dist > Math.max(w, h) * 0.56 || this.alpha <= 0) {
       this.reset(w, h, false);
     }
   }
@@ -70,14 +79,11 @@ class HaloParticle {
   draw(ctx, cx, cy) {
     const x = cx + Math.cos(this.angle) * this.dist;
     const y = cy + Math.sin(this.angle) * this.dist;
-    const col = getAngularColor(this.normAngle);
-    ctx.fillStyle = `rgba(${col.r}, ${col.g}, ${col.b}, ${this.alpha})`;
-    ctx.shadowColor = col.rgb;
-    ctx.shadowBlur = 6;
+    const col = PRECOMPUTED_PALETTE[this.paletteIdx];
+    ctx.fillStyle = col.rgba(Math.max(0, this.alpha));
     ctx.beginPath();
     ctx.arc(x, y, this.size, 0, Math.PI * 2);
     ctx.fill();
-    ctx.shadowBlur = 0;
   }
 }
 
@@ -97,8 +103,15 @@ export const RoundVFXVisualizer = memo(function RoundVFXVisualizer({
   const rotationRef = useRef(0);
   const smoothedBassRef = useRef(0);
   const smoothedDataRef = useRef(new Float32Array(128));
-  const peaksRef = useRef(new Float32Array(72));
-  const particlesRef = useRef([]);
+  const peaksRef = useRef(new Float32Array(RAY_COUNT));
+  const impactRef = useRef(0);
+  const shockwaveRef = useRef(0);
+  const lastBeatTimeRef = useRef(0);
+  const energyHistoryRef = useRef(new Float32Array(35));
+  const historyIdxRef = useRef(0);
+
+  const offscreenPlatterRef = useRef(null);
+  const offscreenPlatterSizeRef = useRef(0);
 
   const artworkImageRef = useRef(null);
   const loadedTrackIdRef = useRef(null);
@@ -128,164 +141,80 @@ export const RoundVFXVisualizer = memo(function RoundVFXVisualizer({
     const container = containerRef.current;
     if (!canvas || !container) return;
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d', { alpha: true });
     let animationId;
-    const dpr = window.devicePixelRatio || 1;
 
-    let width = (canvas.width = container.clientWidth * dpr || size * dpr);
-    let height = (canvas.height = container.clientHeight * dpr || size * dpr);
+    const getClampedDpr = () => Math.min(window.devicePixelRatio || 1, 2.0);
+    let dpr = getClampedDpr();
+    let width = (canvas.width = Math.floor(container.clientWidth * dpr || size * dpr));
+    let height = (canvas.height = Math.floor(container.clientHeight * dpr || size * dpr));
 
     const handleResize = () => {
       if (!container || !canvas) return;
-      width = canvas.width = container.clientWidth * dpr || size * dpr;
-      height = canvas.height = container.clientHeight * dpr || size * dpr;
+      dpr = getClampedDpr();
+      width = canvas.width = Math.floor(container.clientWidth * dpr || size * dpr);
+      height = canvas.height = Math.floor(container.clientHeight * dpr || size * dpr);
+      offscreenPlatterRef.current = null;
     };
 
     window.addEventListener('resize', handleResize);
 
-    if (particlesRef.current.length === 0) {
-      particlesRef.current = Array.from({ length: 48 }, () => new HaloParticle(width, height));
-    }
+    const prefersReducedMotion =
+      typeof window !== 'undefined' &&
+      window.matchMedia &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    const render = () => {
-      ctx.clearRect(0, 0, width, height);
+    const particleCount = prefersReducedMotion ? 12 : 24;
+    const particles = Array.from({ length: particleCount }, () => new FastParticle(width, height));
 
-      const cx = width / 2;
-      const cy = height / 2;
-      const minDim = Math.min(width, height);
-      const analyser = window.__SPX_ANALYSER__;
-
-      let freqData = new Uint8Array(128);
-      let timeData = new Uint8Array(128);
-      let isLiveAudio = false;
-
-      if (analyser && isPlaying) {
-        analyser.getByteFrequencyData(freqData);
-        analyser.getByteTimeDomainData(timeData);
-        isLiveAudio = true;
-      } else if (isPlaying) {
-        const t = Date.now() / 280;
-        for (let i = 0; i < 128; i++) {
-          freqData[i] = Math.max(12, Math.sin(t + i * 0.14) * 60 + Math.cos(t * 0.75 + i * 0.05) * 45 + 75);
-          timeData[i] = 128 + Math.sin(t * 1.5 + i * 0.1) * 25;
-        }
-        isLiveAudio = true;
+    const getOffscreenPlatter = (discRadius, ringOuterRadius) => {
+      const platterDim = Math.ceil(ringOuterRadius * 2 + 10 * dpr);
+      if (offscreenPlatterRef.current && offscreenPlatterSizeRef.current === platterDim) {
+        return offscreenPlatterRef.current;
       }
 
-      // Calculate Bass Energy (sub-frequencies 0..8)
-      let rawBass = 0;
-      for (let i = 0; i < 8; i++) rawBass += freqData[i] || 0;
-      rawBass = rawBass / (8 * 255);
+      const offCanvas = document.createElement('canvas');
+      offCanvas.width = platterDim;
+      offCanvas.height = platterDim;
+      const oCtx = offCanvas.getContext('2d');
+      const oCenter = platterDim / 2;
 
-      smoothedBassRef.current = smoothedBassRef.current * 0.82 + rawBass * 0.18;
-      const bass = smoothedBassRef.current;
+      // 1. Obsidian Black Turntable Vinyl Platter
+      const vinylGrad = oCtx.createRadialGradient(oCenter, oCenter, 5, oCenter, oCenter, discRadius);
+      vinylGrad.addColorStop(0, '#191820');
+      vinylGrad.addColorStop(0.4, '#100f14');
+      vinylGrad.addColorStop(0.85, '#0a090d');
+      vinylGrad.addColorStop(1, '#050406');
+      oCtx.fillStyle = vinylGrad;
+      oCtx.beginPath();
+      oCtx.arc(oCenter, oCenter, discRadius, 0, Math.PI * 2);
+      oCtx.fill();
 
-      const smoothData = smoothedDataRef.current;
-      for (let i = 0; i < 128; i++) {
-        const target = (freqData[i] || 0) / 255;
-        smoothData[i] = smoothData[i] * 0.82 + target * 0.18;
-      }
-
-      // Rotational progression
-      if (isPlaying) {
-        rotationRef.current += 0.004 + bass * 0.01;
-      }
-      const rot = rotationRef.current;
-
-      // 1. Dynamic Ambient Radial Background Glow
-      const ambientRadius = minDim * (0.35 + bass * 0.2);
-      const ambientGrad = ctx.createRadialGradient(cx, cy, 10, cx, cy, ambientRadius);
-      ambientGrad.addColorStop(0, `rgba(139, 92, 246, ${0.2 + bass * 0.25})`);
-      ambientGrad.addColorStop(0.35, `rgba(236, 72, 153, ${0.12 + bass * 0.15})`);
-      ambientGrad.addColorStop(0.7, `rgba(6, 182, 212, ${0.06 + bass * 0.08})`);
-      ambientGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-      ctx.fillStyle = ambientGrad;
-      ctx.fillRect(0, 0, width, height);
-
-      // 2. Cosmic Halo Particles
-      particlesRef.current.forEach(p => {
-        p.update(width, height, isLiveAudio ? bass : 0.01);
-        p.draw(ctx, cx, cy);
+      // 2. Groove Rings
+      const grooveRatios = [0.94, 0.88, 0.82, 0.76, 0.70, 0.64];
+      oCtx.strokeStyle = 'rgba(255, 255, 255, 0.045)';
+      oCtx.lineWidth = 1 * dpr;
+      grooveRatios.forEach(ratio => {
+        oCtx.beginPath();
+        oCtx.arc(oCenter, oCenter, discRadius * ratio, 0, Math.PI * 2);
+        oCtx.stroke();
       });
 
-      // 3. Central Vinyl Disc Radii
-      const discRadius = minDim * 0.22 * (1 + bass * 0.05);
-      const ringOuterRadius = discRadius + 18 * dpr;
-
-      // 4. 360° Symmetrical Radial Frequency Spectrum Equalizer Bars
-      const rayCount = 72;
-      const rayBaseRadius = ringOuterRadius + 4 * dpr;
-
-      if (!peaksRef.current || peaksRef.current.length !== rayCount) {
-        peaksRef.current = new Float32Array(rayCount);
-      }
-      const peaks = peaksRef.current;
-      const peakDecay = 1.0 * dpr;
-
-      for (let i = 0; i < rayCount; i++) {
-        const angle = (i / rayCount) * Math.PI * 2 + rot;
-        const half = rayCount / 2;
-        const distFromHalf = Math.abs(i - half);
-        const normalizedFreqIdx = Math.floor((1 - distFromHalf / half) * 54);
-        const val = isLiveAudio ? smoothData[normalizedFreqIdx] : 0.05;
-        const rayLen = Math.max(4 * dpr, val * minDim * 0.23 * (1 + bass * 0.32));
-
-        if (rayLen >= peaks[i]) {
-          peaks[i] = rayLen;
-        } else {
-          peaks[i] = Math.max(4 * dpr, peaks[i] - peakDecay);
-        }
-
-        const x1 = cx + Math.cos(angle) * rayBaseRadius;
-        const y1 = cy + Math.sin(angle) * rayBaseRadius;
-        const x2 = cx + Math.cos(angle) * (rayBaseRadius + rayLen);
-        const y2 = cy + Math.sin(angle) * (rayBaseRadius + rayLen);
-
-        const normAngle = ((i / rayCount) % 1 + 1) % 1;
-        const col = getAngularColor(normAngle);
-
-        const rayGrad = ctx.createLinearGradient(x1, y1, x2, y2);
-        rayGrad.addColorStop(0, `rgba(${col.r}, ${col.g}, ${col.b}, 0.35)`);
-        rayGrad.addColorStop(0.7, `rgba(${col.r}, ${col.g}, ${col.b}, 0.92)`);
-        rayGrad.addColorStop(1, '#ffffff');
-
-        ctx.strokeStyle = rayGrad;
-        ctx.lineWidth = 2.8 * dpr;
-        ctx.lineCap = 'round';
-        ctx.beginPath();
-        ctx.moveTo(x1, y1);
-        ctx.lineTo(x2, y2);
-        ctx.stroke();
-
-        // Glowing Bloom Tip & Floating Peak Cap
-        const peakDist = rayBaseRadius + peaks[i] + 2.5 * dpr;
-        const px = cx + Math.cos(angle) * peakDist;
-        const py = cy + Math.sin(angle) * peakDist;
-
-        ctx.shadowColor = col.rgb;
-        ctx.shadowBlur = (val > 0.3 ? 12 : 6) * dpr;
-        ctx.fillStyle = val > 0.4 ? '#ffffff' : col.rgb;
-        ctx.beginPath();
-        ctx.arc(px, py, (val > 0.4 ? 2.2 : 1.6) * dpr, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.shadowBlur = 0;
-      }
-
-      // 5. Concentric HUD Gauge Rings (Two 1px rings with 15% opacity)
+      // 3. HUD Guide Rings
       const hudInnerRadius = discRadius + 3 * dpr;
       const hudOuterRadius = ringOuterRadius;
 
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
-      ctx.lineWidth = 1 * dpr;
-      ctx.beginPath();
-      ctx.arc(cx, cy, hudInnerRadius, 0, Math.PI * 2);
-      ctx.stroke();
+      oCtx.strokeStyle = 'rgba(255, 255, 255, 0.14)';
+      oCtx.lineWidth = 1 * dpr;
+      oCtx.beginPath();
+      oCtx.arc(oCenter, oCenter, hudInnerRadius, 0, Math.PI * 2);
+      oCtx.stroke();
 
-      ctx.beginPath();
-      ctx.arc(cx, cy, hudOuterRadius, 0, Math.PI * 2);
-      ctx.stroke();
+      oCtx.beginPath();
+      oCtx.arc(oCenter, oCenter, hudOuterRadius, 0, Math.PI * 2);
+      oCtx.stroke();
 
-      // 24 Micro-Tick Dashes at 15° increments along circumference
+      // 4. 24 Micro-Tick Dashes
       for (let t = 0; t < 24; t++) {
         const tickAngle = (t / 24) * Math.PI * 2;
         const isMajor = t % 6 === 0;
@@ -293,65 +222,223 @@ export const RoundVFXVisualizer = memo(function RoundVFXVisualizer({
         const r1 = hudOuterRadius - tickLen;
         const r2 = hudOuterRadius;
 
-        const tx1 = cx + Math.cos(tickAngle) * r1;
-        const ty1 = cy + Math.sin(tickAngle) * r1;
-        const tx2 = cx + Math.cos(tickAngle) * r2;
-        const ty2 = cy + Math.sin(tickAngle) * r2;
+        const tx1 = oCenter + Math.cos(tickAngle) * r1;
+        const ty1 = oCenter + Math.sin(tickAngle) * r1;
+        const tx2 = oCenter + Math.cos(tickAngle) * r2;
+        const ty2 = oCenter + Math.sin(tickAngle) * r2;
 
-        ctx.strokeStyle = isMajor ? 'rgba(255, 255, 255, 0.5)' : 'rgba(255, 255, 255, 0.2)';
-        ctx.lineWidth = (isMajor ? 1.5 : 1) * dpr;
-        ctx.beginPath();
-        ctx.moveTo(tx1, ty1);
-        ctx.lineTo(tx2, ty2);
-        ctx.stroke();
+        oCtx.strokeStyle = isMajor ? 'rgba(255, 255, 255, 0.5)' : 'rgba(255, 255, 255, 0.2)';
+        oCtx.lineWidth = (isMajor ? 1.5 : 1) * dpr;
+        oCtx.beginPath();
+        oCtx.moveTo(tx1, ty1);
+        oCtx.lineTo(tx2, ty2);
+        oCtx.stroke();
       }
 
-      // 6. Monospace Curved Typography: "✦ HIGH FIDELITY • 360° AUDIO LAB • SPiDEYxFLASH ✦"
-      ctx.save();
-      ctx.translate(cx, cy);
-      ctx.rotate(rot * 0.55);
-
+      // 5. Curved Typography
       const textRadius = (hudInnerRadius + hudOuterRadius) / 2;
       const brandString = '✦ HIGH FIDELITY • 360° AUDIO LAB • VEX-M ✦ ';
       const textLen = brandString.length;
-      ctx.font = `600 ${Math.max(8, 9 * dpr)}px "SF Mono", "Fira Code", monospace, sans-serif`;
-      ctx.fillStyle = `rgba(255, 255, 255, ${0.65 + bass * 0.25})`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
+      oCtx.font = `600 ${Math.max(8, 9 * dpr)}px "SF Mono", "Fira Code", monospace, sans-serif`;
+      oCtx.fillStyle = 'rgba(255, 255, 255, 0.65)';
+      oCtx.textAlign = 'center';
+      oCtx.textBaseline = 'middle';
 
       for (let i = 0; i < textLen; i++) {
         const char = brandString[i];
         const charAngle = (i / textLen) * Math.PI * 2;
-        ctx.save();
-        ctx.rotate(charAngle);
-        ctx.translate(0, -textRadius);
-        ctx.fillText(char, 0, 0);
-        ctx.restore();
+        oCtx.save();
+        oCtx.translate(oCenter, oCenter);
+        oCtx.rotate(charAngle);
+        oCtx.translate(0, -textRadius);
+        oCtx.fillText(char, 0, 0);
+        oCtx.restore();
       }
-      ctx.restore();
 
-      // 7. Obsidian Black Turntable Vinyl Platter
-      const vinylGrad = ctx.createRadialGradient(cx, cy, 5, cx, cy, discRadius);
-      vinylGrad.addColorStop(0, '#1a1921');
-      vinylGrad.addColorStop(0.4, '#100f14');
-      vinylGrad.addColorStop(0.85, '#0a090d');
-      vinylGrad.addColorStop(1, '#050406');
-      ctx.fillStyle = vinylGrad;
-      ctx.beginPath();
-      ctx.arc(cx, cy, discRadius, 0, Math.PI * 2);
-      ctx.fill();
+      offscreenPlatterRef.current = offCanvas;
+      offscreenPlatterSizeRef.current = platterDim;
+      return offCanvas;
+    };
 
-      // Concentric Vinyl Groove Rings
-      const grooveRatios = [0.94, 0.88, 0.82, 0.76, 0.70, 0.64];
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.045)';
-      ctx.lineWidth = 1 * dpr;
-      grooveRatios.forEach(ratio => {
-        ctx.beginPath();
-        ctx.arc(cx, cy, discRadius * ratio, 0, Math.PI * 2);
-        ctx.stroke();
+    let lastFrameTime = performance.now();
+
+    const render = now => {
+      const deltaMs = Math.min(now - lastFrameTime, 100);
+      lastFrameTime = now;
+      const dt = deltaMs / 16.67;
+
+      ctx.clearRect(0, 0, width, height);
+
+      const cx = width / 2;
+      const cy = height / 2;
+      const minDim = Math.min(width, height);
+      const analyser = window.__SPX_ANALYSER__;
+
+      const freqData = new Uint8Array(128);
+      let isLiveAudio = false;
+
+      if (analyser && isPlaying) {
+        analyser.getByteFrequencyData(freqData);
+        isLiveAudio = freqData.some(val => val > 3);
+      }
+
+      if (isLiveAudio) {
+        let subBassSum = 0;
+        for (let i = 1; i <= 3; i++) subBassSum += freqData[i] || 0;
+        const currentSubBass = subBassSum / (3 * 255);
+
+        const history = energyHistoryRef.current;
+        let histTotal = 0;
+        for (let i = 0; i < history.length; i++) histTotal += history[i];
+        const avgEnergy = histTotal / history.length;
+
+        history[historyIdxRef.current] = currentSubBass;
+        historyIdxRef.current = (historyIdxRef.current + 1) % history.length;
+
+        const transientDelta = currentSubBass - (smoothedBassRef.current || 0);
+        const dynamicThreshold = Math.max(0.12, avgEnergy * 1.30);
+        const timeSinceLastBeat = now - lastBeatTimeRef.current;
+
+        if (currentSubBass > dynamicThreshold && transientDelta > 0.035 && timeSinceLastBeat > 180) {
+          lastBeatTimeRef.current = now;
+          const kickStrength = Math.min(1.0, (currentSubBass - avgEnergy) * 2.5 + transientDelta * 2.0);
+          impactRef.current = Math.min(1.0, impactRef.current + kickStrength);
+          shockwaveRef.current = 1.0;
+        }
+
+        if (currentSubBass > smoothedBassRef.current) {
+          smoothedBassRef.current = smoothedBassRef.current * 0.15 + currentSubBass * 0.85;
+        } else {
+          smoothedBassRef.current = smoothedBassRef.current * Math.pow(0.86, dt);
+        }
+      } else if (isPlaying) {
+        const t = now / 1000;
+        const slowBreath = 0.5 + 0.5 * Math.sin(t * 1.5);
+        for (let i = 0; i < 128; i++) {
+          const octaveWave = Math.sin(i * 0.09 + t * 2.0);
+          const curve = Math.max(0.08, (Math.sin(t * 1.1 + i * 0.08) * 0.35 + 0.5) * (1 - i / 135));
+          freqData[i] = Math.round(curve * 155 + octaveWave * 20 + slowBreath * 25);
+        }
+        smoothedBassRef.current = 0.22 + slowBreath * 0.18;
+      } else {
+        smoothedBassRef.current *= Math.pow(0.85, dt);
+      }
+
+      impactRef.current *= Math.pow(0.86, dt);
+      shockwaveRef.current *= Math.pow(0.92, dt);
+
+      const bass = prefersReducedMotion ? smoothedBassRef.current * 0.25 : smoothedBassRef.current;
+      const impact = prefersReducedMotion ? impactRef.current * 0.25 : impactRef.current;
+
+      const smoothData = smoothedDataRef.current;
+      for (let i = 0; i < 128; i++) {
+        const target = (freqData[i] || 0) / 255;
+        if (target > smoothData[i]) {
+          smoothData[i] = smoothData[i] * 0.3 + target * 0.7;
+        } else {
+          smoothData[i] = smoothData[i] * Math.pow(0.85, dt) + target * (1 - Math.pow(0.85, dt));
+        }
+      }
+
+      // 1. Dynamic Ambient Radial Background Glow
+      const ambientRadius = minDim * (0.36 + bass * 0.18);
+      const ambientGrad = ctx.createRadialGradient(cx, cy, 10, cx, cy, ambientRadius);
+      ambientGrad.addColorStop(0, `rgba(139, 92, 246, ${0.16 + bass * 0.2})`);
+      ambientGrad.addColorStop(0.35, `rgba(236, 72, 153, ${0.1 + bass * 0.14})`);
+      ambientGrad.addColorStop(0.7, `rgba(6, 182, 212, ${0.06 + bass * 0.08})`);
+      ambientGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = ambientGrad;
+      ctx.fillRect(0, 0, width, height);
+
+      // 2. Starfield Particles
+      particles.forEach(p => {
+        p.update(width, height, isLiveAudio || isPlaying ? bass : 0.01);
+        p.draw(ctx, cx, cy);
       });
 
-      // 8. Center Album Artwork Record Label (Rotating at 33 RPM)
+      if (isPlaying) {
+        rotationRef.current += (0.0035 + bass * 0.008) * dt;
+      }
+      const rot = rotationRef.current;
+
+      const discRadius = minDim * 0.22 * (1 + bass * 0.04 + impact * 0.03);
+      const ringOuterRadius = discRadius + 18 * dpr;
+
+      // 3. Crisp Kick Shockwave
+      if (shockwaveRef.current > 0.02) {
+        const shockRadius = ringOuterRadius + (1 - shockwaveRef.current) * minDim * 0.18;
+        ctx.beginPath();
+        ctx.arc(cx, cy, shockRadius, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(6, 182, 212, ${shockwaveRef.current * 0.4})`;
+        ctx.lineWidth = Math.max(1.5 * dpr, shockwaveRef.current * 4 * dpr);
+        ctx.stroke();
+      }
+
+      // 4. 360° Symmetrical Radial Equalizer Rays
+      const rayBaseRadius = ringOuterRadius + 4 * dpr;
+      const peaks = peaksRef.current;
+      const peakDecay = 1.2 * dpr * dt;
+
+      for (let i = 0; i < RAY_COUNT; i++) {
+        const angle = (i / RAY_COUNT) * Math.PI * 2 + rot;
+        const half = RAY_COUNT / 2;
+        const distFromHalf = Math.abs(i - half);
+        const logFactor = Math.pow(1 - distFromHalf / half, 1.5);
+        const normalizedFreqIdx = Math.min(127, Math.floor(logFactor * 85));
+
+        const val = isLiveAudio || isPlaying ? smoothData[normalizedFreqIdx] : 0.04;
+        const rayLen = Math.max(4 * dpr, val * minDim * 0.23 * (1 + bass * 0.28 + impact * 0.16));
+
+        if (rayLen >= peaks[i]) {
+          peaks[i] = rayLen;
+        } else {
+          peaks[i] = Math.max(4 * dpr, peaks[i] - peakDecay);
+        }
+
+        const cosA = Math.cos(angle);
+        const sinA = Math.sin(angle);
+        const x1 = cx + cosA * rayBaseRadius;
+        const y1 = cy + sinA * rayBaseRadius;
+        const x2 = cx + cosA * (rayBaseRadius + rayLen);
+        const y2 = cy + sinA * (rayBaseRadius + rayLen);
+
+        const col = PRECOMPUTED_PALETTE[i];
+
+        ctx.strokeStyle = col.rgb;
+        ctx.lineWidth = 2.6 * dpr;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+
+        const peakDist = rayBaseRadius + peaks[i] + 2.5 * dpr;
+        const px = cx + cosA * peakDist;
+        const py = cy + sinA * peakDist;
+
+        ctx.fillStyle = col.rgba(0.4);
+        ctx.beginPath();
+        ctx.arc(px, py, 3.5 * dpr, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(px, py, 1.6 * dpr, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // 5. Draw Pre-rendered Offscreen Platter & HUD Gauge
+      const platterCanvas = getOffscreenPlatter(discRadius, ringOuterRadius);
+      if (platterCanvas) {
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(rot * 0.55);
+        const halfPlatter = platterCanvas.width / 2;
+        ctx.drawImage(platterCanvas, -halfPlatter, -halfPlatter);
+        ctx.restore();
+      }
+
+      // 6. Center Album Artwork Record Label (Rotating at 33 RPM)
       const labelRadius = discRadius * 0.56;
       ctx.save();
       ctx.translate(cx, cy);
@@ -387,27 +474,26 @@ export const RoundVFXVisualizer = memo(function RoundVFXVisualizer({
         ctx.fillText('-M', 0, labelRadius * 0.2);
       }
 
+      // Inner Label Ring
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
       ctx.lineWidth = 1.2 * dpr;
       ctx.beginPath();
       ctx.arc(0, 0, labelRadius, 0, Math.PI * 2);
       ctx.stroke();
 
-      // Center Spindle Hole
       const spindleRadius = discRadius * 0.085;
       ctx.fillStyle = '#070709';
       ctx.beginPath();
       ctx.arc(0, 0, spindleRadius, 0, Math.PI * 2);
       ctx.fill();
 
-      // Metallic Spindle Ring
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.55)';
       ctx.lineWidth = 1.5 * dpr;
       ctx.stroke();
 
       ctx.restore();
 
-      // 9. Glass Specular Gloss Sheen
+      // 7. Specular Gloss Sheen
       ctx.save();
       ctx.beginPath();
       ctx.arc(cx, cy, discRadius, 0, Math.PI * 2);
@@ -418,17 +504,17 @@ export const RoundVFXVisualizer = memo(function RoundVFXVisualizer({
         cx + discRadius * 0.7,
         cy + discRadius * 0.7
       );
-      glossGrad.addColorStop(0, 'rgba(255, 255, 255, 0.14)');
-      glossGrad.addColorStop(0.4, 'rgba(255, 255, 255, 0.03)');
+      glossGrad.addColorStop(0, 'rgba(255, 255, 255, 0.12)');
+      glossGrad.addColorStop(0.4, 'rgba(255, 255, 255, 0.02)');
       glossGrad.addColorStop(0.6, 'rgba(255, 255, 255, 0.0)');
-      glossGrad.addColorStop(1, 'rgba(255, 255, 255, 0.05)');
+      glossGrad.addColorStop(1, 'rgba(255, 255, 255, 0.04)');
       ctx.fillStyle = glossGrad;
       ctx.fillRect(cx - discRadius, cy - discRadius, discRadius * 2, discRadius * 2);
       ctx.restore();
 
       // Platter Outer Rim Accent
-      ctx.strokeStyle = `rgba(139, 92, 246, ${0.45 + bass * 0.4})`;
-      ctx.lineWidth = 1.6 * dpr;
+      ctx.strokeStyle = `rgba(139, 92, 246, ${0.45 + bass * 0.4 + impact * 0.25})`;
+      ctx.lineWidth = (1.5 + impact * 1.0) * dpr;
       ctx.beginPath();
       ctx.arc(cx, cy, discRadius, 0, Math.PI * 2);
       ctx.stroke();
@@ -436,7 +522,7 @@ export const RoundVFXVisualizer = memo(function RoundVFXVisualizer({
       animationId = requestAnimationFrame(render);
     };
 
-    render();
+    animationId = requestAnimationFrame(render);
 
     return () => {
       window.removeEventListener('resize', handleResize);
@@ -455,21 +541,20 @@ export const RoundVFXVisualizer = memo(function RoundVFXVisualizer({
     >
       <canvas ref={canvasRef} className="w-full h-full pointer-events-none" />
 
-      {/* Floating Center Badge / Track Info snippet on hover */}
-      {track && (
+      {activeTrack && (
         <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between p-2.5 rounded-2xl bg-black/60 backdrop-blur-md border border-white/10 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <div className="flex items-center gap-2 min-w-0">
             <div className="w-7 h-7 rounded-lg bg-accent/20 flex items-center justify-center text-accent flex-shrink-0">
               <Disc3 className={`w-4 h-4 ${isPlaying ? 'animate-spin' : ''}`} />
             </div>
             <div className="min-w-0">
-              <p className="text-xs font-bold text-warm-white truncate">{track.title}</p>
-              <p className="text-[10px] text-warm-muted truncate">{track.artist}</p>
+              <p className="text-xs font-bold text-warm-white truncate">{activeTrack.title}</p>
+              <p className="text-[10px] text-warm-muted truncate">{activeTrack.artist}</p>
             </div>
           </div>
 
           <span className="text-[10px] font-mono font-bold text-accent px-2 py-0.5 rounded bg-accent/15 border border-accent/30">
-            360° VFX
+            360° Beats
           </span>
         </div>
       )}
