@@ -27,6 +27,7 @@ import { formatDuration, formatQualityBadge } from '../../utils/formatters';
 import { getArtworkSrc } from '../../utils/artworkGenerator';
 import { SafeImage } from '../ui/SafeImage';
 import { LyricsView } from './LyricsView';
+import { AudioVisualizer } from './AudioVisualizer';
 
 // Apple Music Style Scrubber Component
 const AppleScrubber = memo(function AppleScrubber() {
@@ -168,7 +169,7 @@ export function NowPlayingModal() {
   const removeFromQueue = useAudioStore(s => s.removeFromQueue);
   const clearQueue = useAudioStore(s => s.clearQueue);
 
-  // View state: 'artwork' | 'lyrics' | 'queue'
+  // View state: 'artwork' | 'visualizer' | 'lyrics' | 'queue'
   const [viewMode, setViewMode] = useState('artwork');
 
   // Keyboard shortcut listener
@@ -323,6 +324,14 @@ export function NowPlayingModal() {
                   </button>
 
                   <button
+                    onClick={() => setViewMode('visualizer')}
+                    className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 text-white transition active:scale-95 text-xs font-semibold"
+                  >
+                    <Sparkles className="w-4 h-4 text-cyan-300" />
+                    <span>VFX</span>
+                  </button>
+
+                  <button
                     onClick={() => setViewMode('queue')}
                     className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 text-white transition active:scale-95 text-xs font-semibold"
                   >
@@ -330,6 +339,20 @@ export function NowPlayingModal() {
                     <span>Up Next</span>
                   </button>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* VIEW: LIVE BEAT-REACTIVE VFX */}
+          {viewMode === 'visualizer' && (
+            <div className="relative w-full h-full min-h-[420px] max-h-[72vh] rounded-3xl overflow-hidden bg-black/40 border border-white/10 shadow-2xl">
+              <AudioVisualizer
+                interactive
+                onCollapse={() => setViewMode('artwork')}
+                className="border-0 bg-transparent shadow-none"
+              />
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 pointer-events-none rounded-full border border-white/10 bg-black/50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/60 backdrop-blur-md">
+                Live beat sync
               </div>
             </div>
           )}
