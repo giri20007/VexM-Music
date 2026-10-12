@@ -215,7 +215,7 @@ function ArtistDetailView({ lib, artistName, onNavigate, onBack }) {
   }, [artistName, localArtist]);
 
   const handleShare = async () => {
-    const url = `${window.location.origin}/#artist:${encodeURIComponent(artistName)}`;
+    const url = `${window.location.origin}/artist/${encodeURIComponent(artistName)}`;
     if (navigator.share) {
       try {
         await navigator.share({

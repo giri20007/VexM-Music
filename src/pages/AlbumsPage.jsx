@@ -113,7 +113,7 @@ function AlbumDetailView({ lib, albumName, onNavigate, onBack }) {
   }, [albumName, localAlbum]);
 
   const handleShare = async () => {
-    const url = `${window.location.origin}/#album:${encodeURIComponent(albumName)}`;
+    const url = `${window.location.origin}/album/${encodeURIComponent(albumName)}`;
     if (navigator.share) {
       try {
         await navigator.share({

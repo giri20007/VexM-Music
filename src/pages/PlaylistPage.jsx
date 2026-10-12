@@ -1,5 +1,5 @@
-import React from 'react';
-import { ListMusic, Play, Shuffle, Trash2, ArrowLeft } from 'lucide-react';
+import React, { useState } from 'react';
+import { ListMusic, Play, Shuffle, Trash2, ArrowLeft, Share2, Check } from 'lucide-react';
 import { useAudioStore } from '../store/useAudioStore';
 import { TrackRow } from '../components/library/TrackRow';
 import { formatDuration } from '../utils/formatters';
@@ -11,6 +11,7 @@ export function PlaylistPage({ playlistId, allTracks = [], onBack, onNavigate })
   const currentTrack = useAudioStore(s => s.currentTrack);
   const togglePlay = useAudioStore(s => s.togglePlay);
   const deletePlaylist = useAudioStore(s => s.deletePlaylist);
+  const [copied, setCopied] = useState(false);
 
   const playlist = playlists.find(p => p.id === playlistId);
   if (!playlist) {
@@ -44,6 +45,25 @@ export function PlaylistPage({ playlistId, allTracks = [], onBack, onNavigate })
       const shuffled = [...tracks].sort(() => Math.random() - 0.5);
       playTrack(shuffled[0], shuffled);
     }
+  };
+
+  const handleSharePlaylist = async () => {
+    const url = `${window.location.origin}/playlist/${encodeURIComponent(playlist.id)}`;
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `${playlist.name} - Vex-M Playlist`,
+          text: `Check out playlist "${playlist.name}" on Vex-M`,
+          url,
+        });
+        return;
+      } catch {}
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {}
   };
 
   return (
@@ -93,6 +113,14 @@ export function PlaylistPage({ playlistId, allTracks = [], onBack, onNavigate })
                   </button>
                 </>
               )}
+
+              <button
+                onClick={handleSharePlaylist}
+                className="p-2.5 rounded-full bg-white/10 hover:bg-white/15 text-white border border-white/10 transition"
+                title="Share playlist"
+              >
+                {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Share2 className="w-4 h-4" />}
+              </button>
 
               {playlist.id !== 'favorites' && (
                 <button

@@ -13,13 +13,35 @@ export function SearchPage({ lib, onNavigate }) {
   const preferredLanguage = useSettingsStore(s => s.preferredLanguage) || 'tamil';
   const providerSource = useSettingsStore(s => s.providerSource) || 'all';
 
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(() => {
+    if (typeof window === 'undefined') return '';
+    try {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('q') || '';
+    } catch {
+      return '';
+    }
+  });
   const [ytResults, setYtResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [trendingTracks, setTrendingTracks] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
 
   const clean = searchQuery.trim().toLowerCase();
+
+  // Synchronize active search query with URL (/search?q=...)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const url = new URL(window.location.href);
+      if (clean) {
+        url.searchParams.set('q', clean);
+      } else {
+        url.searchParams.delete('q');
+      }
+      window.history.replaceState(null, '', url.pathname + (url.search ? url.search : ''));
+    } catch {}
+  }, [clean]);
 
   // Load trending music on mount (JioSaavn 320k + YouTube fallback)
   useEffect(() => {

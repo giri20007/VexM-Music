@@ -31,6 +31,7 @@ import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useSettingsStore } from './store/useSettingsStore';
 import { useAudioStore } from './store/useAudioStore';
 import { useAuthStore } from './store/useAuthStore';
+import { routeToPath, pathToRoute } from './utils/router';
 import { Radio, RefreshCw, ShieldAlert, ArrowLeft } from 'lucide-react';
 
 class ErrorBoundary extends React.Component {
@@ -87,8 +88,11 @@ export default function App() {
   const isSleepTimerOpen = useAudioStore(s => s.isSleepTimerOpen);
   const setSleepTimerOpen = useAudioStore(s => s.setSleepTimerOpen);
 
-  // Route state (e.g. 'home', 'library', 'search', 'albums', 'artists', 'liked', 'album:Name', 'artist:Name', 'playlist:id', 'settings:account', 'admin')
-  const [currentRoute, setCurrentRoute] = useState('home');
+  // Route state initialized from clean URL pathname or legacy hash
+  const [currentRoute, setCurrentRoute] = useState(() => {
+    if (typeof window === 'undefined') return 'home';
+    return pathToRoute(window.location.pathname, window.location.hash);
+  });
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [languageModalOpen, setLanguageModalOpen] = useState(false);
 
@@ -114,24 +118,75 @@ export default function App() {
     } catch {}
   }, []);
 
-  // Handle URL hash routing if user enters /#admin or /#settings
+  // Synchronize route with HTML5 browser history (popstate) and migrate legacy hashes
   useEffect(() => {
-    const handleHash = () => {
+    const syncRouteFromLocation = () => {
+      // Check for legacy hash (e.g. #search, #album:Leo, #artist:Anirudh)
       const hash = window.location.hash.replace(/^#\/?/, '');
       if (hash) {
-        setCurrentRoute(hash);
+        const routeFromHash = pathToRoute('', hash);
+        const cleanPath = routeToPath(routeFromHash);
+        // Replace legacy hash with clean path in browser URL without reloading
+        window.history.replaceState({ route: routeFromHash }, '', cleanPath);
+        setCurrentRoute(routeFromHash);
+        return;
       }
+
+      // Read clean pathname
+      const routeFromPath = pathToRoute(window.location.pathname);
+      setCurrentRoute(routeFromPath);
     };
-    handleHash();
-    window.addEventListener('hashchange', handleHash);
-    return () => window.removeEventListener('hashchange', handleHash);
+
+    syncRouteFromLocation();
+    window.addEventListener('popstate', syncRouteFromLocation);
+    window.addEventListener('hashchange', syncRouteFromLocation);
+    return () => {
+      window.removeEventListener('popstate', syncRouteFromLocation);
+      window.removeEventListener('hashchange', syncRouteFromLocation);
+    };
   }, []);
 
-  const navigate = route => {
+  const navigate = (route, replace = false) => {
+    const path = routeToPath(route);
+    if (replace) {
+      window.history.replaceState({ route }, '', path);
+    } else {
+      if (window.location.pathname !== path || window.location.hash) {
+        window.history.pushState({ route }, '', path);
+      }
+    }
     setCurrentRoute(route);
-    window.location.hash = route;
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  // Auto-play / queue when a shared track link is opened (/track/:id)
+  useEffect(() => {
+    if (!currentRoute.startsWith('track:')) return;
+    const trackId = currentRoute.slice(6);
+    if (!trackId) return;
+
+    const findAndPlay = async () => {
+      let track = lib?.allItems?.find(t => String(t.id) === String(trackId));
+      if (!track) {
+        try {
+          const res = await fetch(`/api/songs/${encodeURIComponent(trackId)}`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data?.track || data?.song) {
+              track = data.track || data.song;
+            }
+          }
+        } catch {}
+      }
+
+      if (track) {
+        useAudioStore.getState().playTrack(track, [track]);
+        useAudioStore.getState().set({ isNowPlayingOpen: true });
+      }
+    };
+
+    findAndPlay();
+  }, [currentRoute, lib?.allItems]);
 
   // 1. Loading screen while validating initial session
   if (isCheckingAuth) {
@@ -192,6 +247,7 @@ export default function App() {
   else if (currentRoute.startsWith('playlist:')) headerTitle = 'Playlist';
   else if (currentRoute.startsWith('settings')) headerTitle = 'Settings';
   else if (currentRoute === 'recaps') headerTitle = 'Recaps';
+  else if (currentRoute.startsWith('track:')) headerTitle = 'Now Playing';
 
   return (
     <div className="relative min-h-screen flex flex-col bg-transparent text-warm-white selection:bg-accent selection:text-bg-primary">
@@ -224,7 +280,7 @@ export default function App() {
 
           <main className="flex-1 flex flex-col">
             <ErrorBoundary onReset={() => navigate('home')}>
-              {currentRoute === 'home' && (
+              {(currentRoute === 'home' || currentRoute.startsWith('track:')) && (
                 <HomePage
                   lib={lib}
                   onNavigate={navigate}

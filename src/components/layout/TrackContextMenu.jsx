@@ -60,7 +60,7 @@ export function TrackContextMenu({
   const artworkUrl = getArtworkSrc(track, 120);
 
   const handleShare = async () => {
-    const shareUrl = `${window.location.origin}/#track:${track.id}`;
+    const shareUrl = `${window.location.origin}/track/${encodeURIComponent(track.id)}`;
     if (navigator.share) {
       try {
         await navigator.share({
