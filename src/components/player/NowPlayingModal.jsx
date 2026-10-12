@@ -302,7 +302,7 @@ export function NowPlayingModal() {
                 )}
 
                 {/* Favorite & Mode Selector Tray */}
-                <div className="flex items-center gap-3 mt-6">
+                <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2 mt-6">
                   <button
                     onClick={() => toggleLike(currentTrack.id)}
                     className={`flex items-center gap-2 px-4 py-2 rounded-full border transition active:scale-95 text-xs font-semibold ${
