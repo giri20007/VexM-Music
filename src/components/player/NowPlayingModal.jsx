@@ -352,7 +352,7 @@ export function NowPlayingModal() {
                 className="border-0 bg-transparent shadow-none"
               />
               <div className="absolute bottom-4 left-1/2 -translate-x-1/2 pointer-events-none rounded-full border border-white/10 bg-black/50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/60 backdrop-blur-md">
-                Live beat sync
+                Beat-reactive VFX
               </div>
             </div>
           )}

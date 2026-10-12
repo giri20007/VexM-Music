@@ -173,18 +173,32 @@ export function AudioVisualizer({
       let freqData = new Uint8Array(256);
       let timeData = new Uint8Array(256);
       let isLiveAudio = false;
+      let hasAnalyserSignal = false;
 
       if (analyser && isPlaying) {
         analyser.getByteFrequencyData(freqData);
         analyser.getByteTimeDomainData(timeData);
-        isLiveAudio = true;
-      } else if (isPlaying) {
+        hasAnalyserSignal = freqData.some(value => value > 3);
+        isLiveAudio = hasAnalyserSignal;
+      }
+
+      // YouTube playback and streams without CORS may not enter this analyser.
+      // Do not render a dead visualizer in that case; use a restrained beat model
+      // until real analyser data becomes available.
+      if (isPlaying && !hasAnalyserSignal) {
         const t = Date.now() / 280;
+        const kick = Math.pow(Math.max(0, Math.sin(t * 1.35)), 18);
         for (let i = 0; i < 128; i++) {
-          freqData[i] = Math.max(12, Math.sin(t + i * 0.14) * 60 + Math.cos(t * 0.75 + i * 0.05) * 45 + 75);
-          timeData[i] = 128 + Math.sin(t * 1.5 + i * 0.1) * 25;
+          const falloff = Math.max(0.2, 1 - i / 150);
+          freqData[i] = Math.max(
+            8,
+            Math.sin(t + i * 0.14) * 24 * falloff +
+              Math.cos(t * 0.75 + i * 0.05) * 18 +
+              42 +
+              kick * 170 * falloff
+          );
+          timeData[i] = 128 + Math.sin(t * 1.5 + i * 0.1) * (18 + kick * 42);
         }
-        isLiveAudio = true;
       }
 
       // Separate broad bands so the VFX can distinguish a kick from general motion.
@@ -208,7 +222,8 @@ export function AudioVisualizer({
       const now = performance.now();
 
       // A short cooldown prevents one sustained bass note from becoming a machine-gun flash.
-      if (isLiveAudio && transient > 0.075 && rawBass > 0.22 && now - lastBeatAtRef.current > 120) {
+      const beatSignalAvailable = isLiveAudio || (isPlaying && !hasAnalyserSignal);
+      if (beatSignalAvailable && transient > 0.075 && rawBass > 0.22 && now - lastBeatAtRef.current > 120) {
         lastBeatAtRef.current = now;
         impactRef.current = Math.min(1, impactRef.current + Math.min(0.9, transient * 2.8));
         shockwaveRef.current = 1;
