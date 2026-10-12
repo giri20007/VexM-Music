@@ -129,8 +129,8 @@ export function getDetailedDiagnostics() {
   };
 }
 
-function connectEqualizer(enableEq, gains) {
-  if (!audio || !enableEq) return;
+function connectAudioGraph(enableEq, gains) {
+  if (!audio) return;
 
   try {
     const AudioContextClass = window.AudioContext || window.webkitAudioContext;
@@ -144,8 +144,10 @@ function connectEqualizer(enableEq, gains) {
       gainNode.gain.value = 1.0;
 
       analyserNode = audioCtx.createAnalyser();
-      analyserNode.fftSize = 256;
-      analyserNode.smoothingTimeConstant = 0.8;
+      analyserNode.fftSize = 1024;
+      analyserNode.smoothingTimeConstant = 0.65;
+      analyserNode.minDecibels = -90;
+      analyserNode.maxDecibels = -10;
 
       eqFilters = EQ_FREQUENCIES.map((freq, idx) => {
         const filter = audioCtx.createBiquadFilter();
@@ -176,12 +178,14 @@ function connectEqualizer(enableEq, gains) {
     } catch {}
 
     let lastNode = sourceNode;
-    eqFilters.forEach((filter, idx) => {
-      const gain = gains && gains[idx] !== undefined ? gains[idx] : 0;
-      filter.gain.setValueAtTime(gain, audioCtx.currentTime);
-      lastNode.connect(filter);
-      lastNode = filter;
-    });
+    if (enableEq) {
+      eqFilters.forEach((filter, idx) => {
+        const gain = gains && gains[idx] !== undefined ? gains[idx] : 0;
+        filter.gain.setValueAtTime(gain, audioCtx.currentTime);
+        lastNode.connect(filter);
+        lastNode = filter;
+      });
+    }
 
     if (gainNode) {
       lastNode.connect(gainNode);
@@ -191,7 +195,7 @@ function connectEqualizer(enableEq, gains) {
     }
     analyserNode.connect(audioCtx.destination);
   } catch (err) {
-    console.warn('Equalizer graph initialization:', err.message);
+    console.warn('Audio graph initialization:', err.message);
   }
 }
 
@@ -550,11 +554,9 @@ export function usePlayer() {
     }
   }, [speed, track?.videoId, track?.audioUrl]);
 
-  // 7. Equalizer Graph Connection
+  // 7. Keep the analyser alive even when EQ is disabled so VFX use real audio.
   useEffect(() => {
-    if (eqEnabled) {
-      connectEqualizer(eqEnabled, eqGains);
-    }
+    connectAudioGraph(eqEnabled, eqGains);
   }, [eqEnabled, eqGains]);
 
   // 8. Volume Normalization

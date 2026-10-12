@@ -103,8 +103,12 @@ export function AudioVisualizer({
   const particlesRef = useRef([]);
   const rotationRef = useRef(0);
   const smoothedBassRef = useRef(0);
-  const smoothedDataRef = useRef(new Float32Array(128));
+  const smoothedDataRef = useRef(new Float32Array(256));
   const peaksRef = useRef(new Float32Array(72));
+  const energyRef = useRef(0);
+  const impactRef = useRef(0);
+  const shockwaveRef = useRef(0);
+  const lastBeatAtRef = useRef(0);
 
   // Preload and cache track artwork for Vinyl Hub center
   const artworkImageRef = useRef(null);
@@ -166,8 +170,8 @@ export function AudioVisualizer({
       const minDim = Math.min(width, height);
       const analyser = window.__SPX_ANALYSER__;
 
-      let freqData = new Uint8Array(128);
-      let timeData = new Uint8Array(128);
+      let freqData = new Uint8Array(256);
+      let timeData = new Uint8Array(256);
       let isLiveAudio = false;
 
       if (analyser && isPlaying) {
@@ -183,12 +187,36 @@ export function AudioVisualizer({
         isLiveAudio = true;
       }
 
-      // Bass energy from frequency bins 0..8
-      let rawBass = 0;
-      for (let i = 0; i < 8; i++) rawBass += freqData[i] || 0;
-      rawBass = rawBass / (8 * 255);
+      // Separate broad bands so the VFX can distinguish a kick from general motion.
+      const bandAverage = (start, end) => {
+        let total = 0;
+        let count = 0;
+        for (let i = start; i < end; i++) {
+          total += freqData[i] || 0;
+          count += 1;
+        }
+        return count ? total / (count * 255) : 0;
+      };
 
-      smoothedBassRef.current = smoothedBassRef.current * 0.82 + rawBass * 0.18;
+      const rawBass = bandAverage(0, 10);
+      const mids = bandAverage(10, 42);
+      const treble = bandAverage(42, 128);
+      const rawEnergy = rawBass * 0.55 + mids * 0.3 + treble * 0.15;
+      const previousEnergy = energyRef.current;
+      energyRef.current = previousEnergy * 0.84 + rawEnergy * 0.16;
+      const transient = Math.max(0, rawBass - previousEnergy * 0.72);
+      const now = performance.now();
+
+      // A short cooldown prevents one sustained bass note from becoming a machine-gun flash.
+      if (isLiveAudio && transient > 0.075 && rawBass > 0.22 && now - lastBeatAtRef.current > 120) {
+        lastBeatAtRef.current = now;
+        impactRef.current = Math.min(1, impactRef.current + Math.min(0.9, transient * 2.8));
+        shockwaveRef.current = 1;
+      }
+      impactRef.current *= 0.88;
+      shockwaveRef.current *= 0.94;
+
+      smoothedBassRef.current = smoothedBassRef.current * 0.78 + rawBass * 0.22;
       const bass = prefersReducedMotion ? smoothedBassRef.current * 0.25 : smoothedBassRef.current;
 
       const smoothData = smoothedDataRef.current;
@@ -317,9 +345,22 @@ export function AudioVisualizer({
           p.draw(ctx, cx, cy);
         });
 
-        // 1. Center Disc Radii (with 2% to 6% bass energy pulse)
-        const discRadius = minDim * 0.22 * (1 + bass * 0.05);
+        // 1. Center disc pulse: bass controls the body, transients control the hit.
+        const discRadius = minDim * 0.22 * (1 + bass * 0.05 + impactRef.current * 0.035);
         const ringOuterRadius = discRadius + 18 * dpr;
+
+        // A short-lived shockwave makes kick transients readable without overwhelming artwork.
+        if (shockwaveRef.current > 0.015) {
+          const shockRadius = ringOuterRadius + (1 - shockwaveRef.current) * minDim * 0.2;
+          ctx.beginPath();
+          ctx.arc(cx, cy, shockRadius, 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(255, 255, 255, ${shockwaveRef.current * 0.28})`;
+          ctx.lineWidth = Math.max(1, shockwaveRef.current * 5 * dpr);
+          ctx.shadowColor = '#06b6d4';
+          ctx.shadowBlur = shockwaveRef.current * 18 * dpr;
+          ctx.stroke();
+          ctx.shadowBlur = 0;
+        }
 
         // 2. 360° Symmetrical Radial Equalizer Bars with Seamless Angular Gradient
         const rayCount = 72;
@@ -338,7 +379,7 @@ export function AudioVisualizer({
           const distFromHalf = Math.abs(i - half);
           const normalizedFreqIdx = Math.floor((1 - distFromHalf / half) * 54);
           const val = isLiveAudio ? smoothData[normalizedFreqIdx] : 0.05;
-          const rayLen = Math.max(4 * dpr, val * minDim * 0.23 * (1 + bass * 0.32));
+          const rayLen = Math.max(4 * dpr, val * minDim * 0.23 * (1 + bass * 0.32 + impactRef.current * 0.18));
 
           // Peak hold indicator physics
           if (rayLen >= peaks[i]) {
@@ -543,8 +584,8 @@ export function AudioVisualizer({
         ctx.restore();
 
         // Platter Outer Rim Accent
-        ctx.strokeStyle = `rgba(139, 92, 246, ${0.45 + bass * 0.4})`;
-        ctx.lineWidth = 1.6 * dpr;
+        ctx.strokeStyle = `rgba(139, 92, 246, ${0.45 + bass * 0.4 + impactRef.current * 0.25})`;
+        ctx.lineWidth = (1.6 + impactRef.current * 1.2) * dpr;
         ctx.beginPath();
         ctx.arc(cx, cy, discRadius, 0, Math.PI * 2);
         ctx.stroke();
@@ -764,4 +805,3 @@ export const MiniBeatVisualizer = memo(function MiniBeatVisualizer({
     </div>
   );
 });
-
