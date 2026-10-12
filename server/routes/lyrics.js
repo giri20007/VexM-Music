@@ -42,17 +42,48 @@ function synthesizeTimedLines(rawText, duration = 180) {
   });
 }
 
+function extractSearchCandidates(title = '', artist = '') {
+  let cleaned = (title || '')
+    .replace(/\(.*?(?:video|official|audio|remaster|lyric|4k|hd|feat|from|full|ost|theme).*?\)/gi, '')
+    .replace(/\[.*?(?:video|official|audio|remaster|lyric|4k|hd|feat|from|full|ost|theme).*?\]/gi, '')
+    .trim();
+
+  const labelsRegex = /t-series|tseries|sony music|zee music|think music|saregama|aditya music|tips|lahari|yrf|speed records|sun pictures|sun tv|times music|speed audio|muzik247/i;
+  const junkWords = /^(video|audio|lyric|lyrical|song|full video|teaser|trailer|official|music video|lyric video)$/i;
+
+  const rawSegments = cleaned.split(/[\-\|•—:]/).map(s => s.trim()).filter(Boolean);
+  const segments = rawSegments.filter(s => !labelsRegex.test(s) && !junkWords.test(s));
+
+  const songName = segments[0]?.replace(/\blyric(?:al)?\b/gi, '').trim() || cleaned || title;
+  const secondary = segments[1]?.replace(/\blyric(?:al)?\b/gi, '').trim() || '';
+  const third = segments[2]?.replace(/\blyric(?:al)?\b/gi, '').trim() || '';
+
+  const cleanArtist = artist && !labelsRegex.test(artist) ? artist.trim() : '';
+
+  const queries = [];
+  if (songName) {
+    if (cleanArtist) queries.push(`${songName} ${cleanArtist}`);
+    if (secondary) queries.push(`${songName} ${secondary}`);
+    if (third) queries.push(`${songName} ${third}`);
+    queries.push(songName);
+  }
+  return {
+    songName,
+    cleanArtist,
+    queries: [...new Set(queries.filter(Boolean))],
+  };
+}
+
 async function fetchFromLRCLIB(title, artist, album, duration) {
-  const cleanTitle = cleanQueryString(title);
-  const cleanArtist = cleanQueryString(artist);
-  if (!cleanTitle) return null;
+  const { songName, cleanArtist, queries } = extractSearchCandidates(title, artist);
+  if (!songName) return null;
 
   // 1. Try exact match
   try {
     const params = new URLSearchParams({
-      track_name: cleanTitle,
+      track_name: cleanQueryString(songName),
     });
-    if (cleanArtist) params.set('artist_name', cleanArtist);
+    if (cleanArtist) params.set('artist_name', cleanQueryString(cleanArtist));
     if (album) params.set('album_name', album);
     if (duration > 0) params.set('duration', String(Math.round(duration)));
 
@@ -80,36 +111,37 @@ async function fetchFromLRCLIB(title, artist, album, duration) {
     }
   } catch {}
 
-  // 2. Try search query
-  try {
-    const q = cleanArtist ? `${cleanTitle} ${cleanArtist}` : cleanTitle;
-    const res = await fetch(`https://lrclib.net/api/search?q=${encodeURIComponent(q)}`, {
-      headers: { 'User-Agent': 'VexM-Music-App/2.0' },
-      signal: AbortSignal.timeout(4500),
-    });
+  // 2. Try candidate search queries
+  for (const q of queries) {
+    try {
+      const res = await fetch(`https://lrclib.net/api/search?q=${encodeURIComponent(q)}`, {
+        headers: { 'User-Agent': 'VexM-Music-App/2.0' },
+        signal: AbortSignal.timeout(4500),
+      });
 
-    if (res.ok) {
-      const list = await res.json();
-      if (Array.isArray(list) && list.length > 0) {
-        const syncedMatch = list.find(item => item.syncedLyrics && item.syncedLyrics.trim());
-        if (syncedMatch) {
-          return {
-            raw: syncedMatch.syncedLyrics,
-            isSynced: true,
-            source: 'lrclib',
-          };
-        }
-        const plainMatch = list.find(item => item.plainLyrics && item.plainLyrics.trim()) || list[0];
-        if (plainMatch?.plainLyrics) {
-          return {
-            raw: plainMatch.plainLyrics,
-            isSynced: false,
-            source: 'lrclib',
-          };
+      if (res.ok) {
+        const list = await res.json();
+        if (Array.isArray(list) && list.length > 0) {
+          const syncedMatch = list.find(item => item.syncedLyrics && item.syncedLyrics.trim());
+          if (syncedMatch) {
+            return {
+              raw: syncedMatch.syncedLyrics,
+              isSynced: true,
+              source: 'lrclib',
+            };
+          }
+          const plainMatch = list.find(item => item.plainLyrics && item.plainLyrics.trim()) || list[0];
+          if (plainMatch?.plainLyrics) {
+            return {
+              raw: plainMatch.plainLyrics,
+              isSynced: false,
+              source: 'lrclib',
+            };
+          }
         }
       }
-    }
-  } catch {}
+    } catch {}
+  }
 
   return null;
 }
@@ -118,13 +150,20 @@ async function fetchFromJioSaavn(saavnId, title, artist) {
   // Direct saavnId lookup
   let rawId = saavnId;
   if (!rawId && title) {
+    const { queries } = extractSearchCandidates(title, artist);
     try {
       const { search } = require('../services/jioSaavn');
-      const q = `${cleanQueryString(title)} ${cleanQueryString(artist)}`.trim();
-      const results = await search(q, 3);
-      if (results && results.length > 0) {
-        const match = results.find(t => t.hasLyrics) || results[0];
-        rawId = match.saavnId || (match.id || '').replace(/^saavn_/, '');
+      for (const q of queries) {
+        const results = await search(q, 4);
+        if (results && results.length > 0) {
+          const match = results.find(t => t.hasLyrics) || results[0];
+          if (match && match.hasLyrics) {
+            rawId = match.saavnId || (match.id || '').replace(/^saavn_/, '');
+            break;
+          } else if (match && !rawId) {
+            rawId = match.saavnId || (match.id || '').replace(/^saavn_/, '');
+          }
+        }
       }
     } catch {}
   }

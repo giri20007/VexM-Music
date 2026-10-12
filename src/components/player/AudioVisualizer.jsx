@@ -339,9 +339,9 @@ export function AudioVisualizer({
 
         // Fast zero-latency envelope follower: Instant attack on bass rise, snappy decay
         if (currentBass > smoothedBassRef.current) {
-          smoothedBassRef.current = currentBass; // 0-latency instant attack!
+          smoothedBassRef.current = smoothedBassRef.current * 0.35 + currentBass * 0.65;
         } else {
-          smoothedBassRef.current = smoothedBassRef.current * Math.pow(0.76, dt); // Snappy drum release
+          smoothedBassRef.current = smoothedBassRef.current * Math.pow(0.78, dt);
         }
       } else if (isPlaying) {
         const curTime = (typeof useAudioStore !== 'undefined' && useAudioStore.getState().currentTime) || (now / 1000);
@@ -421,18 +421,20 @@ export function AudioVisualizer({
           p.draw(ctx, cx, cy);
         });
 
-        // Dynamic physical vinyl radius with drum bounce!
-        const bounce = bass * 0.18 + impact * 0.22;
+        // Dynamic physical vinyl radius with isolated drum kick punch
+        const kickBounce = impact * 0.08;
+        const bassGroove = Math.max(0, (bass - 0.25)) * 0.04;
+        const bounce = Math.min(0.11, kickBounce + bassGroove);
         const discRadius = minDim * 0.20 * (1 + bounce);
         const ringOuterRadius = discRadius * (224 / 188);
 
         // Expanding Kick Shockwave Ring
         if (shockwaveRef.current > 0.02) {
-          const shockRadius = ringOuterRadius + (1 - shockwaveRef.current) * minDim * 0.22;
+          const shockRadius = ringOuterRadius + (1 - shockwaveRef.current) * minDim * 0.18;
           ctx.beginPath();
           ctx.arc(cx, cy, shockRadius, 0, Math.PI * 2);
-          ctx.strokeStyle = `rgba(6, 182, 212, ${shockwaveRef.current * 0.55})`;
-          ctx.lineWidth = Math.max(1.5 * dpr, shockwaveRef.current * 4.5 * dpr);
+          ctx.strokeStyle = `rgba(6, 182, 212, ${shockwaveRef.current * 0.4})`;
+          ctx.lineWidth = Math.max(1.5 * dpr, shockwaveRef.current * 3 * dpr);
           ctx.stroke();
         }
 
@@ -449,7 +451,7 @@ export function AudioVisualizer({
           const normalizedFreqIdx = Math.min(127, Math.floor(logFactor * 85));
 
           const val = isLiveAudio || isPlaying ? smoothData[normalizedFreqIdx] : 0.04;
-          const rayLen = Math.max(4 * dpr, val * minDim * 0.23 * (1 + bass * 0.45 + impact * 0.35));
+          const rayLen = Math.max(4 * dpr, val * minDim * 0.20 * (1 + impact * 0.22));
 
           if (rayLen >= peaks[i]) {
             peaks[i] = rayLen;

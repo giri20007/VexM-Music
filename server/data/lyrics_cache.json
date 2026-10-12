@@ -854,5 +854,794 @@
       }
     ],
     "updatedAt": "2026-10-12T17:16:42.105Z"
+  },
+  "yt_test1": {
+    "available": true,
+    "type": "synced",
+    "synced": true,
+    "source": "lrclib",
+    "language": "",
+    "raw": "[00:11.18] इश्क़ में दिल बना है\n[00:13.71] इश्क़ में दिल फ़ना है, oh-oh\n[00:21.24] मिटा दे या बना दे\n[00:23.72] मैंने तुझको चुना है, oh-oh, oh\n[00:29.51] तेरे सारे रंग ओढ़ के, ढंग ओढ़ के\n[00:33.48] तेरा हुआ मैं सब को छोड़ के, oh-oh, oh\n[00:39.71] \"इश्क़ नहीं करना नाप-तोल के, राज़ खोल के\"\n[00:43.45] आया हूँ मैं सब को बोल के, oh-oh, oh-oh\n[00:50.26] ਓ, ਮੈਂ ਤਾਂ ਚੱਲਿਆ ਤੇਰੀ ਓਰ, ਤੇਰਾ ਚੱਲਿਆ ਹੈ ਜ਼ੋਰ\n[00:55.46] ਤੇਰਾ ਹੋਇਆ ਮੈਂ, ਯਾਰ ਵੇ, ਭੁੱਲਿਆ ਏ ਸੰਸਾਰ ਵੇ\n[01:01.16] ਚੱਲਿਆ ਤੇਰੀ ਓਰ, ਤੇਰਾ ਚੱਲਿਆ ਹੈ ਜ਼ੋਰ\n[01:05.59] ਤੇਰਾ ਹੋਇਆ ਮੈਂ, ਯਾਰ ਵੇ, ਭੁੱਲਿਆ ਏ ਸੰਸਾਰ ਵੇ\n[01:12.83] जग तेरे लिए छोड़ेया, दिल तेरे संग जोड़ेया\n[01:17.93] अब तेरा मैं तो हो गया, पाके तुझे मैं खो गया\n[01:22.94] जग तेरे लिए छोड़ेया (छोड़ेया), दिल तेरे संग जोड़ेया (जोड़ेया)\n[01:28.09] अब तेरा मैं तो हो गया (हो गया), पाके तुझे मैं खो गया, खो गया, हाँ\n[01:34.43] इश्क़ में दिल बना है\n[01:37.01] इश्क़ में दिल फ़ना है, oh-oh, oh\n[01:44.52] हँसा दे या रुला दे\n[01:47.14] मैंने तुझको चुना है, oh-oh, oh\n[01:52.98] दुनिया कहती, \"इश्क़ भूल है, बे-फ़िज़ूल है\"\n[01:56.67] हमको तो दिल से क़ुबूल है, oh-oh, oh-oh\n[02:03.05] तुझमें दिखता रब का नूर है, एक सुरूर है\n[02:06.90] तू है अपना, ये ग़ुरूर है, oh-oh-oh, oh-oh\n[02:13.64] ਵੇ ਮੈਂ ਤਾਂ ਚੱਲੀਆਂ ਤੇਰੀ ਓਰ, ਤੇਰਾ ਚੱਲਿਆ ਹੈ ਜ਼ੋਰ\n[02:18.87] ਤੇਰੀ ਹੋਈ ਮੈਂ, ਯਾਰ ਵੇ, ਭੁੱਲਿਆ ਏ ਸੰਸਾਰ ਵੇ\n[02:24.56] ਚੱਲੀਆਂ ਤੇਰੀ ਓਰ, ਤੇਰਾ ਚੱਲਿਆ ਹੈ ਜ਼ੋਰ\n[02:29.06] ਤੇਰੀ ਹੋਈ ਮੈਂ, ਯਾਰ ਵੇ, ਭੁੱਲਿਆ ਏ ਸੰਸਾਰ ਵੇ\n[02:33.64] तू इश्क़-ए-ख़्वाब, ख़्वाब सा है, मेरा बे-हिसाब सा है\n[02:39.06] तेरे लफ़्ज़ चूम लूँ मैं, उर्दू की किताब सा है\n[02:44.15] इश्क़-ए-ख़्वाब, ख़्वाब सा है, मेरा बे-हिसाब सा है\n[02:49.10] तेरे लफ़्ज़ चूम लूँ मैं, उर्दू की किताब सा है\n[02:53.97] जग तेरे लिए छोड़ेया (इश्क़ में दिल बना है)\n[02:56.17] दिल तेरे संग जोड़ेया (इश्क़ में दिल फ़ना है, oh-oh)\n[02:58.92] अब तेरा मैं तो हो गया, पाके तुझे मैं खो गया\n[03:04.09] जग तेरे लिए छोड़ेया (मिटा दे या बना दे)\n[03:06.56] दिल तेरे संग जोड़ेया (मैंने तुझको चुना है, oh-oh, oh)\n[03:09.01] अब तेरा मैं तो हो गया, पाके तुझे मैं खो गया, खो गया, हाँ\n[03:15.63]",
+    "lines": [
+      {
+        "start": 11.18,
+        "end": 13.71,
+        "time": 11.18,
+        "text": "इश्क़ में दिल बना है"
+      },
+      {
+        "start": 13.71,
+        "end": 21.24,
+        "time": 13.71,
+        "text": "इश्क़ में दिल फ़ना है, oh-oh"
+      },
+      {
+        "start": 21.24,
+        "end": 23.72,
+        "time": 21.24,
+        "text": "मिटा दे या बना दे"
+      },
+      {
+        "start": 23.72,
+        "end": 29.51,
+        "time": 23.72,
+        "text": "मैंने तुझको चुना है, oh-oh, oh"
+      },
+      {
+        "start": 29.51,
+        "end": 33.48,
+        "time": 29.51,
+        "text": "तेरे सारे रंग ओढ़ के, ढंग ओढ़ के"
+      },
+      {
+        "start": 33.48,
+        "end": 39.71,
+        "time": 33.48,
+        "text": "तेरा हुआ मैं सब को छोड़ के, oh-oh, oh"
+      },
+      {
+        "start": 39.71,
+        "end": 43.45,
+        "time": 39.71,
+        "text": "\"इश्क़ नहीं करना नाप-तोल के, राज़ खोल के\""
+      },
+      {
+        "start": 43.45,
+        "end": 50.26,
+        "time": 43.45,
+        "text": "आया हूँ मैं सब को बोल के, oh-oh, oh-oh"
+      },
+      {
+        "start": 50.26,
+        "end": 55.46,
+        "time": 50.26,
+        "text": "ਓ, ਮੈਂ ਤਾਂ ਚੱਲਿਆ ਤੇਰੀ ਓਰ, ਤੇਰਾ ਚੱਲਿਆ ਹੈ ਜ਼ੋਰ"
+      },
+      {
+        "start": 55.46,
+        "end": 61.16,
+        "time": 55.46,
+        "text": "ਤੇਰਾ ਹੋਇਆ ਮੈਂ, ਯਾਰ ਵੇ, ਭੁੱਲਿਆ ਏ ਸੰਸਾਰ ਵੇ"
+      },
+      {
+        "start": 61.16,
+        "end": 65.59,
+        "time": 61.16,
+        "text": "ਚੱਲਿਆ ਤੇਰੀ ਓਰ, ਤੇਰਾ ਚੱਲਿਆ ਹੈ ਜ਼ੋਰ"
+      },
+      {
+        "start": 65.59,
+        "end": 72.83,
+        "time": 65.59,
+        "text": "ਤੇਰਾ ਹੋਇਆ ਮੈਂ, ਯਾਰ ਵੇ, ਭੁੱਲਿਆ ਏ ਸੰਸਾਰ ਵੇ"
+      },
+      {
+        "start": 72.83,
+        "end": 77.93,
+        "time": 72.83,
+        "text": "जग तेरे लिए छोड़ेया, दिल तेरे संग जोड़ेया"
+      },
+      {
+        "start": 77.93,
+        "end": 82.94,
+        "time": 77.93,
+        "text": "अब तेरा मैं तो हो गया, पाके तुझे मैं खो गया"
+      },
+      {
+        "start": 82.94,
+        "end": 88.09,
+        "time": 82.94,
+        "text": "जग तेरे लिए छोड़ेया (छोड़ेया), दिल तेरे संग जोड़ेया (जोड़ेया)"
+      },
+      {
+        "start": 88.09,
+        "end": 94.43,
+        "time": 88.09,
+        "text": "अब तेरा मैं तो हो गया (हो गया), पाके तुझे मैं खो गया, खो गया, हाँ"
+      },
+      {
+        "start": 94.43,
+        "end": 97.01,
+        "time": 94.43,
+        "text": "इश्क़ में दिल बना है"
+      },
+      {
+        "start": 97.01,
+        "end": 104.52,
+        "time": 97.01,
+        "text": "इश्क़ में दिल फ़ना है, oh-oh, oh"
+      },
+      {
+        "start": 104.52,
+        "end": 107.14,
+        "time": 104.52,
+        "text": "हँसा दे या रुला दे"
+      },
+      {
+        "start": 107.14,
+        "end": 112.98,
+        "time": 107.14,
+        "text": "मैंने तुझको चुना है, oh-oh, oh"
+      },
+      {
+        "start": 112.98,
+        "end": 116.67,
+        "time": 112.98,
+        "text": "दुनिया कहती, \"इश्क़ भूल है, बे-फ़िज़ूल है\""
+      },
+      {
+        "start": 116.67,
+        "end": 123.05,
+        "time": 116.67,
+        "text": "हमको तो दिल से क़ुबूल है, oh-oh, oh-oh"
+      },
+      {
+        "start": 123.05,
+        "end": 126.9,
+        "time": 123.05,
+        "text": "तुझमें दिखता रब का नूर है, एक सुरूर है"
+      },
+      {
+        "start": 126.9,
+        "end": 133.64,
+        "time": 126.9,
+        "text": "तू है अपना, ये ग़ुरूर है, oh-oh-oh, oh-oh"
+      },
+      {
+        "start": 133.64,
+        "end": 138.87,
+        "time": 133.64,
+        "text": "ਵੇ ਮੈਂ ਤਾਂ ਚੱਲੀਆਂ ਤੇਰੀ ਓਰ, ਤੇਰਾ ਚੱਲਿਆ ਹੈ ਜ਼ੋਰ"
+      },
+      {
+        "start": 138.87,
+        "end": 144.56,
+        "time": 138.87,
+        "text": "ਤੇਰੀ ਹੋਈ ਮੈਂ, ਯਾਰ ਵੇ, ਭੁੱਲਿਆ ਏ ਸੰਸਾਰ ਵੇ"
+      },
+      {
+        "start": 144.56,
+        "end": 149.06,
+        "time": 144.56,
+        "text": "ਚੱਲੀਆਂ ਤੇਰੀ ਓਰ, ਤੇਰਾ ਚੱਲਿਆ ਹੈ ਜ਼ੋਰ"
+      },
+      {
+        "start": 149.06,
+        "end": 153.64,
+        "time": 149.06,
+        "text": "ਤੇਰੀ ਹੋਈ ਮੈਂ, ਯਾਰ ਵੇ, ਭੁੱਲਿਆ ਏ ਸੰਸਾਰ ਵੇ"
+      },
+      {
+        "start": 153.64,
+        "end": 159.06,
+        "time": 153.64,
+        "text": "तू इश्क़-ए-ख़्वाब, ख़्वाब सा है, मेरा बे-हिसाब सा है"
+      },
+      {
+        "start": 159.06,
+        "end": 164.15,
+        "time": 159.06,
+        "text": "तेरे लफ़्ज़ चूम लूँ मैं, उर्दू की किताब सा है"
+      },
+      {
+        "start": 164.15,
+        "end": 169.1,
+        "time": 164.15,
+        "text": "इश्क़-ए-ख़्वाब, ख़्वाब सा है, मेरा बे-हिसाब सा है"
+      },
+      {
+        "start": 169.1,
+        "end": 173.97,
+        "time": 169.1,
+        "text": "तेरे लफ़्ज़ चूम लूँ मैं, उर्दू की किताब सा है"
+      },
+      {
+        "start": 173.97,
+        "end": 176.17,
+        "time": 173.97,
+        "text": "जग तेरे लिए छोड़ेया (इश्क़ में दिल बना है)"
+      },
+      {
+        "start": 176.17,
+        "end": 178.92,
+        "time": 176.17,
+        "text": "दिल तेरे संग जोड़ेया (इश्क़ में दिल फ़ना है, oh-oh)"
+      },
+      {
+        "start": 178.92,
+        "end": 184.09,
+        "time": 178.92,
+        "text": "अब तेरा मैं तो हो गया, पाके तुझे मैं खो गया"
+      },
+      {
+        "start": 184.09,
+        "end": 186.56,
+        "time": 184.09,
+        "text": "जग तेरे लिए छोड़ेया (मिटा दे या बना दे)"
+      },
+      {
+        "start": 186.56,
+        "end": 189.01,
+        "time": 186.56,
+        "text": "दिल तेरे संग जोड़ेया (मैंने तुझको चुना है, oh-oh, oh)"
+      },
+      {
+        "start": 189.01,
+        "end": 195.63,
+        "time": 189.01,
+        "text": "अब तेरा मैं तो हो गया, पाके तुझे मैं खो गया, खो गया, हाँ"
+      },
+      {
+        "start": 195.63,
+        "end": 200.63,
+        "time": 195.63,
+        "text": "♪"
+      }
+    ],
+    "updatedAt": "2026-10-12T17:39:06.049Z"
+  },
+  "yt_test2": {
+    "available": true,
+    "type": "synced",
+    "synced": true,
+    "source": "lrclib",
+    "language": "",
+    "raw": "[00:03.37] Nnaa nee vaanaa\n[00:05.42] Novv nee vaanaa\n[00:08.37] Novv please nnaa, please nnaa thambigalukkosram, thambigalukkosram\n[00:11.84] Vaa, vaa, vaa ayyayyo\n[00:13.88] Naa ready dhaan varavaa\n[00:16.41] Annan naa erangi varavaa\n[00:19.15] Thael kodukku singaththa seendadhappaa\n[00:21.93] Evan thadaththum en route'u maaraadhappaa\n[00:24.52] Naa ready dhaan varavaa\n[00:27.57] Annan naa thaniyaa varavaa\n[00:30.37] Thara nadungura parai adikanum naa aadaththaan\n[00:32.65] Veral idukkula thee pandham naa yeththaththaan\n[00:35.21] Hey paththaadhu bottle'u naa kudikka (hyy)\n[00:37.87] Andaala kondaa cheers adikka (cheers)\n[00:40.63] Keda vetti kondaanga daa\n[00:43.30] En pasi naan thanikka\n[00:46.13] \n[01:15.94] Pogaiyela aruvadaikku thayaaraana opponent'ah kalai eduththu\n[01:18.72] Thalavaliya pokkipadhu enga thalayezhuththu\n[01:21.18] Aadaadha aattam poattaa katti vechu konila katti lorry'la yaeththi\n[01:24.19] Arththupoda anuppiduvom factory'ku\n[01:26.20] Deii ellaa blueprint'um theriyum mission successfull'ah mudiyum\n[01:29.41] Edaiya vandhaa unnaiyum padaiyal veppan kolasaamikki\n[01:31.72] Adhoda aadu, saaraayam, beedi, suruttu, gang'la illa poiyumporattu\n[01:35.02] Velayattu pola velaya navuththum world-wide'u link'u\n[01:37.50] Hey ellaa oorum namma rules uruvadhu daa namma tools\n[01:40.69] Aththana peru asaivum orae maari sync'u\n[01:43.07] Hey singles illa gumbal sanda gelichi-gelichi kalachi poittaen\n[01:46.16] Paththavachchu pogaiya uttaa power'u kick'u\n[01:49.79] \n[01:56.04] Pogaiyela Pogaiyela\n[01:58.82] Power'u kick'u\n[02:01.70] \n[02:24.68] Milaga thatti-mutti kolambula kodhikkudhu paar andha kaal azhagu\n[02:30.02] Adi-dhadi, vettu, kuththu enga veettu samayal vara ada kalandhirukku\n[02:35.52] Kaththi pala kaththi inga enna kuththa kaathirukku adhu dhaan kanakku\n[02:40.85] Indha kaththi vera ragam vaenaa sketch'u enakku puridhaa unakku (ahn puridhu-puridhu)\n[02:46.45] Milli ulla ponaa podhum gilli vella varuvaan daa\n[02:51.81] Milli ulla ponaa podhum gilli vella varuvaan paar\n[02:57.16] Oorukkull enakkoru paer irukku kaettaalae adhirum paar unakku\n[03:01.99] Poster adi annan ready kondaadi koluththanumdi\n[03:07.43] Naa\n[03:08.87] Hey annan varraar vazhi udu\n[03:10.16] Annan naa erangi varavaa\n[03:13.10] Thael kodukku singaththa seendadhappaa\n[03:15.73] Evan thadaththum en route'u maaraadhappaa\n[03:18.57] Naa ready dhaan varavaa\n[03:21.28] Annan naa thaniyaa varavaa\n[03:24.06] Thara nadungura parai adikanum naa aadaththaan\n[03:27.26] Veral idukkula thee pandham naa yeththaththaan\n[03:29.11] Hey paththaadhu bottle'u naa kudikka (hyy)\n[03:32.18] Andaala kondaa cheers adikka (cheers)\n[03:34.84] Keda vetti kondaanga daa\n[03:37.50] En pasi naan thanikka\n[03:38.76]",
+    "lines": [
+      {
+        "start": 3.37,
+        "end": 5.42,
+        "time": 3.37,
+        "text": "Nnaa nee vaanaa"
+      },
+      {
+        "start": 5.42,
+        "end": 8.37,
+        "time": 5.42,
+        "text": "Novv nee vaanaa"
+      },
+      {
+        "start": 8.37,
+        "end": 11.84,
+        "time": 8.37,
+        "text": "Novv please nnaa, please nnaa thambigalukkosram, thambigalukkosram"
+      },
+      {
+        "start": 11.84,
+        "end": 13.88,
+        "time": 11.84,
+        "text": "Vaa, vaa, vaa ayyayyo"
+      },
+      {
+        "start": 13.88,
+        "end": 16.41,
+        "time": 13.88,
+        "text": "Naa ready dhaan varavaa"
+      },
+      {
+        "start": 16.41,
+        "end": 19.15,
+        "time": 16.41,
+        "text": "Annan naa erangi varavaa"
+      },
+      {
+        "start": 19.15,
+        "end": 21.93,
+        "time": 19.15,
+        "text": "Thael kodukku singaththa seendadhappaa"
+      },
+      {
+        "start": 21.93,
+        "end": 24.52,
+        "time": 21.93,
+        "text": "Evan thadaththum en route'u maaraadhappaa"
+      },
+      {
+        "start": 24.52,
+        "end": 27.57,
+        "time": 24.52,
+        "text": "Naa ready dhaan varavaa"
+      },
+      {
+        "start": 27.57,
+        "end": 30.37,
+        "time": 27.57,
+        "text": "Annan naa thaniyaa varavaa"
+      },
+      {
+        "start": 30.37,
+        "end": 32.65,
+        "time": 30.37,
+        "text": "Thara nadungura parai adikanum naa aadaththaan"
+      },
+      {
+        "start": 32.65,
+        "end": 35.21,
+        "time": 32.65,
+        "text": "Veral idukkula thee pandham naa yeththaththaan"
+      },
+      {
+        "start": 35.21,
+        "end": 37.87,
+        "time": 35.21,
+        "text": "Hey paththaadhu bottle'u naa kudikka (hyy)"
+      },
+      {
+        "start": 37.87,
+        "end": 40.63,
+        "time": 37.87,
+        "text": "Andaala kondaa cheers adikka (cheers)"
+      },
+      {
+        "start": 40.63,
+        "end": 43.3,
+        "time": 40.63,
+        "text": "Keda vetti kondaanga daa"
+      },
+      {
+        "start": 43.3,
+        "end": 46.13,
+        "time": 43.3,
+        "text": "En pasi naan thanikka"
+      },
+      {
+        "start": 46.13,
+        "end": 75.94,
+        "time": 46.13,
+        "text": "♪"
+      },
+      {
+        "start": 75.94,
+        "end": 78.72,
+        "time": 75.94,
+        "text": "Pogaiyela aruvadaikku thayaaraana opponent'ah kalai eduththu"
+      },
+      {
+        "start": 78.72,
+        "end": 81.18,
+        "time": 78.72,
+        "text": "Thalavaliya pokkipadhu enga thalayezhuththu"
+      },
+      {
+        "start": 81.18,
+        "end": 84.19,
+        "time": 81.18,
+        "text": "Aadaadha aattam poattaa katti vechu konila katti lorry'la yaeththi"
+      },
+      {
+        "start": 84.19,
+        "end": 86.2,
+        "time": 84.19,
+        "text": "Arththupoda anuppiduvom factory'ku"
+      },
+      {
+        "start": 86.2,
+        "end": 89.41,
+        "time": 86.2,
+        "text": "Deii ellaa blueprint'um theriyum mission successfull'ah mudiyum"
+      },
+      {
+        "start": 89.41,
+        "end": 91.72,
+        "time": 89.41,
+        "text": "Edaiya vandhaa unnaiyum padaiyal veppan kolasaamikki"
+      },
+      {
+        "start": 91.72,
+        "end": 95.02,
+        "time": 91.72,
+        "text": "Adhoda aadu, saaraayam, beedi, suruttu, gang'la illa poiyumporattu"
+      },
+      {
+        "start": 95.02,
+        "end": 97.5,
+        "time": 95.02,
+        "text": "Velayattu pola velaya navuththum world-wide'u link'u"
+      },
+      {
+        "start": 97.5,
+        "end": 100.69,
+        "time": 97.5,
+        "text": "Hey ellaa oorum namma rules uruvadhu daa namma tools"
+      },
+      {
+        "start": 100.69,
+        "end": 103.07,
+        "time": 100.69,
+        "text": "Aththana peru asaivum orae maari sync'u"
+      },
+      {
+        "start": 103.07,
+        "end": 106.16,
+        "time": 103.07,
+        "text": "Hey singles illa gumbal sanda gelichi-gelichi kalachi poittaen"
+      },
+      {
+        "start": 106.16,
+        "end": 109.79,
+        "time": 106.16,
+        "text": "Paththavachchu pogaiya uttaa power'u kick'u"
+      },
+      {
+        "start": 109.79,
+        "end": 116.04,
+        "time": 109.79,
+        "text": "♪"
+      },
+      {
+        "start": 116.04,
+        "end": 118.82,
+        "time": 116.04,
+        "text": "Pogaiyela Pogaiyela"
+      },
+      {
+        "start": 118.82,
+        "end": 121.7,
+        "time": 118.82,
+        "text": "Power'u kick'u"
+      },
+      {
+        "start": 121.7,
+        "end": 144.68,
+        "time": 121.7,
+        "text": "♪"
+      },
+      {
+        "start": 144.68,
+        "end": 150.02,
+        "time": 144.68,
+        "text": "Milaga thatti-mutti kolambula kodhikkudhu paar andha kaal azhagu"
+      },
+      {
+        "start": 150.02,
+        "end": 155.52,
+        "time": 150.02,
+        "text": "Adi-dhadi, vettu, kuththu enga veettu samayal vara ada kalandhirukku"
+      },
+      {
+        "start": 155.52,
+        "end": 160.85,
+        "time": 155.52,
+        "text": "Kaththi pala kaththi inga enna kuththa kaathirukku adhu dhaan kanakku"
+      },
+      {
+        "start": 160.85,
+        "end": 166.45,
+        "time": 160.85,
+        "text": "Indha kaththi vera ragam vaenaa sketch'u enakku puridhaa unakku (ahn puridhu-puridhu)"
+      },
+      {
+        "start": 166.45,
+        "end": 171.81,
+        "time": 166.45,
+        "text": "Milli ulla ponaa podhum gilli vella varuvaan daa"
+      },
+      {
+        "start": 171.81,
+        "end": 177.16,
+        "time": 171.81,
+        "text": "Milli ulla ponaa podhum gilli vella varuvaan paar"
+      },
+      {
+        "start": 177.16,
+        "end": 181.99,
+        "time": 177.16,
+        "text": "Oorukkull enakkoru paer irukku kaettaalae adhirum paar unakku"
+      },
+      {
+        "start": 181.99,
+        "end": 187.43,
+        "time": 181.99,
+        "text": "Poster adi annan ready kondaadi koluththanumdi"
+      },
+      {
+        "start": 187.43,
+        "end": 188.87,
+        "time": 187.43,
+        "text": "Naa"
+      },
+      {
+        "start": 188.87,
+        "end": 190.16,
+        "time": 188.87,
+        "text": "Hey annan varraar vazhi udu"
+      },
+      {
+        "start": 190.16,
+        "end": 193.1,
+        "time": 190.16,
+        "text": "Annan naa erangi varavaa"
+      },
+      {
+        "start": 193.1,
+        "end": 195.73,
+        "time": 193.1,
+        "text": "Thael kodukku singaththa seendadhappaa"
+      },
+      {
+        "start": 195.73,
+        "end": 198.57,
+        "time": 195.73,
+        "text": "Evan thadaththum en route'u maaraadhappaa"
+      },
+      {
+        "start": 198.57,
+        "end": 201.28,
+        "time": 198.57,
+        "text": "Naa ready dhaan varavaa"
+      },
+      {
+        "start": 201.28,
+        "end": 204.06,
+        "time": 201.28,
+        "text": "Annan naa thaniyaa varavaa"
+      },
+      {
+        "start": 204.06,
+        "end": 207.26,
+        "time": 204.06,
+        "text": "Thara nadungura parai adikanum naa aadaththaan"
+      },
+      {
+        "start": 207.26,
+        "end": 209.11,
+        "time": 207.26,
+        "text": "Veral idukkula thee pandham naa yeththaththaan"
+      },
+      {
+        "start": 209.11,
+        "end": 212.18,
+        "time": 209.11,
+        "text": "Hey paththaadhu bottle'u naa kudikka (hyy)"
+      },
+      {
+        "start": 212.18,
+        "end": 214.84,
+        "time": 212.18,
+        "text": "Andaala kondaa cheers adikka (cheers)"
+      },
+      {
+        "start": 214.84,
+        "end": 217.5,
+        "time": 214.84,
+        "text": "Keda vetti kondaanga daa"
+      },
+      {
+        "start": 217.5,
+        "end": 218.76,
+        "time": 217.5,
+        "text": "En pasi naan thanikka"
+      },
+      {
+        "start": 218.76,
+        "end": 223.76,
+        "time": 218.76,
+        "text": "♪"
+      }
+    ],
+    "updatedAt": "2026-10-12T17:39:08.490Z"
+  },
+  "yt_test3": {
+    "available": true,
+    "type": "synced",
+    "synced": true,
+    "source": "lrclib",
+    "language": "",
+    "raw": "[00:29.07] எண்ணமே ஏன் உன்னால\n[00:31.12] உள்ள பூந்தது தன்னால\n[00:34.74] கன்னமே ஏன் கண்ணால\n[00:37.42] வெந்து செவந்து புண்ணாக\n[00:39.12] ஏதோ நானும் ஒலர\n[00:41.59] கொஞ்சம் காதல் வளர\n[00:44.01] உள்ள வெக்கம் வளர\n[00:46.23] அவ வந்தா தேடியே\n[00:48.67] தன்ன நேரம் நிக்குது மோகம் சொக்குது வார்த்த திக்குதமா\n[00:53.45] நெஞ்சம் பூட்டி வெச்சத வந்தொடச்சிட்டமா\n[00:58.12] கட்சி சேர நிக்குது கண் அழைக்குது பொன் அணிந்திடமா\n[01:03.12] அன்பு தேங்கி நிக்குது வந்தெடுத்துக்கோமா\n[01:08.54] \n[01:37.18] யாரும் பார்த்து நின்னு பேசவில்ல\n[01:40.09] காத்து நின்னு குடுத்ததில்ல\n[01:42.50] நீயும் வந்து பார்த்ததால பனியும் பத்திகிச்சே\n[01:47.23] கண் மறச்சு போற புள்ள\n[01:49.26] முன் அழச்சது யாரும் இல்ல\n[01:52.56] உன் மனசில்தான் விழுந்தேன் நானும் தங்கிடவே\n[01:56.99] ஹே எண்ணமே ஏன் உன்னால\n[01:59.12] உள்ள பூந்தது தன்னால\n[02:01.98] கன்னமே ஏன் கண்ணால\n[02:04.38] வெந்து செவந்து புண்ணாக\n[02:06.56] ஏதோ நானும் ஒலர\n[02:08.44] கொஞ்சம் காதல் வளர\n[02:11.03] உள்ள வெக்கம் வளர\n[02:13.54] அவ வந்தா தேடியே\n[02:15.87] தன்ன நேரம் நிக்குது மோகம் சொக்குது வார்த்த திக்குதமா\n[02:20.35] நெஞ்சம் பூட்டி வெச்சத வந்தொடச்சிட்டமா\n[02:25.29] கட்சி சேர நிக்குது கண் அழைக்குது பொன் அணிந்திடமா\n[02:30.19] அன்பு தேங்கி நிக்குது வந்தெடுத்துக்கோமா\n[02:37.14]",
+    "lines": [
+      {
+        "start": 29.07,
+        "end": 31.12,
+        "time": 29.07,
+        "text": "எண்ணமே ஏன் உன்னால"
+      },
+      {
+        "start": 31.12,
+        "end": 34.74,
+        "time": 31.12,
+        "text": "உள்ள பூந்தது தன்னால"
+      },
+      {
+        "start": 34.74,
+        "end": 37.42,
+        "time": 34.74,
+        "text": "கன்னமே ஏன் கண்ணால"
+      },
+      {
+        "start": 37.42,
+        "end": 39.12,
+        "time": 37.42,
+        "text": "வெந்து செவந்து புண்ணாக"
+      },
+      {
+        "start": 39.12,
+        "end": 41.59,
+        "time": 39.12,
+        "text": "ஏதோ நானும் ஒலர"
+      },
+      {
+        "start": 41.59,
+        "end": 44.01,
+        "time": 41.59,
+        "text": "கொஞ்சம் காதல் வளர"
+      },
+      {
+        "start": 44.01,
+        "end": 46.23,
+        "time": 44.01,
+        "text": "உள்ள வெக்கம் வளர"
+      },
+      {
+        "start": 46.23,
+        "end": 48.67,
+        "time": 46.23,
+        "text": "அவ வந்தா தேடியே"
+      },
+      {
+        "start": 48.67,
+        "end": 53.45,
+        "time": 48.67,
+        "text": "தன்ன நேரம் நிக்குது மோகம் சொக்குது வார்த்த திக்குதமா"
+      },
+      {
+        "start": 53.45,
+        "end": 58.12,
+        "time": 53.45,
+        "text": "நெஞ்சம் பூட்டி வெச்சத வந்தொடச்சிட்டமா"
+      },
+      {
+        "start": 58.12,
+        "end": 63.12,
+        "time": 58.12,
+        "text": "கட்சி சேர நிக்குது கண் அழைக்குது பொன் அணிந்திடமா"
+      },
+      {
+        "start": 63.12,
+        "end": 68.54,
+        "time": 63.12,
+        "text": "அன்பு தேங்கி நிக்குது வந்தெடுத்துக்கோமா"
+      },
+      {
+        "start": 68.54,
+        "end": 97.18,
+        "time": 68.54,
+        "text": "♪"
+      },
+      {
+        "start": 97.18,
+        "end": 100.09,
+        "time": 97.18,
+        "text": "யாரும் பார்த்து நின்னு பேசவில்ல"
+      },
+      {
+        "start": 100.09,
+        "end": 102.5,
+        "time": 100.09,
+        "text": "காத்து நின்னு குடுத்ததில்ல"
+      },
+      {
+        "start": 102.5,
+        "end": 107.23,
+        "time": 102.5,
+        "text": "நீயும் வந்து பார்த்ததால பனியும் பத்திகிச்சே"
+      },
+      {
+        "start": 107.23,
+        "end": 109.26,
+        "time": 107.23,
+        "text": "கண் மறச்சு போற புள்ள"
+      },
+      {
+        "start": 109.26,
+        "end": 112.56,
+        "time": 109.26,
+        "text": "முன் அழச்சது யாரும் இல்ல"
+      },
+      {
+        "start": 112.56,
+        "end": 116.99,
+        "time": 112.56,
+        "text": "உன் மனசில்தான் விழுந்தேன் நானும் தங்கிடவே"
+      },
+      {
+        "start": 116.99,
+        "end": 119.12,
+        "time": 116.99,
+        "text": "ஹே எண்ணமே ஏன் உன்னால"
+      },
+      {
+        "start": 119.12,
+        "end": 121.98,
+        "time": 119.12,
+        "text": "உள்ள பூந்தது தன்னால"
+      },
+      {
+        "start": 121.98,
+        "end": 124.38,
+        "time": 121.98,
+        "text": "கன்னமே ஏன் கண்ணால"
+      },
+      {
+        "start": 124.38,
+        "end": 126.56,
+        "time": 124.38,
+        "text": "வெந்து செவந்து புண்ணாக"
+      },
+      {
+        "start": 126.56,
+        "end": 128.44,
+        "time": 126.56,
+        "text": "ஏதோ நானும் ஒலர"
+      },
+      {
+        "start": 128.44,
+        "end": 131.03,
+        "time": 128.44,
+        "text": "கொஞ்சம் காதல் வளர"
+      },
+      {
+        "start": 131.03,
+        "end": 133.54,
+        "time": 131.03,
+        "text": "உள்ள வெக்கம் வளர"
+      },
+      {
+        "start": 133.54,
+        "end": 135.87,
+        "time": 133.54,
+        "text": "அவ வந்தா தேடியே"
+      },
+      {
+        "start": 135.87,
+        "end": 140.35,
+        "time": 135.87,
+        "text": "தன்ன நேரம் நிக்குது மோகம் சொக்குது வார்த்த திக்குதமா"
+      },
+      {
+        "start": 140.35,
+        "end": 145.29,
+        "time": 140.35,
+        "text": "நெஞ்சம் பூட்டி வெச்சத வந்தொடச்சிட்டமா"
+      },
+      {
+        "start": 145.29,
+        "end": 150.19,
+        "time": 145.29,
+        "text": "கட்சி சேர நிக்குது கண் அழைக்குது பொன் அணிந்திடமா"
+      },
+      {
+        "start": 150.19,
+        "end": 157.14,
+        "time": 150.19,
+        "text": "அன்பு தேங்கி நிக்குது வந்தெடுத்துக்கோமா"
+      },
+      {
+        "start": 157.14,
+        "end": 162.14,
+        "time": 157.14,
+        "text": "♪"
+      }
+    ],
+    "updatedAt": "2026-10-12T17:39:10.135Z"
   }
 }
