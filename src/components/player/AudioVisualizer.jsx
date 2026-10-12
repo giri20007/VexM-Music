@@ -201,6 +201,8 @@ export function AudioVisualizer({
         }
       }
 
+      const hasVisualSignal = isLiveAudio || (isPlaying && !hasAnalyserSignal);
+
       // Separate broad bands so the VFX can distinguish a kick from general motion.
       const bandAverage = (start, end) => {
         let total = 0;
@@ -260,8 +262,8 @@ export function AudioVisualizer({
 
         for (let i = 0; i < barCount; i++) {
           const binIdx = Math.floor((i / barCount) * 64);
-          const val = isLiveAudio ? smoothData[binIdx] : 0.04;
-          const barH = Math.max(6 * dpr, val * height * 0.58);
+          const val = hasVisualSignal ? smoothData[binIdx] : 0.04;
+          const barH = Math.max(6 * dpr, val * height * (0.58 + impactRef.current * 0.16));
           const x = startX + i * (barWidth + 3 * dpr);
           const y = baseHeight - barH;
 
@@ -310,8 +312,8 @@ export function AudioVisualizer({
             const binIdx = Math.floor((i / points) * 64);
             const freqVal = smoothData[binIdx] || 0;
             const timeVal = ((timeData[i * 2] || 128) - 128) / 128;
-            const displacement = isLiveAudio
-              ? (timeVal * 0.6 + freqVal * 0.4) * (height * 0.32 * layer.amp)
+            const displacement = hasVisualSignal
+              ? (timeVal * 0.6 + freqVal * 0.4) * (height * (0.32 + impactRef.current * 0.18) * layer.amp)
               : Math.sin(Date.now() / 400 + i * 0.2 + layer.offset) * (height * 0.04);
 
             const x = i * step;
@@ -324,8 +326,8 @@ export function AudioVisualizer({
               const prevBin = Math.floor(((i - 1) / points) * 64);
               const prevFreq = smoothData[prevBin] || 0;
               const prevTime = ((timeData[(i - 1) * 2] || 128) - 128) / 128;
-              const prevDisp = isLiveAudio
-                ? (prevTime * 0.6 + prevFreq * 0.4) * (height * 0.32 * layer.amp)
+              const prevDisp = hasVisualSignal
+                ? (prevTime * 0.6 + prevFreq * 0.4) * (height * (0.32 + impactRef.current * 0.18) * layer.amp)
                 : Math.sin(Date.now() / 400 + (i - 1) * 0.2 + layer.offset) * (height * 0.04);
               const prevY = centerY + prevDisp;
               const mx = (prevX + x) / 2;
@@ -356,7 +358,7 @@ export function AudioVisualizer({
 
         // Ambient Starfield Particles
         particlesRef.current.forEach(p => {
-          p.update(width, height, isLiveAudio ? bass : 0.01);
+          p.update(width, height, hasVisualSignal ? bass : 0.01);
           p.draw(ctx, cx, cy);
         });
 
@@ -393,7 +395,7 @@ export function AudioVisualizer({
           const half = rayCount / 2;
           const distFromHalf = Math.abs(i - half);
           const normalizedFreqIdx = Math.floor((1 - distFromHalf / half) * 54);
-          const val = isLiveAudio ? smoothData[normalizedFreqIdx] : 0.05;
+          const val = hasVisualSignal ? smoothData[normalizedFreqIdx] : 0.05;
           const rayLen = Math.max(4 * dpr, val * minDim * 0.23 * (1 + bass * 0.32 + impactRef.current * 0.18));
 
           // Peak hold indicator physics
