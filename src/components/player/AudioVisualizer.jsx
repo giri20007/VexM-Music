@@ -182,8 +182,8 @@ export function AudioVisualizer({
     /**
      * Pre-render static turntable platter, groove rings, and HUD typography once onto an offscreen canvas
      */
-    const getOffscreenPlatter = (discRadius, ringOuterRadius) => {
-      const platterDim = Math.ceil(ringOuterRadius * 2 + 10 * dpr);
+    const getOffscreenPlatter = () => {
+      const platterDim = Math.round(512 * dpr);
       if (offscreenPlatterRef.current && offscreenPlatterSizeRef.current === platterDim) {
         return offscreenPlatterRef.current;
       }
@@ -193,6 +193,8 @@ export function AudioVisualizer({
       offCanvas.height = platterDim;
       const oCtx = offCanvas.getContext('2d');
       const oCenter = platterDim / 2;
+      const discRadius = 188 * dpr;
+      const ringOuterRadius = 224 * dpr;
 
       // 1. Obsidian Black Turntable Vinyl Platter
       const vinylGrad = oCtx.createRadialGradient(oCenter, oCenter, 5, oCenter, oCenter, discRadius);
@@ -294,6 +296,9 @@ export function AudioVisualizer({
       let isLiveAudio = false;
 
       if (analyser && isPlaying) {
+        if (window.__SPX_AUDIO_CTX__ && window.__SPX_AUDIO_CTX__.state === 'suspended') {
+          window.__SPX_AUDIO_CTX__.resume().catch(() => {});
+        }
         analyser.getByteFrequencyData(freqData);
         analyser.getByteTimeDomainData(timeData);
         isLiveAudio = freqData.some(val => val > 3);
@@ -301,10 +306,15 @@ export function AudioVisualizer({
 
       // True Real-Time Beat & Kick Transient Detection
       if (isLiveAudio) {
-        // Sub-bass Kick Band: Bins 1..3 (43 Hz - 130 Hz)
-        let subBassSum = 0;
-        for (let i = 1; i <= 3; i++) subBassSum += freqData[i] || 0;
-        const currentSubBass = subBassSum / (3 * 255);
+        // Broad Sub-bass & Bass Kick Band: Bins 1..8 (40 Hz - 350 Hz)
+        let bassSum = 0;
+        let bassWeight = 0;
+        for (let i = 1; i <= 8; i++) {
+          const w = i <= 3 ? 1.6 : (i <= 5 ? 1.2 : 0.8);
+          bassSum += (freqData[i] || 0) * w;
+          bassWeight += w * 255;
+        }
+        const currentBass = bassSum / bassWeight;
 
         // Update running energy history buffer for dynamic adaptive threshold
         const history = energyHistoryRef.current;
@@ -312,38 +322,68 @@ export function AudioVisualizer({
         for (let i = 0; i < history.length; i++) histTotal += history[i];
         const avgEnergy = histTotal / history.length;
 
-        history[historyIdxRef.current] = currentSubBass;
+        history[historyIdxRef.current] = currentBass;
         historyIdxRef.current = (historyIdxRef.current + 1) % history.length;
 
         // Instant Transient Kick Impulse Detection
-        const transientDelta = currentSubBass - (smoothedBassRef.current || 0);
-        const dynamicThreshold = Math.max(0.12, avgEnergy * 1.30);
+        const transientDelta = currentBass - (smoothedBassRef.current || 0);
         const timeSinceLastBeat = now - lastBeatTimeRef.current;
 
-        if (currentSubBass > dynamicThreshold && transientDelta > 0.035 && timeSinceLastBeat > 180) {
+        // Fast adaptive kick trigger:
+        // Catches direct bass jumps above dynamic baseline or sharp rising transients
+        if (
+          ((currentBass > avgEnergy * 1.15 && currentBass - avgEnergy > 0.035) || transientDelta > 0.03) &&
+          timeSinceLastBeat > 130
+        ) {
           lastBeatTimeRef.current = now;
-          const kickStrength = Math.min(1.0, (currentSubBass - avgEnergy) * 2.5 + transientDelta * 2.0);
-          impactRef.current = Math.min(1.0, impactRef.current + kickStrength);
+          const kickStrength = Math.min(1.0, (currentBass - avgEnergy) * 3.0 + Math.max(0, transientDelta) * 2.5);
+          impactRef.current = Math.min(1.0, impactRef.current + Math.max(0.4, kickStrength));
           shockwaveRef.current = 1.0;
         }
 
         // Asymmetric zero-latency envelope follower: Instant attack on bass rise, smooth exponential acoustic release
-        if (currentSubBass > smoothedBassRef.current) {
-          smoothedBassRef.current = smoothedBassRef.current * 0.15 + currentSubBass * 0.85; // <1 frame attack
+        if (currentBass > smoothedBassRef.current) {
+          smoothedBassRef.current = smoothedBassRef.current * 0.12 + currentBass * 0.88; // <1 frame attack
         } else {
-          smoothedBassRef.current = smoothedBassRef.current * Math.pow(0.86, dt);
+          smoothedBassRef.current = smoothedBassRef.current * Math.pow(0.84, dt);
         }
       } else if (isPlaying) {
-        // Organic, silky harmonic breathing waves for YouTube / Streams without PCM Access
-        const t = now / 1000;
-        const slowBreath = 0.5 + 0.5 * Math.sin(t * 1.5);
-        for (let i = 0; i < 128; i++) {
-          const octaveWave = Math.sin(i * 0.09 + t * 2.0);
-          const curve = Math.max(0.08, (Math.sin(t * 1.1 + i * 0.08) * 0.35 + 0.5) * (1 - i / 135));
-          freqData[i] = Math.round(curve * 155 + octaveWave * 20 + slowBreath * 25);
-          timeData[i] = Math.round(128 + Math.sin(t * 3.5 + i * 0.18) * 18 * slowBreath);
+        // Synthesized acoustic drum engine synchronized to track playback time
+        const track = useAudioStore.getState().currentTrack;
+        const trackStr = track?.id ? String(track.id) : (track?.title || 'track');
+        let hash = 0;
+        for (let i = 0; i < trackStr.length; i++) hash = ((hash << 5) - hash + trackStr.charCodeAt(i)) | 0;
+        const bpm = 118 + (Math.abs(hash) % 15);
+        const beatPeriod = 60 / bpm;
+        const curTime = (typeof useAudioStore !== 'undefined' && useAudioStore.getState().currentTime) || (now / 1000);
+        const beatPhase = (curTime % beatPeriod) / beatPeriod;
+
+        const kickEnvelope = Math.pow(Math.max(0, 1 - beatPhase), 2.6);
+        const offBeatPhase = ((curTime + beatPeriod * 0.5) % beatPeriod) / beatPeriod;
+        const offBeatEnvelope = Math.pow(Math.max(0, 1 - offBeatPhase), 3.2) * 0.45;
+        const groove = Math.max(kickEnvelope, offBeatEnvelope);
+
+        if (beatPhase < 0.08 && now - lastBeatTimeRef.current > beatPeriod * 750) {
+          lastBeatTimeRef.current = now;
+          impactRef.current = Math.min(1.0, impactRef.current + 0.85);
+          shockwaveRef.current = 1.0;
         }
-        smoothedBassRef.current = 0.22 + slowBreath * 0.18;
+
+        for (let i = 0; i < 128; i++) {
+          const isBassBin = i <= 8;
+          const isMidBin = i > 8 && i <= 36;
+          let amp;
+          if (isBassBin) {
+            amp = kickEnvelope * 0.85 + 0.15;
+          } else if (isMidBin) {
+            amp = offBeatEnvelope * 0.65 + Math.sin(curTime * 8 + i * 0.2) * 0.15 + 0.15;
+          } else {
+            amp = 0.12 + Math.sin(curTime * 12 + i * 0.3) * 0.08 + groove * 0.15;
+          }
+          freqData[i] = Math.min(255, Math.round(amp * 230));
+          timeData[i] = Math.round(128 + Math.sin(curTime * 20 + i * 0.4) * 35 * (groove + 0.2));
+        }
+        smoothedBassRef.current = 0.18 + kickEnvelope * 0.62;
       } else {
         smoothedBassRef.current *= Math.pow(0.85, dt);
       }
@@ -392,16 +432,17 @@ export function AudioVisualizer({
         });
 
         // Dynamic physical vinyl radius with drum bounce!
-        const discRadius = minDim * 0.22 * (1 + bass * 0.045 + impact * 0.06);
-        const ringOuterRadius = discRadius + 18 * dpr;
+        const bounce = bass * 0.15 + impact * 0.18;
+        const discRadius = minDim * 0.21 * (1 + bounce);
+        const ringOuterRadius = discRadius * (224 / 188);
 
         // Expanding Kick Shockwave Ring
         if (shockwaveRef.current > 0.02) {
-          const shockRadius = ringOuterRadius + (1 - shockwaveRef.current) * minDim * 0.2;
+          const shockRadius = ringOuterRadius + (1 - shockwaveRef.current) * minDim * 0.22;
           ctx.beginPath();
           ctx.arc(cx, cy, shockRadius, 0, Math.PI * 2);
-          ctx.strokeStyle = `rgba(6, 182, 212, ${shockwaveRef.current * 0.45})`;
-          ctx.lineWidth = Math.max(1.5 * dpr, shockwaveRef.current * 4 * dpr);
+          ctx.strokeStyle = `rgba(6, 182, 212, ${shockwaveRef.current * 0.55})`;
+          ctx.lineWidth = Math.max(1.5 * dpr, shockwaveRef.current * 4.5 * dpr);
           ctx.stroke();
         }
 
@@ -418,7 +459,7 @@ export function AudioVisualizer({
           const normalizedFreqIdx = Math.min(127, Math.floor(logFactor * 85));
 
           const val = isLiveAudio || isPlaying ? smoothData[normalizedFreqIdx] : 0.04;
-          const rayLen = Math.max(4 * dpr, val * minDim * 0.23 * (1 + bass * 0.28 + impact * 0.22));
+          const rayLen = Math.max(4 * dpr, val * minDim * 0.23 * (1 + bass * 0.45 + impact * 0.35));
 
           if (rayLen >= peaks[i]) {
             peaks[i] = rayLen;
@@ -460,13 +501,14 @@ export function AudioVisualizer({
         }
 
         // Draw Pre-rendered Offscreen Platter & HUD Gauge (Single Blit!)
-        const platterCanvas = getOffscreenPlatter(discRadius, ringOuterRadius);
+        const platterCanvas = getOffscreenPlatter();
         if (platterCanvas) {
           ctx.save();
           ctx.translate(cx, cy);
           ctx.rotate(rot * 0.55);
-          const halfPlatter = platterCanvas.width / 2;
-          ctx.drawImage(platterCanvas, -halfPlatter, -halfPlatter);
+          const scale = discRadius / (188 * dpr);
+          const halfPlatter = (platterCanvas.width / 2) * scale;
+          ctx.drawImage(platterCanvas, -halfPlatter, -halfPlatter, halfPlatter * 2, halfPlatter * 2);
           ctx.restore();
         }
 
@@ -562,13 +604,13 @@ export function AudioVisualizer({
 
         // Radiant Stellar Rays shooting from core
         const novaRays = 48;
-        const coreRadius = minDim * (0.16 + bass * 0.05 + impact * 0.05);
+        const coreRadius = minDim * (0.16 + bass * 0.12 + impact * 0.15);
 
         for (let i = 0; i < novaRays; i++) {
           const angle = (i / novaRays) * Math.PI * 2 + rot;
           const freqIdx = Math.min(127, Math.floor(Math.pow(i / novaRays, 1.4) * 80));
           const val = isLiveAudio || isPlaying ? smoothData[freqIdx] : 0.04;
-          const beamLen = Math.max(8 * dpr, val * minDim * 0.32 * (1 + bass * 0.3 + impact * 0.25));
+          const beamLen = Math.max(8 * dpr, val * minDim * 0.32 * (1 + bass * 0.45 + impact * 0.35));
 
           const cosA = Math.cos(angle);
           const sinA = Math.sin(angle);
@@ -651,7 +693,7 @@ export function AudioVisualizer({
         for (let i = 0; i < barCount; i++) {
           const logIdx = Math.min(127, Math.floor(Math.pow(i / barCount, 1.5) * 85));
           const val = isLiveAudio || isPlaying ? smoothData[logIdx] : 0.04;
-          const barH = Math.max(6 * dpr, val * height * (0.55 + impact * 0.18));
+          const barH = Math.max(6 * dpr, val * height * (0.50 + bass * 0.28 + impact * 0.25));
           const x = startX + i * (barWidth + 3 * dpr);
           const y = baseHeight - barH;
 
@@ -707,7 +749,7 @@ export function AudioVisualizer({
             const freqVal = smoothData[binIdx] || 0;
             const timeVal = ((timeData[i * 2] || 128) - 128) / 128;
             const displacement = isLiveAudio || isPlaying
-              ? (timeVal * 0.6 + freqVal * 0.4) * (height * (0.3 + impact * 0.18) * layer.amp)
+              ? (timeVal * 0.6 + freqVal * 0.4) * (height * (0.26 + bass * 0.26 + impact * 0.22) * layer.amp)
               : Math.sin(now / 400 + i * 0.2 + layer.offset) * (height * 0.04);
 
             const x = i * step;
@@ -721,7 +763,7 @@ export function AudioVisualizer({
               const prevFreq = smoothData[prevBin] || 0;
               const prevTime = ((timeData[(i - 1) * 2] || 128) - 128) / 128;
               const prevDisp = isLiveAudio || isPlaying
-                ? (prevTime * 0.6 + prevFreq * 0.4) * (height * (0.3 + impact * 0.18) * layer.amp)
+                ? (prevTime * 0.6 + prevFreq * 0.4) * (height * (0.26 + bass * 0.26 + impact * 0.22) * layer.amp)
                 : Math.sin(now / 400 + (i - 1) * 0.2 + layer.offset) * (height * 0.04);
               const prevY = centerY + prevDisp;
               const mx = (prevX + x) / 2;
@@ -903,11 +945,14 @@ export const MiniBeatVisualizer = memo(function MiniBeatVisualizer({
           ctx.fill();
         }
       } else if (isPlaying) {
-        const t = performance.now() / 300;
+        const curTime = (typeof useAudioStore !== 'undefined' && useAudioStore.getState().currentTime) || (performance.now() / 1000);
+        const beatPeriod = 0.48;
+        const beatPhase = (curTime % beatPeriod) / beatPeriod;
+        const kickEnvelope = Math.pow(Math.max(0, 1 - beatPhase), 2.5);
         ctx.fillStyle = sharedGrad;
         for (let i = 0; i < barCount; i++) {
-          const val = (Math.sin(t + i * 0.35) + 1) * 0.4 + 0.1;
-          const barHeight = Math.max(3, val * height * 0.75 + 2);
+          const val = i <= 6 ? (kickEnvelope * 0.8 + 0.15) : (Math.sin(curTime * 10 + i * 0.4) * 0.35 + 0.45);
+          const barHeight = Math.max(3, val * height * 0.85);
           const x = i * (barWidth + 1.5);
           const y = height - barHeight;
 

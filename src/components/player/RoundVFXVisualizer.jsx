@@ -167,8 +167,8 @@ export const RoundVFXVisualizer = memo(function RoundVFXVisualizer({
     const particleCount = prefersReducedMotion ? 12 : 24;
     const particles = Array.from({ length: particleCount }, () => new FastParticle(width, height));
 
-    const getOffscreenPlatter = (discRadius, ringOuterRadius) => {
-      const platterDim = Math.ceil(ringOuterRadius * 2 + 10 * dpr);
+    const getOffscreenPlatter = () => {
+      const platterDim = Math.round(512 * dpr);
       if (offscreenPlatterRef.current && offscreenPlatterSizeRef.current === platterDim) {
         return offscreenPlatterRef.current;
       }
@@ -178,6 +178,8 @@ export const RoundVFXVisualizer = memo(function RoundVFXVisualizer({
       offCanvas.height = platterDim;
       const oCtx = offCanvas.getContext('2d');
       const oCenter = platterDim / 2;
+      const discRadius = 188 * dpr;
+      const ringOuterRadius = 224 * dpr;
 
       // 1. Obsidian Black Turntable Vinyl Platter
       const vinylGrad = oCtx.createRadialGradient(oCenter, oCenter, 5, oCenter, oCenter, discRadius);
@@ -275,51 +277,90 @@ export const RoundVFXVisualizer = memo(function RoundVFXVisualizer({
       const analyser = window.__SPX_ANALYSER__;
 
       const freqData = new Uint8Array(128);
+      const timeData = new Uint8Array(128);
       let isLiveAudio = false;
 
       if (analyser && isPlaying) {
+        if (window.__SPX_AUDIO_CTX__ && window.__SPX_AUDIO_CTX__.state === 'suspended') {
+          window.__SPX_AUDIO_CTX__.resume().catch(() => {});
+        }
         analyser.getByteFrequencyData(freqData);
+        analyser.getByteTimeDomainData(timeData);
         isLiveAudio = freqData.some(val => val > 3);
       }
 
       if (isLiveAudio) {
-        let subBassSum = 0;
-        for (let i = 1; i <= 3; i++) subBassSum += freqData[i] || 0;
-        const currentSubBass = subBassSum / (3 * 255);
+        // Broad Sub-bass & Bass Kick Band: Bins 1..8 (40 Hz - 350 Hz)
+        let bassSum = 0;
+        let bassWeight = 0;
+        for (let i = 1; i <= 8; i++) {
+          const w = i <= 3 ? 1.6 : (i <= 5 ? 1.2 : 0.8);
+          bassSum += (freqData[i] || 0) * w;
+          bassWeight += w * 255;
+        }
+        const currentBass = bassSum / bassWeight;
 
         const history = energyHistoryRef.current;
         let histTotal = 0;
         for (let i = 0; i < history.length; i++) histTotal += history[i];
         const avgEnergy = histTotal / history.length;
 
-        history[historyIdxRef.current] = currentSubBass;
+        history[historyIdxRef.current] = currentBass;
         historyIdxRef.current = (historyIdxRef.current + 1) % history.length;
 
-        const transientDelta = currentSubBass - (smoothedBassRef.current || 0);
-        const dynamicThreshold = Math.max(0.12, avgEnergy * 1.30);
+        const transientDelta = currentBass - (smoothedBassRef.current || 0);
         const timeSinceLastBeat = now - lastBeatTimeRef.current;
 
-        if (currentSubBass > dynamicThreshold && transientDelta > 0.035 && timeSinceLastBeat > 180) {
+        if (
+          ((currentBass > avgEnergy * 1.15 && currentBass - avgEnergy > 0.035) || transientDelta > 0.03) &&
+          timeSinceLastBeat > 130
+        ) {
           lastBeatTimeRef.current = now;
-          const kickStrength = Math.min(1.0, (currentSubBass - avgEnergy) * 2.5 + transientDelta * 2.0);
-          impactRef.current = Math.min(1.0, impactRef.current + kickStrength);
+          const kickStrength = Math.min(1.0, (currentBass - avgEnergy) * 3.0 + Math.max(0, transientDelta) * 2.5);
+          impactRef.current = Math.min(1.0, impactRef.current + Math.max(0.4, kickStrength));
           shockwaveRef.current = 1.0;
         }
 
-        if (currentSubBass > smoothedBassRef.current) {
-          smoothedBassRef.current = smoothedBassRef.current * 0.15 + currentSubBass * 0.85;
+        if (currentBass > smoothedBassRef.current) {
+          smoothedBassRef.current = smoothedBassRef.current * 0.12 + currentBass * 0.88;
         } else {
-          smoothedBassRef.current = smoothedBassRef.current * Math.pow(0.86, dt);
+          smoothedBassRef.current = smoothedBassRef.current * Math.pow(0.84, dt);
         }
       } else if (isPlaying) {
-        const t = now / 1000;
-        const slowBreath = 0.5 + 0.5 * Math.sin(t * 1.5);
-        for (let i = 0; i < 128; i++) {
-          const octaveWave = Math.sin(i * 0.09 + t * 2.0);
-          const curve = Math.max(0.08, (Math.sin(t * 1.1 + i * 0.08) * 0.35 + 0.5) * (1 - i / 135));
-          freqData[i] = Math.round(curve * 155 + octaveWave * 20 + slowBreath * 25);
+        const track = useAudioStore.getState().currentTrack;
+        const trackStr = track?.id ? String(track.id) : (track?.title || 'track');
+        let hash = 0;
+        for (let i = 0; i < trackStr.length; i++) hash = ((hash << 5) - hash + trackStr.charCodeAt(i)) | 0;
+        const bpm = 118 + (Math.abs(hash) % 15);
+        const beatPeriod = 60 / bpm;
+        const curTime = (typeof useAudioStore !== 'undefined' && useAudioStore.getState().currentTime) || (now / 1000);
+        const beatPhase = (curTime % beatPeriod) / beatPeriod;
+
+        const kickEnvelope = Math.pow(Math.max(0, 1 - beatPhase), 2.6);
+        const offBeatPhase = ((curTime + beatPeriod * 0.5) % beatPeriod) / beatPeriod;
+        const offBeatEnvelope = Math.pow(Math.max(0, 1 - offBeatPhase), 3.2) * 0.45;
+        const groove = Math.max(kickEnvelope, offBeatEnvelope);
+
+        if (beatPhase < 0.08 && now - lastBeatTimeRef.current > beatPeriod * 750) {
+          lastBeatTimeRef.current = now;
+          impactRef.current = Math.min(1.0, impactRef.current + 0.85);
+          shockwaveRef.current = 1.0;
         }
-        smoothedBassRef.current = 0.22 + slowBreath * 0.18;
+
+        for (let i = 0; i < 128; i++) {
+          const isBassBin = i <= 8;
+          const isMidBin = i > 8 && i <= 36;
+          let amp;
+          if (isBassBin) {
+            amp = kickEnvelope * 0.85 + 0.15;
+          } else if (isMidBin) {
+            amp = offBeatEnvelope * 0.65 + Math.sin(curTime * 8 + i * 0.2) * 0.15 + 0.15;
+          } else {
+            amp = 0.12 + Math.sin(curTime * 12 + i * 0.3) * 0.08 + groove * 0.15;
+          }
+          freqData[i] = Math.min(255, Math.round(amp * 230));
+        }
+        smoothedBassRef.current = 0.18 + kickEnvelope * 0.62;
       } else {
         smoothedBassRef.current *= Math.pow(0.85, dt);
       }
@@ -361,16 +402,17 @@ export const RoundVFXVisualizer = memo(function RoundVFXVisualizer({
       }
       const rot = rotationRef.current;
 
-      const discRadius = minDim * 0.22 * (1 + bass * 0.04 + impact * 0.03);
-      const ringOuterRadius = discRadius + 18 * dpr;
+      const bounce = bass * 0.15 + impact * 0.18;
+      const discRadius = minDim * 0.21 * (1 + bounce);
+      const ringOuterRadius = discRadius * (224 / 188);
 
       // 3. Crisp Kick Shockwave
       if (shockwaveRef.current > 0.02) {
-        const shockRadius = ringOuterRadius + (1 - shockwaveRef.current) * minDim * 0.18;
+        const shockRadius = ringOuterRadius + (1 - shockwaveRef.current) * minDim * 0.22;
         ctx.beginPath();
         ctx.arc(cx, cy, shockRadius, 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(6, 182, 212, ${shockwaveRef.current * 0.4})`;
-        ctx.lineWidth = Math.max(1.5 * dpr, shockwaveRef.current * 4 * dpr);
+        ctx.strokeStyle = `rgba(6, 182, 212, ${shockwaveRef.current * 0.55})`;
+        ctx.lineWidth = Math.max(1.5 * dpr, shockwaveRef.current * 4.5 * dpr);
         ctx.stroke();
       }
 
@@ -387,7 +429,7 @@ export const RoundVFXVisualizer = memo(function RoundVFXVisualizer({
         const normalizedFreqIdx = Math.min(127, Math.floor(logFactor * 85));
 
         const val = isLiveAudio || isPlaying ? smoothData[normalizedFreqIdx] : 0.04;
-        const rayLen = Math.max(4 * dpr, val * minDim * 0.23 * (1 + bass * 0.28 + impact * 0.16));
+        const rayLen = Math.max(4 * dpr, val * minDim * 0.23 * (1 + bass * 0.45 + impact * 0.35));
 
         if (rayLen >= peaks[i]) {
           peaks[i] = rayLen;
@@ -428,13 +470,14 @@ export const RoundVFXVisualizer = memo(function RoundVFXVisualizer({
       }
 
       // 5. Draw Pre-rendered Offscreen Platter & HUD Gauge
-      const platterCanvas = getOffscreenPlatter(discRadius, ringOuterRadius);
+      const platterCanvas = getOffscreenPlatter();
       if (platterCanvas) {
         ctx.save();
         ctx.translate(cx, cy);
         ctx.rotate(rot * 0.55);
-        const halfPlatter = platterCanvas.width / 2;
-        ctx.drawImage(platterCanvas, -halfPlatter, -halfPlatter);
+        const scale = discRadius / (188 * dpr);
+        const halfPlatter = (platterCanvas.width / 2) * scale;
+        ctx.drawImage(platterCanvas, -halfPlatter, -halfPlatter, halfPlatter * 2, halfPlatter * 2);
         ctx.restore();
       }
 

@@ -17,6 +17,8 @@ import {
   Heart,
   Minimize2,
   Mic2,
+  Share2,
+  Check,
 } from 'lucide-react';
 import { useAudioStore } from '../../store/useAudioStore';
 import { useSettingsStore } from '../../store/useSettingsStore';
@@ -105,6 +107,27 @@ export function FullscreenVisualizerModal({ isOpen, onClose }) {
 
   // Mobile active tab: 'visualizer' | 'lyrics'
   const [mobileTab, setMobileTab] = useState('visualizer');
+  const [copied, setCopied] = useState(false);
+
+  const handleShare = async () => {
+    if (!currentTrack) return;
+    const shareUrl = `${window.location.origin}/track/${encodeURIComponent(currentTrack.id)}`;
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `${currentTrack.title} - ${currentTrack.artist}`,
+          text: `Listen to "${currentTrack.title}" by ${currentTrack.artist} on Vex-M`,
+          url: shareUrl,
+        });
+        return;
+      } catch {}
+    }
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {}
+  };
 
   useEffect(() => {
     if (!isOpen) return;
@@ -318,8 +341,20 @@ export function FullscreenVisualizerModal({ isOpen, onClose }) {
               className={`p-1.5 rounded-full transition hover:scale-110 flex-shrink-0 ${
                 isLiked ? 'text-accent' : 'text-warm-muted hover:text-white'
               }`}
+              title={isLiked ? 'Favorited' : 'Favorite'}
+              aria-label="Favorite track"
             >
               <Heart className={`w-4 h-4 ${isLiked ? 'fill-accent' : ''}`} />
+            </button>
+            <button
+              onClick={handleShare}
+              className={`p-1.5 rounded-full transition hover:scale-110 flex-shrink-0 ${
+                copied ? 'text-emerald-400' : 'text-warm-muted hover:text-white'
+              }`}
+              title={copied ? 'Link Copied!' : 'Share Song'}
+              aria-label="Share song"
+            >
+              {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Share2 className="w-4 h-4" />}
             </button>
           </div>
 

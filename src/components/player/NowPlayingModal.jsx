@@ -20,6 +20,7 @@ import {
   X,
   Trash2,
   Share2,
+  Check,
 } from 'lucide-react';
 import { useAudioStore } from '../../store/useAudioStore';
 import { seek } from '../../hooks/usePlayer';
@@ -171,6 +172,27 @@ export function NowPlayingModal() {
 
   // View state: 'artwork' | 'visualizer' | 'lyrics' | 'queue'
   const [viewMode, setViewMode] = useState('artwork');
+  const [copied, setCopied] = useState(false);
+
+  const handleShare = async () => {
+    if (!currentTrack) return;
+    const shareUrl = `${window.location.origin}/track/${encodeURIComponent(currentTrack.id)}`;
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `${currentTrack.title} - ${currentTrack.artist}`,
+          text: `Listen to "${currentTrack.title}" by ${currentTrack.artist} on Vex-M`,
+          url: shareUrl,
+        });
+        return;
+      } catch {}
+    }
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {}
+  };
 
   // Keyboard shortcut listener
   useEffect(() => {
@@ -239,8 +261,21 @@ export function NowPlayingModal() {
           </span>
         </div>
 
-        {/* Right Tools: Equalizer & Sleep Timer */}
+        {/* Right Tools: Share, Equalizer & Sleep Timer */}
         <div className="flex items-center gap-2">
+          <button
+            onClick={handleShare}
+            className={`p-2 rounded-full transition border border-white/10 ${
+              copied
+                ? 'text-emerald-400 bg-emerald-500/20 border-emerald-500/40'
+                : 'text-white/70 hover:text-white bg-white/10 hover:bg-white/20'
+            }`}
+            title={copied ? 'Link Copied!' : 'Share Track'}
+            aria-label="Share track"
+          >
+            {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Share2 className="w-4 h-4" />}
+          </button>
+
           <button
             onClick={() => setSleepTimerOpen(true)}
             className={`p-2 rounded-full transition border border-white/10 ${
@@ -337,6 +372,19 @@ export function NowPlayingModal() {
                   >
                     <ListMusic className="w-4 h-4" />
                     <span>Up Next</span>
+                  </button>
+
+                  <button
+                    onClick={handleShare}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-full border transition active:scale-95 text-xs font-semibold ${
+                      copied
+                        ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300'
+                        : 'bg-white/10 hover:bg-white/20 border-white/15 text-white'
+                    }`}
+                    title={copied ? 'Link Copied!' : 'Share Song'}
+                  >
+                    {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Share2 className="w-4 h-4 text-sky-400" />}
+                    <span>{copied ? 'Copied!' : 'Share'}</span>
                   </button>
                 </div>
               </div>

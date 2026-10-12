@@ -146,7 +146,7 @@ function connectAudioGraph(enableEq, gains) {
 
       analyserNode = audioCtx.createAnalyser();
       analyserNode.fftSize = 1024;
-      analyserNode.smoothingTimeConstant = 0.52;
+      analyserNode.smoothingTimeConstant = 0.32;
       analyserNode.minDecibels = -90;
       analyserNode.maxDecibels = -10;
 
