@@ -138,16 +138,16 @@ function connectAudioGraph(enableEq, gains) {
     if (!AudioContextClass) return;
 
     if (!audioCtx) {
-      audioCtx = new AudioContextClass({ latencyHint: 'playback' });
+      audioCtx = new AudioContextClass({ latencyHint: 'interactive' });
       audio.crossOrigin = 'anonymous';
       sourceNode = audioCtx.createMediaElementSource(audio);
       gainNode = audioCtx.createGain();
       gainNode.gain.value = 1.0;
 
       analyserNode = audioCtx.createAnalyser();
-      analyserNode.fftSize = 1024;
-      analyserNode.smoothingTimeConstant = 0.32;
-      analyserNode.minDecibels = -90;
+      analyserNode.fftSize = 512;
+      analyserNode.smoothingTimeConstant = 0.15;
+      analyserNode.minDecibels = -85;
       analyserNode.maxDecibels = -10;
 
       eqFilters = EQ_FREQUENCIES.map((freq, idx) => {
@@ -212,6 +212,9 @@ export async function safePlay() {
   if (isPlayPending) return;
   isPlayPending = true;
   try {
+    if (!audioCtx) {
+      connectAudioGraph(useSettingsStore.getState().eqEnabled, useSettingsStore.getState().eqGains);
+    }
     if (audioCtx && audioCtx.state === 'suspended') {
       await audioCtx.resume().catch(() => {});
     }

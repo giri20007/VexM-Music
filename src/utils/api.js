@@ -48,8 +48,16 @@ export async function request(path, { retries = 3, onRetry, ...fetchOptions } = 
 export const fetchLibrary = (refresh, onRetry) =>
   request(`/api/library${refresh ? '?refresh=1' : ''}`, { onRetry });
 
-export const fetchTrackLyrics = id =>
-  request(`/api/lyrics/${encodeURIComponent(id)}`, { retries: 1 }).catch(() => null);
+export const fetchTrackLyrics = (id, track = {}) => {
+  const query = new URLSearchParams();
+  if (track.title) query.set('title', track.title);
+  if (track.artist) query.set('artist', track.artist);
+  if (track.album) query.set('album', track.album);
+  if (track.duration) query.set('duration', String(track.duration));
+  if (track.saavnId) query.set('saavnId', String(track.saavnId));
+  const qs = query.toString();
+  return request(`/api/lyrics/${encodeURIComponent(id)}${qs ? `?${qs}` : ''}`, { retries: 1 }).catch(() => null);
+};
 
 export const fetchTrackMetadata = id =>
   request(`/api/metadata/${encodeURIComponent(id)}`, { retries: 1 }).catch(() => null);

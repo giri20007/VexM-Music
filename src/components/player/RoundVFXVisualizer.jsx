@@ -290,15 +290,12 @@ export const RoundVFXVisualizer = memo(function RoundVFXVisualizer({
       }
 
       if (isLiveAudio) {
-        // Broad Sub-bass & Bass Kick Band: Bins 1..8 (40 Hz - 350 Hz)
+        // Fast Sub-bass & Bass Kick Band: Bins 1..6 (40 Hz - 260 Hz)
         let bassSum = 0;
-        let bassWeight = 0;
-        for (let i = 1; i <= 8; i++) {
-          const w = i <= 3 ? 1.6 : (i <= 5 ? 1.2 : 0.8);
-          bassSum += (freqData[i] || 0) * w;
-          bassWeight += w * 255;
+        for (let i = 1; i <= 6; i++) {
+          bassSum += freqData[i] || 0;
         }
-        const currentBass = bassSum / bassWeight;
+        const currentBass = bassSum / (6 * 255);
 
         const history = energyHistoryRef.current;
         let histTotal = 0;
@@ -312,36 +309,31 @@ export const RoundVFXVisualizer = memo(function RoundVFXVisualizer({
         const timeSinceLastBeat = now - lastBeatTimeRef.current;
 
         if (
-          ((currentBass > avgEnergy * 1.15 && currentBass - avgEnergy > 0.035) || transientDelta > 0.03) &&
-          timeSinceLastBeat > 130
+          ((currentBass > avgEnergy * 1.12 && currentBass - avgEnergy > 0.028) || transientDelta > 0.025) &&
+          timeSinceLastBeat > 110
         ) {
           lastBeatTimeRef.current = now;
-          const kickStrength = Math.min(1.0, (currentBass - avgEnergy) * 3.0 + Math.max(0, transientDelta) * 2.5);
-          impactRef.current = Math.min(1.0, impactRef.current + Math.max(0.4, kickStrength));
+          const kickStrength = Math.min(1.0, (currentBass - avgEnergy) * 3.5 + Math.max(0, transientDelta) * 3.0);
+          impactRef.current = Math.min(1.0, impactRef.current + Math.max(0.6, kickStrength));
           shockwaveRef.current = 1.0;
         }
 
         if (currentBass > smoothedBassRef.current) {
-          smoothedBassRef.current = smoothedBassRef.current * 0.12 + currentBass * 0.88;
+          smoothedBassRef.current = currentBass;
         } else {
-          smoothedBassRef.current = smoothedBassRef.current * Math.pow(0.84, dt);
+          smoothedBassRef.current = smoothedBassRef.current * Math.pow(0.76, dt);
         }
       } else if (isPlaying) {
-        const track = useAudioStore.getState().currentTrack;
-        const trackStr = track?.id ? String(track.id) : (track?.title || 'track');
-        let hash = 0;
-        for (let i = 0; i < trackStr.length; i++) hash = ((hash << 5) - hash + trackStr.charCodeAt(i)) | 0;
-        const bpm = 118 + (Math.abs(hash) % 15);
-        const beatPeriod = 60 / bpm;
         const curTime = (typeof useAudioStore !== 'undefined' && useAudioStore.getState().currentTime) || (now / 1000);
+        const beatPeriod = 0.484;
         const beatPhase = (curTime % beatPeriod) / beatPeriod;
 
-        const kickEnvelope = Math.pow(Math.max(0, 1 - beatPhase), 2.6);
+        const kickEnvelope = Math.pow(Math.max(0, 1 - beatPhase), 3.0);
         const offBeatPhase = ((curTime + beatPeriod * 0.5) % beatPeriod) / beatPeriod;
-        const offBeatEnvelope = Math.pow(Math.max(0, 1 - offBeatPhase), 3.2) * 0.45;
+        const offBeatEnvelope = Math.pow(Math.max(0, 1 - offBeatPhase), 3.5) * 0.4;
         const groove = Math.max(kickEnvelope, offBeatEnvelope);
 
-        if (beatPhase < 0.08 && now - lastBeatTimeRef.current > beatPeriod * 750) {
+        if (beatPhase < 0.07 && now - lastBeatTimeRef.current > beatPeriod * 750) {
           lastBeatTimeRef.current = now;
           impactRef.current = Math.min(1.0, impactRef.current + 0.85);
           shockwaveRef.current = 1.0;
@@ -365,8 +357,8 @@ export const RoundVFXVisualizer = memo(function RoundVFXVisualizer({
         smoothedBassRef.current *= Math.pow(0.85, dt);
       }
 
-      impactRef.current *= Math.pow(0.86, dt);
-      shockwaveRef.current *= Math.pow(0.92, dt);
+      impactRef.current *= Math.pow(0.70, dt);
+      shockwaveRef.current *= Math.pow(0.82, dt);
 
       const bass = prefersReducedMotion ? smoothedBassRef.current * 0.25 : smoothedBassRef.current;
       const impact = prefersReducedMotion ? impactRef.current * 0.25 : impactRef.current;
@@ -375,9 +367,9 @@ export const RoundVFXVisualizer = memo(function RoundVFXVisualizer({
       for (let i = 0; i < 128; i++) {
         const target = (freqData[i] || 0) / 255;
         if (target > smoothData[i]) {
-          smoothData[i] = smoothData[i] * 0.3 + target * 0.7;
+          smoothData[i] = target;
         } else {
-          smoothData[i] = smoothData[i] * Math.pow(0.85, dt) + target * (1 - Math.pow(0.85, dt));
+          smoothData[i] = smoothData[i] * Math.pow(0.75, dt);
         }
       }
 
@@ -402,8 +394,8 @@ export const RoundVFXVisualizer = memo(function RoundVFXVisualizer({
       }
       const rot = rotationRef.current;
 
-      const bounce = bass * 0.15 + impact * 0.18;
-      const discRadius = minDim * 0.21 * (1 + bounce);
+      const bounce = bass * 0.18 + impact * 0.22;
+      const discRadius = minDim * 0.20 * (1 + bounce);
       const ringOuterRadius = discRadius * (224 / 188);
 
       // 3. Crisp Kick Shockwave

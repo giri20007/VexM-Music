@@ -44,7 +44,7 @@ export function LyricsView({ track, isCompact = false }) {
     let cancelled = false;
     setLoading(true);
 
-    fetchTrackLyrics(track.id)
+    fetchTrackLyrics(track.id, track)
       .then(res => {
         if (cancelled) return;
         if (res && (res.lines?.length || res.raw)) {

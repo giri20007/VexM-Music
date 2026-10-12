@@ -1,0 +1,858 @@
+{
+  "saavn_a9f2J7An": {
+    "available": true,
+    "type": "synced",
+    "synced": true,
+    "source": "lrclib",
+    "language": "",
+    "raw": "[00:09.65] The club isn't the best place to find a lover\n[00:12.10] So the bar is where I go\n[00:14.81] Me and my friends at the table doing shots\n[00:17.04] Drinking fast, and then we talk slow\n[00:19.70] You come over and start up a conversation with just me\n[00:22.24] And trust me, I'll give it a chance now \n[00:24.42] Take my hand, stop, put \"Van the Man\" on the jukebox\n[00:27.27] And then we start to dance\n[00:28.91] And now I'm singing like\n[00:29.83] Girl, you know I want your love\n[00:32.22] Your love was handmade for somebody like me\n[00:35.23] Come on now, follow my lead\n[00:37.31] I may be crazy, don't mind me\n[00:39.64] Say, \"Boy, let's not talk too much\n[00:42.28] Grab on my waist and put that body on me\"\n[00:45.30] Come on now, follow my lead\n[00:47.28] Come, come on now, follow my lead\n[00:49.18] \n[00:50.75] I'm in love with the shape of you\n[00:53.14] We push and pull like a magnet do\n[00:55.69] Although my heart is falling too\n[00:58.14] I'm in love with your body\n[01:00.61] Last night you were in my room\n[01:03.19] And now my bed sheets smell like you\n[01:05.35] Every day discovering something brand new\n[01:08.02] Oh, I'm in love with your body\n[01:10.02] Oh I, oh I, oh I, oh I\n[01:13.14] Oh, I'm in love with your body\n[01:14.89] Oh I, oh I, oh I, oh I\n[01:18.04] Oh, I'm in love with your body\n[01:19.98] Oh I, oh I, oh I, oh I\n[01:23.04] Oh, I'm in love with your body\n[01:25.04] Every day discovering something brand new\n[01:28.39] I'm in love with the shape of you\n[01:29.89] One week in we let the story begin\n[01:31.95] We're going out on our first date (mm-mm)\n[01:34.34] But you and me are thrifty, so go all-you-can-eat\n[01:36.91] Fill up your bag, and I fill up a plate (mm-mm)\n[01:39.53] We talk for hours and hours about the sweet and the sour\n[01:41.96] And how your family is doing okay (mm-mm)\n[01:44.55] And leave and get in a taxi, then kiss in the back seat\n[01:47.15] Tell the driver make the radio play\n[01:48.70] And I'm singing like\n[01:50.16] Girl, you know I want your love\n[01:52.20] Your love was handmade for somebody like me\n[01:55.39] Come on now, follow my lead\n[01:57.26] I may be crazy, don't mind me\n[01:59.58] Say, \"Boy, let's not talk too much\n[02:02.27] Grab on my waist and put that body on me\"\n[02:05.32] Come on now, follow my lead\n[02:07.12] Come, come on now, follow my lead\n[02:09.17] \n[02:10.56] I'm in love with the shape of you\n[02:13.04] We push and pull like a magnet do\n[02:15.66] Although my heart is falling too\n[02:18.11] I'm in love with your body\n[02:20.56] Last night you were in my room\n[02:23.19] And now my bed sheets smell like you\n[02:25.26] Every day discovering something brand new\n[02:28.15] Oh, I'm in love with your body\n[02:30.03] Oh I, oh I, oh I, oh I\n[02:33.04] Oh, I'm in love with your body\n[02:34.90] Oh I, oh I, oh I, oh I\n[02:38.08] Oh, I'm in love with your body\n[02:40.04] Oh I, oh I, oh I, oh I\n[02:43.09] Oh, I'm in love with your body\n[02:45.03] Every day discovering something brand new\n[02:48.28] I'm in love with the shape of you\n[02:50.11] Come on, be my baby, come on\n[02:52.66] Come on, be my baby, come on\n[02:55.05] Come on, be my baby, come on\n[02:57.66] Come on, be my baby, come on\n[03:00.02] Come on, be my baby, come on\n[03:02.45] Come on, be my baby, come on\n[03:05.03] Come on, be my baby, come on\n[03:07.52] Come on, be my baby, come on\n[03:10.54] I'm in love with the shape of you\n[03:13.10] We push and pull like a magnet do\n[03:15.60] Although my heart is falling too\n[03:18.11] I'm in love with your body\n[03:20.52] Last night you were in my room\n[03:23.13] And now my bed sheets smell like you\n[03:25.39] Every day discovering something brand new\n[03:28.18] Oh, I'm in love with your body\n[03:30.27] Come on, be my baby, come on\n[03:32.65] Come on, be my baby, come on (I'm in love with your body)\n[03:35.20] Come on, be my baby, come on\n[03:37.53] Come on, be my baby, come on (oh, I'm in love with your body)\n[03:40.24] Come on, be my baby, come on\n[03:42.66] Come on, be my baby, come on (I'm in love with your body)\n[03:45.19] Every day discovering something brand new\n[03:48.18] I'm in love with the shape of you\n[03:50.31]",
+    "lines": [
+      {
+        "start": 9.65,
+        "end": 12.1,
+        "time": 9.65,
+        "text": "The club isn't the best place to find a lover"
+      },
+      {
+        "start": 12.1,
+        "end": 14.81,
+        "time": 12.1,
+        "text": "So the bar is where I go"
+      },
+      {
+        "start": 14.81,
+        "end": 17.04,
+        "time": 14.81,
+        "text": "Me and my friends at the table doing shots"
+      },
+      {
+        "start": 17.04,
+        "end": 19.7,
+        "time": 17.04,
+        "text": "Drinking fast, and then we talk slow"
+      },
+      {
+        "start": 19.7,
+        "end": 22.24,
+        "time": 19.7,
+        "text": "You come over and start up a conversation with just me"
+      },
+      {
+        "start": 22.24,
+        "end": 24.42,
+        "time": 22.24,
+        "text": "And trust me, I'll give it a chance now"
+      },
+      {
+        "start": 24.42,
+        "end": 27.27,
+        "time": 24.42,
+        "text": "Take my hand, stop, put \"Van the Man\" on the jukebox"
+      },
+      {
+        "start": 27.27,
+        "end": 28.91,
+        "time": 27.27,
+        "text": "And then we start to dance"
+      },
+      {
+        "start": 28.91,
+        "end": 29.83,
+        "time": 28.91,
+        "text": "And now I'm singing like"
+      },
+      {
+        "start": 29.83,
+        "end": 32.22,
+        "time": 29.83,
+        "text": "Girl, you know I want your love"
+      },
+      {
+        "start": 32.22,
+        "end": 35.23,
+        "time": 32.22,
+        "text": "Your love was handmade for somebody like me"
+      },
+      {
+        "start": 35.23,
+        "end": 37.31,
+        "time": 35.23,
+        "text": "Come on now, follow my lead"
+      },
+      {
+        "start": 37.31,
+        "end": 39.64,
+        "time": 37.31,
+        "text": "I may be crazy, don't mind me"
+      },
+      {
+        "start": 39.64,
+        "end": 42.28,
+        "time": 39.64,
+        "text": "Say, \"Boy, let's not talk too much"
+      },
+      {
+        "start": 42.28,
+        "end": 45.3,
+        "time": 42.28,
+        "text": "Grab on my waist and put that body on me\""
+      },
+      {
+        "start": 45.3,
+        "end": 47.28,
+        "time": 45.3,
+        "text": "Come on now, follow my lead"
+      },
+      {
+        "start": 47.28,
+        "end": 49.18,
+        "time": 47.28,
+        "text": "Come, come on now, follow my lead"
+      },
+      {
+        "start": 49.18,
+        "end": 50.75,
+        "time": 49.18,
+        "text": "♪"
+      },
+      {
+        "start": 50.75,
+        "end": 53.14,
+        "time": 50.75,
+        "text": "I'm in love with the shape of you"
+      },
+      {
+        "start": 53.14,
+        "end": 55.69,
+        "time": 53.14,
+        "text": "We push and pull like a magnet do"
+      },
+      {
+        "start": 55.69,
+        "end": 58.14,
+        "time": 55.69,
+        "text": "Although my heart is falling too"
+      },
+      {
+        "start": 58.14,
+        "end": 60.61,
+        "time": 58.14,
+        "text": "I'm in love with your body"
+      },
+      {
+        "start": 60.61,
+        "end": 63.19,
+        "time": 60.61,
+        "text": "Last night you were in my room"
+      },
+      {
+        "start": 63.19,
+        "end": 65.35,
+        "time": 63.19,
+        "text": "And now my bed sheets smell like you"
+      },
+      {
+        "start": 65.35,
+        "end": 68.02,
+        "time": 65.35,
+        "text": "Every day discovering something brand new"
+      },
+      {
+        "start": 68.02,
+        "end": 70.02,
+        "time": 68.02,
+        "text": "Oh, I'm in love with your body"
+      },
+      {
+        "start": 70.02,
+        "end": 73.14,
+        "time": 70.02,
+        "text": "Oh I, oh I, oh I, oh I"
+      },
+      {
+        "start": 73.14,
+        "end": 74.89,
+        "time": 73.14,
+        "text": "Oh, I'm in love with your body"
+      },
+      {
+        "start": 74.89,
+        "end": 78.04,
+        "time": 74.89,
+        "text": "Oh I, oh I, oh I, oh I"
+      },
+      {
+        "start": 78.04,
+        "end": 79.98,
+        "time": 78.04,
+        "text": "Oh, I'm in love with your body"
+      },
+      {
+        "start": 79.98,
+        "end": 83.04,
+        "time": 79.98,
+        "text": "Oh I, oh I, oh I, oh I"
+      },
+      {
+        "start": 83.04,
+        "end": 85.04,
+        "time": 83.04,
+        "text": "Oh, I'm in love with your body"
+      },
+      {
+        "start": 85.04,
+        "end": 88.39,
+        "time": 85.04,
+        "text": "Every day discovering something brand new"
+      },
+      {
+        "start": 88.39,
+        "end": 89.89,
+        "time": 88.39,
+        "text": "I'm in love with the shape of you"
+      },
+      {
+        "start": 89.89,
+        "end": 91.95,
+        "time": 89.89,
+        "text": "One week in we let the story begin"
+      },
+      {
+        "start": 91.95,
+        "end": 94.34,
+        "time": 91.95,
+        "text": "We're going out on our first date (mm-mm)"
+      },
+      {
+        "start": 94.34,
+        "end": 96.91,
+        "time": 94.34,
+        "text": "But you and me are thrifty, so go all-you-can-eat"
+      },
+      {
+        "start": 96.91,
+        "end": 99.53,
+        "time": 96.91,
+        "text": "Fill up your bag, and I fill up a plate (mm-mm)"
+      },
+      {
+        "start": 99.53,
+        "end": 101.96,
+        "time": 99.53,
+        "text": "We talk for hours and hours about the sweet and the sour"
+      },
+      {
+        "start": 101.96,
+        "end": 104.55,
+        "time": 101.96,
+        "text": "And how your family is doing okay (mm-mm)"
+      },
+      {
+        "start": 104.55,
+        "end": 107.15,
+        "time": 104.55,
+        "text": "And leave and get in a taxi, then kiss in the back seat"
+      },
+      {
+        "start": 107.15,
+        "end": 108.7,
+        "time": 107.15,
+        "text": "Tell the driver make the radio play"
+      },
+      {
+        "start": 108.7,
+        "end": 110.16,
+        "time": 108.7,
+        "text": "And I'm singing like"
+      },
+      {
+        "start": 110.16,
+        "end": 112.2,
+        "time": 110.16,
+        "text": "Girl, you know I want your love"
+      },
+      {
+        "start": 112.2,
+        "end": 115.39,
+        "time": 112.2,
+        "text": "Your love was handmade for somebody like me"
+      },
+      {
+        "start": 115.39,
+        "end": 117.26,
+        "time": 115.39,
+        "text": "Come on now, follow my lead"
+      },
+      {
+        "start": 117.26,
+        "end": 119.58,
+        "time": 117.26,
+        "text": "I may be crazy, don't mind me"
+      },
+      {
+        "start": 119.58,
+        "end": 122.27,
+        "time": 119.58,
+        "text": "Say, \"Boy, let's not talk too much"
+      },
+      {
+        "start": 122.27,
+        "end": 125.32,
+        "time": 122.27,
+        "text": "Grab on my waist and put that body on me\""
+      },
+      {
+        "start": 125.32,
+        "end": 127.12,
+        "time": 125.32,
+        "text": "Come on now, follow my lead"
+      },
+      {
+        "start": 127.12,
+        "end": 129.17,
+        "time": 127.12,
+        "text": "Come, come on now, follow my lead"
+      },
+      {
+        "start": 129.17,
+        "end": 130.56,
+        "time": 129.17,
+        "text": "♪"
+      },
+      {
+        "start": 130.56,
+        "end": 133.04,
+        "time": 130.56,
+        "text": "I'm in love with the shape of you"
+      },
+      {
+        "start": 133.04,
+        "end": 135.66,
+        "time": 133.04,
+        "text": "We push and pull like a magnet do"
+      },
+      {
+        "start": 135.66,
+        "end": 138.11,
+        "time": 135.66,
+        "text": "Although my heart is falling too"
+      },
+      {
+        "start": 138.11,
+        "end": 140.56,
+        "time": 138.11,
+        "text": "I'm in love with your body"
+      },
+      {
+        "start": 140.56,
+        "end": 143.19,
+        "time": 140.56,
+        "text": "Last night you were in my room"
+      },
+      {
+        "start": 143.19,
+        "end": 145.26,
+        "time": 143.19,
+        "text": "And now my bed sheets smell like you"
+      },
+      {
+        "start": 145.26,
+        "end": 148.15,
+        "time": 145.26,
+        "text": "Every day discovering something brand new"
+      },
+      {
+        "start": 148.15,
+        "end": 150.03,
+        "time": 148.15,
+        "text": "Oh, I'm in love with your body"
+      },
+      {
+        "start": 150.03,
+        "end": 153.04,
+        "time": 150.03,
+        "text": "Oh I, oh I, oh I, oh I"
+      },
+      {
+        "start": 153.04,
+        "end": 154.9,
+        "time": 153.04,
+        "text": "Oh, I'm in love with your body"
+      },
+      {
+        "start": 154.9,
+        "end": 158.08,
+        "time": 154.9,
+        "text": "Oh I, oh I, oh I, oh I"
+      },
+      {
+        "start": 158.08,
+        "end": 160.04,
+        "time": 158.08,
+        "text": "Oh, I'm in love with your body"
+      },
+      {
+        "start": 160.04,
+        "end": 163.09,
+        "time": 160.04,
+        "text": "Oh I, oh I, oh I, oh I"
+      },
+      {
+        "start": 163.09,
+        "end": 165.03,
+        "time": 163.09,
+        "text": "Oh, I'm in love with your body"
+      },
+      {
+        "start": 165.03,
+        "end": 168.28,
+        "time": 165.03,
+        "text": "Every day discovering something brand new"
+      },
+      {
+        "start": 168.28,
+        "end": 170.11,
+        "time": 168.28,
+        "text": "I'm in love with the shape of you"
+      },
+      {
+        "start": 170.11,
+        "end": 172.66,
+        "time": 170.11,
+        "text": "Come on, be my baby, come on"
+      },
+      {
+        "start": 172.66,
+        "end": 175.05,
+        "time": 172.66,
+        "text": "Come on, be my baby, come on"
+      },
+      {
+        "start": 175.05,
+        "end": 177.66,
+        "time": 175.05,
+        "text": "Come on, be my baby, come on"
+      },
+      {
+        "start": 177.66,
+        "end": 180.02,
+        "time": 177.66,
+        "text": "Come on, be my baby, come on"
+      },
+      {
+        "start": 180.02,
+        "end": 182.45,
+        "time": 180.02,
+        "text": "Come on, be my baby, come on"
+      },
+      {
+        "start": 182.45,
+        "end": 185.03,
+        "time": 182.45,
+        "text": "Come on, be my baby, come on"
+      },
+      {
+        "start": 185.03,
+        "end": 187.52,
+        "time": 185.03,
+        "text": "Come on, be my baby, come on"
+      },
+      {
+        "start": 187.52,
+        "end": 190.54,
+        "time": 187.52,
+        "text": "Come on, be my baby, come on"
+      },
+      {
+        "start": 190.54,
+        "end": 193.1,
+        "time": 190.54,
+        "text": "I'm in love with the shape of you"
+      },
+      {
+        "start": 193.1,
+        "end": 195.6,
+        "time": 193.1,
+        "text": "We push and pull like a magnet do"
+      },
+      {
+        "start": 195.6,
+        "end": 198.11,
+        "time": 195.6,
+        "text": "Although my heart is falling too"
+      },
+      {
+        "start": 198.11,
+        "end": 200.52,
+        "time": 198.11,
+        "text": "I'm in love with your body"
+      },
+      {
+        "start": 200.52,
+        "end": 203.13,
+        "time": 200.52,
+        "text": "Last night you were in my room"
+      },
+      {
+        "start": 203.13,
+        "end": 205.39,
+        "time": 203.13,
+        "text": "And now my bed sheets smell like you"
+      },
+      {
+        "start": 205.39,
+        "end": 208.18,
+        "time": 205.39,
+        "text": "Every day discovering something brand new"
+      },
+      {
+        "start": 208.18,
+        "end": 210.27,
+        "time": 208.18,
+        "text": "Oh, I'm in love with your body"
+      },
+      {
+        "start": 210.27,
+        "end": 212.65,
+        "time": 210.27,
+        "text": "Come on, be my baby, come on"
+      },
+      {
+        "start": 212.65,
+        "end": 215.2,
+        "time": 212.65,
+        "text": "Come on, be my baby, come on (I'm in love with your body)"
+      },
+      {
+        "start": 215.2,
+        "end": 217.53,
+        "time": 215.2,
+        "text": "Come on, be my baby, come on"
+      },
+      {
+        "start": 217.53,
+        "end": 220.24,
+        "time": 217.53,
+        "text": "Come on, be my baby, come on (oh, I'm in love with your body)"
+      },
+      {
+        "start": 220.24,
+        "end": 222.66,
+        "time": 220.24,
+        "text": "Come on, be my baby, come on"
+      },
+      {
+        "start": 222.66,
+        "end": 225.19,
+        "time": 222.66,
+        "text": "Come on, be my baby, come on (I'm in love with your body)"
+      },
+      {
+        "start": 225.19,
+        "end": 228.18,
+        "time": 225.19,
+        "text": "Every day discovering something brand new"
+      },
+      {
+        "start": 228.18,
+        "end": 230.31,
+        "time": 228.18,
+        "text": "I'm in love with the shape of you"
+      },
+      {
+        "start": 230.31,
+        "end": 235.31,
+        "time": 230.31,
+        "text": "♪"
+      }
+    ],
+    "updatedAt": "2026-10-12T17:10:16.909Z"
+  },
+  "saavn_test": {
+    "available": true,
+    "type": "synced",
+    "synced": true,
+    "source": "lrclib",
+    "language": "",
+    "raw": "[00:07.82] First things first, I'ma say all the words inside my head\n[00:12.15] I'm fired up and tired of the way that things have been, oh, ooh\n[00:18.16] The way that things have been, oh, ooh\n[00:23.11] Second things second, don't you tell me what you think that I could be\n[00:27.55] I'm the one at the sail, I'm the master of my sea, oh, ooh\n[00:33.66] The master of my sea, oh, ooh\n[00:38.33] I was broken from a young age\n[00:40.08] Taken my sulking to the masses\n[00:41.94] Writing my poems for the few\n[00:43.79] That look at me, took to me, shook to me, feelin' me\n[00:45.72] Singing from heartache from the pain\n[00:47.64] Taking my message from the veins\n[00:49.58] Speaking my lesson from the brain\n[00:51.45] Seeing the beauty through the\n[00:54.73] Pain, you made me a, you made me a believer, believer\n[01:02.63] Pain, you break me down and build me up, believer, believer\n[01:09.28] Pain, oh, let the bullets fly, oh, let them rain\n[01:14.85] My life, my love, my drive, it came from\n[01:17.75] Pain, you made me a, you made me a believer, believer\n[01:24.67] Third things third, send a prayer to the ones up above\n[01:28.92] All the hate that you've heard has turned your spirit to a dove, oh, ooh\n[01:34.91] Your spirit up above, oh, ooh\n[01:39.71] I was choking in the crowd\n[01:41.44] Building my rain up in the cloud\n[01:43.36] Falling like ashes to the ground\n[01:45.32] Hoping my feelings, they would drown\n[01:47.42] But they never did, ever lived, ebbin' and flowin'\n[01:49.53] Inhibited, limited, 'til it broke open and rained down\n[01:52.81] It rained down like\n[01:56.37] Pain, you made me a, you made me a believer, believer\n[02:03.92] Pain, you break me down and build me up, believer, believer\n[02:10.73] Pain, oh, let the bullets fly, oh, let them rain\n[02:16.33] My life, my love, my drive, it came from\n[02:19.38] Pain, you made me a, you made me a believer, believer\n[02:26.15] Last things last, by the grace of the fire and the flames\n[02:30.50] You're the face of the future, the blood in my veins, oh, ooh\n[02:36.54] The blood in my veins, oh, ooh\n[02:41.19] But they never did, ever lived, ebbin' and flowin'\n[02:43.17] Inhibited, limited, 'til it broke open and rained down\n[02:46.58] It rained down like\n[02:49.98] Pain, you made me a, you made me a believer, believer\n[02:57.70] Pain, you break me down and build me up, believer, believer\n[03:04.43] Pain, oh, let the bullets fly, oh, let them rain\n[03:10.07] My life, my love, my drive, it came from\n[03:13.36] Pain, you made me a, you made me a believer, believer\n[03:17.76]",
+    "lines": [
+      {
+        "start": 7.82,
+        "end": 12.15,
+        "time": 7.82,
+        "text": "First things first, I'ma say all the words inside my head"
+      },
+      {
+        "start": 12.15,
+        "end": 18.16,
+        "time": 12.15,
+        "text": "I'm fired up and tired of the way that things have been, oh, ooh"
+      },
+      {
+        "start": 18.16,
+        "end": 23.11,
+        "time": 18.16,
+        "text": "The way that things have been, oh, ooh"
+      },
+      {
+        "start": 23.11,
+        "end": 27.55,
+        "time": 23.11,
+        "text": "Second things second, don't you tell me what you think that I could be"
+      },
+      {
+        "start": 27.55,
+        "end": 33.66,
+        "time": 27.55,
+        "text": "I'm the one at the sail, I'm the master of my sea, oh, ooh"
+      },
+      {
+        "start": 33.66,
+        "end": 38.33,
+        "time": 33.66,
+        "text": "The master of my sea, oh, ooh"
+      },
+      {
+        "start": 38.33,
+        "end": 40.08,
+        "time": 38.33,
+        "text": "I was broken from a young age"
+      },
+      {
+        "start": 40.08,
+        "end": 41.94,
+        "time": 40.08,
+        "text": "Taken my sulking to the masses"
+      },
+      {
+        "start": 41.94,
+        "end": 43.79,
+        "time": 41.94,
+        "text": "Writing my poems for the few"
+      },
+      {
+        "start": 43.79,
+        "end": 45.72,
+        "time": 43.79,
+        "text": "That look at me, took to me, shook to me, feelin' me"
+      },
+      {
+        "start": 45.72,
+        "end": 47.64,
+        "time": 45.72,
+        "text": "Singing from heartache from the pain"
+      },
+      {
+        "start": 47.64,
+        "end": 49.58,
+        "time": 47.64,
+        "text": "Taking my message from the veins"
+      },
+      {
+        "start": 49.58,
+        "end": 51.45,
+        "time": 49.58,
+        "text": "Speaking my lesson from the brain"
+      },
+      {
+        "start": 51.45,
+        "end": 54.73,
+        "time": 51.45,
+        "text": "Seeing the beauty through the"
+      },
+      {
+        "start": 54.73,
+        "end": 62.63,
+        "time": 54.73,
+        "text": "Pain, you made me a, you made me a believer, believer"
+      },
+      {
+        "start": 62.63,
+        "end": 69.28,
+        "time": 62.63,
+        "text": "Pain, you break me down and build me up, believer, believer"
+      },
+      {
+        "start": 69.28,
+        "end": 74.85,
+        "time": 69.28,
+        "text": "Pain, oh, let the bullets fly, oh, let them rain"
+      },
+      {
+        "start": 74.85,
+        "end": 77.75,
+        "time": 74.85,
+        "text": "My life, my love, my drive, it came from"
+      },
+      {
+        "start": 77.75,
+        "end": 84.67,
+        "time": 77.75,
+        "text": "Pain, you made me a, you made me a believer, believer"
+      },
+      {
+        "start": 84.67,
+        "end": 88.92,
+        "time": 84.67,
+        "text": "Third things third, send a prayer to the ones up above"
+      },
+      {
+        "start": 88.92,
+        "end": 94.91,
+        "time": 88.92,
+        "text": "All the hate that you've heard has turned your spirit to a dove, oh, ooh"
+      },
+      {
+        "start": 94.91,
+        "end": 99.71,
+        "time": 94.91,
+        "text": "Your spirit up above, oh, ooh"
+      },
+      {
+        "start": 99.71,
+        "end": 101.44,
+        "time": 99.71,
+        "text": "I was choking in the crowd"
+      },
+      {
+        "start": 101.44,
+        "end": 103.36,
+        "time": 101.44,
+        "text": "Building my rain up in the cloud"
+      },
+      {
+        "start": 103.36,
+        "end": 105.32,
+        "time": 103.36,
+        "text": "Falling like ashes to the ground"
+      },
+      {
+        "start": 105.32,
+        "end": 107.42,
+        "time": 105.32,
+        "text": "Hoping my feelings, they would drown"
+      },
+      {
+        "start": 107.42,
+        "end": 109.53,
+        "time": 107.42,
+        "text": "But they never did, ever lived, ebbin' and flowin'"
+      },
+      {
+        "start": 109.53,
+        "end": 112.81,
+        "time": 109.53,
+        "text": "Inhibited, limited, 'til it broke open and rained down"
+      },
+      {
+        "start": 112.81,
+        "end": 116.37,
+        "time": 112.81,
+        "text": "It rained down like"
+      },
+      {
+        "start": 116.37,
+        "end": 123.92,
+        "time": 116.37,
+        "text": "Pain, you made me a, you made me a believer, believer"
+      },
+      {
+        "start": 123.92,
+        "end": 130.73,
+        "time": 123.92,
+        "text": "Pain, you break me down and build me up, believer, believer"
+      },
+      {
+        "start": 130.73,
+        "end": 136.33,
+        "time": 130.73,
+        "text": "Pain, oh, let the bullets fly, oh, let them rain"
+      },
+      {
+        "start": 136.33,
+        "end": 139.38,
+        "time": 136.33,
+        "text": "My life, my love, my drive, it came from"
+      },
+      {
+        "start": 139.38,
+        "end": 146.15,
+        "time": 139.38,
+        "text": "Pain, you made me a, you made me a believer, believer"
+      },
+      {
+        "start": 146.15,
+        "end": 150.5,
+        "time": 146.15,
+        "text": "Last things last, by the grace of the fire and the flames"
+      },
+      {
+        "start": 150.5,
+        "end": 156.54,
+        "time": 150.5,
+        "text": "You're the face of the future, the blood in my veins, oh, ooh"
+      },
+      {
+        "start": 156.54,
+        "end": 161.19,
+        "time": 156.54,
+        "text": "The blood in my veins, oh, ooh"
+      },
+      {
+        "start": 161.19,
+        "end": 163.17,
+        "time": 161.19,
+        "text": "But they never did, ever lived, ebbin' and flowin'"
+      },
+      {
+        "start": 163.17,
+        "end": 166.58,
+        "time": 163.17,
+        "text": "Inhibited, limited, 'til it broke open and rained down"
+      },
+      {
+        "start": 166.58,
+        "end": 169.98,
+        "time": 166.58,
+        "text": "It rained down like"
+      },
+      {
+        "start": 169.98,
+        "end": 177.7,
+        "time": 169.98,
+        "text": "Pain, you made me a, you made me a believer, believer"
+      },
+      {
+        "start": 177.7,
+        "end": 184.43,
+        "time": 177.7,
+        "text": "Pain, you break me down and build me up, believer, believer"
+      },
+      {
+        "start": 184.43,
+        "end": 190.07,
+        "time": 184.43,
+        "text": "Pain, oh, let the bullets fly, oh, let them rain"
+      },
+      {
+        "start": 190.07,
+        "end": 193.36,
+        "time": 190.07,
+        "text": "My life, my love, my drive, it came from"
+      },
+      {
+        "start": 193.36,
+        "end": 197.76,
+        "time": 193.36,
+        "text": "Pain, you made me a, you made me a believer, believer"
+      },
+      {
+        "start": 197.76,
+        "end": 202.76,
+        "time": 197.76,
+        "text": "♪"
+      }
+    ],
+    "updatedAt": "2026-10-12T17:16:42.105Z"
+  }
+}
