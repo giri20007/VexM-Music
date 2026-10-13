@@ -8,7 +8,7 @@ export const artworkUrl = (id, title = '') =>
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-// Timeout + limited exponential backoff retries for waking Render free tier
+// Timeout + limited exponential backoff retries for serverless cold starts
 export async function request(path, { retries = 3, onRetry, ...fetchOptions } = {}) {
   let lastErr;
   for (let i = 0; i <= retries; i++) {

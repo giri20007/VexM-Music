@@ -31,7 +31,7 @@ export function AdminSystem() {
             System & Diagnostics
           </h2>
           <p className="text-xs text-warm-muted">
-            Live process telemetry, memory, Node runtime, and Render environment status
+            Live process telemetry, memory, Node runtime, and Vercel environment status
           </p>
         </div>
 
