@@ -78,14 +78,16 @@ async function fetchFromLRCLIB(title, artist, album, duration) {
   const { songName, cleanArtist, queries } = extractSearchCandidates(title, artist);
   if (!songName) return null;
 
-  // 1. Try exact match
+  const targetDur = Number(duration) > 20 ? Number(duration) : 0;
+
+  // 1. Try exact match first
   try {
     const params = new URLSearchParams({
       track_name: cleanQueryString(songName),
     });
     if (cleanArtist) params.set('artist_name', cleanQueryString(cleanArtist));
     if (album) params.set('album_name', album);
-    if (duration > 0) params.set('duration', String(Math.round(duration)));
+    if (targetDur > 0) params.set('duration', String(Math.round(targetDur)));
 
     const res = await fetch(`https://lrclib.net/api/get?${params.toString()}`, {
       headers: { 'User-Agent': 'VexM-Music-App/2.0' },
@@ -101,17 +103,13 @@ async function fetchFromLRCLIB(title, artist, album, duration) {
           source: 'lrclib',
         };
       }
-      if (data.plainLyrics && data.plainLyrics.trim()) {
-        return {
-          raw: data.plainLyrics,
-          isSynced: false,
-          source: 'lrclib',
-        };
-      }
     }
   } catch {}
 
-  // 2. Try candidate search queries
+  // 2. Search queries: PRIORITIZE SYNCED LYRICS WITH DURATION MATCHING
+  let bestPlain = null;
+  const allSynced = [];
+
   for (const q of queries) {
     try {
       const res = await fetch(`https://lrclib.net/api/search?q=${encodeURIComponent(q)}`, {
@@ -122,25 +120,47 @@ async function fetchFromLRCLIB(title, artist, album, duration) {
       if (res.ok) {
         const list = await res.json();
         if (Array.isArray(list) && list.length > 0) {
-          const syncedMatch = list.find(item => item.syncedLyrics && item.syncedLyrics.trim());
-          if (syncedMatch) {
-            return {
-              raw: syncedMatch.syncedLyrics,
-              isSynced: true,
-              source: 'lrclib',
-            };
-          }
-          const plainMatch = list.find(item => item.plainLyrics && item.plainLyrics.trim()) || list[0];
-          if (plainMatch?.plainLyrics) {
-            return {
-              raw: plainMatch.plainLyrics,
-              isSynced: false,
-              source: 'lrclib',
-            };
+          for (const item of list) {
+            if (item.syncedLyrics && item.syncedLyrics.trim()) {
+              allSynced.push(item);
+            } else if (!bestPlain && item.plainLyrics && item.plainLyrics.trim()) {
+              bestPlain = item.plainLyrics;
+            }
           }
         }
       }
     } catch {}
+
+    // If we already collected synced candidates for this query, pick the duration match
+    if (allSynced.length > 0) {
+      break;
+    }
+  }
+
+  if (allSynced.length > 0) {
+    if (targetDur > 20) {
+      // Sort by closest duration to the real song (eliminates teaser snippets / ringtones)
+      allSynced.sort((a, b) => {
+        const diffA = Math.abs((a.duration || 0) - targetDur);
+        const diffB = Math.abs((b.duration || 0) - targetDur);
+        return diffA - diffB;
+      });
+    }
+    const best = allSynced[0];
+    return {
+      raw: best.syncedLyrics,
+      isSynced: true,
+      source: 'lrclib',
+    };
+  }
+
+  // 3. Fallback to plain lyrics only if NO synced lyrics exist anywhere
+  if (bestPlain) {
+    return {
+      raw: bestPlain,
+      isSynced: false,
+      source: 'lrclib',
+    };
   }
 
   return null;
@@ -244,23 +264,23 @@ router.get('/:id', async (req, res) => {
           raw: lrcResult.raw,
           updatedAt: new Date().toISOString(),
         };
+        setLyrics(id, lrcResult.raw, 'synced', lrcResult.source, '', effDuration);
       } else {
-        const lines = synthesizeTimedLines(lrcResult.raw, effDuration);
         lyrics = {
           available: true,
           trackId: id,
           title: effTitle,
           artist: effArtist,
-          type: 'synced',
-          synced: true,
+          type: 'plain',
+          synced: false,
           source: lrcResult.source,
           language: '',
-          lines,
+          lines: [],
           raw: lrcResult.raw,
           updatedAt: new Date().toISOString(),
         };
+        setLyrics(id, lrcResult.raw, 'plain', lrcResult.source, '', effDuration);
       }
-      setLyrics(id, lrcResult.raw, 'synced', lrcResult.source, '', effDuration);
       onlineLyricsCache.set(cacheKey, lyrics);
     }
   }
@@ -269,21 +289,20 @@ router.get('/:id', async (req, res) => {
   if (!lyrics && (saavnId || effTitle)) {
     const saavnResult = await fetchFromJioSaavn(saavnId, effTitle, effArtist);
     if (saavnResult) {
-      const lines = synthesizeTimedLines(saavnResult.raw, effDuration);
       lyrics = {
         available: true,
         trackId: id,
         title: effTitle,
         artist: effArtist,
-        type: 'synced',
-        synced: true,
+        type: 'plain',
+        synced: false,
         source: saavnResult.source,
         language: '',
-        lines,
+        lines: [],
         raw: saavnResult.raw,
         updatedAt: new Date().toISOString(),
       };
-      setLyrics(id, saavnResult.raw, 'synced', saavnResult.source, '', effDuration);
+      setLyrics(id, saavnResult.raw, 'plain', saavnResult.source, '', effDuration);
       onlineLyricsCache.set(cacheKey, lyrics);
     }
   }

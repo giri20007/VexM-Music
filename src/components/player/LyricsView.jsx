@@ -60,11 +60,11 @@ export function LyricsView({ track, isCompact = false }) {
 
   const parsedLines = lyricsData?.lines?.length
     ? lyricsData.lines
-    : lyricsData?.raw
+    : lyricsData?.raw && lyricsData?.synced !== false
     ? parseLrc(lyricsData.raw)
     : [];
 
-  const isSynced = syncLyrics && parsedLines.length > 0;
+  const isSynced = syncLyrics && lyricsData?.synced !== false && parsedLines.length > 0;
   const activeIndex = isSynced
     ? findActiveLyricIndex(parsedLines, currentTime, offsetMs)
     : -1;

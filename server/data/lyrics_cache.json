@@ -1643,5 +1643,1041 @@
       }
     ],
     "updatedAt": "2026-10-12T17:39:10.135Z"
+  },
+  "yt_test_badass": {
+    "available": true,
+    "type": "synced",
+    "synced": true,
+    "source": "lrclib",
+    "language": "",
+    "raw": "[00:02.71] Badass'maa orasaama oadidu\n[00:07.49] Badass'maa un vaala suruttidu\n[00:12.51] Badass'maa Leo Das'umaa\n[00:17.63] Badass'maa orasaama oadidu\n[00:23.18] \n[00:35.87] Badass, Mr Leo Das is a badass\n[00:41.45] He's a freakin' badass man\n[00:43.92] Singam erangunaa kaattukkae virundhu\n[00:46.52] Ivan vaettaikku sedharanum bayandhu\n[00:48.98] Perumpullikellaam mutruppulli ezhudhi\n[00:51.69] Kodal uruvura sambhavam urudhi\n[00:54.10] Idhu varayila nallavan irundhaan\n[00:56.43] Badass, Mr Leo Das is a badass\n[00:59.36] Indha kadhayila raatchasa mugamdhaan\n[01:02.86] He's a freakin' badass man\n[01:04.39] Vaththikuchi illa erimala mavanae\n[01:07.02] Nerungaadha nee\n[01:09.68] Kolasaamiya vaendikko maamae\n[01:12.38] Moraikkaadha nee\n[01:14.37] Badass'maa orasaama oadidu\n[01:19.53] Badass'maa un vaala suruttidu\n[01:24.63] Badass'maa Leo Das'umaa\n[01:29.74] Badass'maa orasaama oadidu\n[01:34.97] Leo-ohh-ohhh-ohh\n[01:37.85] Badass, Mr Leo Das is a badass\n[01:40.59] Leo-ohh-ohhh-ohh\n[01:43.48] He's a freakin' badass man\n[01:45.43] Leo-ohh-ohhh-ohh\n[01:50.36] Leo-ohh-ohhh-ohh\n[01:55.60] Pala raajaakala paaththaachudaa\n[01:58.37] Ivan kaththi romba koorachudaa\n[02:01.48] Leo, Leo, Leo, Leo veridhaan\n[02:05.91] Nooru pachayat'ah theethaachudaa\n[02:08.68] Varalaaru moththam blood aachudaa\n[02:11.50] Leo, Leo, Leo, Leo veridhaan\n[02:15.96] Tha... romba, romba adaadhamaa\n[02:21.44] Therikka, therikka adippaarumaa\n[02:28.05] Bloody sweet\n[02:29.87] Vaththikuchi illa erimala mavanae\n[02:32.27] Nerungaadha nee\n[02:34.75] Kolasaamiya vaendikko maamae\n[02:37.47] Moraikkaadha nee\n[02:39.47] Badass'maa orasaama oadidu\n[02:44.58] Badass'maa un vaala suruttidu\n[02:49.73] Badass'maa Leo Das'umaa\n[02:54.93] Badass'maa orasaama oadidu\n[03:00.18] Leo-ohh-ohhh-ohh\n[03:02.96] Badass, Mr Leo Das is a badass\n[03:05.22] Leo-ohh-ohhh-ohh\n[03:08.57] He's a freakin' badass man\n[03:10.52] Leo-ohh-ohhh-ohh\n[03:13.26] Badass, Mr Leo Das is a badass\n[03:15.60] Leo-ohh-ohhh-ohh\n[03:18.97] He's a freakin' badass man\n[03:20.83] Badass, Mr Leo Das is a badass\n[03:23.36] Leo-ohh-ohhh-ohh\n[03:26.76] He's a freakin' badass man\n[03:28.51] Leo-ohh-ohhh-ohh\n[03:31.59] Badass, Mr Leo Das is a badass\n[03:33.83] Leo-ohh-ohhh-ohh\n[03:37.12] He's a freakin' badass man\n[03:38.97] Leo-ohh-ohhh-ohh\n[03:43.42] Rest in peace\n[03:46.03]",
+    "lines": [
+      {
+        "start": 2.71,
+        "end": 7.49,
+        "time": 2.71,
+        "text": "Badass'maa orasaama oadidu"
+      },
+      {
+        "start": 7.49,
+        "end": 12.51,
+        "time": 7.49,
+        "text": "Badass'maa un vaala suruttidu"
+      },
+      {
+        "start": 12.51,
+        "end": 17.63,
+        "time": 12.51,
+        "text": "Badass'maa Leo Das'umaa"
+      },
+      {
+        "start": 17.63,
+        "end": 23.18,
+        "time": 17.63,
+        "text": "Badass'maa orasaama oadidu"
+      },
+      {
+        "start": 23.18,
+        "end": 35.87,
+        "time": 23.18,
+        "text": "♪"
+      },
+      {
+        "start": 35.87,
+        "end": 41.45,
+        "time": 35.87,
+        "text": "Badass, Mr Leo Das is a badass"
+      },
+      {
+        "start": 41.45,
+        "end": 43.92,
+        "time": 41.45,
+        "text": "He's a freakin' badass man"
+      },
+      {
+        "start": 43.92,
+        "end": 46.52,
+        "time": 43.92,
+        "text": "Singam erangunaa kaattukkae virundhu"
+      },
+      {
+        "start": 46.52,
+        "end": 48.98,
+        "time": 46.52,
+        "text": "Ivan vaettaikku sedharanum bayandhu"
+      },
+      {
+        "start": 48.98,
+        "end": 51.69,
+        "time": 48.98,
+        "text": "Perumpullikellaam mutruppulli ezhudhi"
+      },
+      {
+        "start": 51.69,
+        "end": 54.1,
+        "time": 51.69,
+        "text": "Kodal uruvura sambhavam urudhi"
+      },
+      {
+        "start": 54.1,
+        "end": 56.43,
+        "time": 54.1,
+        "text": "Idhu varayila nallavan irundhaan"
+      },
+      {
+        "start": 56.43,
+        "end": 59.36,
+        "time": 56.43,
+        "text": "Badass, Mr Leo Das is a badass"
+      },
+      {
+        "start": 59.36,
+        "end": 62.86,
+        "time": 59.36,
+        "text": "Indha kadhayila raatchasa mugamdhaan"
+      },
+      {
+        "start": 62.86,
+        "end": 64.39,
+        "time": 62.86,
+        "text": "He's a freakin' badass man"
+      },
+      {
+        "start": 64.39,
+        "end": 67.02,
+        "time": 64.39,
+        "text": "Vaththikuchi illa erimala mavanae"
+      },
+      {
+        "start": 67.02,
+        "end": 69.68,
+        "time": 67.02,
+        "text": "Nerungaadha nee"
+      },
+      {
+        "start": 69.68,
+        "end": 72.38,
+        "time": 69.68,
+        "text": "Kolasaamiya vaendikko maamae"
+      },
+      {
+        "start": 72.38,
+        "end": 74.37,
+        "time": 72.38,
+        "text": "Moraikkaadha nee"
+      },
+      {
+        "start": 74.37,
+        "end": 79.53,
+        "time": 74.37,
+        "text": "Badass'maa orasaama oadidu"
+      },
+      {
+        "start": 79.53,
+        "end": 84.63,
+        "time": 79.53,
+        "text": "Badass'maa un vaala suruttidu"
+      },
+      {
+        "start": 84.63,
+        "end": 89.74,
+        "time": 84.63,
+        "text": "Badass'maa Leo Das'umaa"
+      },
+      {
+        "start": 89.74,
+        "end": 94.97,
+        "time": 89.74,
+        "text": "Badass'maa orasaama oadidu"
+      },
+      {
+        "start": 94.97,
+        "end": 97.85,
+        "time": 94.97,
+        "text": "Leo-ohh-ohhh-ohh"
+      },
+      {
+        "start": 97.85,
+        "end": 100.59,
+        "time": 97.85,
+        "text": "Badass, Mr Leo Das is a badass"
+      },
+      {
+        "start": 100.59,
+        "end": 103.48,
+        "time": 100.59,
+        "text": "Leo-ohh-ohhh-ohh"
+      },
+      {
+        "start": 103.48,
+        "end": 105.43,
+        "time": 103.48,
+        "text": "He's a freakin' badass man"
+      },
+      {
+        "start": 105.43,
+        "end": 110.36,
+        "time": 105.43,
+        "text": "Leo-ohh-ohhh-ohh"
+      },
+      {
+        "start": 110.36,
+        "end": 115.6,
+        "time": 110.36,
+        "text": "Leo-ohh-ohhh-ohh"
+      },
+      {
+        "start": 115.6,
+        "end": 118.37,
+        "time": 115.6,
+        "text": "Pala raajaakala paaththaachudaa"
+      },
+      {
+        "start": 118.37,
+        "end": 121.48,
+        "time": 118.37,
+        "text": "Ivan kaththi romba koorachudaa"
+      },
+      {
+        "start": 121.48,
+        "end": 125.91,
+        "time": 121.48,
+        "text": "Leo, Leo, Leo, Leo veridhaan"
+      },
+      {
+        "start": 125.91,
+        "end": 128.68,
+        "time": 125.91,
+        "text": "Nooru pachayat'ah theethaachudaa"
+      },
+      {
+        "start": 128.68,
+        "end": 131.5,
+        "time": 128.68,
+        "text": "Varalaaru moththam blood aachudaa"
+      },
+      {
+        "start": 131.5,
+        "end": 135.96,
+        "time": 131.5,
+        "text": "Leo, Leo, Leo, Leo veridhaan"
+      },
+      {
+        "start": 135.96,
+        "end": 141.44,
+        "time": 135.96,
+        "text": "Tha... romba, romba adaadhamaa"
+      },
+      {
+        "start": 141.44,
+        "end": 148.05,
+        "time": 141.44,
+        "text": "Therikka, therikka adippaarumaa"
+      },
+      {
+        "start": 148.05,
+        "end": 149.87,
+        "time": 148.05,
+        "text": "Bloody sweet"
+      },
+      {
+        "start": 149.87,
+        "end": 152.27,
+        "time": 149.87,
+        "text": "Vaththikuchi illa erimala mavanae"
+      },
+      {
+        "start": 152.27,
+        "end": 154.75,
+        "time": 152.27,
+        "text": "Nerungaadha nee"
+      },
+      {
+        "start": 154.75,
+        "end": 157.47,
+        "time": 154.75,
+        "text": "Kolasaamiya vaendikko maamae"
+      },
+      {
+        "start": 157.47,
+        "end": 159.47,
+        "time": 157.47,
+        "text": "Moraikkaadha nee"
+      },
+      {
+        "start": 159.47,
+        "end": 164.58,
+        "time": 159.47,
+        "text": "Badass'maa orasaama oadidu"
+      },
+      {
+        "start": 164.58,
+        "end": 169.73,
+        "time": 164.58,
+        "text": "Badass'maa un vaala suruttidu"
+      },
+      {
+        "start": 169.73,
+        "end": 174.93,
+        "time": 169.73,
+        "text": "Badass'maa Leo Das'umaa"
+      },
+      {
+        "start": 174.93,
+        "end": 180.18,
+        "time": 174.93,
+        "text": "Badass'maa orasaama oadidu"
+      },
+      {
+        "start": 180.18,
+        "end": 182.96,
+        "time": 180.18,
+        "text": "Leo-ohh-ohhh-ohh"
+      },
+      {
+        "start": 182.96,
+        "end": 185.22,
+        "time": 182.96,
+        "text": "Badass, Mr Leo Das is a badass"
+      },
+      {
+        "start": 185.22,
+        "end": 188.57,
+        "time": 185.22,
+        "text": "Leo-ohh-ohhh-ohh"
+      },
+      {
+        "start": 188.57,
+        "end": 190.52,
+        "time": 188.57,
+        "text": "He's a freakin' badass man"
+      },
+      {
+        "start": 190.52,
+        "end": 193.26,
+        "time": 190.52,
+        "text": "Leo-ohh-ohhh-ohh"
+      },
+      {
+        "start": 193.26,
+        "end": 195.6,
+        "time": 193.26,
+        "text": "Badass, Mr Leo Das is a badass"
+      },
+      {
+        "start": 195.6,
+        "end": 198.97,
+        "time": 195.6,
+        "text": "Leo-ohh-ohhh-ohh"
+      },
+      {
+        "start": 198.97,
+        "end": 200.83,
+        "time": 198.97,
+        "text": "He's a freakin' badass man"
+      },
+      {
+        "start": 200.83,
+        "end": 203.36,
+        "time": 200.83,
+        "text": "Badass, Mr Leo Das is a badass"
+      },
+      {
+        "start": 203.36,
+        "end": 206.76,
+        "time": 203.36,
+        "text": "Leo-ohh-ohhh-ohh"
+      },
+      {
+        "start": 206.76,
+        "end": 208.51,
+        "time": 206.76,
+        "text": "He's a freakin' badass man"
+      },
+      {
+        "start": 208.51,
+        "end": 211.59,
+        "time": 208.51,
+        "text": "Leo-ohh-ohhh-ohh"
+      },
+      {
+        "start": 211.59,
+        "end": 213.83,
+        "time": 211.59,
+        "text": "Badass, Mr Leo Das is a badass"
+      },
+      {
+        "start": 213.83,
+        "end": 217.12,
+        "time": 213.83,
+        "text": "Leo-ohh-ohhh-ohh"
+      },
+      {
+        "start": 217.12,
+        "end": 218.97,
+        "time": 217.12,
+        "text": "He's a freakin' badass man"
+      },
+      {
+        "start": 218.97,
+        "end": 223.42,
+        "time": 218.97,
+        "text": "Leo-ohh-ohhh-ohh"
+      },
+      {
+        "start": 223.42,
+        "end": 226.03,
+        "time": 223.42,
+        "text": "Rest in peace"
+      },
+      {
+        "start": 226.03,
+        "end": 228,
+        "time": 226.03,
+        "text": "♪"
+      }
+    ],
+    "updatedAt": "2026-10-13T04:34:52.909Z"
+  },
+  "yt_test_arabic": {
+    "available": true,
+    "type": "synced",
+    "synced": true,
+    "source": "lrclib",
+    "language": "",
+    "raw": "[00:00.66] ஹலமித்தி ஹபிபோ\n[00:02.53] ஹலமித்தி ஹபி வந்தாலே\n[00:04.34] ஹலமித்தி ஹபிபோ\n[00:06.54] ஹலமித்தி ஹபி வந்தா\n[00:08.42] ஹலமித்தி ஹபிபோ\n[00:10.47] ஹலமித்தி ஹபி வந்தாலே\n[00:12.58] ஹலமித்தி ஹபிபோ\n[00:14.40] ஹலமித்தி ஹபிபோ ஓ ஓ ஓ\n[00:18.85] அய்யோ\n[00:20.80] யப்போ\n[00:22.67] யம்மோ\n[00:25.13] \n[00:34.36] அய்யோ\n[00:36.27] யப்போ\n[00:38.17] யம்மோ\n[00:40.73] மலம பித்தா பித்தாதே\n[00:42.60] மலம பித்தா பித்தாதே\n[00:44.63] மல பித்தா பித்தாதே மலம பித்தாதே\n[00:48.20] ஏ மலம பித்தா பித்தாதே\n[00:50.22] மலம பித்தா பித்தாதே\n[00:52.43] மல பித்தா பித்தாதே மலம பித்தாதே\n[00:56.24] होली, होली பக்கத்துல சிரிக்கும் ரங்கோலி\n[00:59.94] Jolly, jolly வெக்கத்துல மயங்குற டோலி\n[01:03.91] காலி, காலி மொத்தத்துல அவனும் தான் காலி\n[01:07.76] Jolly, jolly அடிபொலி\n[01:10.58] ஹலமித்தி ஹபிபோ\n[01:12.56] ஹலமித்தி மித்தி வந்தாலே\n[01:14.29] ஹலமித்தி ஹபிபோ\n[01:16.07] ஹலமித்தி மித்தி வந்தா\n[01:18.15] ஹலமித்தி ஹபிபோ\n[01:20.08] ஹலமித்தி மித்தி வந்தாலே\n[01:21.94] ஹலமித்தி ஹபிபோ\n[01:24.02] ஹலமித்தி மித்திபோ ஓ ஓ ஓ...\n[01:26.72] Oh cutie, நீ sweety\n[01:28.78] உன் beauty அதில் மாட்டி\n[01:30.77] நான் மெல்லமா, மெல்லமா காலி\n[01:32.94] அத சொல்லல, சொல்லல போடி\n[01:34.76] முதல் வாட்டி படம் காட்டி\n[01:36.25] என்ன வாட்டி கண்ண காட்டி\n[01:38.44] Love'ah கொஞ்சமா, கொஞ்சமா ஏத்தி\n[01:40.70] என்ன செஞ்சிட்டா, செஞ்சிட்டா ஒருத்தி\n[01:42.66] இவன் யாரோ சொக்க வச்சானே\n[01:45.01] என் மனசுக்குள்ள குழந்தைப் போல கொஞ்சிக்கிட்டானே, love'ah வச்சானே\n[01:50.57] இவன் யாரோ kick'ah வச்சானே\n[01:53.13] என் வயசுக்குள்ள முதல் மழைய feel'ah வச்சானே\n[01:56.98] ஹலமித்தி ஹபிபோ\n[01:59.31] ஹலமித்தி\n[02:00.84] ஹலமித்தி ஹபிபோ\n[02:02.72] ஹலமித்தி\n[02:04.41] ஹலமித்தி ஹபிபோ\n[02:06.76] ஹலமித்தி\n[02:08.37] ஹலமித்தி ஹபிபோ\n[02:10.45] ஹலமித்தி(ஹேய் பிதா)\n[02:13.31] ஹேய் பிதா பலிஹபி பலிபாதி பலிஹபி\n[02:17.37] பலிஹபிதா பலிஹபி வல்லே வல்லே பலிஹபி\n[02:21.42] ஹேய் பிதா பலிஹபி பலிபாதி பலிஹபி\n[02:25.29] பலிஹபிதா பலிஹபி வல்லே வல்லே பலிஹபி\n[02:29.03] ஹல்லுவா ஈ பலுபபிதாதே ஈ பலுபபிதா\n[02:32.93] ஹல்லுவா ஈ பலுபபிதாதே, ஏ வத்தாதே\n[02:36.87] ஹல்லுவா ஈ பலுபபிதாதே ஈ பலுபபிதா\n[02:40.69] ஹல்லுவா ஈ பலுபபிதாதே, ஏ வத்தாதே\n[02:44.50] होली, होली பக்கத்துல சிரிக்கும் ரங்கோலி\n[02:48.51] Jolly, jolly வெக்கத்துல மயங்குற டோலி\n[02:52.22] காலி, காலி மொத்தத்துல அவனும் தான் காலி\n[02:55.92] Jolly, jolly அடிபொலி\n[02:58.60] ஹலமித்தி ஹபிபோ\n[03:00.79] ஹலமித்தி ஹபி வந்தாலே\n[03:02.66] ஹலமித்தி ஹபிபோ\n[03:04.46] ஹலமித்தி ஹபி வந்தா\n[03:06.64] ஹலமித்தி ஹபிபோ\n[03:08.51] ஹலமித்தி ஹபி வந்தாலே\n[03:10.07] ஹலமித்தி ஹபிபோ\n[03:12.01] ஹலமித்தி ஹபிபோ ஓ ஓ ஓ...\n[03:15.12] Oh, cutie நீ sweety\n[03:17.24] உன் beauty அதில் மாட்டி\n[03:19.04] நான் மெல்லமா, மெல்லமா காலி\n[03:21.11] அத சொல்லல, சொல்லல போடி\n[03:22.95] முதல் வாட்டி படம் காட்டி\n[03:24.98] என்ன வாட்டி கண்ண காட்டி\n[03:26.63] Love'ah கொஞ்சமா, கொஞ்சமா ஏத்தி\n[03:28.86] என்ன செஞ்சிட்டா, செஞ்சிட்டா ஒருத்தி\n[03:31.05] இவன் யாரோ சொக்க வச்சானே\n[03:33.69] என் மனசுக்குள்ள குழந்தைப் போல கொஞ்சிக்கிட்டானே, love'ah வச்சானே\n[03:38.82] இவன் யாரோ kick'ah வச்சானே\n[03:41.26] என் வயசுக்குள்ள முதல் மழைய feel'ah வச்சானே\n[03:45.07] ஹலமித்தி ஹபிபோ\n[03:47.25] ஹலமித்தி மித்தி வந்தாலே\n[03:49.16] ஹலமித்தி ஹபிபோ\n[03:50.90] ஹலமித்தி மித்தி வந்தா\n[03:53.07] ஹலமித்தி ஹபிபோ\n[03:54.93] ஹலமித்தி மித்தி வந்தாலே\n[03:56.90] ஹலமித்தி ஹபிபோ\n[03:58.97] ஹலமித்தி ஹபிபோ ஓ ஓ ஓ...\n[04:01.65] மலம பித்தா பித்தாதே\n[04:03.72] மலம பித்தா பித்தாதே\n[04:06.10] மல பித்தா பித்தாதே மலம பித்தாதே\n[04:09.45] ஏ மலம பித்தா பித்தாதே\n[04:11.31] மலம பித்தா பித்தாதே\n[04:13.77] மல பித்தா பித்தாதே மலம பித்தாதே\n[04:17.51] ஹேய் பிதா பலிஹபி பலிபாதி பலிஹபி\n[04:21.66] பலிஹபிதா பலிஹபி வல்லே வல்லே பலிஹபி\n[04:25.38] ஹேய் (ஹலமித்தி) பலிபாதி (ஹலமித்தி)\n[04:29.39] பலிஹபிதா (ஹலமித்தி)\n[04:31.47] ஹலமித்தி ஹபிபோ\n[04:33.91]",
+    "lines": [
+      {
+        "start": 0.66,
+        "end": 2.53,
+        "time": 0.66,
+        "text": "ஹலமித்தி ஹபிபோ"
+      },
+      {
+        "start": 2.53,
+        "end": 4.34,
+        "time": 2.53,
+        "text": "ஹலமித்தி ஹபி வந்தாலே"
+      },
+      {
+        "start": 4.34,
+        "end": 6.54,
+        "time": 4.34,
+        "text": "ஹலமித்தி ஹபிபோ"
+      },
+      {
+        "start": 6.54,
+        "end": 8.42,
+        "time": 6.54,
+        "text": "ஹலமித்தி ஹபி வந்தா"
+      },
+      {
+        "start": 8.42,
+        "end": 10.47,
+        "time": 8.42,
+        "text": "ஹலமித்தி ஹபிபோ"
+      },
+      {
+        "start": 10.47,
+        "end": 12.58,
+        "time": 10.47,
+        "text": "ஹலமித்தி ஹபி வந்தாலே"
+      },
+      {
+        "start": 12.58,
+        "end": 14.4,
+        "time": 12.58,
+        "text": "ஹலமித்தி ஹபிபோ"
+      },
+      {
+        "start": 14.4,
+        "end": 18.85,
+        "time": 14.4,
+        "text": "ஹலமித்தி ஹபிபோ ஓ ஓ ஓ"
+      },
+      {
+        "start": 18.85,
+        "end": 20.8,
+        "time": 18.85,
+        "text": "அய்யோ"
+      },
+      {
+        "start": 20.8,
+        "end": 22.67,
+        "time": 20.8,
+        "text": "யப்போ"
+      },
+      {
+        "start": 22.67,
+        "end": 25.13,
+        "time": 22.67,
+        "text": "யம்மோ"
+      },
+      {
+        "start": 25.13,
+        "end": 34.36,
+        "time": 25.13,
+        "text": "♪"
+      },
+      {
+        "start": 34.36,
+        "end": 36.27,
+        "time": 34.36,
+        "text": "அய்யோ"
+      },
+      {
+        "start": 36.27,
+        "end": 38.17,
+        "time": 36.27,
+        "text": "யப்போ"
+      },
+      {
+        "start": 38.17,
+        "end": 40.73,
+        "time": 38.17,
+        "text": "யம்மோ"
+      },
+      {
+        "start": 40.73,
+        "end": 42.6,
+        "time": 40.73,
+        "text": "மலம பித்தா பித்தாதே"
+      },
+      {
+        "start": 42.6,
+        "end": 44.63,
+        "time": 42.6,
+        "text": "மலம பித்தா பித்தாதே"
+      },
+      {
+        "start": 44.63,
+        "end": 48.2,
+        "time": 44.63,
+        "text": "மல பித்தா பித்தாதே மலம பித்தாதே"
+      },
+      {
+        "start": 48.2,
+        "end": 50.22,
+        "time": 48.2,
+        "text": "ஏ மலம பித்தா பித்தாதே"
+      },
+      {
+        "start": 50.22,
+        "end": 52.43,
+        "time": 50.22,
+        "text": "மலம பித்தா பித்தாதே"
+      },
+      {
+        "start": 52.43,
+        "end": 56.24,
+        "time": 52.43,
+        "text": "மல பித்தா பித்தாதே மலம பித்தாதே"
+      },
+      {
+        "start": 56.24,
+        "end": 59.94,
+        "time": 56.24,
+        "text": "होली, होली பக்கத்துல சிரிக்கும் ரங்கோலி"
+      },
+      {
+        "start": 59.94,
+        "end": 63.91,
+        "time": 59.94,
+        "text": "Jolly, jolly வெக்கத்துல மயங்குற டோலி"
+      },
+      {
+        "start": 63.91,
+        "end": 67.76,
+        "time": 63.91,
+        "text": "காலி, காலி மொத்தத்துல அவனும் தான் காலி"
+      },
+      {
+        "start": 67.76,
+        "end": 70.58,
+        "time": 67.76,
+        "text": "Jolly, jolly அடிபொலி"
+      },
+      {
+        "start": 70.58,
+        "end": 72.56,
+        "time": 70.58,
+        "text": "ஹலமித்தி ஹபிபோ"
+      },
+      {
+        "start": 72.56,
+        "end": 74.29,
+        "time": 72.56,
+        "text": "ஹலமித்தி மித்தி வந்தாலே"
+      },
+      {
+        "start": 74.29,
+        "end": 76.07,
+        "time": 74.29,
+        "text": "ஹலமித்தி ஹபிபோ"
+      },
+      {
+        "start": 76.07,
+        "end": 78.15,
+        "time": 76.07,
+        "text": "ஹலமித்தி மித்தி வந்தா"
+      },
+      {
+        "start": 78.15,
+        "end": 80.08,
+        "time": 78.15,
+        "text": "ஹலமித்தி ஹபிபோ"
+      },
+      {
+        "start": 80.08,
+        "end": 81.94,
+        "time": 80.08,
+        "text": "ஹலமித்தி மித்தி வந்தாலே"
+      },
+      {
+        "start": 81.94,
+        "end": 84.02,
+        "time": 81.94,
+        "text": "ஹலமித்தி ஹபிபோ"
+      },
+      {
+        "start": 84.02,
+        "end": 86.72,
+        "time": 84.02,
+        "text": "ஹலமித்தி மித்திபோ ஓ ஓ ஓ..."
+      },
+      {
+        "start": 86.72,
+        "end": 88.78,
+        "time": 86.72,
+        "text": "Oh cutie, நீ sweety"
+      },
+      {
+        "start": 88.78,
+        "end": 90.77,
+        "time": 88.78,
+        "text": "உன் beauty அதில் மாட்டி"
+      },
+      {
+        "start": 90.77,
+        "end": 92.94,
+        "time": 90.77,
+        "text": "நான் மெல்லமா, மெல்லமா காலி"
+      },
+      {
+        "start": 92.94,
+        "end": 94.76,
+        "time": 92.94,
+        "text": "அத சொல்லல, சொல்லல போடி"
+      },
+      {
+        "start": 94.76,
+        "end": 96.25,
+        "time": 94.76,
+        "text": "முதல் வாட்டி படம் காட்டி"
+      },
+      {
+        "start": 96.25,
+        "end": 98.44,
+        "time": 96.25,
+        "text": "என்ன வாட்டி கண்ண காட்டி"
+      },
+      {
+        "start": 98.44,
+        "end": 100.7,
+        "time": 98.44,
+        "text": "Love'ah கொஞ்சமா, கொஞ்சமா ஏத்தி"
+      },
+      {
+        "start": 100.7,
+        "end": 102.66,
+        "time": 100.7,
+        "text": "என்ன செஞ்சிட்டா, செஞ்சிட்டா ஒருத்தி"
+      },
+      {
+        "start": 102.66,
+        "end": 105.01,
+        "time": 102.66,
+        "text": "இவன் யாரோ சொக்க வச்சானே"
+      },
+      {
+        "start": 105.01,
+        "end": 110.57,
+        "time": 105.01,
+        "text": "என் மனசுக்குள்ள குழந்தைப் போல கொஞ்சிக்கிட்டானே, love'ah வச்சானே"
+      },
+      {
+        "start": 110.57,
+        "end": 113.13,
+        "time": 110.57,
+        "text": "இவன் யாரோ kick'ah வச்சானே"
+      },
+      {
+        "start": 113.13,
+        "end": 116.98,
+        "time": 113.13,
+        "text": "என் வயசுக்குள்ள முதல் மழைய feel'ah வச்சானே"
+      },
+      {
+        "start": 116.98,
+        "end": 119.31,
+        "time": 116.98,
+        "text": "ஹலமித்தி ஹபிபோ"
+      },
+      {
+        "start": 119.31,
+        "end": 120.84,
+        "time": 119.31,
+        "text": "ஹலமித்தி"
+      },
+      {
+        "start": 120.84,
+        "end": 122.72,
+        "time": 120.84,
+        "text": "ஹலமித்தி ஹபிபோ"
+      },
+      {
+        "start": 122.72,
+        "end": 124.41,
+        "time": 122.72,
+        "text": "ஹலமித்தி"
+      },
+      {
+        "start": 124.41,
+        "end": 126.76,
+        "time": 124.41,
+        "text": "ஹலமித்தி ஹபிபோ"
+      },
+      {
+        "start": 126.76,
+        "end": 128.37,
+        "time": 126.76,
+        "text": "ஹலமித்தி"
+      },
+      {
+        "start": 128.37,
+        "end": 130.45,
+        "time": 128.37,
+        "text": "ஹலமித்தி ஹபிபோ"
+      },
+      {
+        "start": 130.45,
+        "end": 133.31,
+        "time": 130.45,
+        "text": "ஹலமித்தி(ஹேய் பிதா)"
+      },
+      {
+        "start": 133.31,
+        "end": 137.37,
+        "time": 133.31,
+        "text": "ஹேய் பிதா பலிஹபி பலிபாதி பலிஹபி"
+      },
+      {
+        "start": 137.37,
+        "end": 141.42,
+        "time": 137.37,
+        "text": "பலிஹபிதா பலிஹபி வல்லே வல்லே பலிஹபி"
+      },
+      {
+        "start": 141.42,
+        "end": 145.29,
+        "time": 141.42,
+        "text": "ஹேய் பிதா பலிஹபி பலிபாதி பலிஹபி"
+      },
+      {
+        "start": 145.29,
+        "end": 149.03,
+        "time": 145.29,
+        "text": "பலிஹபிதா பலிஹபி வல்லே வல்லே பலிஹபி"
+      },
+      {
+        "start": 149.03,
+        "end": 152.93,
+        "time": 149.03,
+        "text": "ஹல்லுவா ஈ பலுபபிதாதே ஈ பலுபபிதா"
+      },
+      {
+        "start": 152.93,
+        "end": 156.87,
+        "time": 152.93,
+        "text": "ஹல்லுவா ஈ பலுபபிதாதே, ஏ வத்தாதே"
+      },
+      {
+        "start": 156.87,
+        "end": 160.69,
+        "time": 156.87,
+        "text": "ஹல்லுவா ஈ பலுபபிதாதே ஈ பலுபபிதா"
+      },
+      {
+        "start": 160.69,
+        "end": 164.5,
+        "time": 160.69,
+        "text": "ஹல்லுவா ஈ பலுபபிதாதே, ஏ வத்தாதே"
+      },
+      {
+        "start": 164.5,
+        "end": 168.51,
+        "time": 164.5,
+        "text": "होली, होली பக்கத்துல சிரிக்கும் ரங்கோலி"
+      },
+      {
+        "start": 168.51,
+        "end": 172.22,
+        "time": 168.51,
+        "text": "Jolly, jolly வெக்கத்துல மயங்குற டோலி"
+      },
+      {
+        "start": 172.22,
+        "end": 175.92,
+        "time": 172.22,
+        "text": "காலி, காலி மொத்தத்துல அவனும் தான் காலி"
+      },
+      {
+        "start": 175.92,
+        "end": 178.6,
+        "time": 175.92,
+        "text": "Jolly, jolly அடிபொலி"
+      },
+      {
+        "start": 178.6,
+        "end": 180.79,
+        "time": 178.6,
+        "text": "ஹலமித்தி ஹபிபோ"
+      },
+      {
+        "start": 180.79,
+        "end": 182.66,
+        "time": 180.79,
+        "text": "ஹலமித்தி ஹபி வந்தாலே"
+      },
+      {
+        "start": 182.66,
+        "end": 184.46,
+        "time": 182.66,
+        "text": "ஹலமித்தி ஹபிபோ"
+      },
+      {
+        "start": 184.46,
+        "end": 186.64,
+        "time": 184.46,
+        "text": "ஹலமித்தி ஹபி வந்தா"
+      },
+      {
+        "start": 186.64,
+        "end": 188.51,
+        "time": 186.64,
+        "text": "ஹலமித்தி ஹபிபோ"
+      },
+      {
+        "start": 188.51,
+        "end": 190.07,
+        "time": 188.51,
+        "text": "ஹலமித்தி ஹபி வந்தாலே"
+      },
+      {
+        "start": 190.07,
+        "end": 192.01,
+        "time": 190.07,
+        "text": "ஹலமித்தி ஹபிபோ"
+      },
+      {
+        "start": 192.01,
+        "end": 195.12,
+        "time": 192.01,
+        "text": "ஹலமித்தி ஹபிபோ ஓ ஓ ஓ..."
+      },
+      {
+        "start": 195.12,
+        "end": 197.24,
+        "time": 195.12,
+        "text": "Oh, cutie நீ sweety"
+      },
+      {
+        "start": 197.24,
+        "end": 199.04,
+        "time": 197.24,
+        "text": "உன் beauty அதில் மாட்டி"
+      },
+      {
+        "start": 199.04,
+        "end": 201.11,
+        "time": 199.04,
+        "text": "நான் மெல்லமா, மெல்லமா காலி"
+      },
+      {
+        "start": 201.11,
+        "end": 202.95,
+        "time": 201.11,
+        "text": "அத சொல்லல, சொல்லல போடி"
+      },
+      {
+        "start": 202.95,
+        "end": 204.98,
+        "time": 202.95,
+        "text": "முதல் வாட்டி படம் காட்டி"
+      },
+      {
+        "start": 204.98,
+        "end": 206.63,
+        "time": 204.98,
+        "text": "என்ன வாட்டி கண்ண காட்டி"
+      },
+      {
+        "start": 206.63,
+        "end": 208.86,
+        "time": 206.63,
+        "text": "Love'ah கொஞ்சமா, கொஞ்சமா ஏத்தி"
+      },
+      {
+        "start": 208.86,
+        "end": 211.05,
+        "time": 208.86,
+        "text": "என்ன செஞ்சிட்டா, செஞ்சிட்டா ஒருத்தி"
+      },
+      {
+        "start": 211.05,
+        "end": 213.69,
+        "time": 211.05,
+        "text": "இவன் யாரோ சொக்க வச்சானே"
+      },
+      {
+        "start": 213.69,
+        "end": 218.82,
+        "time": 213.69,
+        "text": "என் மனசுக்குள்ள குழந்தைப் போல கொஞ்சிக்கிட்டானே, love'ah வச்சானே"
+      },
+      {
+        "start": 218.82,
+        "end": 221.26,
+        "time": 218.82,
+        "text": "இவன் யாரோ kick'ah வச்சானே"
+      },
+      {
+        "start": 221.26,
+        "end": 225.07,
+        "time": 221.26,
+        "text": "என் வயசுக்குள்ள முதல் மழைய feel'ah வச்சானே"
+      },
+      {
+        "start": 225.07,
+        "end": 227.25,
+        "time": 225.07,
+        "text": "ஹலமித்தி ஹபிபோ"
+      },
+      {
+        "start": 227.25,
+        "end": 229.16,
+        "time": 227.25,
+        "text": "ஹலமித்தி மித்தி வந்தாலே"
+      },
+      {
+        "start": 229.16,
+        "end": 230.9,
+        "time": 229.16,
+        "text": "ஹலமித்தி ஹபிபோ"
+      },
+      {
+        "start": 230.9,
+        "end": 233.07,
+        "time": 230.9,
+        "text": "ஹலமித்தி மித்தி வந்தா"
+      },
+      {
+        "start": 233.07,
+        "end": 234.93,
+        "time": 233.07,
+        "text": "ஹலமித்தி ஹபிபோ"
+      },
+      {
+        "start": 234.93,
+        "end": 236.9,
+        "time": 234.93,
+        "text": "ஹலமித்தி மித்தி வந்தாலே"
+      },
+      {
+        "start": 236.9,
+        "end": 238.97,
+        "time": 236.9,
+        "text": "ஹலமித்தி ஹபிபோ"
+      },
+      {
+        "start": 238.97,
+        "end": 241.65,
+        "time": 238.97,
+        "text": "ஹலமித்தி ஹபிபோ ஓ ஓ ஓ..."
+      },
+      {
+        "start": 241.65,
+        "end": 243.72,
+        "time": 241.65,
+        "text": "மலம பித்தா பித்தாதே"
+      },
+      {
+        "start": 243.72,
+        "end": 246.1,
+        "time": 243.72,
+        "text": "மலம பித்தா பித்தாதே"
+      },
+      {
+        "start": 246.1,
+        "end": 249.45,
+        "time": 246.1,
+        "text": "மல பித்தா பித்தாதே மலம பித்தாதே"
+      },
+      {
+        "start": 249.45,
+        "end": 251.31,
+        "time": 249.45,
+        "text": "ஏ மலம பித்தா பித்தாதே"
+      },
+      {
+        "start": 251.31,
+        "end": 253.77,
+        "time": 251.31,
+        "text": "மலம பித்தா பித்தாதே"
+      },
+      {
+        "start": 253.77,
+        "end": 257.51,
+        "time": 253.77,
+        "text": "மல பித்தா பித்தாதே மலம பித்தாதே"
+      },
+      {
+        "start": 257.51,
+        "end": 261.66,
+        "time": 257.51,
+        "text": "ஹேய் பிதா பலிஹபி பலிபாதி பலிஹபி"
+      },
+      {
+        "start": 261.66,
+        "end": 265.38,
+        "time": 261.66,
+        "text": "பலிஹபிதா பலிஹபி வல்லே வல்லே பலிஹபி"
+      },
+      {
+        "start": 265.38,
+        "end": 269.39,
+        "time": 265.38,
+        "text": "ஹேய் (ஹலமித்தி) பலிபாதி (ஹலமித்தி)"
+      },
+      {
+        "start": 269.39,
+        "end": 271.47,
+        "time": 269.39,
+        "text": "பலிஹபிதா (ஹலமித்தி)"
+      },
+      {
+        "start": 271.47,
+        "end": 273.91,
+        "time": 271.47,
+        "text": "ஹலமித்தி ஹபிபோ"
+      },
+      {
+        "start": 273.91,
+        "end": 280,
+        "time": 273.91,
+        "text": "♪"
+      }
+    ],
+    "updatedAt": "2026-10-13T04:34:54.158Z"
   }
 }

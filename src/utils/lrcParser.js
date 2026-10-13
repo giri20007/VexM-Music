@@ -44,7 +44,8 @@ export function parseLrc(lrcContent, trackDuration = 0) {
 
 export function findActiveLyricIndex(lines, currentTime, offsetMs = 0) {
   if (!lines || lines.length === 0) return -1;
-  const adjustedTime = Math.max(0, currentTime + offsetMs / 1000);
+  // +0.20s lead-in lookahead aligns visual lyric activation right as vocal onset starts
+  const adjustedTime = Math.max(0, currentTime + 0.20 + offsetMs / 1000);
 
   let activeIndex = -1;
   for (let i = 0; i < lines.length; i++) {

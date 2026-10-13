@@ -318,10 +318,11 @@ export const RoundVFXVisualizer = memo(function RoundVFXVisualizer({
           shockwaveRef.current = 1.0;
         }
 
+        // Silky smooth organic bass follower locked to beat transients
         if (currentBass > smoothedBassRef.current) {
-          smoothedBassRef.current = smoothedBassRef.current * 0.35 + currentBass * 0.65;
+          smoothedBassRef.current = smoothedBassRef.current * 0.70 + currentBass * 0.30;
         } else {
-          smoothedBassRef.current = smoothedBassRef.current * Math.pow(0.78, dt);
+          smoothedBassRef.current = smoothedBassRef.current * 0.85 + currentBass * 0.15;
         }
       } else if (isPlaying) {
         const curTime = (typeof useAudioStore !== 'undefined' && useAudioStore.getState().currentTime) || (now / 1000);
@@ -352,24 +353,25 @@ export const RoundVFXVisualizer = memo(function RoundVFXVisualizer({
           }
           freqData[i] = Math.min(255, Math.round(amp * 230));
         }
-        smoothedBassRef.current = 0.18 + kickEnvelope * 0.62;
+        smoothedBassRef.current = smoothedBassRef.current * 0.75 + (0.18 + kickEnvelope * 0.62) * 0.25;
       } else {
-        smoothedBassRef.current *= Math.pow(0.85, dt);
+        smoothedBassRef.current *= Math.pow(0.88, dt);
       }
 
-      impactRef.current *= Math.pow(0.70, dt);
-      shockwaveRef.current *= Math.pow(0.82, dt);
+      impactRef.current *= Math.pow(0.78, dt);
+      shockwaveRef.current *= Math.pow(0.86, dt);
 
       const bass = prefersReducedMotion ? smoothedBassRef.current * 0.25 : smoothedBassRef.current;
       const impact = prefersReducedMotion ? impactRef.current * 0.25 : impactRef.current;
 
+      // Silky smooth spectrum interpolation (fluid 60fps/120fps motion like Old VFX)
       const smoothData = smoothedDataRef.current;
       for (let i = 0; i < 128; i++) {
         const target = (freqData[i] || 0) / 255;
         if (target > smoothData[i]) {
-          smoothData[i] = target;
+          smoothData[i] = smoothData[i] * 0.65 + target * 0.35; // Smooth responsive attack
         } else {
-          smoothData[i] = smoothData[i] * Math.pow(0.75, dt);
+          smoothData[i] = smoothData[i] * 0.82 + target * 0.18; // Gentle liquid decay
         }
       }
 
@@ -394,11 +396,9 @@ export const RoundVFXVisualizer = memo(function RoundVFXVisualizer({
       }
       const rot = rotationRef.current;
 
-      // Tight kick punch isolation: prevents sustained basslines from awkward over-bouncing
-      const kickBounce = impact * 0.08;
-      const bassGroove = Math.max(0, (bass - 0.25)) * 0.04;
-      const bounce = Math.min(0.11, kickBounce + bassGroove);
-      const discRadius = minDim * 0.20 * (1 + bounce);
+      // Smooth organic vinyl breathing locked to the beat (subtle ~6-8% max pulsation)
+      const bounce = bass * 0.05 + impact * 0.04;
+      const discRadius = minDim * 0.21 * (1 + bounce);
       const ringOuterRadius = discRadius * (224 / 188);
 
       // 3. Crisp Kick Shockwave
@@ -406,15 +406,15 @@ export const RoundVFXVisualizer = memo(function RoundVFXVisualizer({
         const shockRadius = ringOuterRadius + (1 - shockwaveRef.current) * minDim * 0.18;
         ctx.beginPath();
         ctx.arc(cx, cy, shockRadius, 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(6, 182, 212, ${shockwaveRef.current * 0.4})`;
-        ctx.lineWidth = Math.max(1.5 * dpr, shockwaveRef.current * 3 * dpr);
+        ctx.strokeStyle = `rgba(6, 182, 212, ${shockwaveRef.current * 0.35})`;
+        ctx.lineWidth = Math.max(1.5 * dpr, shockwaveRef.current * 2.5 * dpr);
         ctx.stroke();
       }
 
       // 4. 360° Symmetrical Radial Equalizer Rays
       const rayBaseRadius = ringOuterRadius + 4 * dpr;
       const peaks = peaksRef.current;
-      const peakDecay = 1.2 * dpr * dt;
+      const peakDecay = 0.9 * dpr * dt;
 
       for (let i = 0; i < RAY_COUNT; i++) {
         const angle = (i / RAY_COUNT) * Math.PI * 2 + rot;
@@ -424,7 +424,7 @@ export const RoundVFXVisualizer = memo(function RoundVFXVisualizer({
         const normalizedFreqIdx = Math.min(127, Math.floor(logFactor * 85));
 
         const val = isLiveAudio || isPlaying ? smoothData[normalizedFreqIdx] : 0.04;
-        const rayLen = Math.max(4 * dpr, val * minDim * 0.20 * (1 + impact * 0.22));
+        const rayLen = Math.max(4 * dpr, val * minDim * 0.22 * (1 + bass * 0.15 + impact * 0.15));
 
         if (rayLen >= peaks[i]) {
           peaks[i] = rayLen;
