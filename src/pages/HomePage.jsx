@@ -7,15 +7,18 @@ import {
   Globe,
   Heart,
   RotateCcw,
-  Sparkles,
   Search,
   Menu,
   Clock,
   Flame,
-  Coffee,
+  Radio,
+  Plus,
+  Check,
+  Disc3,
   Waves,
   Music2,
-  Compass,
+  SlidersHorizontal,
+  Sparkles,
 } from 'lucide-react';
 import { useAudioStore } from '../store/useAudioStore';
 import { useAuthStore } from '../store/useAuthStore';
@@ -127,23 +130,24 @@ const dedupeList = list => {
   return res;
 };
 
-const getGreetingTime = () => {
-  const hour = new Date().getHours();
-  if (hour >= 5 && hour < 12) return 'Good morning';
-  if (hour >= 12 && hour < 17) return 'Good afternoon';
-  if (hour >= 17 && hour < 22) return 'Good evening';
-  return 'Late night';
-};
-
 /**
- * Clean Horizontal Carousel with smooth desktop arrows and native touch scroll
+ * Amazon Music Horizontal Carousel (Shelf)
  */
-function CleanCarousel({ title, subtitle, items = [], currentTrackId, isPlaying, onPlay, onNavigateAll }) {
+function AmazonMusicShelf({
+  title,
+  subtitle,
+  items = [],
+  currentTrackId,
+  isPlaying,
+  onPlay,
+  onNavigateAll,
+  showAtmos = true,
+}) {
   const scrollRef = useRef(null);
 
   const scroll = direction => {
     if (!scrollRef.current) return;
-    const offset = direction === 'left' ? -380 : 380;
+    const offset = direction === 'left' ? -420 : 420;
     scrollRef.current.scrollBy({ left: offset, behavior: 'smooth' });
   };
 
@@ -151,14 +155,14 @@ function CleanCarousel({ title, subtitle, items = [], currentTrackId, isPlaying,
 
   return (
     <section className="space-y-3">
-      {/* Header */}
+      {/* Amazon Music Shelf Header */}
       <div className="flex items-end justify-between px-1">
         <div>
-          <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white tracking-tight">
-            {title}
+          <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-2">
+            <span>{title}</span>
           </h2>
           {subtitle && (
-            <p className="text-xs text-white/50 mt-0.5 font-medium">
+            <p className="text-xs text-white/55 font-normal mt-0.5">
               {subtitle}
             </p>
           )}
@@ -168,7 +172,7 @@ function CleanCarousel({ title, subtitle, items = [], currentTrackId, isPlaying,
           {onNavigateAll && (
             <button
               onClick={onNavigateAll}
-              className="text-xs font-semibold text-white/60 hover:text-white transition mr-1"
+              className="text-xs font-bold text-[#00a8e1] hover:text-[#22d3ee] uppercase tracking-wider transition mr-1"
             >
               See all
             </button>
@@ -176,15 +180,15 @@ function CleanCarousel({ title, subtitle, items = [], currentTrackId, isPlaying,
           <div className="hidden sm:flex items-center gap-1">
             <button
               onClick={() => scroll('left')}
-              className="w-7 h-7 rounded-full bg-white/[0.06] hover:bg-white/[0.12] flex items-center justify-center text-white/70 hover:text-white transition"
-              aria-label="Scroll left"
+              className="w-8 h-8 rounded-full bg-white/[0.08] hover:bg-white/[0.16] flex items-center justify-center text-white/80 hover:text-white transition active:scale-95"
+              aria-label="Previous"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
             <button
               onClick={() => scroll('right')}
-              className="w-7 h-7 rounded-full bg-white/[0.06] hover:bg-white/[0.12] flex items-center justify-center text-white/70 hover:text-white transition"
-              aria-label="Scroll right"
+              className="w-8 h-8 rounded-full bg-white/[0.08] hover:bg-white/[0.16] flex items-center justify-center text-white/80 hover:text-white transition active:scale-95"
+              aria-label="Next"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -199,31 +203,39 @@ function CleanCarousel({ title, subtitle, items = [], currentTrackId, isPlaying,
       >
         {items.map((track, idx) => {
           const isThisPlaying = String(currentTrackId) === String(track.id) && isPlaying;
-          const cover = getArtworkSrc(track, 300);
+          const cover = getArtworkSrc(track, 360);
 
           return (
             <div
-              key={`card_${track.id}_${idx}`}
+              key={`amz_card_${track.id}_${idx}`}
               onClick={() => onPlay(track, items)}
-              className="group flex-shrink-0 w-[145px] sm:w-[170px] cursor-pointer select-none snap-start clean-card rounded-xl p-3"
+              className="group flex-shrink-0 w-[155px] sm:w-[178px] cursor-pointer select-none snap-start amz-card p-3"
             >
               {/* Artwork Box */}
-              <div className="relative aspect-square w-full rounded-lg overflow-hidden bg-neutral-900 shadow-md mb-2.5">
+              <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-[#0d1117] shadow-lg mb-2.5">
                 <SafeImage
                   src={cover}
                   track={track}
                   alt={track.title}
-                  size={300}
+                  size={360}
                   className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                 />
 
-                {/* Clean Floating Play Button */}
+                {/* Amazon Music Signature Badges */}
+                <div className="absolute top-2 left-2 flex items-center gap-1">
+                  <span className="amz-badge-hd">ULTRA HD</span>
+                  {showAtmos && idx % 2 === 0 && (
+                    <span className="amz-badge-atmos">ATMOS</span>
+                  )}
+                </div>
+
+                {/* Amazon Music Cyan Circular Play Button */}
                 <button
                   onClick={e => {
                     e.stopPropagation();
                     onPlay(track, items);
                   }}
-                  className={`absolute right-2.5 bottom-2.5 w-10 h-10 rounded-full bg-[#fa2d48] text-white flex items-center justify-center shadow-lg transition-all duration-200 hover:scale-110 active:scale-95 ${
+                  className={`absolute right-2.5 bottom-2.5 w-10 h-10 rounded-full amz-play-btn flex items-center justify-center ${
                     isThisPlaying
                       ? 'opacity-100 scale-100'
                       : 'opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0'
@@ -239,11 +251,11 @@ function CleanCarousel({ title, subtitle, items = [], currentTrackId, isPlaying,
               </div>
 
               {/* Title & Artist */}
-              <h3 className="text-xs sm:text-sm font-semibold text-white truncate group-hover:text-[#fa2d48] transition-colors leading-snug">
+              <h3 className="text-xs sm:text-sm font-bold text-white truncate group-hover:text-[#00a8e1] transition-colors leading-tight">
                 {track.title}
               </h3>
-              <p className="text-[11px] text-white/50 truncate mt-0.5">
-                {track.artist || 'Unknown Artist'}
+              <p className="text-[11px] text-white/50 truncate mt-1">
+                {track.artist || 'Amazon Music Hit'}
               </p>
             </div>
           );
@@ -254,7 +266,7 @@ function CleanCarousel({ title, subtitle, items = [], currentTrackId, isPlaying,
 }
 
 /**
- * HOMEPAGE - Clean, Simple, Ultra-Fast & Modern
+ * MASTER HOMEPAGE: AMAZON MUSIC CLONE IN IOS 17
  */
 export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileNav }) {
   const currentTrack = useAudioStore(s => s.currentTrack);
@@ -271,8 +283,10 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileN
   const langConfig = MUSIC_LANGUAGES.find(l => l.id === preferredLanguage) || MUSIC_LANGUAGES[0];
   const providerSource = useSettingsStore(s => s.providerSource) || 'all';
 
+  const [activeFilter, setActiveFilter] = useState('all');
   const [seed, setSeed] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [featuredHeroIndex, setFeaturedHeroIndex] = useState(0);
 
   const cacheKey = `${preferredLanguage}_${providerSource}_${seed}`;
   const cached = feedCache[cacheKey];
@@ -285,10 +299,9 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileN
 
   const artistsScrollRef = useRef(null);
 
-  const greetingTime = useMemo(() => getGreetingTime(), []);
   const displayName = user?.displayName || user?.username || 'Listener';
 
-  // Fetch clean language-tailored music feed
+  // Load language tailored content
   useEffect(() => {
     let isMounted = true;
 
@@ -382,16 +395,26 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileN
     }, 500);
   };
 
+  // Top featured hero tracks for the Amazon Music Spotlight Banner
+  const heroSpotlightTracks = useMemo(() => {
+    const pool = trendingTracks.length ? trendingTracks : (lib?.allItems || []);
+    return pool.slice(0, 4);
+  }, [trendingTracks, lib?.allItems]);
+
+  const currentHeroTrack = heroSpotlightTracks[featuredHeroIndex] || heroSpotlightTracks[0];
+  const isHeroPlaying = currentHeroTrack && currentTrack?.id === currentHeroTrack.id && isPlaying;
+  const heroCover = currentHeroTrack ? getArtworkSrc(currentHeroTrack, 600) : null;
+
   const currentArtists = useMemo(() => {
     return LANGUAGE_ARTISTS[preferredLanguage] || LANGUAGE_ARTISTS.tamil;
   }, [preferredLanguage]);
 
-  // Quick Pick shortcut items
-  const quickItems = useMemo(() => [
+  // Quick 6-card Jump Back In tiles
+  const quickJumpItems = useMemo(() => [
     {
       id: 'liked',
-      title: 'Liked Songs',
-      sub: `${likedTrackIds.length} tracks`,
+      title: 'My Favorites',
+      sub: `${likedTrackIds.length} Songs`,
       isLikedSpecial: true,
       action: () => onNavigate('liked'),
       playAction: () => {
@@ -402,8 +425,8 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileN
     },
     {
       id: 'recent',
-      title: 'Recently Played',
-      sub: `${recentlyPlayed.length} tracks`,
+      title: 'Listen Again',
+      sub: `${recentlyPlayed.length} Tracks`,
       track: recentlyPlayed[0] || trendingTracks[0],
       action: () => {
         if (recentlyPlayed[0]) handlePlayTrack(recentlyPlayed[0], recentlyPlayed);
@@ -412,8 +435,8 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileN
     },
     {
       id: 'slowed',
-      title: 'Slowed & Reverb',
-      sub: `${langConfig.name} Lofi`,
+      title: 'Slowed + Reverb',
+      sub: `${langConfig.name} Station`,
       track: slowedTracks[0] || trendingTracks[1],
       action: () => {
         if (slowedTracks[0]) handlePlayTrack(slowedTracks[0], slowedTracks);
@@ -431,7 +454,7 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileN
     {
       id: 'chill',
       title: 'Acoustic Chill',
-      sub: 'Relaxing Vibes',
+      sub: 'Relaxing Melodies',
       track: chillTracks[0] || trendingTracks[2],
       action: () => {
         if (chillTracks[0]) handlePlayTrack(chillTracks[0], chillTracks);
@@ -439,8 +462,8 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileN
     },
     {
       id: 'radio',
-      title: 'All-Time Melodies',
-      sub: 'Evergreen Radio',
+      title: 'Evergreen Radio',
+      sub: 'All-Time Hits',
       track: bestSongs[0] || trendingTracks[3],
       action: () => {
         if (bestSongs[0]) handlePlayTrack(bestSongs[0], bestSongs);
@@ -450,342 +473,496 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileN
 
   return (
     <div className="flex-1 w-full pb-32 select-none bg-transparent text-white font-sans">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 space-y-9 pt-5">
+      <div className="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 space-y-7 pt-4">
 
         {/* ========================================================================= */}
-        {/* 1. CLEAN TOP HEADER                                                       */}
+        {/* 1. TOP HEADER & BRANDING (AMAZON MUSIC WEB + IOS 17)                      */}
         {/* ========================================================================= */}
-        <header className="flex items-center justify-between gap-3 pb-2 border-b border-white/[0.06]">
-          {/* Left: Mobile Nav Toggle + Greeting */}
-          <div className="flex items-center gap-2.5 min-w-0">
-            {onToggleMobileNav && (
-              <button
-                onClick={onToggleMobileNav}
-                className="md:hidden p-2 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-white/70 hover:text-white transition flex items-center justify-center min-w-[38px] min-h-[38px]"
-                aria-label="Open menu"
+        <header className="flex flex-col gap-3 pb-2 border-b border-white/[0.08]">
+          <div className="flex items-center justify-between gap-3">
+            {/* Left: Mobile Nav Toggle + Amazon Music Brand Mark */}
+            <div className="flex items-center gap-2.5 min-w-0">
+              {onToggleMobileNav && (
+                <button
+                  onClick={onToggleMobileNav}
+                  className="md:hidden p-2 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-white/80 hover:text-white transition flex items-center justify-center min-w-[38px] min-h-[38px]"
+                  aria-label="Open navigation menu"
+                >
+                  <Menu className="w-5 h-5" />
+                </button>
+              )}
+
+              <div
+                onClick={() => onNavigate('home')}
+                className="cursor-pointer flex items-center gap-1.5"
               >
-                <Menu className="w-5 h-5" />
-              </button>
-            )}
+                <span className="text-xl sm:text-2xl font-black tracking-tight text-white">
+                  vex<span className="text-[#00a8e1]">m</span>
+                </span>
+                <span className="text-xs sm:text-sm font-semibold text-white/60 tracking-wider uppercase ml-1">
+                  music
+                </span>
+              </div>
+            </div>
 
-            <div className="min-w-0">
-              <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight text-white truncate">
-                {greetingTime}, {displayName}
-              </h1>
+            {/* Right: Search, Language, Provider, Refresh & Profile */}
+            <div className="flex items-center gap-2 sm:gap-2.5 flex-shrink-0">
+              {/* Search Pill */}
+              <button
+                onClick={() => setSearchModalOpen(true)}
+                className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.08] hover:bg-white/[0.14] border border-white/5 text-xs text-white/70 hover:text-white transition active:scale-95"
+                title="Search music, artists, albums"
+              >
+                <Search className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Search</span>
+              </button>
+
+              {/* Provider Source Selector */}
+              <ProviderSourceButton />
+
+              {/* Language Selector Pill */}
+              <button
+                onClick={onOpenLanguageModal}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.08] hover:bg-white/[0.14] border border-white/5 text-xs font-semibold text-white/85 hover:text-white transition active:scale-95"
+                title="Switch language"
+              >
+                <Globe className="w-3.5 h-3.5 text-[#00a8e1]" />
+                <span>{langConfig.name}</span>
+              </button>
+
+              {/* Refresh Button */}
+              <button
+                onClick={handleRefresh}
+                disabled={isRefreshing}
+                className="p-2 rounded-full bg-white/[0.08] hover:bg-white/[0.14] text-white/70 hover:text-white transition active:scale-95"
+                title="Refresh recommendations"
+                aria-label="Refresh recommendations"
+              >
+                <RotateCcw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-[#00a8e1]' : ''}`} />
+              </button>
+
+              {/* User Avatar Action */}
+              <div className="w-8 h-8 rounded-full overflow-hidden bg-white/[0.10] border border-white/10 flex items-center justify-center text-xs font-bold text-white shadow-sm flex-shrink-0 ring-2 ring-[#00a8e1]/40">
+                {user?.photoUrl ? (
+                  <img src={user.photoUrl} alt={displayName} className="w-full h-full object-cover" />
+                ) : (
+                  <span>{(displayName[0] || 'L').toUpperCase()}</span>
+                )}
+              </div>
             </div>
           </div>
 
-          {/* Right: Search, Language, Provider, Refresh & Profile */}
-          <div className="flex items-center gap-2 sm:gap-2.5 flex-shrink-0">
-            {/* Search Pill */}
-            <button
-              onClick={() => setSearchModalOpen(true)}
-              className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.06] hover:bg-white/[0.10] border border-white/5 text-xs text-white/60 hover:text-white transition"
-              title="Search music"
-            >
-              <Search className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Search</span>
-            </button>
-
-            {/* Provider Selector */}
-            <ProviderSourceButton />
-
-            {/* Language Selector Pill */}
-            <button
-              onClick={onOpenLanguageModal}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.06] hover:bg-white/[0.10] border border-white/5 text-xs font-semibold text-white/80 hover:text-white transition"
-              title="Switch language"
-            >
-              <Globe className="w-3.5 h-3.5 text-[#fa2d48]" />
-              <span className="hidden xs:inline">{langConfig.name}</span>
-            </button>
-
-            {/* Refresh Feed */}
-            <button
-              onClick={handleRefresh}
-              disabled={isRefreshing}
-              className="p-2 rounded-full bg-white/[0.06] hover:bg-white/[0.10] text-white/60 hover:text-white transition"
-              title="Refresh feed"
-              aria-label="Refresh feed"
-            >
-              <RotateCcw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-white' : ''}`} />
-            </button>
-
-            {/* User Avatar */}
-            <div className="w-8 h-8 rounded-full overflow-hidden bg-white/[0.08] border border-white/10 flex items-center justify-center text-xs font-bold text-white flex-shrink-0">
-              {user?.photoUrl ? (
-                <img src={user.photoUrl} alt={displayName} className="w-full h-full object-cover" />
-              ) : (
-                <span>{(displayName[0] || 'L').toUpperCase()}</span>
-              )}
-            </div>
+          {/* ========================================================================= */}
+          {/* IOS 17 HORIZONTAL FILTER CHIPS (ALL, MUSIC, SLOWED, ARTISTS, CHARTS)      */}
+          {/* ========================================================================= */}
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pt-1 -mx-4 px-4 sm:mx-0 sm:px-0">
+            {[
+              { id: 'all', label: 'All' },
+              { id: 'music', label: 'Music' },
+              { id: 'slowed', label: 'Slowed + Reverb' },
+              { id: 'artists', label: 'Artists' },
+              { id: 'charts', label: 'Charts' },
+              { id: 'favorites', label: 'My Favorites' },
+            ].map(chip => (
+              <button
+                key={chip.id}
+                onClick={() => setActiveFilter(chip.id)}
+                className={`amz-chip ${activeFilter === chip.id ? 'active' : ''}`}
+              >
+                {chip.label}
+              </button>
+            ))}
           </div>
         </header>
 
         {/* ========================================================================= */}
-        {/* 2. QUICK PLAY GRID (SPOTIFY 6-TILE SHORTCUTS - 1 TAP PLAY)               */}
+        {/* 2. FEATURED SPOTLIGHT BANNER (AMAZON MUSIC ORIGINAL HERO)                 */}
         {/* ========================================================================= */}
-        <section>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-2.5 sm:gap-3">
-            {quickItems.map(item => {
-              const cover = item.track ? getArtworkSrc(item.track, 120) : null;
-              const isPlayingItem = item.track && currentTrack?.id === item.track.id && isPlaying;
+        {(activeFilter === 'all' || activeFilter === 'music') && currentHeroTrack && (
+          <section className="relative rounded-2xl md:rounded-3xl overflow-hidden bg-[#111622] border border-white/10 shadow-2xl">
+            {/* Background Artwork Stage with Dark Right-to-Left Gradient Overlay */}
+            {heroCover && (
+              <div className="absolute inset-0">
+                <img
+                  src={heroCover}
+                  alt={currentHeroTrack.title}
+                  className="w-full h-full object-cover opacity-25 filter blur-xs sm:blur-none sm:opacity-30 object-right"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t sm:bg-gradient-to-r from-[#0b0e14] via-[#0b0e14]/90 to-transparent" />
+              </div>
+            )}
 
-              return (
-                <div
-                  key={item.id}
-                  onClick={item.playAction || item.action}
-                  className="group relative h-14 sm:h-16 rounded-xl clean-card-compact flex items-center overflow-hidden cursor-pointer select-none pr-3"
-                >
-                  {/* Thumbnail */}
-                  <div className="w-14 sm:w-16 h-full flex-shrink-0 bg-neutral-900 relative">
-                    {item.isLikedSpecial ? (
-                      <div className="w-full h-full bg-gradient-to-br from-[#fa2d48] to-[#8b5cf6] flex items-center justify-center text-white">
-                        <Heart className="w-5 h-5 fill-white" />
-                      </div>
-                    ) : cover ? (
-                      <SafeImage
-                        src={cover}
-                        alt={item.title}
-                        size={120}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-neutral-800 flex items-center justify-center text-white/40">
-                        <Music2 className="w-5 h-5" />
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Title & Subtitle */}
-                  <div className="min-w-0 flex-1 px-3">
-                    <p className="text-xs sm:text-sm font-bold text-white truncate group-hover:text-[#fa2d48] transition-colors">
-                      {item.title}
-                    </p>
-                    <p className="text-[10px] sm:text-[11px] text-white/45 truncate">
-                      {item.sub}
-                    </p>
-                  </div>
-
-                  {/* Instant Play Button */}
-                  <div className="flex-shrink-0 ml-1">
-                    <button
-                      onClick={e => {
-                        e.stopPropagation();
-                        if (item.playAction) item.playAction();
-                        else item.action();
-                      }}
-                      className={`w-8 h-8 rounded-full bg-[#fa2d48] text-white flex items-center justify-center shadow-md transition-all duration-150 ${
-                        isPlayingItem
-                          ? 'opacity-100 scale-100'
-                          : 'opacity-0 scale-90 group-hover:opacity-100 group-hover:scale-100'
-                      }`}
-                      aria-label={`Play ${item.title}`}
-                    >
-                      {isPlayingItem ? (
-                        <Pause className="w-3.5 h-3.5 fill-white" />
-                      ) : (
-                        <Play className="w-3.5 h-3.5 fill-white ml-0.5" />
-                      )}
-                    </button>
-                  </div>
+            <div className="relative z-10 p-6 sm:p-8 md:p-10 flex flex-col sm:flex-row items-center justify-between gap-6 sm:gap-8">
+              {/* Left Column: Metadata & CTAs */}
+              <div className="flex-1 space-y-3.5 text-center sm:text-left">
+                <div className="inline-flex items-center gap-2">
+                  <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-[#00a8e1]">
+                    FEATURED SPOTLIGHT
+                  </span>
+                  <span className="amz-badge-hd">ULTRA HD</span>
+                  <span className="amz-badge-atmos">DOLBY ATMOS</span>
                 </div>
-              );
-            })}
-          </div>
-        </section>
+
+                <div className="space-y-1">
+                  <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white tracking-tight leading-tight line-clamp-2">
+                    {currentHeroTrack.title}
+                  </h2>
+                  <p className="text-sm sm:text-base text-white/70 font-medium truncate">
+                    {currentHeroTrack.artist || 'Featured Artist'} • {currentHeroTrack.album || 'Single'}
+                  </p>
+                </div>
+
+                {/* Primary & Secondary Action Buttons */}
+                <div className="flex items-center justify-center sm:justify-start gap-3 pt-2">
+                  <button
+                    onClick={() => handlePlayTrack(currentHeroTrack, heroSpotlightTracks)}
+                    className="flex items-center gap-2 px-6 py-3 rounded-full amz-play-btn font-bold text-xs sm:text-sm active:scale-95"
+                  >
+                    {isHeroPlaying ? (
+                      <>
+                        <Pause className="w-4 h-4 fill-white" />
+                        <span>Pause</span>
+                      </>
+                    ) : (
+                      <>
+                        <Play className="w-4 h-4 fill-white ml-0.5" />
+                        <span>Listen Now</span>
+                      </>
+                    )}
+                  </button>
+
+                  <button
+                    onClick={() => toggleLike(currentHeroTrack.id)}
+                    className="flex items-center gap-1.5 px-4 py-3 rounded-full bg-white/[0.08] hover:bg-white/[0.14] border border-white/10 text-white font-semibold text-xs sm:text-sm transition active:scale-95"
+                  >
+                    <Heart
+                      className={`w-4 h-4 ${
+                        likedTrackIds.includes(String(currentHeroTrack.id))
+                          ? 'fill-[#fa2d48] text-[#fa2d48]'
+                          : 'text-white/80'
+                      }`}
+                    />
+                    <span>{likedTrackIds.includes(String(currentHeroTrack.id)) ? 'Saved' : 'Add to Library'}</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Right Column: Square Artwork with Spotlight Controls */}
+              <div className="w-40 sm:w-48 md:w-56 aspect-square rounded-2xl overflow-hidden shadow-2xl border border-white/10 flex-shrink-0 relative group">
+                <SafeImage
+                  src={heroCover}
+                  alt={currentHeroTrack.title}
+                  size={500}
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+
+                {/* Carousel Dots */}
+                {heroSpotlightTracks.length > 1 && (
+                  <div className="absolute bottom-2 inset-x-0 flex items-center justify-center gap-1.5 z-10">
+                    {heroSpotlightTracks.map((_, i) => (
+                      <button
+                        key={`dot_${i}`}
+                        onClick={e => {
+                          e.stopPropagation();
+                          setFeaturedHeroIndex(i);
+                        }}
+                        className={`h-1.5 rounded-full transition-all ${
+                          i === featuredHeroIndex ? 'w-5 bg-[#00a8e1]' : 'w-1.5 bg-white/40'
+                        }`}
+                        aria-label={`Go to slide ${i + 1}`}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* ========================================================================= */}
-        {/* 3. TRENDING NOW (CLEAN ALBUM ART CAROUSEL)                                */}
+        {/* 3. JUMP BACK IN / LISTEN AGAIN (AMAZON MUSIC 6-CARD GRID)                 */}
         {/* ========================================================================= */}
-        <CleanCarousel
-          title={`Trending in ${langConfig.name}`}
-          subtitle="Top viral and most played songs right now"
-          items={trendingTracks}
-          currentTrackId={currentTrack?.id}
-          isPlaying={isPlaying}
-          onPlay={handlePlayTrack}
-          onNavigateAll={() => onNavigate('search')}
-        />
+        {(activeFilter === 'all' || activeFilter === 'favorites') && (
+          <section className="space-y-3">
+            <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight px-1">
+              Listen Again
+            </h2>
+
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-2.5 sm:gap-3">
+              {quickJumpItems.map(item => {
+                const cover = item.track ? getArtworkSrc(item.track, 140) : null;
+                const isPlayingItem = item.track && currentTrack?.id === item.track.id && isPlaying;
+
+                return (
+                  <div
+                    key={item.id}
+                    onClick={item.playAction || item.action}
+                    className="group relative h-15 sm:h-16 rounded-xl amz-card flex items-center overflow-hidden cursor-pointer select-none pr-3"
+                  >
+                    {/* Artwork on Left */}
+                    <div className="w-15 sm:w-16 h-full flex-shrink-0 bg-[#0d1117] relative">
+                      {item.isLikedSpecial ? (
+                        <div className="w-full h-full bg-gradient-to-br from-[#00a8e1] to-[#8b5cf6] flex items-center justify-center text-white">
+                          <Heart className="w-5 h-5 fill-white" />
+                        </div>
+                      ) : cover ? (
+                        <SafeImage
+                          src={cover}
+                          alt={item.title}
+                          size={140}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-neutral-800 flex items-center justify-center text-white/40">
+                          <Music2 className="w-5 h-5" />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Metadata */}
+                    <div className="min-w-0 flex-1 px-3">
+                      <p className="text-xs sm:text-sm font-bold text-white truncate group-hover:text-[#00a8e1] transition-colors">
+                        {item.title}
+                      </p>
+                      <p className="text-[10px] sm:text-[11px] text-white/50 truncate">
+                        {item.sub}
+                      </p>
+                    </div>
+
+                    {/* Play Button */}
+                    <div className="flex-shrink-0 ml-1">
+                      <button
+                        onClick={e => {
+                          e.stopPropagation();
+                          if (item.playAction) item.playAction();
+                          else item.action();
+                        }}
+                        className={`w-8 h-8 rounded-full amz-play-btn flex items-center justify-center ${
+                          isPlayingItem
+                            ? 'opacity-100 scale-100'
+                            : 'opacity-0 scale-90 group-hover:opacity-100 group-hover:scale-100'
+                        }`}
+                        aria-label={`Play ${item.title}`}
+                      >
+                        {isPlayingItem ? (
+                          <Pause className="w-3.5 h-3.5 fill-white" />
+                        ) : (
+                          <Play className="w-3.5 h-3.5 fill-white ml-0.5" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        )}
 
         {/* ========================================================================= */}
-        {/* 4. SLOWED & REVERB HITS (REQUESTED BY USER)                              */}
+        {/* 4. TRENDING SONGS IN {LANGUAGE} (AMAZON MUSIC HORIZONTAL SHELF)           */}
         {/* ========================================================================= */}
-        {slowedTracks.length > 0 && (
-          <CleanCarousel
-            title="Slowed + Reverb"
-            subtitle="Aesthetic lofi and midnight chill vibes"
-            items={slowedTracks}
+        {(activeFilter === 'all' || activeFilter === 'music' || activeFilter === 'charts') && (
+          <AmazonMusicShelf
+            title={`Trending Songs in ${langConfig.name}`}
+            subtitle="The most-streamed tracks on Amazon Music this week"
+            items={trendingTracks}
             currentTrackId={currentTrack?.id}
             isPlaying={isPlaying}
             onPlay={handlePlayTrack}
+            onNavigateAll={() => onNavigate('search')}
           />
         )}
 
         {/* ========================================================================= */}
-        {/* 5. TOP ARTISTS (CLEAN CIRCULAR AVATARS)                                   */}
+        {/* 5. SLOWED + REVERB STATIONS (SIGNATURE AMZ STATION SHELF)                 */}
         {/* ========================================================================= */}
-        <section className="space-y-3">
-          <div className="flex items-end justify-between px-1">
-            <div>
-              <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white tracking-tight">
-                Popular Artists
-              </h2>
-              <p className="text-xs text-white/50 mt-0.5 font-medium">
-                Top visionaries and composers in {langConfig.name}
-              </p>
-            </div>
+        {(activeFilter === 'all' || activeFilter === 'slowed') && slowedTracks.length > 0 && (
+          <AmazonMusicShelf
+            title="Slowed + Reverb Stations"
+            subtitle="Endless aesthetic lofi, midnight chill, and slowed mixes"
+            items={slowedTracks}
+            currentTrackId={currentTrack?.id}
+            isPlaying={isPlaying}
+            onPlay={handlePlayTrack}
+            showAtmos={false}
+          />
+        )}
 
-            <div className="hidden sm:flex items-center gap-1">
-              <button
-                onClick={() => artistsScrollRef.current?.scrollBy({ left: -320, behavior: 'smooth' })}
-                className="w-7 h-7 rounded-full bg-white/[0.06] hover:bg-white/[0.12] flex items-center justify-center text-white/70 hover:text-white transition"
-                aria-label="Scroll left"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => artistsScrollRef.current?.scrollBy({ left: 320, behavior: 'smooth' })}
-                className="w-7 h-7 rounded-full bg-white/[0.06] hover:bg-white/[0.12] flex items-center justify-center text-white/70 hover:text-white transition"
-                aria-label="Scroll right"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-
-          <div
-            ref={artistsScrollRef}
-            className="flex gap-4 sm:gap-6 overflow-x-auto pb-3 pt-1 no-scrollbar snap-x snap-mandatory -mx-4 px-4 sm:mx-0 sm:px-0"
-          >
-            {currentArtists.map((artist, idx) => (
-              <div
-                key={`artist_${artist.name}_${idx}`}
-                onClick={() => onNavigate(`artist:${artist.name}`)}
-                className="group flex flex-col items-center flex-shrink-0 w-[105px] sm:w-[125px] cursor-pointer select-none text-center snap-start"
-              >
-                <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden bg-neutral-900 shadow-md ring-2 ring-white/10 group-hover:ring-[#fa2d48]/60 transition-all duration-300 group-hover:scale-105 mb-2">
-                  <SafeImage
-                    src={artist.image}
-                    alt={artist.name}
-                    size={240}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <h3 className="text-xs sm:text-sm font-semibold text-white truncate w-full group-hover:text-[#fa2d48] transition-colors">
-                  {artist.name}
-                </h3>
-                <p className="text-[10px] text-white/40 truncate w-full mt-0.5">
-                  {artist.role || 'Artist'}
+        {/* ========================================================================= */}
+        {/* 6. POPULAR ARTISTS (AMAZON MUSIC VERIFIED ARTIST ROW)                     */}
+        {/* ========================================================================= */}
+        {(activeFilter === 'all' || activeFilter === 'artists') && (
+          <section className="space-y-3">
+            <div className="flex items-end justify-between px-1">
+              <div>
+                <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+                  Popular Artists
+                </h2>
+                <p className="text-xs text-white/55 font-normal mt-0.5">
+                  Top composers, singers, and creators in {langConfig.name}
                 </p>
               </div>
-            ))}
-          </div>
-        </section>
 
-        {/* ========================================================================= */}
-        {/* 6. RECOMMENDED TRACKS (CLEAN, COMPACT SONG LIST)                          */}
-        {/* ========================================================================= */}
-        <section className="space-y-3">
-          <div className="flex items-end justify-between px-1">
-            <div>
-              <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white tracking-tight">
-                Recommended For You
-              </h2>
-              <p className="text-xs text-white/50 mt-0.5 font-medium">
-                Fresh picks based on what's trending right now
-              </p>
-            </div>
-            <button
-              onClick={() => onNavigate('search')}
-              className="text-xs font-semibold text-white/60 hover:text-white transition"
-            >
-              Search more
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-            {(trendingTracks.length ? trendingTracks.slice(0, 8) : []).map((track, idx) => {
-              const isThisPlaying = String(currentTrack?.id) === String(track.id) && isPlaying;
-              const isLiked = likedTrackIds.includes(String(track.id));
-              const thumb = getArtworkSrc(track, 100);
-
-              return (
-                <div
-                  key={`rec_${track.id}_${idx}`}
-                  onClick={() => handlePlayTrack(track, trendingTracks)}
-                  className={`group flex items-center justify-between h-14 px-3 rounded-xl clean-card-compact cursor-pointer select-none ${
-                    currentTrack?.id === track.id ? 'border-[#fa2d48]/30 bg-[#fa2d48]/5' : ''
-                  }`}
+              <div className="hidden sm:flex items-center gap-1">
+                <button
+                  onClick={() => artistsScrollRef.current?.scrollBy({ left: -360, behavior: 'smooth' })}
+                  className="w-8 h-8 rounded-full bg-white/[0.08] hover:bg-white/[0.16] flex items-center justify-center text-white/80 hover:text-white transition active:scale-95"
+                  aria-label="Previous artists"
                 >
-                  {/* Left: Thumbnail & Song / Artist */}
-                  <div className="flex items-center gap-3 min-w-0 flex-1 pr-2">
-                    <div className="relative w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 bg-neutral-900 shadow-sm">
-                      <SafeImage
-                        src={thumb}
-                        track={track}
-                        alt={track.title}
-                        size={100}
-                        className="w-full h-full object-cover"
-                      />
-                      <div
-                        className={`absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity ${
-                          isThisPlaying ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
-                        }`}
-                      >
-                        {isThisPlaying ? (
-                          <div className="flex items-end gap-0.5 h-3">
-                            <span className="w-1 h-2 bg-[#fa2d48] animate-pulse rounded-full" />
-                            <span className="w-1 h-3.5 bg-[#fa2d48] animate-pulse delay-75 rounded-full" />
-                            <span className="w-1 h-2 bg-[#fa2d48] animate-pulse delay-150 rounded-full" />
-                          </div>
-                        ) : (
-                          <Play className="w-3.5 h-3.5 fill-white text-white ml-0.5" />
-                        )}
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => artistsScrollRef.current?.scrollBy({ left: 360, behavior: 'smooth' })}
+                  className="w-8 h-8 rounded-full bg-white/[0.08] hover:bg-white/[0.16] flex items-center justify-center text-white/80 hover:text-white transition active:scale-95"
+                  aria-label="Next artists"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            <div
+              ref={artistsScrollRef}
+              className="flex gap-4 sm:gap-6 overflow-x-auto pb-3 pt-1 no-scrollbar snap-x snap-mandatory -mx-4 px-4 sm:mx-0 sm:px-0"
+            >
+              {currentArtists.map((artist, idx) => (
+                <div
+                  key={`amz_artist_${artist.name}_${idx}`}
+                  onClick={() => onNavigate(`artist:${artist.name}`)}
+                  className="group flex flex-col items-center flex-shrink-0 w-[110px] sm:w-[130px] cursor-pointer select-none text-center snap-start"
+                >
+                  <div className="relative w-22 h-22 sm:w-26 sm:h-26 rounded-full overflow-hidden bg-[#0d1117] shadow-lg ring-2 ring-white/10 group-hover:ring-[#00a8e1] transition-all duration-300 group-hover:scale-105 mb-2">
+                    <SafeImage
+                      src={artist.image}
+                      alt={artist.name}
+                      size={260}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <h3 className="text-xs sm:text-sm font-bold text-white truncate w-full group-hover:text-[#00a8e1] transition-colors">
+                    {artist.name}
+                  </h3>
+                  <p className="text-[10px] text-white/45 truncate w-full mt-0.5">
+                    {artist.role || 'Artist'}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* ========================================================================= */}
+        {/* 7. TOP 10 CHARTBUSTERS (AMAZON MUSIC NUMBERED TRACK LIST)                 */}
+        {/* ========================================================================= */}
+        {(activeFilter === 'all' || activeFilter === 'music' || activeFilter === 'charts') && (
+          <section className="space-y-3">
+            <div className="flex items-end justify-between px-1">
+              <div>
+                <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+                  Top Chartbusters
+                </h2>
+                <p className="text-xs text-white/55 font-normal mt-0.5">
+                  Stream in Ultra HD Lossless Audio
+                </p>
+              </div>
+              <button
+                onClick={() => onNavigate('search')}
+                className="text-xs font-bold text-[#00a8e1] hover:text-[#22d3ee] uppercase tracking-wider transition"
+              >
+                Explore More
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
+              {(trendingTracks.length ? trendingTracks.slice(0, 8) : []).map((track, idx) => {
+                const isThisPlaying = String(currentTrack?.id) === String(track.id) && isPlaying;
+                const isLiked = likedTrackIds.includes(String(track.id));
+                const thumb = getArtworkSrc(track, 120);
+
+                return (
+                  <div
+                    key={`chart_row_${track.id}_${idx}`}
+                    onClick={() => handlePlayTrack(track, trendingTracks)}
+                    className={`group flex items-center justify-between h-15 px-3 rounded-xl amz-card cursor-pointer select-none ${
+                      currentTrack?.id === track.id ? 'border-[#00a8e1]/40 bg-[#00a8e1]/10' : ''
+                    }`}
+                  >
+                    {/* Left: Number + Thumbnail + Info */}
+                    <div className="flex items-center gap-3 min-w-0 flex-1 pr-2">
+                      <span className="w-5 text-center text-xs font-bold text-white/40 group-hover:text-[#00a8e1] font-mono">
+                        {idx + 1}
+                      </span>
+
+                      <div className="relative w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 bg-[#0d1117] shadow-sm">
+                        <SafeImage
+                          src={thumb}
+                          track={track}
+                          alt={track.title}
+                          size={120}
+                          className="w-full h-full object-cover"
+                        />
+                        <div
+                          className={`absolute inset-0 bg-black/45 flex items-center justify-center transition-opacity ${
+                            isThisPlaying ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+                          }`}
+                        >
+                          {isThisPlaying ? (
+                            <div className="flex items-end gap-0.5 h-3">
+                              <span className="w-1 h-2 bg-[#00a8e1] animate-pulse rounded-full" />
+                              <span className="w-1 h-3.5 bg-[#00a8e1] animate-pulse delay-75 rounded-full" />
+                              <span className="w-1 h-2 bg-[#00a8e1] animate-pulse delay-150 rounded-full" />
+                            </div>
+                          ) : (
+                            <Play className="w-3.5 h-3.5 fill-white text-white ml-0.5" />
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1.5">
+                          <p className={`text-xs sm:text-sm font-bold truncate ${
+                            currentTrack?.id === track.id ? 'text-[#00a8e1]' : 'text-white'
+                          }`}>
+                            {track.title}
+                          </p>
+                          <span className="amz-badge-hd hidden sm:inline-flex">ULTRA HD</span>
+                        </div>
+                        <p className="text-[11px] text-white/50 truncate mt-0.5">
+                          {track.artist || 'Amazon Music Hit'}
+                        </p>
                       </div>
                     </div>
 
-                    <div className="min-w-0 flex-1">
-                      <p className={`text-xs sm:text-sm font-semibold truncate ${
-                        currentTrack?.id === track.id ? 'text-[#fa2d48]' : 'text-white'
-                      }`}>
-                        {track.title}
-                      </p>
-                      <p className="text-[11px] text-white/50 truncate mt-0.5">
-                        {track.artist || 'Unknown'}
-                      </p>
+                    {/* Right: Duration & Like button */}
+                    <div className="flex items-center gap-3 flex-shrink-0">
+                      <span className="text-xs text-white/40 font-mono">
+                        {formatDuration(track.duration || 210)}
+                      </span>
+                      <button
+                        onClick={e => {
+                          e.stopPropagation();
+                          toggleLike(track.id);
+                        }}
+                        className={`p-1.5 rounded-lg hover:bg-white/10 transition ${
+                          isLiked ? 'text-[#fa2d48]' : 'text-white/30 hover:text-white'
+                        }`}
+                        aria-label="Like track"
+                      >
+                        <Heart className={`w-3.5 h-3.5 ${isLiked ? 'fill-current' : ''}`} />
+                      </button>
                     </div>
                   </div>
-
-                  {/* Right: Duration & Like button */}
-                  <div className="flex items-center gap-3 flex-shrink-0">
-                    <span className="text-xs text-white/40 font-mono">
-                      {formatDuration(track.duration || 210)}
-                    </span>
-                    <button
-                      onClick={e => {
-                        e.stopPropagation();
-                        toggleLike(track.id);
-                      }}
-                      className={`p-1.5 rounded-lg hover:bg-white/10 transition ${
-                        isLiked ? 'text-[#fa2d48]' : 'text-white/30 hover:text-white'
-                      }`}
-                      aria-label="Like track"
-                    >
-                      <Heart className={`w-3.5 h-3.5 ${isLiked ? 'fill-current' : ''}`} />
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </section>
+                );
+              })}
+            </div>
+          </section>
+        )}
 
         {/* ========================================================================= */}
-        {/* 7. RECENTLY PLAYED                                                        */}
+        {/* 8. RECENTLY PLAYED SHELF                                                  */}
         {/* ========================================================================= */}
-        {recentlyPlayed.length > 0 ? (
-          <CleanCarousel
+        {recentlyPlayed.length > 0 && (
+          <AmazonMusicShelf
             title="Recently Played"
             subtitle="Pick up where you left off"
             items={recentlyPlayed}
@@ -793,17 +970,8 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileN
             isPlaying={isPlaying}
             onPlay={handlePlayTrack}
             onNavigateAll={() => onNavigate('library')}
+            showAtmos={false}
           />
-        ) : (
-          <section className="clean-card rounded-2xl p-6 text-center space-y-2">
-            <div className="w-10 h-10 rounded-full bg-white/[0.06] flex items-center justify-center mx-auto text-[#fa2d48]">
-              <Compass className="w-5 h-5" />
-            </div>
-            <h3 className="text-sm font-bold text-white">No listening history yet</h3>
-            <p className="text-xs text-white/50 max-w-sm mx-auto">
-              Any song you play will appear here so you can easily jump back in anytime.
-            </p>
-          </section>
         )}
 
       </div>
