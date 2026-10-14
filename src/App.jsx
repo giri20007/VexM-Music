@@ -271,12 +271,14 @@ export default function App() {
 
         {/* Right Scrollable Main Content Column */}
         <div className="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto pb-28 md:pb-24">
-          <Header
-            title={headerTitle}
-            currentRoute={currentRoute}
-            onToggleMobileNav={() => setMobileNavOpen(true)}
-            onNavigate={navigate}
-          />
+          {currentRoute !== 'home' && !currentRoute.startsWith('track:') && (
+            <Header
+              title={headerTitle}
+              currentRoute={currentRoute}
+              onToggleMobileNav={() => setMobileNavOpen(true)}
+              onNavigate={navigate}
+            />
+          )}
 
           <main className="flex-1 flex flex-col">
             <ErrorBoundary onReset={() => navigate('home')}>
@@ -285,6 +287,7 @@ export default function App() {
                   lib={lib}
                   onNavigate={navigate}
                   onOpenLanguageModal={() => setLanguageModalOpen(true)}
+                  onToggleMobileNav={() => setMobileNavOpen(true)}
                 />
               )}
 

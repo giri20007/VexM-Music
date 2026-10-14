@@ -8,46 +8,33 @@ import {
   Heart,
   RotateCcw,
   Sparkles,
-  Waves,
+  Search,
+  Menu,
+  Clock,
+  Compass,
+  Radio,
+  Flame,
+  Volume2,
+  Headphones,
   Zap,
   Coffee,
-  Radio,
-  Headphones,
+  Waves,
   Disc3,
+  Moon,
+  Library,
 } from 'lucide-react';
 import { useAudioStore } from '../store/useAudioStore';
+import { useAuthStore } from '../store/useAuthStore';
 import { useSettingsStore } from '../store/useSettingsStore';
 import { SafeImage } from '../components/ui/SafeImage';
 import { getArtworkSrc } from '../utils/artworkGenerator';
 import { fetchSaavnTrending, searchSaavn, searchYouTube } from '../utils/api';
 import { MUSIC_LANGUAGES } from '../components/modals/LanguagePreferenceModal';
 import { ProviderSourceButton } from '../components/layout/ProviderSourceButton';
+import { formatDuration } from '../utils/formatters';
 
-// In-memory feed cache for instant zero-flicker switching
+// In-memory feed cache for fast switching
 const feedCache = {};
-
-// Apple Music Editorial Category Tags
-const EDITORIAL_TAGS = [
-  'EDITOR’S CHOICE',
-  'NEW RELEASE',
-  'TRENDING HIT',
-  'SPATIAL AUDIO',
-  'FEATURED EXCLUSIVE',
-  'TOP CHARTBUSTER',
-];
-
-// Clean Apple iOS Segmented Mood Chips
-const MOOD_CHIPS = [
-  { id: 'all', label: 'All' },
-  { id: 'slowed', label: 'Slowed & Reverb', icon: Waves },
-  { id: 'relax', label: 'Relax', icon: Coffee },
-  { id: 'workout', label: 'Workout', icon: Zap },
-  { id: 'energize', label: 'Energize', icon: Sparkles },
-  { id: 'romance', label: 'Romance', icon: Heart },
-  { id: 'party', label: 'Party', icon: Radio },
-  { id: 'focus', label: 'Focus', icon: Headphones },
-  { id: 'nostalgia', label: 'Nostalgia', icon: Disc3 },
-];
 
 // Curated top artists per language with verified high-res CDN photos
 const LANGUAGE_ARTISTS = {
@@ -163,421 +150,33 @@ const dedupeList = list => {
   return res;
 };
 
-// Formats today's date in Apple Music uppercase format
-const getFormattedToday = () => {
-  try {
-    const d = new Date();
-    return d.toLocaleDateString('en-US', {
-      weekday: 'long',
-      month: 'long',
-      day: 'numeric',
-    }).toUpperCase();
-  } catch {
-    return 'LISTEN NOW';
-  }
+// Human-like time-of-day greeting
+const getGreetingTime = () => {
+  const hour = new Date().getHours();
+  if (hour >= 5 && hour < 12) return 'Good morning';
+  if (hour >= 12 && hour < 17) return 'Good afternoon';
+  if (hour >= 17 && hour < 22) return 'Good evening';
+  return 'Late night';
 };
 
 /**
- * 1. Apple Music Large Featured Editorial Hero Card
+ * MASTER HOMEPAGE: "VEX-M ATMOSPHERE"
  */
-function AppleFeaturedHeroCard({ track, index, onPlay, queue = [] }) {
+export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileNav }) {
   const currentTrack = useAudioStore(s => s.currentTrack);
   const isPlaying = useAudioStore(s => s.isPlaying);
-  const isThisPlaying = currentTrack?.id === track.id && isPlaying;
-
-  const tag = EDITORIAL_TAGS[index % EDITORIAL_TAGS.length];
-  const cover = getArtworkSrc(track, 800);
-
-  const handlePlay = e => {
-    e.stopPropagation();
-    onPlay(track, queue);
-  };
-
-  return (
-    <div
-      onClick={handlePlay}
-      className="group flex-shrink-0 w-[84vw] max-w-[540px] flex flex-col cursor-pointer select-none snap-start apple-press"
-    >
-      {/* Editorial Header */}
-      <div className="mb-2 px-1">
-        <p className="text-[10px] sm:text-[11px] font-bold tracking-wider uppercase text-white/50">
-          {tag}
-        </p>
-        <h3 className="text-base sm:text-xl font-bold text-white tracking-tight truncate group-hover:text-[#fa2d48] transition-colors">
-          {track.title}
-        </h3>
-        <p className="text-xs sm:text-sm text-white/60 truncate">
-          {track.artist}
-        </p>
-      </div>
-
-      {/* Visual Glass Banner Card */}
-      <div className="relative aspect-[16/9] sm:aspect-[2.1/1] w-full rounded-3xl overflow-hidden apple-glass-card shadow-xl transition-all duration-300 group-hover:shadow-[0_20px_48px_rgba(0,0,0,0.8)]">
-        <SafeImage
-          src={cover}
-          track={track}
-          alt={track.title}
-          size={800}
-          className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-        />
-
-        {/* Ambient Dark Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
-
-        {/* Floating Glass Play Badge */}
-        <div className="absolute right-3.5 bottom-3.5 sm:right-4 sm:bottom-4">
-          <button
-            onClick={handlePlay}
-            className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center backdrop-blur-2xl border border-white/25 shadow-2xl transition-all duration-200 hover:scale-105 active:scale-90 ${
-              isThisPlaying
-                ? 'bg-[#fa2d48] text-white opacity-100 scale-100 shadow-[0_0_20px_rgba(250,45,72,0.5)]'
-                : 'bg-black/50 hover:bg-[#fa2d48] text-white opacity-90 group-hover:opacity-100'
-            }`}
-            aria-label={`Play ${track.title}`}
-          >
-            {isThisPlaying ? (
-              <Pause className="w-5 h-5 fill-current" />
-            ) : (
-              <Play className="w-5 h-5 fill-current ml-0.5" />
-            )}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/**
- * 2. iOS Glass Widget Speed Dial Card ("Listen Again")
- */
-function SpeedDialWidget({ track, onPlay, queue = [] }) {
-  const currentTrack = useAudioStore(s => s.currentTrack);
-  const isPlaying = useAudioStore(s => s.isPlaying);
-  const isThisPlaying = currentTrack?.id === track.id && isPlaying;
-  const cover = getArtworkSrc(track, 120);
-
-  return (
-    <div
-      onClick={() => onPlay(track, queue)}
-      className={`group relative flex items-center h-15 rounded-2xl apple-glass-card apple-press p-1.5 pr-3 cursor-pointer select-none ${
-        currentTrack?.id === track.id ? 'bg-white/[0.14] border-white/25 shadow-lg' : ''
-      }`}
-    >
-      <div className="relative w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 bg-neutral-900 shadow-md">
-        <SafeImage
-          src={cover}
-          track={track}
-          alt={track.title}
-          size={120}
-          className="w-full h-full object-cover"
-        />
-        {isThisPlaying && (
-          <div className="absolute inset-0 bg-black/45 backdrop-blur-[2px] flex items-center justify-center">
-            <div className="flex items-end gap-0.5 h-3">
-              <span className="w-1 h-2.5 bg-[#fa2d48] animate-pulse rounded-full" />
-              <span className="w-1 h-3.5 bg-[#fa2d48] animate-pulse delay-75 rounded-full" />
-              <span className="w-1 h-2 bg-[#fa2d48] animate-pulse delay-150 rounded-full" />
-            </div>
-          </div>
-        )}
-      </div>
-
-      <div className="min-w-0 flex-1 px-2.5">
-        <p className={`text-xs sm:text-sm font-semibold truncate transition-colors ${
-          currentTrack?.id === track.id ? 'text-[#fa2d48]' : 'text-white'
-        }`}>
-          {track.title}
-        </p>
-        <p className="text-[11px] text-white/50 truncate mt-0.5">
-          {track.artist}
-        </p>
-      </div>
-
-      <div className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
-        <button
-          onClick={e => {
-            e.stopPropagation();
-            onPlay(track, queue);
-          }}
-          className="w-7 h-7 rounded-full bg-[#fa2d48] text-white flex items-center justify-center shadow-lg hover:scale-105 active:scale-90 transition"
-          aria-label={`Play ${track.title}`}
-        >
-          {isThisPlaying ? (
-            <Pause className="w-3.5 h-3.5 fill-current" />
-          ) : (
-            <Play className="w-3.5 h-3.5 fill-current ml-0.5" />
-          )}
-        </button>
-      </div>
-    </div>
-  );
-}
-
-/**
- * 3. Apple iOS Frosted Glass Music Card
- */
-function AppleGlassCard({ track, onPlay, queue = [] }) {
-  const currentTrack = useAudioStore(s => s.currentTrack);
-  const isPlaying = useAudioStore(s => s.isPlaying);
-  const isThisPlaying = currentTrack?.id === track.id && isPlaying;
-  const cover = getArtworkSrc(track, 360);
-
-  const handlePlay = e => {
-    e.stopPropagation();
-    onPlay(track, queue);
-  };
-
-  return (
-    <div
-      onClick={handlePlay}
-      className="group flex flex-col flex-shrink-0 w-[140px] sm:w-[165px] md:w-[180px] cursor-pointer select-none snap-start apple-glass-card apple-press rounded-2xl p-2.5"
-    >
-      <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-neutral-900 shadow-md mb-2">
-        <SafeImage
-          src={cover}
-          track={track}
-          alt={track.title}
-          size={360}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-        />
-
-        {/* Floating Glass Play Button */}
-        <button
-          onClick={handlePlay}
-          className={`absolute right-2 bottom-2 w-9 h-9 rounded-full bg-[#fa2d48] text-white flex items-center justify-center shadow-2xl transition-all duration-200 hover:scale-105 active:scale-90 ${
-            isThisPlaying
-              ? 'opacity-100 scale-100 translate-y-0'
-              : 'opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0'
-          }`}
-          aria-label={`Play ${track.title}`}
-        >
-          {isThisPlaying ? (
-            <Pause className="w-4 h-4 fill-white" />
-          ) : (
-            <Play className="w-4 h-4 fill-white ml-0.5" />
-          )}
-        </button>
-      </div>
-
-      <h4 className="text-xs sm:text-sm font-semibold text-white truncate group-hover:underline px-0.5">
-        {track.title}
-      </h4>
-      <p className="text-[11px] text-white/50 truncate mt-0.5 px-0.5">
-        {track.artist}
-      </p>
-    </div>
-  );
-}
-
-/**
- * 4. Apple iOS Frosted Glass Row Item (Used in 3-Row Stacked Slider)
- */
-function AppleGlassRowItem({ track, onPlay, queue = [] }) {
-  const currentTrack = useAudioStore(s => s.currentTrack);
-  const isPlaying = useAudioStore(s => s.isPlaying);
-  const isThisPlaying = currentTrack?.id === track.id && isPlaying;
-  const toggleLike = useAudioStore(s => s.toggleLike);
-  const likedTrackIds = useAudioStore(s => s.likedTrackIds);
-  const isLiked = likedTrackIds.includes(String(track.id));
-  const cover = getArtworkSrc(track, 120);
-
-  const handlePlay = e => {
-    e.stopPropagation();
-    onPlay(track, queue);
-  };
-
-  return (
-    <div
-      onClick={handlePlay}
-      className={`group flex items-center justify-between h-13 px-2.5 py-1.5 rounded-xl hover:bg-white/[0.08] transition-colors cursor-pointer select-none apple-press ${
-        currentTrack?.id === track.id ? 'bg-white/[0.08]' : ''
-      }`}
-    >
-      <div className="flex items-center gap-3 min-w-0 flex-1 pr-2">
-        <div className="relative w-11 h-11 rounded-lg overflow-hidden flex-shrink-0 bg-neutral-900 shadow-sm">
-          <SafeImage
-            src={cover}
-            track={track}
-            alt={track.title}
-            size={120}
-            className="w-full h-full object-cover"
-          />
-          <div
-            className={`absolute inset-0 bg-black/45 backdrop-blur-[2px] flex items-center justify-center transition-opacity ${
-              isThisPlaying ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
-            }`}
-          >
-            {isThisPlaying ? (
-              <Pause className="w-4 h-4 fill-white text-white" />
-            ) : (
-              <Play className="w-4 h-4 fill-white text-white ml-0.5" />
-            )}
-          </div>
-        </div>
-
-        <div className="min-w-0 flex-1">
-          <p
-            className={`text-xs sm:text-sm font-medium truncate ${
-              currentTrack?.id === track.id ? 'text-[#fa2d48] font-semibold' : 'text-white'
-            }`}
-          >
-            {track.title}
-          </p>
-          <p className="text-[11px] text-white/50 truncate mt-0.5">
-            {track.artist}
-          </p>
-        </div>
-      </div>
-
-      <div className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
-        <button
-          onClick={e => {
-            e.stopPropagation();
-            toggleLike(track.id);
-          }}
-          className={`p-1.5 rounded-full hover:bg-white/10 active:scale-90 transition ${
-            isLiked ? 'text-[#fa2d48] opacity-100' : 'text-white/40 hover:text-white'
-          }`}
-          aria-label="Favorite"
-        >
-          <Heart className={`w-3.5 h-3.5 ${isLiked ? 'fill-current' : ''}`} />
-        </button>
-      </div>
-    </div>
-  );
-}
-
-/**
- * 5. Apple Music Circular Artist Spotlight Card
- */
-function AppleArtistCard({ artist, onSelect }) {
-  return (
-    <div
-      onClick={() => onSelect(artist.name)}
-      className="group flex flex-col items-center flex-shrink-0 w-[115px] sm:w-[135px] cursor-pointer select-none text-center snap-start apple-press"
-    >
-      <div className="relative w-22 h-22 sm:w-28 sm:h-28 rounded-full overflow-hidden bg-neutral-900 shadow-xl ring-2 ring-white/10 group-hover:ring-white/40 transition-all duration-300 group-hover:scale-105 mb-2.5">
-        <SafeImage
-          src={artist.image}
-          alt={artist.name}
-          size={280}
-          className="w-full h-full object-cover"
-        />
-      </div>
-      <h4 className="text-xs sm:text-sm font-semibold text-white truncate w-full group-hover:underline">
-        {artist.name}
-      </h4>
-      <p className="text-[11px] text-white/50 truncate w-full mt-0.5">
-        {artist.role || 'Artist'}
-      </p>
-    </div>
-  );
-}
-
-/**
- * 6. Apple Glass Horizontal Section Row
- */
-function AppleSectionRow({ kicker, title, subtitle, onSeeAll, children, scrollRef }) {
-  const handleScroll = dir => {
-    if (scrollRef?.current) {
-      const offset = dir === 'left' ? -340 : 340;
-      scrollRef.current.scrollBy({ left: offset, behavior: 'smooth' });
-    }
-  };
-
-  return (
-    <section className="space-y-3">
-      <div className="flex items-end justify-between gap-3 px-1">
-        <div className="min-w-0">
-          {kicker && (
-            <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-white/40 mb-0.5">
-              {kicker}
-            </p>
-          )}
-          <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white tracking-tight truncate">
-            {title}
-          </h2>
-          {subtitle && (
-            <p className="text-xs text-white/50 truncate mt-0.5">{subtitle}</p>
-          )}
-        </div>
-
-        <div className="flex items-center gap-1.5 flex-shrink-0">
-          {onSeeAll && (
-            <button
-              onClick={onSeeAll}
-              className="text-xs font-semibold text-[#fa2d48] hover:underline transition mr-1 apple-press"
-            >
-              See all
-            </button>
-          )}
-          {scrollRef && (
-            <>
-              <button
-                onClick={() => handleScroll('left')}
-                className="w-8 h-8 rounded-full apple-glass apple-press flex items-center justify-center text-white/70 hover:text-white transition"
-                aria-label="Previous"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => handleScroll('right')}
-                className="w-8 h-8 rounded-full apple-glass apple-press flex items-center justify-center text-white/70 hover:text-white transition"
-                aria-label="Next"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </>
-          )}
-        </div>
-      </div>
-
-      <div
-        ref={scrollRef}
-        className="flex gap-3.5 sm:gap-5 overflow-x-auto pb-3 pt-1 no-scrollbar snap-x snap-mandatory scroll-smooth -mx-4 px-4 sm:mx-0 sm:px-0"
-      >
-        {children}
-      </div>
-    </section>
-  );
-}
-
-// Skeletons
-function SkeletonHero() {
-  return (
-    <div className="w-[84vw] max-w-[540px] flex-shrink-0 animate-pulse">
-      <div className="h-3 w-24 bg-white/10 rounded mb-2" />
-      <div className="h-5 w-48 bg-white/10 rounded mb-1" />
-      <div className="h-3.5 w-32 bg-white/5 rounded mb-3" />
-      <div className="aspect-[16/9] sm:aspect-[2.1/1] w-full bg-white/[0.06] rounded-3xl" />
-    </div>
-  );
-}
-
-function SkeletonCard() {
-  return (
-    <div className="w-[140px] sm:w-[165px] md:w-[180px] flex-shrink-0 flex flex-col animate-pulse rounded-2xl apple-glass-card p-2.5">
-      <div className="aspect-square w-full rounded-xl bg-white/[0.06] mb-2" />
-      <div className="h-3.5 w-3/4 bg-white/10 rounded mb-1" />
-      <div className="h-3 w-1/2 bg-white/5 rounded" />
-    </div>
-  );
-}
-
-/**
- * MASTER HOMEPAGE (APPLE iOS GLASSMORPHISM REDESIGN)
- */
-export function HomePage({ lib, onNavigate, onOpenLanguageModal }) {
-  const currentTrack = useAudioStore(s => s.currentTrack);
   const playTrack = useAudioStore(s => s.playTrack);
   const togglePlay = useAudioStore(s => s.togglePlay);
+  const toggleLike = useAudioStore(s => s.toggleLike);
+  const likedTrackIds = useAudioStore(s => s.likedTrackIds) || [];
   const recentlyPlayed = useAudioStore(s => s.recentlyPlayed) || [];
+  const setSearchModalOpen = useAudioStore(s => s.setSearchModalOpen);
 
+  const user = useAuthStore(s => s.user);
   const preferredLanguage = useSettingsStore(s => s.preferredLanguage) || 'tamil';
   const langConfig = MUSIC_LANGUAGES.find(l => l.id === preferredLanguage) || MUSIC_LANGUAGES[0];
   const providerSource = useSettingsStore(s => s.providerSource) || 'all';
 
-  const [activeMood, setActiveMood] = useState('all');
   const [seed, setSeed] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -595,31 +194,10 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal }) {
   const [newReleases, setNewReleases] = useState(cached?.releases || []);
   const [isLoading, setIsLoading] = useState(!cached);
 
-  const heroScrollRef = useRef(null);
-  const slowedScrollRef = useRef(null);
-  const trendingScrollRef = useRef(null);
-  const chillScrollRef = useRef(null);
-  const workoutScrollRef = useRef(null);
-  const romanceScrollRef = useRef(null);
-  const nostalgiaScrollRef = useRef(null);
   const artistsScrollRef = useRef(null);
 
-  const todayDateString = useMemo(() => getFormattedToday(), []);
-
-  // Speed Dial items (Recently played + top trending fallback)
-  const speedDialItems = useMemo(() => {
-    const list = [...recentlyPlayed];
-    if (list.length < 8) {
-      const fallback = [...trendingTracks, ...featuredTracks, ...bestSongs];
-      for (const t of fallback) {
-        if (!list.some(p => p.id === t.id)) {
-          list.push(t);
-        }
-        if (list.length >= 8) break;
-      }
-    }
-    return list.slice(0, 8);
-  }, [recentlyPlayed, trendingTracks, featuredTracks, bestSongs]);
+  const greetingTime = useMemo(() => getGreetingTime(), []);
+  const displayName = user?.displayName || user?.username || 'Listener';
 
   // Load language tailored content
   useEffect(() => {
@@ -680,7 +258,6 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal }) {
       }
     };
 
-    // YouTube Music search specifically for Slowed + Reverb
     const fetchSlowedYTM = async () => {
       try {
         const items = await searchYouTube(slowedQuery, 16);
@@ -768,459 +345,705 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal }) {
     }, 600);
   };
 
-  // 4 columns x 3 rows for Quick Picks slider
-  const radioColumns = useMemo(() => {
-    const list = bestSongs.length ? bestSongs.slice(0, 15) : featuredTracks.slice(0, 15);
-    const cols = [];
-    for (let i = 0; i < list.length; i += 3) {
-      cols.push(list.slice(i, i + 3));
-    }
-    return cols;
-  }, [bestSongs, featuredTracks]);
+  // Hero Spotlight Track (featured track or top trending)
+  const heroTrack = useMemo(() => {
+    if (featuredTracks.length > 0) return featuredTracks[0];
+    if (trendingTracks.length > 0) return trendingTracks[0];
+    return currentTrack;
+  }, [featuredTracks, trendingTracks, currentTrack]);
+
+  const isHeroPlaying = heroTrack && currentTrack?.id === heroTrack.id && isPlaying;
+  const heroCover = heroTrack ? getArtworkSrc(heroTrack, 800) : null;
+
+  // Curated Focus Collections
+  const focusCollections = useMemo(() => [
+    {
+      id: 'late_night',
+      title: 'Late Night Drive',
+      description: 'Atmospheric midnight synth & slow reverb',
+      mood: 'Midnight Beats',
+      tracks: slowedTracks.length ? slowedTracks : trendingTracks,
+      gradient: 'from-purple-900/40 via-indigo-950/30 to-black',
+      cover: slowedTracks[0] ? getArtworkSrc(slowedTracks[0], 400) : heroCover,
+    },
+    {
+      id: 'deep_focus',
+      title: 'Deep Focus',
+      description: 'Ambient acoustic flow for uninterrupted coding',
+      mood: 'Calm Flow',
+      tracks: chillTracks.length ? chillTracks : bestSongs,
+      gradient: 'from-cyan-950/40 via-slate-900/30 to-black',
+      cover: chillTracks[0] ? getArtworkSrc(chillTracks[0], 400) : heroCover,
+    },
+    {
+      id: 'studio_energy',
+      title: 'Studio Energy',
+      description: 'High-voltage basslines and festival adrenaline',
+      mood: 'Adrenaline',
+      tracks: workoutTracks.length ? workoutTracks : trendingTracks,
+      gradient: 'from-rose-950/40 via-red-950/30 to-black',
+      cover: workoutTracks[0] ? getArtworkSrc(workoutTracks[0], 400) : heroCover,
+    },
+    {
+      id: 'neon_rain',
+      title: 'Neon Rain',
+      description: 'Lofi chill and deep spatial resonance',
+      mood: 'Spatial Audio',
+      tracks: slowedTracks.length > 3 ? slowedTracks.slice(3) : trendingTracks,
+      gradient: 'from-violet-950/40 via-blue-950/30 to-black',
+      cover: slowedTracks[1] ? getArtworkSrc(slowedTracks[1], 400) : heroCover,
+    },
+  ], [slowedTracks, chillTracks, workoutTracks, trendingTracks, bestSongs, heroCover]);
 
   const currentArtists = useMemo(() => {
     return LANGUAGE_ARTISTS[preferredLanguage] || LANGUAGE_ARTISTS.tamil;
   }, [preferredLanguage]);
 
   return (
-    <div className="flex-1 w-full pb-32 select-none bg-transparent text-white">
-      {/* 1. TOP EDITORIAL HERO HEADER */}
-      <div className="px-4 sm:px-8 pt-5 pb-2 space-y-4">
-        {/* Apple Editorial Date & Listen Now Title + Action Glass Controls */}
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="text-[11px] font-bold tracking-wider uppercase text-white/40">
-              {todayDateString}
-            </p>
-            <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white font-sans mt-0.5">
-              Listen Now
-            </h1>
+    <div className="flex-1 w-full pb-36 select-none bg-transparent text-white font-sans">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-8 lg:px-12 space-y-12">
+        {/* ========================================================================= */}
+        {/* SECTION 1: TOP HEADER                                                     */}
+        {/* ========================================================================= */}
+        <header className="pt-6 pb-2 flex items-center justify-between gap-4 border-b border-white/[0.08]">
+          {/* Left: Mobile Nav Toggle + Contextual Greeting & Atmosphere Subtitle */}
+          <div className="flex items-center gap-3 min-w-0">
+            {onToggleMobileNav && (
+              <button
+                onClick={onToggleMobileNav}
+                className="md:hidden p-2 rounded-xl vexm-glass vexm-press text-white/70 hover:text-white flex items-center justify-center min-w-[40px] min-h-[40px]"
+                aria-label="Open navigation menu"
+              >
+                <Menu className="w-5 h-5" />
+              </button>
+            )}
+
+            <div className="min-w-0">
+              <p className="text-[10px] sm:text-[11px] font-bold tracking-widest uppercase text-white/40">
+                Your Listening Atmosphere
+              </p>
+              <h1 className="text-xl sm:text-2xl font-black tracking-tight text-white truncate">
+                {greetingTime}, <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-white/70">{displayName}</span>
+              </h1>
+            </div>
           </div>
 
-          <div className="flex items-center gap-2 flex-shrink-0 pt-1">
-            {/* Minimalist Apple Glass Refresh Button */}
+          {/* Center: Desktop Integrated Glass Search Field */}
+          <div className="hidden md:flex flex-1 max-w-md mx-4">
             <button
-              onClick={handleRefresh}
-              disabled={isRefreshing}
-              className="w-9 h-9 rounded-full apple-glass apple-press flex items-center justify-center text-white/70 hover:text-white transition"
-              title="Refresh feed"
-              aria-label="Refresh feed"
+              onClick={() => setSearchModalOpen(true)}
+              className="w-full h-10 px-4 rounded-full vexm-glass hover:bg-white/[0.09] hover:border-white/20 transition-all flex items-center justify-between text-white/40 hover:text-white/80 group shadow-sm"
             >
-              <RotateCcw
-                className={`w-3.5 h-3.5 transition-transform duration-500 ${
-                  isRefreshing ? 'animate-spin text-white' : ''
-                }`}
-              />
+              <div className="flex items-center gap-2.5 min-w-0">
+                <Search className="w-4 h-4 text-white/40 group-hover:text-[#fa2d48] transition-colors" />
+                <span className="text-xs truncate">Search songs, artists, albums...</span>
+              </div>
+              <kbd className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-white/[0.06] border border-white/10 text-white/40">
+                ⌘K
+              </kbd>
+            </button>
+          </div>
+
+          {/* Right: Actions (Mobile Search Button + Source Button + Language Pill + Refresh + Avatar) */}
+          <div className="flex items-center gap-2 sm:gap-2.5 flex-shrink-0">
+            {/* Mobile Search Icon Button */}
+            <button
+              onClick={() => setSearchModalOpen(true)}
+              className="md:hidden p-2.5 rounded-full vexm-glass vexm-press text-white/70 hover:text-white"
+              title="Search"
+              aria-label="Search"
+            >
+              <Search className="w-4 h-4" />
             </button>
 
-            {/* Apple Glass Language Pill */}
+            {/* Provider Source Selector */}
+            <ProviderSourceButton />
+
+            {/* Language Selector Pill */}
             <button
               onClick={onOpenLanguageModal}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full apple-glass apple-press text-xs font-semibold text-white/90 hover:text-white transition"
-              title="Change language"
+              className="hidden sm:flex items-center gap-1.5 px-3.5 py-1.5 rounded-full vexm-glass vexm-press text-xs font-semibold text-white/90 hover:text-white hover:border-white/20"
+              title="Change music language"
             >
               <Globe className="w-3.5 h-3.5 text-[#fa2d48]" />
               <span>{langConfig.name}</span>
             </button>
 
-            <ProviderSourceButton />
-          </div>
-        </div>
-
-        {/* Apple iOS Segmented Glass Mood Bar */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 pt-1 no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
-          {MOOD_CHIPS.map(chip => {
-            const isActive = activeMood === chip.id;
-            return (
-              <button
-                key={chip.id}
-                onClick={() => setActiveMood(isActive ? 'all' : chip.id)}
-                className={`flex-shrink-0 px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 apple-press ${
-                  isActive
-                    ? 'apple-pill-active'
-                    : 'apple-pill-inactive'
-                }`}
-              >
-                {chip.label}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="px-4 sm:px-8 space-y-11 mt-5">
-        {/* ========================================================================= */}
-        {/* SECTION 1: SPEED DIAL (LISTEN AGAIN / RECENT FAVORITES)                   */}
-        {/* ========================================================================= */}
-        {speedDialItems.length > 0 && (
-          <section className="space-y-3">
-            <div className="flex items-center justify-between px-1">
-              <h3 className="text-[11px] font-bold text-white/40 tracking-wider uppercase">
-                Listen Again & Quick Picks
-              </h3>
-              {recentlyPlayed.length > 0 && (
-                <button
-                  onClick={() => onNavigate('library')}
-                  className="text-xs font-semibold text-[#fa2d48] hover:underline flex items-center gap-0.5 apple-press"
-                >
-                  <span>History</span>
-                  <ChevronRight className="w-3.5 h-3.5" />
-                </button>
-              )}
-            </div>
-
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-3">
-              {speedDialItems.map((track, idx) => (
-                <SpeedDialWidget
-                  key={`sd_${track.id}_${idx}`}
-                  track={track}
-                  onPlay={handlePlayTrack}
-                  queue={speedDialItems}
-                />
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* ========================================================================= */}
-        {/* SECTION 2: APPLE FEATURED EDITORIAL HERO BANNER                           */}
-        {/* ========================================================================= */}
-        {(activeMood === 'all' || activeMood === 'energize') && (
-          <section className="space-y-3">
-            <div className="flex items-center justify-between px-1">
-              <div>
-                <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-white/40 mb-0.5">
-                  Apple Music Spotlight
-                </p>
-                <h2 className="text-lg sm:text-xl md:text-2xl font-bold tracking-tight text-white">
-                  Featured
-                </h2>
-              </div>
-
-              <div className="flex items-center gap-1.5">
-                <button
-                  onClick={() => heroScrollRef.current?.scrollBy({ left: -420, behavior: 'smooth' })}
-                  className="w-8 h-8 rounded-full apple-glass apple-press flex items-center justify-center text-white/70 hover:text-white transition"
-                  aria-label="Previous Featured"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => heroScrollRef.current?.scrollBy({ left: 420, behavior: 'smooth' })}
-                  className="w-8 h-8 rounded-full apple-glass apple-press flex items-center justify-center text-white/70 hover:text-white transition"
-                  aria-label="Next Featured"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-
-            <div
-              ref={heroScrollRef}
-              className="flex gap-4 sm:gap-5 overflow-x-auto pb-3 pt-1 no-scrollbar snap-x snap-mandatory scroll-smooth -mx-4 px-4 sm:mx-0 sm:px-0"
+            {/* Minimal Refresh Button */}
+            <button
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              className="p-2.5 rounded-full vexm-glass vexm-press text-white/60 hover:text-white"
+              title="Refresh recommendations"
+              aria-label="Refresh recommendations"
             >
-              {isLoading && featuredTracks.length === 0 ? (
-                <>
-                  <SkeletonHero />
-                  <SkeletonHero />
-                </>
+              <RotateCcw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-white' : ''}`} />
+            </button>
+
+            {/* User Avatar Action */}
+            <div className="w-8 h-8 rounded-full overflow-hidden vexm-glass border border-white/15 flex items-center justify-center text-xs font-bold text-white shadow-sm flex-shrink-0">
+              {user?.photoUrl ? (
+                <img src={user.photoUrl} alt={displayName} className="w-full h-full object-cover" />
               ) : (
-                featuredTracks.slice(0, 8).map((t, idx) => (
-                  <AppleFeaturedHeroCard
-                    key={`hero_${t.id}_${idx}`}
-                    track={t}
-                    index={idx}
-                    onPlay={handlePlayTrack}
-                    queue={featuredTracks}
-                  />
-                ))
+                <span>{(displayName[0] || 'L').toUpperCase()}</span>
               )}
             </div>
-          </section>
-        )}
-
-        {/* ========================================================================= */}
-        {/* SECTION 3: SLOWED & REVERB (APPLE CURATED MIDNIGHT SESSION)               */}
-        {/* ========================================================================= */}
-        {(activeMood === 'all' || activeMood === 'slowed' || activeMood === 'relax' || activeMood === 'focus') && (
-          <div className="p-4 sm:p-6 rounded-3xl apple-glass shadow-2xl relative overflow-hidden -mx-2 sm:mx-0">
-            <AppleSectionRow
-              kicker="Spatial Lofi"
-              title="Slowed & Reverb"
-              subtitle={`Aesthetic slowed tempo and midnight edits in ${langConfig.name}`}
-              scrollRef={slowedScrollRef}
-              onSeeAll={() => onNavigate('search')}
-            >
-              {isLoading && slowedTracks.length === 0 ? (
-                [...Array(6)].map((_, i) => <SkeletonCard key={`sk_sl_${i}`} />)
-              ) : (
-                slowedTracks.map((t, idx) => (
-                  <AppleGlassCard
-                    key={`slow_${t.id}_${idx}`}
-                    track={t}
-                    onPlay={handlePlayTrack}
-                    queue={slowedTracks}
-                  />
-                ))
-              )}
-            </AppleSectionRow>
           </div>
-        )}
+        </header>
 
         {/* ========================================================================= */}
-        {/* SECTION 4: QUICK PICKS RADIO (APPLE 3-ROW STACKED GLASS COLUMNS)          */}
+        {/* SECTION 2: HERO SECTION ("VEX-M ATMOSPHERE" PERSONALIZED LISTENING STAGE) */}
         {/* ========================================================================= */}
-        {(activeMood === 'all' || activeMood === 'energize') && (
-          <section className="space-y-3">
-            <div className="flex items-end justify-between px-1">
-              <div>
-                <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-white/40 mb-0.5">
-                  Start radio from a song
-                </p>
-                <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white tracking-tight">
-                  Quick picks
-                </h2>
-              </div>
-              <button
-                onClick={() => onNavigate('search')}
-                className="text-xs font-semibold text-[#fa2d48] hover:underline transition apple-press"
-              >
-                See all
-              </button>
-            </div>
+        {heroTrack && (
+          <section className="relative rounded-3xl p-6 sm:p-8 md:p-10 vexm-glass-strong overflow-hidden shadow-2xl">
+            {/* Ambient Blurred Artwork Lighting */}
+            {heroCover && (
+              <div
+                className="absolute -right-16 -top-16 w-[450px] h-[450px] rounded-full filter blur-[120px] opacity-25 pointer-events-none bg-cover bg-center"
+                style={{ backgroundImage: `url(${heroCover})` }}
+              />
+            )}
 
-            <div className="flex gap-4 sm:gap-6 overflow-x-auto pb-3 pt-1 no-scrollbar snap-x snap-mandatory -mx-4 px-4 sm:mx-0 sm:px-0">
-              {radioColumns.map((colGroup, colIdx) => (
-                <div
-                  key={`col_${colIdx}`}
-                  className="flex-shrink-0 w-[285px] sm:w-[325px] md:w-[350px] p-2 rounded-2xl apple-glass-card flex flex-col space-y-1 snap-start"
-                >
-                  {colGroup.map((track, rowIdx) => (
-                    <AppleGlassRowItem
-                      key={`qp_${track.id}_${colIdx}_${rowIdx}`}
-                      track={track}
-                      onPlay={handlePlayTrack}
-                      queue={bestSongs}
-                    />
-                  ))}
+            <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8 sm:gap-10">
+              {/* Left Side: Editorial Typography & Actions */}
+              <div className="flex-1 space-y-5 text-center lg:text-left">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.08] border border-white/10 text-[10px] sm:text-[11px] font-bold tracking-widest uppercase text-white/70">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#fa2d48] animate-pulse" />
+                  Your Current Atmosphere
                 </div>
-              ))}
+
+                <div className="space-y-2">
+                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white leading-tight">
+                    Find your next frequency.
+                  </h2>
+                  <p className="text-sm sm:text-base text-white/60 max-w-xl mx-auto lg:mx-0 leading-relaxed">
+                    A curated space for the sounds you keep coming back to. Precision-mastered 320 kbps audio streaming in {langConfig.name}.
+                  </p>
+                </div>
+
+                {/* Primary & Secondary Call to Actions */}
+                <div className="flex items-center justify-center lg:justify-start gap-3.5 pt-1">
+                  <button
+                    onClick={() => handlePlayTrack(heroTrack, featuredTracks)}
+                    className="flex items-center gap-2.5 px-6 py-3 rounded-full bg-[#fa2d48] hover:bg-[#ff3b53] text-white font-bold text-xs sm:text-sm shadow-xl shadow-[#fa2d48]/25 vexm-press"
+                  >
+                    {isHeroPlaying ? (
+                      <>
+                        <Pause className="w-4 h-4 fill-white" />
+                        <span>Pause Session</span>
+                      </>
+                    ) : (
+                      <>
+                        <Play className="w-4 h-4 fill-white ml-0.5" />
+                        <span>Start Listening</span>
+                      </>
+                    )}
+                  </button>
+
+                  <button
+                    onClick={() => onNavigate('library')}
+                    className="flex items-center gap-2 px-5 py-3 rounded-full vexm-glass hover:bg-white/[0.12] text-white/90 hover:text-white font-semibold text-xs sm:text-sm vexm-press"
+                  >
+                    <Library className="w-4 h-4 text-white/70" />
+                    <span>Explore Library</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Right Side: Large Rounded Artwork Stage with Glass Metadata Strip */}
+              <div className="w-full sm:w-[360px] md:w-[400px] flex-shrink-0">
+                <div
+                  onClick={() => handlePlayTrack(heroTrack, featuredTracks)}
+                  className="group relative aspect-square w-full rounded-2xl overflow-hidden vexm-glass border border-white/15 shadow-2xl cursor-pointer"
+                >
+                  <SafeImage
+                    src={heroCover}
+                    track={heroTrack}
+                    alt={heroTrack.title}
+                    size={600}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+
+                  {/* Glass Metadata Strip Overlapping Artwork Bottom */}
+                  <div className="absolute inset-x-3 bottom-3 p-3.5 rounded-xl bg-black/60 backdrop-blur-2xl border border-white/15 flex items-center justify-between gap-3 shadow-2xl">
+                    <div className="flex items-center gap-3 min-w-0">
+                      {/* Mini Vinyl Spin Detail */}
+                      <div className="w-9 h-9 rounded-full bg-neutral-900 border border-white/20 flex items-center justify-center flex-shrink-0 shadow-inner">
+                        <Disc3 className={`w-5 h-5 text-[#fa2d48] ${isHeroPlaying ? 'animate-spin' : ''}`} />
+                      </div>
+
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs sm:text-sm font-bold text-white truncate group-hover:text-[#fa2d48] transition-colors">
+                          {heroTrack.title}
+                        </p>
+                        <p className="text-[11px] text-white/50 truncate">
+                          {heroTrack.artist}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Quality Badge & Play Icon */}
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <span className="hidden xs:inline-block px-1.5 py-0.5 rounded text-[9px] font-bold tracking-wider uppercase bg-white/10 text-white/80 border border-white/10">
+                        320 KBPS
+                      </span>
+                      <button
+                        onClick={e => {
+                          e.stopPropagation();
+                          handlePlayTrack(heroTrack, featuredTracks);
+                        }}
+                        className="w-8 h-8 rounded-full bg-[#fa2d48] text-white flex items-center justify-center shadow-lg hover:scale-105 active:scale-90 transition"
+                        aria-label="Play spotlight track"
+                      >
+                        {isHeroPlaying ? (
+                          <Pause className="w-3.5 h-3.5 fill-white" />
+                        ) : (
+                          <Play className="w-3.5 h-3.5 fill-white ml-0.5" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </section>
         )}
 
         {/* ========================================================================= */}
-        {/* SECTION 5: TODAY'S BIGGEST HITS / TRENDING NOW                            */}
+        {/* SECTION 3: QUICK LISTENING ROW (COMPACT SHORTCUTS)                        */}
         {/* ========================================================================= */}
-        {(activeMood === 'all' || activeMood === 'energize' || activeMood === 'party') && (
-          <AppleSectionRow
-            kicker="Charts"
-            title="Today's Biggest Hits"
-            subtitle={`The top streaming chartbusters in ${langConfig.name}`}
-            scrollRef={trendingScrollRef}
-            onSeeAll={() => onNavigate('search')}
-          >
-            {isLoading && trendingTracks.length === 0 ? (
-              [...Array(6)].map((_, i) => <SkeletonCard key={`sk_tr_${i}`} />)
-            ) : (
-              trendingTracks.slice(0, 14).map((t, idx) => (
-                <AppleGlassCard
-                  key={`trend_${t.id}_${idx}`}
-                  track={t}
-                  onPlay={handlePlayTrack}
-                  queue={trendingTracks}
-                />
-              ))
-            )}
-          </AppleSectionRow>
-        )}
+        <section className="space-y-3">
+          <h3 className="text-xs font-bold text-white/40 tracking-wider uppercase px-1">
+            Quick Shortcuts
+          </h3>
 
-        {/* ========================================================================= */}
-        {/* SECTION 6: CHILL & PEACEFUL MELODIES                                      */}
-        {/* ========================================================================= */}
-        {(activeMood === 'all' || activeMood === 'relax' || activeMood === 'focus') && (
-          <AppleSectionRow
-            kicker="Mood"
-            title="Peaceful & Relaxed"
-            subtitle="Gentle acoustics, melodic chill and ambient flow"
-            scrollRef={chillScrollRef}
-          >
-            {chillTracks.length === 0 ? (
-              [...Array(6)].map((_, i) => <SkeletonCard key={`sk_ch_${i}`} />)
-            ) : (
-              chillTracks.slice(0, 14).map((t, idx) => (
-                <AppleGlassCard
-                  key={`chill_${t.id}_${idx}`}
-                  track={t}
-                  onPlay={handlePlayTrack}
-                  queue={chillTracks}
-                />
-              ))
-            )}
-          </AppleSectionRow>
-        )}
-
-        {/* ========================================================================= */}
-        {/* SECTION 7: WORKOUT ENERGY                                                 */}
-        {/* ========================================================================= */}
-        {(activeMood === 'all' || activeMood === 'workout' || activeMood === 'energize') && (
-          <AppleSectionRow
-            kicker="Activity"
-            title="Energy Boost"
-            subtitle="High-tempo workout tracks to power your session"
-            scrollRef={workoutScrollRef}
-          >
-            {workoutTracks.length === 0 ? (
-              [...Array(6)].map((_, i) => <SkeletonCard key={`sk_wo_${i}`} />)
-            ) : (
-              workoutTracks.slice(0, 14).map((t, idx) => (
-                <AppleGlassCard
-                  key={`work_${t.id}_${idx}`}
-                  track={t}
-                  onPlay={handlePlayTrack}
-                  queue={workoutTracks}
-                />
-              ))
-            )}
-          </AppleSectionRow>
-        )}
-
-        {/* ========================================================================= */}
-        {/* SECTION 8: ROMANTIC MELODIES                                              */}
-        {/* ========================================================================= */}
-        {(activeMood === 'all' || activeMood === 'romance') && (
-          <AppleSectionRow
-            kicker="Romance"
-            title="Heartfelt Melodies"
-            subtitle={`Soulful duets and romantic melodies in ${langConfig.name}`}
-            scrollRef={romanceScrollRef}
-          >
-            {romanceTracks.length === 0 ? (
-              [...Array(6)].map((_, i) => <SkeletonCard key={`sk_rom_${i}`} />)
-            ) : (
-              romanceTracks.slice(0, 14).map((t, idx) => (
-                <AppleGlassCard
-                  key={`rom_${t.id}_${idx}`}
-                  track={t}
-                  onPlay={handlePlayTrack}
-                  queue={romanceTracks}
-                />
-              ))
-            )}
-          </AppleSectionRow>
-        )}
-
-        {/* ========================================================================= */}
-        {/* SECTION 9: FORGOTTEN FAVORITES (NOSTALGIA)                                */}
-        {/* ========================================================================= */}
-        {(activeMood === 'all' || activeMood === 'nostalgia') && (
-          <AppleSectionRow
-            kicker="Nostalgia"
-            title="Forgotten Favorites"
-            subtitle={`Timeless golden era classics in ${langConfig.name}`}
-            scrollRef={nostalgiaScrollRef}
-          >
-            {nostalgiaTracks.length === 0 ? (
-              [...Array(6)].map((_, i) => <SkeletonCard key={`sk_nost_${i}`} />)
-            ) : (
-              nostalgiaTracks.slice(0, 14).map((t, idx) => (
-                <AppleGlassCard
-                  key={`nost_${t.id}_${idx}`}
-                  track={t}
-                  onPlay={handlePlayTrack}
-                  queue={nostalgiaTracks}
-                />
-              ))
-            )}
-          </AppleSectionRow>
-        )}
-
-        {/* ========================================================================= */}
-        {/* SECTION 10: POPULAR ARTISTS & COMPOSERS                                   */}
-        {/* ========================================================================= */}
-        {(activeMood === 'all' || activeMood === 'energize') && (
-          <section className="space-y-3">
-            <div className="flex items-end justify-between px-1">
-              <div>
-                <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-white/40 mb-0.5">
-                  Discography
-                </p>
-                <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white tracking-tight">
-                  Featured Artists
-                </h2>
-              </div>
-
-              <div className="flex items-center gap-1.5">
-                <button
-                  onClick={() => artistsScrollRef.current?.scrollBy({ left: -300, behavior: 'smooth' })}
-                  className="w-8 h-8 rounded-full apple-glass apple-press flex items-center justify-center text-white/70 hover:text-white transition"
-                  aria-label="Previous artists"
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3">
+            {[
+              {
+                label: 'Recently Played',
+                sub: `${recentlyPlayed.length} Tracks`,
+                icon: Clock,
+                color: 'text-cyan-400',
+                action: () => onNavigate('library'),
+              },
+              {
+                label: 'Liked Songs',
+                sub: `${likedTrackIds.length} Favorites`,
+                icon: Heart,
+                color: 'text-[#fa2d48]',
+                action: () => onNavigate('liked'),
+              },
+              {
+                label: 'Slowed & Reverb',
+                sub: 'Midnight Lofi',
+                icon: Waves,
+                color: 'text-purple-400',
+                action: () => {
+                  if (slowedTracks[0]) handlePlayTrack(slowedTracks[0], slowedTracks);
+                },
+              },
+              {
+                label: 'Trending Hits',
+                sub: `${langConfig.name} Top 20`,
+                icon: Flame,
+                color: 'text-amber-400',
+                action: () => {
+                  if (trendingTracks[0]) handlePlayTrack(trendingTracks[0], trendingTracks);
+                },
+              },
+              {
+                label: 'Pure Chill',
+                sub: 'Acoustic Beats',
+                icon: Coffee,
+                color: 'text-emerald-400',
+                action: () => {
+                  if (chillTracks[0]) handlePlayTrack(chillTracks[0], chillTracks);
+                },
+              },
+              {
+                label: 'New Drops',
+                sub: 'Fresh Releases',
+                icon: Sparkles,
+                color: 'text-rose-400',
+                action: () => {
+                  if (newReleases[0]) handlePlayTrack(newReleases[0], newReleases);
+                },
+              },
+            ].map((shortcut, idx) => {
+              const Icon = shortcut.icon;
+              return (
+                <div
+                  key={`sc_${idx}`}
+                  onClick={shortcut.action}
+                  className="h-14 px-3 rounded-2xl vexm-glass-card vexm-press flex items-center gap-3 cursor-pointer select-none group"
                 >
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => artistsScrollRef.current?.scrollBy({ left: 300, behavior: 'smooth' })}
-                  className="w-8 h-8 rounded-full apple-glass apple-press flex items-center justify-center text-white/70 hover:text-white transition"
-                  aria-label="Next artists"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
+                  <div className="w-8 h-8 rounded-xl bg-white/[0.06] border border-white/10 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+                    <Icon className={`w-4 h-4 ${shortcut.color}`} />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs font-bold text-white truncate group-hover:text-[#fa2d48] transition-colors">
+                      {shortcut.label}
+                    </p>
+                    <p className="text-[10px] text-white/40 truncate">
+                      {shortcut.sub}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* ========================================================================= */}
+        {/* SECTION 4: FOCUS SECTION ("MADE FOR YOUR FOCUS" SESSIONS)                 */}
+        {/* ========================================================================= */}
+        <section className="space-y-4">
+          <div className="flex items-end justify-between px-1">
+            <div>
+              <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-white/40 mb-0.5">
+                Session Curation
+              </p>
+              <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+                Made for your focus
+              </h2>
             </div>
+            <p className="text-xs text-white/40 hidden sm:block">
+              Soundscapes designed to lock you into deep flow
+            </p>
+          </div>
 
-            <div
-              ref={artistsScrollRef}
-              className="flex gap-4 sm:gap-6 overflow-x-auto pb-3 pt-1 no-scrollbar snap-x snap-mandatory scroll-smooth -mx-4 px-4 sm:mx-0 sm:px-0"
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {focusCollections.map((col, idx) => {
+              const isColPlaying = col.tracks.some(t => t.id === currentTrack?.id) && isPlaying;
+              return (
+                <div
+                  key={col.id}
+                  onClick={() => {
+                    if (col.tracks[0]) handlePlayTrack(col.tracks[0], col.tracks);
+                  }}
+                  className="group relative aspect-[1.4/1] rounded-2xl overflow-hidden vexm-glass-card vexm-press p-5 flex flex-col justify-between cursor-pointer border border-white/10 shadow-lg"
+                >
+                  {/* Subtle Background Glow Tint */}
+                  <div className={`absolute inset-0 bg-gradient-to-br ${col.gradient} opacity-80 group-hover:opacity-100 transition-opacity`} />
+                  
+                  {/* Background Artwork Silhouette */}
+                  {col.cover && (
+                    <div
+                      className="absolute inset-0 bg-cover bg-center opacity-15 filter blur-sm scale-110 group-hover:scale-105 transition-transform duration-700"
+                      style={{ backgroundImage: `url(${col.cover})` }}
+                    />
+                  )}
+
+                  {/* Header: Mood Tag */}
+                  <div className="relative z-10 flex items-center justify-between">
+                    <span className="px-2.5 py-0.5 rounded-full bg-white/10 backdrop-blur-md text-[10px] font-bold text-white/80 border border-white/10 uppercase tracking-wider">
+                      {col.mood}
+                    </span>
+                    <button
+                      className={`w-9 h-9 rounded-full bg-[#fa2d48] text-white flex items-center justify-center shadow-xl transition-all duration-200 ${
+                        isColPlaying ? 'opacity-100 scale-100' : 'opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0'
+                      }`}
+                      aria-label={`Play ${col.title}`}
+                    >
+                      {isColPlaying ? <Pause className="w-4 h-4 fill-white" /> : <Play className="w-4 h-4 fill-white ml-0.5" />}
+                    </button>
+                  </div>
+
+                  {/* Footer Details */}
+                  <div className="relative z-10 space-y-1">
+                    <h4 className="text-base font-bold text-white tracking-tight group-hover:text-[#fa2d48] transition-colors">
+                      {col.title}
+                    </h4>
+                    <p className="text-xs text-white/60 line-clamp-1 leading-relaxed">
+                      {col.description}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* ========================================================================= */}
+        {/* SECTION 5: TRENDING / NEW MUSIC TRACK LIST                                */}
+        {/* ========================================================================= */}
+        <section className="space-y-4">
+          <div className="flex items-end justify-between px-1">
+            <div>
+              <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-white/40 mb-0.5">
+                Top Chartbusters
+              </p>
+              <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+                Trending now
+              </h2>
+            </div>
+            <button
+              onClick={() => onNavigate('search')}
+              className="text-xs font-semibold text-[#fa2d48] hover:underline transition"
             >
-              {currentArtists.map((artist, idx) => (
-                <AppleArtistCard
-                  key={`art_${artist.name}_${idx}`}
-                  artist={artist}
-                  onSelect={artistName => onNavigate(`artist:${artistName}`)}
-                />
-              ))}
-            </div>
-          </section>
-        )}
+              See all
+            </button>
+          </div>
+
+          <div className="rounded-2xl vexm-glass border border-white/10 p-2 sm:p-3 divide-y divide-white/[0.04]">
+            {isLoading && trendingTracks.length === 0 ? (
+              [...Array(6)].map((_, i) => (
+                <div key={`sk_tr_${i}`} className="h-14 flex items-center gap-3 px-3 animate-pulse">
+                  <div className="w-10 h-10 rounded-xl bg-white/[0.06]" />
+                  <div className="flex-1 space-y-1.5">
+                    <div className="h-3 w-40 bg-white/[0.06] rounded" />
+                    <div className="h-2.5 w-24 bg-white/[0.04] rounded" />
+                  </div>
+                </div>
+              ))
+            ) : (
+              trendingTracks.slice(0, 8).map((track, idx) => {
+                const isThisPlaying = currentTrack?.id === track.id && isPlaying;
+                const isLiked = likedTrackIds.includes(String(track.id));
+                const thumb = getArtworkSrc(track, 120);
+
+                return (
+                  <div
+                    key={`tr_${track.id}_${idx}`}
+                    onClick={() => handlePlayTrack(track, trendingTracks)}
+                    className={`group flex items-center justify-between h-15 px-3 py-2 rounded-xl transition-all cursor-pointer ${
+                      currentTrack?.id === track.id
+                        ? 'bg-white/[0.08] shadow-sm'
+                        : 'hover:bg-white/[0.04]'
+                    }`}
+                  >
+                    {/* Left: Thumbnail & Song / Artist */}
+                    <div className="flex items-center gap-3.5 min-w-0 flex-1 pr-3">
+                      <div className="relative w-11 h-11 rounded-xl overflow-hidden flex-shrink-0 bg-neutral-900 shadow">
+                        <SafeImage
+                          src={thumb}
+                          track={track}
+                          alt={track.title}
+                          size={120}
+                          className="w-full h-full object-cover"
+                        />
+                        <div
+                          className={`absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity ${
+                            isThisPlaying ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+                          }`}
+                        >
+                          {isThisPlaying ? (
+                            <div className="flex items-end gap-0.5 h-3">
+                              <span className="w-1 h-2 bg-[#fa2d48] animate-pulse rounded-full" />
+                              <span className="w-1 h-3.5 bg-[#fa2d48] animate-pulse delay-75 rounded-full" />
+                              <span className="w-1 h-2 bg-[#fa2d48] animate-pulse delay-150 rounded-full" />
+                            </div>
+                          ) : (
+                            <Play className="w-3.5 h-3.5 fill-white text-white ml-0.5" />
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="min-w-0 flex-1">
+                        <p className={`text-xs sm:text-sm font-semibold truncate ${
+                          currentTrack?.id === track.id ? 'text-[#fa2d48]' : 'text-white'
+                        }`}>
+                          {track.title}
+                        </p>
+                        <p className="text-[11px] text-white/50 truncate mt-0.5">
+                          {track.artist}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Center: Album Name (Desktop) */}
+                    <div className="hidden md:block w-1/4 text-xs text-white/40 truncate pr-4">
+                      {track.album || 'Single'}
+                    </div>
+
+                    {/* Right: Quality Badge, Duration, and Favorite Button */}
+                    <div className="flex items-center gap-3 flex-shrink-0">
+                      <span className="hidden sm:inline-block px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-white/[0.06] text-white/60 border border-white/5">
+                        320K
+                      </span>
+                      <span className="text-xs text-white/40 font-mono">
+                        {formatDuration(track.duration || 210)}
+                      </span>
+                      <button
+                        onClick={e => {
+                          e.stopPropagation();
+                          toggleLike(track.id);
+                        }}
+                        className={`p-1.5 rounded-full hover:bg-white/10 transition ${
+                          isLiked ? 'text-[#fa2d48]' : 'text-white/40 hover:text-white'
+                        }`}
+                        aria-label="Favorite"
+                      >
+                        <Heart className={`w-3.5 h-3.5 ${isLiked ? 'fill-current' : ''}`} />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </section>
 
         {/* ========================================================================= */}
-        {/* SECTION 11: NEW RELEASES                                                  */}
+        {/* SECTION 6: FEATURED ARTISTS DISCOVERY                                     */}
         {/* ========================================================================= */}
-        {(activeMood === 'all' || activeMood === 'energize') && (
-          <section className="space-y-3">
-            <div className="flex items-end justify-between px-1">
-              <div>
-                <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-white/40 mb-0.5">
-                  Latest Drops
-                </p>
-                <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white tracking-tight">
-                  New Releases
-                </h2>
-              </div>
+        <section className="space-y-4">
+          <div className="flex items-end justify-between px-1">
+            <div>
+              <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-white/40 mb-0.5">
+                Artists & Visionaries
+              </p>
+              <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+                Featured Artists
+              </h2>
+            </div>
+
+            <div className="flex items-center gap-1.5">
               <button
-                onClick={() => onNavigate('search')}
-                className="text-xs font-semibold text-[#fa2d48] hover:underline transition apple-press"
+                onClick={() => artistsScrollRef.current?.scrollBy({ left: -320, behavior: 'smooth' })}
+                className="w-8 h-8 rounded-full vexm-glass vexm-press flex items-center justify-center text-white/60 hover:text-white"
+                aria-label="Previous artists"
               >
-                See all
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => artistsScrollRef.current?.scrollBy({ left: 320, behavior: 'smooth' })}
+                className="w-8 h-8 rounded-full vexm-glass vexm-press flex items-center justify-center text-white/60 hover:text-white"
+                aria-label="Next artists"
+              >
+                <ChevronRight className="w-4 h-4" />
               </button>
             </div>
+          </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3.5 sm:gap-4">
-              {isLoading && newReleases.length === 0 ? (
-                [...Array(6)].map((_, i) => <SkeletonCard key={`sk_rel_${i}`} />)
-              ) : (
-                (newReleases.length ? newReleases : featuredTracks).slice(0, 12).map((t, idx) => (
-                  <AppleGlassCard
-                    key={`rel_${t.id}_${idx}`}
-                    track={t}
-                    onPlay={handlePlayTrack}
-                    queue={newReleases}
+          <div
+            ref={artistsScrollRef}
+            className="flex gap-4 sm:gap-6 overflow-x-auto pb-2 pt-1 no-scrollbar snap-x snap-mandatory -mx-4 px-4 sm:mx-0 sm:px-0"
+          >
+            {currentArtists.map((artist, idx) => (
+              <div
+                key={`art_${artist.name}_${idx}`}
+                onClick={() => onNavigate(`artist:${artist.name}`)}
+                className="group flex flex-col items-center flex-shrink-0 w-[115px] sm:w-[135px] cursor-pointer select-none text-center snap-start vexm-press"
+              >
+                <div className="relative w-22 h-22 sm:w-28 sm:h-28 rounded-full overflow-hidden bg-neutral-900 shadow-xl ring-2 ring-white/10 group-hover:ring-white/40 transition-all duration-300 group-hover:scale-105 mb-2.5">
+                  <SafeImage
+                    src={artist.image}
+                    alt={artist.name}
+                    size={280}
+                    className="w-full h-full object-cover"
                   />
-                ))
-              )}
+                </div>
+                <h4 className="text-xs sm:text-sm font-semibold text-white truncate w-full group-hover:text-[#fa2d48] transition-colors">
+                  {artist.name}
+                </h4>
+                <p className="text-[11px] text-white/40 truncate w-full mt-0.5">
+                  {artist.role || 'Artist'}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ========================================================================= */}
+        {/* SECTION 7: RECENTLY PLAYED SECTION (WITH DESIGNED EMPTY STATE)             */}
+        {/* ========================================================================= */}
+        <section className="space-y-4">
+          <div className="flex items-end justify-between px-1">
+            <div>
+              <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-white/40 mb-0.5">
+                Playback History
+              </p>
+              <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+                Recently played
+              </h2>
             </div>
-          </section>
-        )}
+            {recentlyPlayed.length > 0 && (
+              <button
+                onClick={() => onNavigate('library')}
+                className="text-xs font-semibold text-[#fa2d48] hover:underline transition"
+              >
+                View all in library
+              </button>
+            )}
+          </div>
+
+          {recentlyPlayed.length === 0 ? (
+            /* Clear, Designed Empty State */
+            <div className="rounded-3xl vexm-glass border border-white/10 p-8 sm:p-12 text-center space-y-4 shadow-xl">
+              <div className="w-14 h-14 rounded-2xl bg-white/[0.06] border border-white/10 flex items-center justify-center mx-auto text-[#fa2d48] shadow-inner">
+                <Compass className="w-7 h-7" />
+              </div>
+              <div className="space-y-1 max-w-sm mx-auto">
+                <h4 className="text-base font-bold text-white">
+                  No listening history yet
+                </h4>
+                <p className="text-xs text-white/50 leading-relaxed">
+                  Songs you play will appear here so you can pick up your session right where you left off.
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  if (featuredTracks[0]) handlePlayTrack(featuredTracks[0], featuredTracks);
+                }}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#fa2d48] text-white text-xs font-bold shadow-lg shadow-[#fa2d48]/20 hover:scale-105 active:scale-95 transition"
+              >
+                <Play className="w-3.5 h-3.5 fill-white" />
+                <span>Start exploring music</span>
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3.5 sm:gap-4">
+              {recentlyPlayed.slice(0, 6).map((track, idx) => {
+                const isThisPlaying = currentTrack?.id === track.id && isPlaying;
+                const cover = getArtworkSrc(track, 360);
+
+                return (
+                  <div
+                    key={`rec_${track.id}_${idx}`}
+                    onClick={() => handlePlayTrack(track, recentlyPlayed)}
+                    className="group flex flex-col cursor-pointer select-none vexm-glass-card vexm-press rounded-2xl p-2.5"
+                  >
+                    <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-neutral-900 shadow mb-2">
+                      <SafeImage
+                        src={cover}
+                        track={track}
+                        alt={track.title}
+                        size={360}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                      <button
+                        onClick={e => {
+                          e.stopPropagation();
+                          handlePlayTrack(track, recentlyPlayed);
+                        }}
+                        className={`absolute right-2 bottom-2 w-9 h-9 rounded-full bg-[#fa2d48] text-white flex items-center justify-center shadow-xl transition-all duration-200 hover:scale-105 active:scale-90 ${
+                          isThisPlaying
+                            ? 'opacity-100 scale-100'
+                            : 'opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0'
+                        }`}
+                        aria-label={`Play ${track.title}`}
+                      >
+                        {isThisPlaying ? (
+                          <Pause className="w-4 h-4 fill-white" />
+                        ) : (
+                          <Play className="w-4 h-4 fill-white ml-0.5" />
+                        )}
+                      </button>
+                    </div>
+
+                    <h4 className="text-xs sm:text-sm font-semibold text-white truncate group-hover:text-[#fa2d48] transition-colors px-0.5">
+                      {track.title}
+                    </h4>
+                    <p className="text-[11px] text-white/50 truncate mt-0.5 px-0.5">
+                      {track.artist}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </section>
       </div>
     </div>
   );
