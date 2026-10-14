@@ -23,7 +23,7 @@ import { fetchSaavnTrending, searchSaavn, searchYouTube } from '../utils/api';
 import { MUSIC_LANGUAGES } from '../components/modals/LanguagePreferenceModal';
 import { ProviderSourceButton } from '../components/layout/ProviderSourceButton';
 
-// In-memory cache for fast, zero-flicker feed switching
+// In-memory feed cache for instant zero-flicker switching
 const feedCache = {};
 
 // Apple Music Editorial Category Tags
@@ -163,13 +163,18 @@ const dedupeList = list => {
   return res;
 };
 
-// Human-like time-of-day greeting
-const getGreetingText = () => {
-  const hour = new Date().getHours();
-  if (hour >= 5 && hour < 12) return 'Good morning';
-  if (hour >= 12 && hour < 17) return 'Good afternoon';
-  if (hour >= 17 && hour < 22) return 'Good evening';
-  return 'Late night';
+// Formats today's date in Apple Music uppercase format
+const getFormattedToday = () => {
+  try {
+    const d = new Date();
+    return d.toLocaleDateString('en-US', {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+    }).toUpperCase();
+  } catch {
+    return 'LISTEN NOW';
+  }
 };
 
 /**
@@ -191,23 +196,23 @@ function AppleFeaturedHeroCard({ track, index, onPlay, queue = [] }) {
   return (
     <div
       onClick={handlePlay}
-      className="group flex-shrink-0 w-[300px] sm:w-[440px] md:w-[520px] lg:w-[580px] flex flex-col cursor-pointer select-none snap-start apple-press"
+      className="group flex-shrink-0 w-[84vw] max-w-[540px] flex flex-col cursor-pointer select-none snap-start apple-press"
     >
       {/* Editorial Header */}
-      <div className="mb-2.5 px-1">
-        <p className="text-[11px] font-bold tracking-wider uppercase text-white/50">
+      <div className="mb-2 px-1">
+        <p className="text-[10px] sm:text-[11px] font-bold tracking-wider uppercase text-white/50">
           {tag}
         </p>
-        <h3 className="text-lg sm:text-xl font-bold text-white tracking-tight truncate group-hover:text-[#fa2d48] transition-colors">
+        <h3 className="text-base sm:text-xl font-bold text-white tracking-tight truncate group-hover:text-[#fa2d48] transition-colors">
           {track.title}
         </h3>
-        <p className="text-xs sm:text-sm text-white/60 truncate mt-0.5">
+        <p className="text-xs sm:text-sm text-white/60 truncate">
           {track.artist}
         </p>
       </div>
 
       {/* Visual Glass Banner Card */}
-      <div className="relative aspect-[2.1/1] w-full rounded-3xl overflow-hidden apple-glass-card shadow-2xl transition-all duration-300 group-hover:shadow-[0_20px_48px_rgba(0,0,0,0.8)]">
+      <div className="relative aspect-[16/9] sm:aspect-[2.1/1] w-full rounded-3xl overflow-hidden apple-glass-card shadow-xl transition-all duration-300 group-hover:shadow-[0_20px_48px_rgba(0,0,0,0.8)]">
         <SafeImage
           src={cover}
           track={track}
@@ -216,11 +221,11 @@ function AppleFeaturedHeroCard({ track, index, onPlay, queue = [] }) {
           className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
         />
 
-        {/* Ambient Dark Gradient Vignette */}
+        {/* Ambient Dark Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
 
-        {/* Apple Music Floating Glass Play Badge */}
-        <div className="absolute right-4 bottom-4">
+        {/* Floating Glass Play Badge */}
+        <div className="absolute right-3.5 bottom-3.5 sm:right-4 sm:bottom-4">
           <button
             onClick={handlePlay}
             className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center backdrop-blur-2xl border border-white/25 shadow-2xl transition-all duration-200 hover:scale-105 active:scale-90 ${
@@ -254,11 +259,11 @@ function SpeedDialWidget({ track, onPlay, queue = [] }) {
   return (
     <div
       onClick={() => onPlay(track, queue)}
-      className={`group relative flex items-center h-16 rounded-2xl apple-glass-card apple-press p-1.5 pr-3.5 cursor-pointer select-none ${
-        currentTrack?.id === track.id ? 'bg-white/[0.12] border-white/25 shadow-lg' : ''
+      className={`group relative flex items-center h-15 rounded-2xl apple-glass-card apple-press p-1.5 pr-3 cursor-pointer select-none ${
+        currentTrack?.id === track.id ? 'bg-white/[0.14] border-white/25 shadow-lg' : ''
       }`}
     >
-      <div className="relative w-13 h-13 rounded-xl overflow-hidden flex-shrink-0 bg-neutral-900 shadow-md">
+      <div className="relative w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 bg-neutral-900 shadow-md">
         <SafeImage
           src={cover}
           track={track}
@@ -277,7 +282,7 @@ function SpeedDialWidget({ track, onPlay, queue = [] }) {
         )}
       </div>
 
-      <div className="min-w-0 flex-1 px-3">
+      <div className="min-w-0 flex-1 px-2.5">
         <p className={`text-xs sm:text-sm font-semibold truncate transition-colors ${
           currentTrack?.id === track.id ? 'text-[#fa2d48]' : 'text-white'
         }`}>
@@ -288,13 +293,13 @@ function SpeedDialWidget({ track, onPlay, queue = [] }) {
         </p>
       </div>
 
-      <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+      <div className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
         <button
           onClick={e => {
             e.stopPropagation();
             onPlay(track, queue);
           }}
-          className="w-8 h-8 rounded-full bg-[#fa2d48] text-white flex items-center justify-center shadow-lg hover:scale-105 active:scale-90 transition"
+          className="w-7 h-7 rounded-full bg-[#fa2d48] text-white flex items-center justify-center shadow-lg hover:scale-105 active:scale-90 transition"
           aria-label={`Play ${track.title}`}
         >
           {isThisPlaying ? (
@@ -325,7 +330,7 @@ function AppleGlassCard({ track, onPlay, queue = [] }) {
   return (
     <div
       onClick={handlePlay}
-      className="group flex flex-col flex-shrink-0 w-[145px] sm:w-[170px] md:w-[185px] cursor-pointer select-none snap-start apple-glass-card apple-press rounded-2xl p-2.5"
+      className="group flex flex-col flex-shrink-0 w-[140px] sm:w-[165px] md:w-[180px] cursor-pointer select-none snap-start apple-glass-card apple-press rounded-2xl p-2.5"
     >
       <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-neutral-900 shadow-md mb-2">
         <SafeImage
@@ -339,7 +344,7 @@ function AppleGlassCard({ track, onPlay, queue = [] }) {
         {/* Floating Glass Play Button */}
         <button
           onClick={handlePlay}
-          className={`absolute right-2.5 bottom-2.5 w-10 h-10 rounded-full bg-[#fa2d48] text-white flex items-center justify-center shadow-2xl transition-all duration-200 hover:scale-105 active:scale-90 ${
+          className={`absolute right-2 bottom-2 w-9 h-9 rounded-full bg-[#fa2d48] text-white flex items-center justify-center shadow-2xl transition-all duration-200 hover:scale-105 active:scale-90 ${
             isThisPlaying
               ? 'opacity-100 scale-100 translate-y-0'
               : 'opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0'
@@ -357,7 +362,7 @@ function AppleGlassCard({ track, onPlay, queue = [] }) {
       <h4 className="text-xs sm:text-sm font-semibold text-white truncate group-hover:underline px-0.5">
         {track.title}
       </h4>
-      <p className="text-[11px] sm:text-xs text-white/50 truncate mt-0.5 px-0.5">
+      <p className="text-[11px] text-white/50 truncate mt-0.5 px-0.5">
         {track.artist}
       </p>
     </div>
@@ -449,9 +454,9 @@ function AppleArtistCard({ artist, onSelect }) {
   return (
     <div
       onClick={() => onSelect(artist.name)}
-      className="group flex flex-col items-center flex-shrink-0 w-[120px] sm:w-[135px] cursor-pointer select-none text-center snap-start apple-press"
+      className="group flex flex-col items-center flex-shrink-0 w-[115px] sm:w-[135px] cursor-pointer select-none text-center snap-start apple-press"
     >
-      <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden bg-neutral-900 shadow-xl ring-2 ring-white/10 group-hover:ring-white/40 transition-all duration-300 group-hover:scale-105 mb-2.5">
+      <div className="relative w-22 h-22 sm:w-28 sm:h-28 rounded-full overflow-hidden bg-neutral-900 shadow-xl ring-2 ring-white/10 group-hover:ring-white/40 transition-all duration-300 group-hover:scale-105 mb-2.5">
         <SafeImage
           src={artist.image}
           alt={artist.name}
@@ -475,7 +480,7 @@ function AppleArtistCard({ artist, onSelect }) {
 function AppleSectionRow({ kicker, title, subtitle, onSeeAll, children, scrollRef }) {
   const handleScroll = dir => {
     if (scrollRef?.current) {
-      const offset = dir === 'left' ? -380 : 380;
+      const offset = dir === 'left' ? -340 : 340;
       scrollRef.current.scrollBy({ left: offset, behavior: 'smooth' });
     }
   };
@@ -485,7 +490,7 @@ function AppleSectionRow({ kicker, title, subtitle, onSeeAll, children, scrollRe
       <div className="flex items-end justify-between gap-3 px-1">
         <div className="min-w-0">
           {kicker && (
-            <p className="text-[11px] font-bold uppercase tracking-wider text-white/50 mb-0.5">
+            <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-white/40 mb-0.5">
               {kicker}
             </p>
           )}
@@ -529,7 +534,7 @@ function AppleSectionRow({ kicker, title, subtitle, onSeeAll, children, scrollRe
 
       <div
         ref={scrollRef}
-        className="flex gap-4 sm:gap-5 overflow-x-auto pb-3 pt-1 no-scrollbar snap-x snap-mandatory scroll-smooth"
+        className="flex gap-3.5 sm:gap-5 overflow-x-auto pb-3 pt-1 no-scrollbar snap-x snap-mandatory scroll-smooth -mx-4 px-4 sm:mx-0 sm:px-0"
       >
         {children}
       </div>
@@ -540,18 +545,18 @@ function AppleSectionRow({ kicker, title, subtitle, onSeeAll, children, scrollRe
 // Skeletons
 function SkeletonHero() {
   return (
-    <div className="w-[300px] sm:w-[440px] md:w-[520px] lg:w-[580px] flex-shrink-0 animate-pulse">
+    <div className="w-[84vw] max-w-[540px] flex-shrink-0 animate-pulse">
       <div className="h-3 w-24 bg-white/10 rounded mb-2" />
       <div className="h-5 w-48 bg-white/10 rounded mb-1" />
       <div className="h-3.5 w-32 bg-white/5 rounded mb-3" />
-      <div className="aspect-[2.1/1] w-full bg-white/[0.06] rounded-3xl" />
+      <div className="aspect-[16/9] sm:aspect-[2.1/1] w-full bg-white/[0.06] rounded-3xl" />
     </div>
   );
 }
 
 function SkeletonCard() {
   return (
-    <div className="w-[145px] sm:w-[170px] md:w-[185px] flex-shrink-0 flex flex-col animate-pulse rounded-2xl apple-glass-card p-2.5">
+    <div className="w-[140px] sm:w-[165px] md:w-[180px] flex-shrink-0 flex flex-col animate-pulse rounded-2xl apple-glass-card p-2.5">
       <div className="aspect-square w-full rounded-xl bg-white/[0.06] mb-2" />
       <div className="h-3.5 w-3/4 bg-white/10 rounded mb-1" />
       <div className="h-3 w-1/2 bg-white/5 rounded" />
@@ -599,7 +604,7 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal }) {
   const nostalgiaScrollRef = useRef(null);
   const artistsScrollRef = useRef(null);
 
-  const greeting = useMemo(() => getGreetingText(), []);
+  const todayDateString = useMemo(() => getFormattedToday(), []);
 
   // Speed Dial items (Recently played + top trending fallback)
   const speedDialItems = useMemo(() => {
@@ -778,21 +783,21 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal }) {
   }, [preferredLanguage]);
 
   return (
-    <div className="flex-1 w-full pb-28 select-none bg-transparent text-white">
-      {/* 1. TOP DYNAMIC GLASS HEADER & MOOD BAR */}
-      <div className="px-4 sm:px-8 pt-6 pb-2 space-y-4">
-        {/* Main Title & Apple Glass Controls */}
-        <div className="flex items-center justify-between gap-3">
+    <div className="flex-1 w-full pb-32 select-none bg-transparent text-white">
+      {/* 1. TOP EDITORIAL HERO HEADER */}
+      <div className="px-4 sm:px-8 pt-5 pb-2 space-y-4">
+        {/* Apple Editorial Date & Listen Now Title + Action Glass Controls */}
+        <div className="flex items-start justify-between gap-3">
           <div>
-            <h1 className="text-2xl sm:text-4xl font-black tracking-tight text-white font-sans">
-              {greeting}
-            </h1>
-            <p className="text-xs sm:text-sm text-white/50 hidden xs:block mt-0.5">
-              Curated playlists, Spatial audio, and fresh drops
+            <p className="text-[11px] font-bold tracking-wider uppercase text-white/40">
+              {todayDateString}
             </p>
+            <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white font-sans mt-0.5">
+              Listen Now
+            </h1>
           </div>
 
-          <div className="flex items-center gap-2 flex-shrink-0">
+          <div className="flex items-center gap-2 flex-shrink-0 pt-1">
             {/* Minimalist Apple Glass Refresh Button */}
             <button
               onClick={handleRefresh}
@@ -843,14 +848,14 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal }) {
         </div>
       </div>
 
-      <div className="px-4 sm:px-8 space-y-12 mt-6">
+      <div className="px-4 sm:px-8 space-y-11 mt-5">
         {/* ========================================================================= */}
         {/* SECTION 1: SPEED DIAL (LISTEN AGAIN / RECENT FAVORITES)                   */}
         {/* ========================================================================= */}
         {speedDialItems.length > 0 && (
           <section className="space-y-3">
             <div className="flex items-center justify-between px-1">
-              <h3 className="text-xs font-bold text-white/50 tracking-wider uppercase">
+              <h3 className="text-[11px] font-bold text-white/40 tracking-wider uppercase">
                 Listen Again & Quick Picks
               </h3>
               {recentlyPlayed.length > 0 && (
@@ -864,7 +869,7 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal }) {
               )}
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-3">
               {speedDialItems.map((track, idx) => (
                 <SpeedDialWidget
                   key={`sd_${track.id}_${idx}`}
@@ -884,7 +889,7 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal }) {
           <section className="space-y-3">
             <div className="flex items-center justify-between px-1">
               <div>
-                <p className="text-[11px] font-bold uppercase tracking-wider text-white/50 mb-0.5">
+                <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-white/40 mb-0.5">
                   Apple Music Spotlight
                 </p>
                 <h2 className="text-lg sm:text-xl md:text-2xl font-bold tracking-tight text-white">
@@ -894,14 +899,14 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal }) {
 
               <div className="flex items-center gap-1.5">
                 <button
-                  onClick={() => heroScrollRef.current?.scrollBy({ left: -480, behavior: 'smooth' })}
+                  onClick={() => heroScrollRef.current?.scrollBy({ left: -420, behavior: 'smooth' })}
                   className="w-8 h-8 rounded-full apple-glass apple-press flex items-center justify-center text-white/70 hover:text-white transition"
                   aria-label="Previous Featured"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
                 <button
-                  onClick={() => heroScrollRef.current?.scrollBy({ left: 480, behavior: 'smooth' })}
+                  onClick={() => heroScrollRef.current?.scrollBy({ left: 420, behavior: 'smooth' })}
                   className="w-8 h-8 rounded-full apple-glass apple-press flex items-center justify-center text-white/70 hover:text-white transition"
                   aria-label="Next Featured"
                 >
@@ -912,7 +917,7 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal }) {
 
             <div
               ref={heroScrollRef}
-              className="flex gap-5 overflow-x-auto pb-3 pt-1 no-scrollbar snap-x snap-mandatory scroll-smooth"
+              className="flex gap-4 sm:gap-5 overflow-x-auto pb-3 pt-1 no-scrollbar snap-x snap-mandatory scroll-smooth -mx-4 px-4 sm:mx-0 sm:px-0"
             >
               {isLoading && featuredTracks.length === 0 ? (
                 <>
@@ -938,7 +943,7 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal }) {
         {/* SECTION 3: SLOWED & REVERB (APPLE CURATED MIDNIGHT SESSION)               */}
         {/* ========================================================================= */}
         {(activeMood === 'all' || activeMood === 'slowed' || activeMood === 'relax' || activeMood === 'focus') && (
-          <div className="p-5 sm:p-6 rounded-3xl apple-glass shadow-2xl relative overflow-hidden">
+          <div className="p-4 sm:p-6 rounded-3xl apple-glass shadow-2xl relative overflow-hidden -mx-2 sm:mx-0">
             <AppleSectionRow
               kicker="Spatial Lofi"
               title="Slowed & Reverb"
@@ -969,7 +974,7 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal }) {
           <section className="space-y-3">
             <div className="flex items-end justify-between px-1">
               <div>
-                <p className="text-[11px] font-bold uppercase tracking-wider text-white/50 mb-0.5">
+                <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-white/40 mb-0.5">
                   Start radio from a song
                 </p>
                 <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white tracking-tight">
@@ -984,11 +989,11 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal }) {
               </button>
             </div>
 
-            <div className="flex gap-4 sm:gap-6 overflow-x-auto pb-3 pt-1 no-scrollbar snap-x snap-mandatory">
+            <div className="flex gap-4 sm:gap-6 overflow-x-auto pb-3 pt-1 no-scrollbar snap-x snap-mandatory -mx-4 px-4 sm:mx-0 sm:px-0">
               {radioColumns.map((colGroup, colIdx) => (
                 <div
                   key={`col_${colIdx}`}
-                  className="flex-shrink-0 w-[290px] sm:w-[330px] md:w-[360px] p-2 rounded-2xl apple-glass-card flex flex-col space-y-1 snap-start"
+                  className="flex-shrink-0 w-[285px] sm:w-[325px] md:w-[350px] p-2 rounded-2xl apple-glass-card flex flex-col space-y-1 snap-start"
                 >
                   {colGroup.map((track, rowIdx) => (
                     <AppleGlassRowItem
@@ -1137,7 +1142,7 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal }) {
           <section className="space-y-3">
             <div className="flex items-end justify-between px-1">
               <div>
-                <p className="text-[11px] font-bold uppercase tracking-wider text-white/50 mb-0.5">
+                <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-white/40 mb-0.5">
                   Discography
                 </p>
                 <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white tracking-tight">
@@ -1147,14 +1152,14 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal }) {
 
               <div className="flex items-center gap-1.5">
                 <button
-                  onClick={() => artistsScrollRef.current?.scrollBy({ left: -320, behavior: 'smooth' })}
+                  onClick={() => artistsScrollRef.current?.scrollBy({ left: -300, behavior: 'smooth' })}
                   className="w-8 h-8 rounded-full apple-glass apple-press flex items-center justify-center text-white/70 hover:text-white transition"
                   aria-label="Previous artists"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
                 <button
-                  onClick={() => artistsScrollRef.current?.scrollBy({ left: 320, behavior: 'smooth' })}
+                  onClick={() => artistsScrollRef.current?.scrollBy({ left: 300, behavior: 'smooth' })}
                   className="w-8 h-8 rounded-full apple-glass apple-press flex items-center justify-center text-white/70 hover:text-white transition"
                   aria-label="Next artists"
                 >
@@ -1165,7 +1170,7 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal }) {
 
             <div
               ref={artistsScrollRef}
-              className="flex gap-4 sm:gap-6 overflow-x-auto pb-3 pt-1 no-scrollbar snap-x snap-mandatory scroll-smooth"
+              className="flex gap-4 sm:gap-6 overflow-x-auto pb-3 pt-1 no-scrollbar snap-x snap-mandatory scroll-smooth -mx-4 px-4 sm:mx-0 sm:px-0"
             >
               {currentArtists.map((artist, idx) => (
                 <AppleArtistCard
@@ -1185,7 +1190,7 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal }) {
           <section className="space-y-3">
             <div className="flex items-end justify-between px-1">
               <div>
-                <p className="text-[11px] font-bold uppercase tracking-wider text-white/50 mb-0.5">
+                <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-white/40 mb-0.5">
                   Latest Drops
                 </p>
                 <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white tracking-tight">
@@ -1200,7 +1205,7 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal }) {
               </button>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3.5 sm:gap-4">
               {isLoading && newReleases.length === 0 ? (
                 [...Array(6)].map((_, i) => <SkeletonCard key={`sk_rel_${i}`} />)
               ) : (
