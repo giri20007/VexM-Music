@@ -7,6 +7,13 @@ import {
   Globe,
   Heart,
   RotateCcw,
+  Sparkles,
+  Waves,
+  Zap,
+  Coffee,
+  Radio,
+  Headphones,
+  Disc3,
 } from 'lucide-react';
 import { useAudioStore } from '../store/useAudioStore';
 import { useSettingsStore } from '../store/useSettingsStore';
@@ -19,69 +26,79 @@ import { ProviderSourceButton } from '../components/layout/ProviderSourceButton'
 // In-memory cache for fast, zero-flicker feed switching
 const feedCache = {};
 
-// Clean, professional mood chips matching YouTube Music & Spotify
+// Apple Music Editorial Category Tags
+const EDITORIAL_TAGS = [
+  'EDITOR’S CHOICE',
+  'NEW RELEASE',
+  'TRENDING HIT',
+  'SPATIAL AUDIO',
+  'FEATURED EXCLUSIVE',
+  'TOP CHARTBUSTER',
+];
+
+// Clean Apple iOS Segmented Mood Chips
 const MOOD_CHIPS = [
   { id: 'all', label: 'All' },
-  { id: 'slowed', label: 'Slowed & Reverb' },
-  { id: 'relax', label: 'Relax' },
-  { id: 'workout', label: 'Workout' },
-  { id: 'energize', label: 'Energize' },
-  { id: 'romance', label: 'Romance' },
-  { id: 'party', label: 'Party' },
-  { id: 'focus', label: 'Focus' },
-  { id: 'nostalgia', label: 'Nostalgia' },
+  { id: 'slowed', label: 'Slowed & Reverb', icon: Waves },
+  { id: 'relax', label: 'Relax', icon: Coffee },
+  { id: 'workout', label: 'Workout', icon: Zap },
+  { id: 'energize', label: 'Energize', icon: Sparkles },
+  { id: 'romance', label: 'Romance', icon: Heart },
+  { id: 'party', label: 'Party', icon: Radio },
+  { id: 'focus', label: 'Focus', icon: Headphones },
+  { id: 'nostalgia', label: 'Nostalgia', icon: Disc3 },
 ];
 
 // Curated top artists per language with verified high-res CDN photos
 const LANGUAGE_ARTISTS = {
   tamil: [
-    { name: 'Anirudh Ravichander', image: 'https://lh3.googleusercontent.com/wBG4jypwBcEGHd-qSbM2_4B46WPEhlOCjusCOEkxdnsoIC4WLS9LmFARZsE854pB-vAEYlsp4x2yiHE=w1200-h1200-p-l90-rj' },
-    { name: 'A.R. Rahman', image: 'https://c.saavncdn.com/artists/AR_Rahman_002_20210120084455_500x500.jpg' },
-    { name: 'Yuvan Shankar Raja', image: 'https://c.saavncdn.com/artists/Yuvan_Shankar_Raja_002_20180802174245_500x500.jpg' },
-    { name: 'Harris Jayaraj', image: 'https://c.saavncdn.com/artists/Harris_Jayaraj_002_20230718071330_500x500.jpg' },
-    { name: 'Sid Sriram', image: 'https://c.saavncdn.com/artists/Sid_Sriram_005_20240425180600_500x500.jpg' },
-    { name: 'Santhosh Narayanan', image: 'https://c.saavncdn.com/artists/Santhosh_Narayanan_002_20250527101718_500x500.jpg' },
-    { name: 'Ilaiyaraaja', image: 'https://c.saavncdn.com/artists/Ilaiyaraaja_001_20251020081419_500x500.jpg' },
-    { name: 'Pradeep Kumar', image: 'https://c.saavncdn.com/artists/Pradeep_Kumar_002_20250807084559_500x500.jpg' },
+    { name: 'Anirudh Ravichander', image: 'https://lh3.googleusercontent.com/wBG4jypwBcEGHd-qSbM2_4B46WPEhlOCjusCOEkxdnsoIC4WLS9LmFARZsE854pB-vAEYlsp4x2yiHE=w1200-h1200-p-l90-rj', role: 'Composer' },
+    { name: 'A.R. Rahman', image: 'https://c.saavncdn.com/artists/AR_Rahman_002_20210120084455_500x500.jpg', role: 'Composer' },
+    { name: 'Yuvan Shankar Raja', image: 'https://c.saavncdn.com/artists/Yuvan_Shankar_Raja_002_20180802174245_500x500.jpg', role: 'Composer' },
+    { name: 'Harris Jayaraj', image: 'https://c.saavncdn.com/artists/Harris_Jayaraj_002_20230718071330_500x500.jpg', role: 'Composer' },
+    { name: 'Sid Sriram', image: 'https://c.saavncdn.com/artists/Sid_Sriram_005_20240425180600_500x500.jpg', role: 'Singer' },
+    { name: 'Santhosh Narayanan', image: 'https://c.saavncdn.com/artists/Santhosh_Narayanan_002_20250527101718_500x500.jpg', role: 'Composer' },
+    { name: 'Ilaiyaraaja', image: 'https://c.saavncdn.com/artists/Ilaiyaraaja_001_20251020081419_500x500.jpg', role: 'Maestro' },
+    { name: 'Pradeep Kumar', image: 'https://c.saavncdn.com/artists/Pradeep_Kumar_002_20250807084559_500x500.jpg', role: 'Singer' },
   ],
   hindi: [
-    { name: 'Arijit Singh', image: 'https://c.saavncdn.com/artists/Arijit_Singh_004_20241118063717_500x500.jpg' },
-    { name: 'Pritam', image: 'https://c.saavncdn.com/artists/Pritam_003_20231120091809_500x500.jpg' },
-    { name: 'Shreya Ghoshal', image: 'https://c.saavncdn.com/artists/Shreya_Ghoshal_007_20241101074144_500x500.jpg' },
-    { name: 'Badshah', image: 'https://c.saavncdn.com/artists/Badshah_005_20230327072944_500x500.jpg' },
-    { name: 'Sachin-Jigar', image: 'https://c.saavncdn.com/artists/Sachin-Jigar_002_20220623063546_500x500.jpg' },
-    { name: 'KK', image: 'https://c.saavncdn.com/artists/KK_500x500.jpg' },
-    { name: 'Atif Aslam', image: 'https://c.saavncdn.com/artists/Atif_Aslam_002_20240118072124_500x500.jpg' },
+    { name: 'Arijit Singh', image: 'https://c.saavncdn.com/artists/Arijit_Singh_004_20241118063717_500x500.jpg', role: 'Singer' },
+    { name: 'Pritam', image: 'https://c.saavncdn.com/artists/Pritam_003_20231120091809_500x500.jpg', role: 'Composer' },
+    { name: 'Shreya Ghoshal', image: 'https://c.saavncdn.com/artists/Shreya_Ghoshal_007_20241101074144_500x500.jpg', role: 'Singer' },
+    { name: 'Badshah', image: 'https://c.saavncdn.com/artists/Badshah_005_20230327072944_500x500.jpg', role: 'Artist' },
+    { name: 'Sachin-Jigar', image: 'https://c.saavncdn.com/artists/Sachin-Jigar_002_20220623063546_500x500.jpg', role: 'Composer' },
+    { name: 'KK', image: 'https://c.saavncdn.com/artists/KK_500x500.jpg', role: 'Singer' },
+    { name: 'Atif Aslam', image: 'https://c.saavncdn.com/artists/Atif_Aslam_002_20240118072124_500x500.jpg', role: 'Singer' },
   ],
   telugu: [
-    { name: 'Devi Sri Prasad', image: 'https://c.saavncdn.com/artists/Devi_Sri_Prasad_002_20220502094759_500x500.jpg' },
-    { name: 'Thaman S', image: 'https://c.saavncdn.com/artists/Thaman_S_002_20220627110123_500x500.jpg' },
-    { name: 'Sid Sriram', image: 'https://c.saavncdn.com/artists/Sid_Sriram_005_20240425180600_500x500.jpg' },
-    { name: 'Anirudh Ravichander', image: 'https://lh3.googleusercontent.com/wBG4jypwBcEGHd-qSbM2_4B46WPEhlOCjusCOEkxdnsoIC4WLS9LmFARZsE854pB-vAEYlsp4x2yiHE=w1200-h1200-p-l90-rj' },
-    { name: 'Ram Miriyala', image: 'https://c.saavncdn.com/artists/Ram_Miriyala_001_20230504092248_500x500.jpg' },
-    { name: 'Anurag Kulkarni', image: 'https://c.saavncdn.com/artists/Anurag_Kulkarni_001_20230413063533_500x500.jpg' },
+    { name: 'Devi Sri Prasad', image: 'https://c.saavncdn.com/artists/Devi_Sri_Prasad_002_20220502094759_500x500.jpg', role: 'Composer' },
+    { name: 'Thaman S', image: 'https://c.saavncdn.com/artists/Thaman_S_002_20220627110123_500x500.jpg', role: 'Composer' },
+    { name: 'Sid Sriram', image: 'https://c.saavncdn.com/artists/Sid_Sriram_005_20240425180600_500x500.jpg', role: 'Singer' },
+    { name: 'Anirudh Ravichander', image: 'https://lh3.googleusercontent.com/wBG4jypwBcEGHd-qSbM2_4B46WPEhlOCjusCOEkxdnsoIC4WLS9LmFARZsE854pB-vAEYlsp4x2yiHE=w1200-h1200-p-l90-rj', role: 'Composer' },
+    { name: 'Ram Miriyala', image: 'https://c.saavncdn.com/artists/Ram_Miriyala_001_20230504092248_500x500.jpg', role: 'Singer' },
+    { name: 'Anurag Kulkarni', image: 'https://c.saavncdn.com/artists/Anurag_Kulkarni_001_20230413063533_500x500.jpg', role: 'Singer' },
   ],
   malayalam: [
-    { name: 'Sushin Shyam', image: 'https://c.saavncdn.com/artists/Sushin_Shyam_001_20230920084534_500x500.jpg' },
-    { name: 'Jakes Bejoy', image: 'https://c.saavncdn.com/artists/Jakes_Bejoy_002_20230919102237_500x500.jpg' },
-    { name: 'Hesham Abdul Wahab', image: 'https://c.saavncdn.com/artists/Hesham_Abdul_Wahab_001_20230919101248_500x500.jpg' },
-    { name: 'Deepak Dev', image: 'https://c.saavncdn.com/artists/Deepak_Dev_001_20230920084918_500x500.jpg' },
-    { name: 'Shaan Rahman', image: 'https://c.saavncdn.com/artists/Shaan_Rahman_002_20230919102431_500x500.jpg' },
+    { name: 'Sushin Shyam', image: 'https://c.saavncdn.com/artists/Sushin_Shyam_001_20230920084534_500x500.jpg', role: 'Composer' },
+    { name: 'Jakes Bejoy', image: 'https://c.saavncdn.com/artists/Jakes_Bejoy_002_20230919102237_500x500.jpg', role: 'Composer' },
+    { name: 'Hesham Abdul Wahab', image: 'https://c.saavncdn.com/artists/Hesham_Abdul_Wahab_001_20230919101248_500x500.jpg', role: 'Composer' },
+    { name: 'Deepak Dev', image: 'https://c.saavncdn.com/artists/Deepak_Dev_001_20230920084918_500x500.jpg', role: 'Composer' },
+    { name: 'Shaan Rahman', image: 'https://c.saavncdn.com/artists/Shaan_Rahman_002_20230919102431_500x500.jpg', role: 'Composer' },
   ],
   punjabi: [
-    { name: 'Diljit Dosanjh', image: 'https://c.saavncdn.com/artists/Diljit_Dosanjh_007_20241001072935_500x500.jpg' },
-    { name: 'Sidhu Moosewala', image: 'https://c.saavncdn.com/artists/Sidhu_Moose_Wala_004_20220601092823_500x500.jpg' },
-    { name: 'AP Dhillon', image: 'https://c.saavncdn.com/artists/AP_Dhillon_002_20230818073145_500x500.jpg' },
-    { name: 'Karan Aujla', image: 'https://c.saavncdn.com/artists/Karan_Aujla_004_20230918072234_500x500.jpg' },
-    { name: 'Shubh', image: 'https://c.saavncdn.com/artists/Shubh_001_20230522063857_500x500.jpg' },
+    { name: 'Diljit Dosanjh', image: 'https://c.saavncdn.com/artists/Diljit_Dosanjh_007_20241001072935_500x500.jpg', role: 'Artist' },
+    { name: 'Sidhu Moosewala', image: 'https://c.saavncdn.com/artists/Sidhu_Moose_Wala_004_20220601092823_500x500.jpg', role: 'Legend' },
+    { name: 'AP Dhillon', image: 'https://c.saavncdn.com/artists/AP_Dhillon_002_20230818073145_500x500.jpg', role: 'Artist' },
+    { name: 'Karan Aujla', image: 'https://c.saavncdn.com/artists/Karan_Aujla_004_20230918072234_500x500.jpg', role: 'Artist' },
+    { name: 'Shubh', image: 'https://c.saavncdn.com/artists/Shubh_001_20230522063857_500x500.jpg', role: 'Artist' },
   ],
   english: [
-    { name: 'Taylor Swift', image: 'https://c.saavncdn.com/artists/Taylor_Swift_003_20200226074119_500x500.jpg' },
-    { name: 'The Weeknd', image: 'https://c.saavncdn.com/artists/The_Weeknd_002_20241003071400_500x500.jpg' },
-    { name: 'Drake', image: 'https://c.saavncdn.com/artists/Drake_006_20260520062317_500x500.jpg' },
-    { name: 'Billie Eilish', image: 'https://c.saavncdn.com/artists/Billie_Eilish_20190211151539_500x500.jpg' },
-    { name: 'Dua Lipa', image: 'https://c.saavncdn.com/artists/Dua_Lipa_004_20231120090922_500x500.jpg' },
-    { name: 'Coldplay', image: 'https://c.saavncdn.com/artists/Coldplay_002_20241003070447_500x500.jpg' },
+    { name: 'Taylor Swift', image: 'https://c.saavncdn.com/artists/Taylor_Swift_003_20200226074119_500x500.jpg', role: 'Artist' },
+    { name: 'The Weeknd', image: 'https://c.saavncdn.com/artists/The_Weeknd_002_20241003071400_500x500.jpg', role: 'Artist' },
+    { name: 'Drake', image: 'https://c.saavncdn.com/artists/Drake_006_20260520062317_500x500.jpg', role: 'Artist' },
+    { name: 'Billie Eilish', image: 'https://c.saavncdn.com/artists/Billie_Eilish_20190211151539_500x500.jpg', role: 'Artist' },
+    { name: 'Dua Lipa', image: 'https://c.saavncdn.com/artists/Dua_Lipa_004_20231120090922_500x500.jpg', role: 'Artist' },
+    { name: 'Coldplay', image: 'https://c.saavncdn.com/artists/Coldplay_002_20241003070447_500x500.jpg', role: 'Band' },
   ],
 };
 
@@ -156,9 +173,79 @@ const getGreetingText = () => {
 };
 
 /**
- * 1. Speed Dial / "Listen again" (2x3 or 2x4 grid matching Spotify/YTM)
+ * 1. Apple Music Large Featured Editorial Hero Card
  */
-function SpeedDialItem({ track, onPlay, queue = [] }) {
+function AppleFeaturedHeroCard({ track, index, onPlay, queue = [] }) {
+  const currentTrack = useAudioStore(s => s.currentTrack);
+  const isPlaying = useAudioStore(s => s.isPlaying);
+  const isThisPlaying = currentTrack?.id === track.id && isPlaying;
+
+  const tag = EDITORIAL_TAGS[index % EDITORIAL_TAGS.length];
+  const cover = getArtworkSrc(track, 800);
+
+  const handlePlay = e => {
+    e.stopPropagation();
+    onPlay(track, queue);
+  };
+
+  return (
+    <div
+      onClick={handlePlay}
+      className="group flex-shrink-0 w-[300px] sm:w-[440px] md:w-[520px] lg:w-[580px] flex flex-col cursor-pointer select-none snap-start apple-press"
+    >
+      {/* Editorial Header */}
+      <div className="mb-2.5 px-1">
+        <p className="text-[11px] font-bold tracking-wider uppercase text-white/50">
+          {tag}
+        </p>
+        <h3 className="text-lg sm:text-xl font-bold text-white tracking-tight truncate group-hover:text-[#fa2d48] transition-colors">
+          {track.title}
+        </h3>
+        <p className="text-xs sm:text-sm text-white/60 truncate mt-0.5">
+          {track.artist}
+        </p>
+      </div>
+
+      {/* Visual Glass Banner Card */}
+      <div className="relative aspect-[2.1/1] w-full rounded-3xl overflow-hidden apple-glass-card shadow-2xl transition-all duration-300 group-hover:shadow-[0_20px_48px_rgba(0,0,0,0.8)]">
+        <SafeImage
+          src={cover}
+          track={track}
+          alt={track.title}
+          size={800}
+          className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+        />
+
+        {/* Ambient Dark Gradient Vignette */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
+
+        {/* Apple Music Floating Glass Play Badge */}
+        <div className="absolute right-4 bottom-4">
+          <button
+            onClick={handlePlay}
+            className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center backdrop-blur-2xl border border-white/25 shadow-2xl transition-all duration-200 hover:scale-105 active:scale-90 ${
+              isThisPlaying
+                ? 'bg-[#fa2d48] text-white opacity-100 scale-100 shadow-[0_0_20px_rgba(250,45,72,0.5)]'
+                : 'bg-black/50 hover:bg-[#fa2d48] text-white opacity-90 group-hover:opacity-100'
+            }`}
+            aria-label={`Play ${track.title}`}
+          >
+            {isThisPlaying ? (
+              <Pause className="w-5 h-5 fill-current" />
+            ) : (
+              <Play className="w-5 h-5 fill-current ml-0.5" />
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * 2. iOS Glass Widget Speed Dial Card ("Listen Again")
+ */
+function SpeedDialWidget({ track, onPlay, queue = [] }) {
   const currentTrack = useAudioStore(s => s.currentTrack);
   const isPlaying = useAudioStore(s => s.isPlaying);
   const isThisPlaying = currentTrack?.id === track.id && isPlaying;
@@ -167,11 +254,11 @@ function SpeedDialItem({ track, onPlay, queue = [] }) {
   return (
     <div
       onClick={() => onPlay(track, queue)}
-      className={`group relative flex items-center h-14 rounded-md overflow-hidden bg-white/[0.06] hover:bg-white/[0.12] transition-colors cursor-pointer select-none ${
-        currentTrack?.id === track.id ? 'bg-white/[0.14]' : ''
+      className={`group relative flex items-center h-16 rounded-2xl apple-glass-card apple-press p-1.5 pr-3.5 cursor-pointer select-none ${
+        currentTrack?.id === track.id ? 'bg-white/[0.12] border-white/25 shadow-lg' : ''
       }`}
     >
-      <div className="relative w-14 h-14 flex-shrink-0 bg-neutral-900">
+      <div className="relative w-13 h-13 rounded-xl overflow-hidden flex-shrink-0 bg-neutral-900 shadow-md">
         <SafeImage
           src={cover}
           track={track}
@@ -180,32 +267,34 @@ function SpeedDialItem({ track, onPlay, queue = [] }) {
           className="w-full h-full object-cover"
         />
         {isThisPlaying && (
-          <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/45 backdrop-blur-[2px] flex items-center justify-center">
             <div className="flex items-end gap-0.5 h-3">
-              <span className="w-1 h-2.5 bg-white animate-pulse rounded-full" />
-              <span className="w-1 h-3.5 bg-white animate-pulse delay-75 rounded-full" />
-              <span className="w-1 h-2 bg-white animate-pulse delay-150 rounded-full" />
+              <span className="w-1 h-2.5 bg-[#fa2d48] animate-pulse rounded-full" />
+              <span className="w-1 h-3.5 bg-[#fa2d48] animate-pulse delay-75 rounded-full" />
+              <span className="w-1 h-2 bg-[#fa2d48] animate-pulse delay-150 rounded-full" />
             </div>
           </div>
         )}
       </div>
 
       <div className="min-w-0 flex-1 px-3">
-        <p className="text-xs sm:text-sm font-semibold text-white truncate">
+        <p className={`text-xs sm:text-sm font-semibold truncate transition-colors ${
+          currentTrack?.id === track.id ? 'text-[#fa2d48]' : 'text-white'
+        }`}>
           {track.title}
         </p>
-        <p className="text-[11px] text-neutral-400 truncate mt-0.5">
+        <p className="text-[11px] text-white/50 truncate mt-0.5">
           {track.artist}
         </p>
       </div>
 
-      <div className="pr-3 opacity-0 group-hover:opacity-100 transition-opacity">
+      <div className="opacity-0 group-hover:opacity-100 transition-opacity">
         <button
           onClick={e => {
             e.stopPropagation();
             onPlay(track, queue);
           }}
-          className="w-8 h-8 rounded-full bg-[#fa2d48] text-white flex items-center justify-center shadow-md hover:scale-105 active:scale-95 transition"
+          className="w-8 h-8 rounded-full bg-[#fa2d48] text-white flex items-center justify-center shadow-lg hover:scale-105 active:scale-90 transition"
           aria-label={`Play ${track.title}`}
         >
           {isThisPlaying ? (
@@ -220,9 +309,9 @@ function SpeedDialItem({ track, onPlay, queue = [] }) {
 }
 
 /**
- * 2. Standard Music Card (Spotify / YouTube Music square format)
+ * 3. Apple iOS Frosted Glass Music Card
  */
-function MusicCard({ track, onPlay, queue = [] }) {
+function AppleGlassCard({ track, onPlay, queue = [] }) {
   const currentTrack = useAudioStore(s => s.currentTrack);
   const isPlaying = useAudioStore(s => s.isPlaying);
   const isThisPlaying = currentTrack?.id === track.id && isPlaying;
@@ -236,21 +325,21 @@ function MusicCard({ track, onPlay, queue = [] }) {
   return (
     <div
       onClick={handlePlay}
-      className="group flex flex-col flex-shrink-0 w-[140px] sm:w-[165px] md:w-[180px] cursor-pointer select-none snap-start"
+      className="group flex flex-col flex-shrink-0 w-[145px] sm:w-[170px] md:w-[185px] cursor-pointer select-none snap-start apple-glass-card apple-press rounded-2xl p-2.5"
     >
-      <div className="relative aspect-square w-full rounded-md overflow-hidden bg-neutral-900 mb-2.5">
+      <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-neutral-900 shadow-md mb-2">
         <SafeImage
           src={cover}
           track={track}
           alt={track.title}
           size={360}
-          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
 
-        {/* Hover / Active Play Button */}
+        {/* Floating Glass Play Button */}
         <button
           onClick={handlePlay}
-          className={`absolute right-2.5 bottom-2.5 w-10 h-10 rounded-full bg-[#fa2d48] text-white flex items-center justify-center shadow-xl transition-all duration-200 hover:scale-105 active:scale-95 ${
+          className={`absolute right-2.5 bottom-2.5 w-10 h-10 rounded-full bg-[#fa2d48] text-white flex items-center justify-center shadow-2xl transition-all duration-200 hover:scale-105 active:scale-90 ${
             isThisPlaying
               ? 'opacity-100 scale-100 translate-y-0'
               : 'opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0'
@@ -265,10 +354,10 @@ function MusicCard({ track, onPlay, queue = [] }) {
         </button>
       </div>
 
-      <h4 className="text-xs sm:text-sm font-semibold text-white truncate group-hover:underline">
+      <h4 className="text-xs sm:text-sm font-semibold text-white truncate group-hover:underline px-0.5">
         {track.title}
       </h4>
-      <p className="text-[11px] sm:text-xs text-neutral-400 truncate mt-0.5">
+      <p className="text-[11px] sm:text-xs text-white/50 truncate mt-0.5 px-0.5">
         {track.artist}
       </p>
     </div>
@@ -276,9 +365,9 @@ function MusicCard({ track, onPlay, queue = [] }) {
 }
 
 /**
- * 3. Quick Picks Row Item (Used in 4-column stacked radio slider)
+ * 4. Apple iOS Frosted Glass Row Item (Used in 3-Row Stacked Slider)
  */
-function QuickPickRowItem({ track, onPlay, queue = [] }) {
+function AppleGlassRowItem({ track, onPlay, queue = [] }) {
   const currentTrack = useAudioStore(s => s.currentTrack);
   const isPlaying = useAudioStore(s => s.isPlaying);
   const isThisPlaying = currentTrack?.id === track.id && isPlaying;
@@ -295,12 +384,12 @@ function QuickPickRowItem({ track, onPlay, queue = [] }) {
   return (
     <div
       onClick={handlePlay}
-      className={`group flex items-center justify-between h-13 px-2 py-1.5 rounded-lg hover:bg-white/[0.08] transition-colors cursor-pointer select-none ${
+      className={`group flex items-center justify-between h-13 px-2.5 py-1.5 rounded-xl hover:bg-white/[0.08] transition-colors cursor-pointer select-none apple-press ${
         currentTrack?.id === track.id ? 'bg-white/[0.08]' : ''
       }`}
     >
       <div className="flex items-center gap-3 min-w-0 flex-1 pr-2">
-        <div className="relative w-11 h-11 rounded-md overflow-hidden flex-shrink-0 bg-neutral-900">
+        <div className="relative w-11 h-11 rounded-lg overflow-hidden flex-shrink-0 bg-neutral-900 shadow-sm">
           <SafeImage
             src={cover}
             track={track}
@@ -309,7 +398,7 @@ function QuickPickRowItem({ track, onPlay, queue = [] }) {
             className="w-full h-full object-cover"
           />
           <div
-            className={`absolute inset-0 bg-black/50 flex items-center justify-center transition-opacity ${
+            className={`absolute inset-0 bg-black/45 backdrop-blur-[2px] flex items-center justify-center transition-opacity ${
               isThisPlaying ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
             }`}
           >
@@ -324,12 +413,12 @@ function QuickPickRowItem({ track, onPlay, queue = [] }) {
         <div className="min-w-0 flex-1">
           <p
             className={`text-xs sm:text-sm font-medium truncate ${
-              currentTrack?.id === track.id ? 'text-[#fa2d48]' : 'text-white'
+              currentTrack?.id === track.id ? 'text-[#fa2d48] font-semibold' : 'text-white'
             }`}
           >
             {track.title}
           </p>
-          <p className="text-[11px] text-neutral-400 truncate mt-0.5">
+          <p className="text-[11px] text-white/50 truncate mt-0.5">
             {track.artist}
           </p>
         </div>
@@ -341,8 +430,8 @@ function QuickPickRowItem({ track, onPlay, queue = [] }) {
             e.stopPropagation();
             toggleLike(track.id);
           }}
-          className={`p-1.5 rounded-full hover:bg-white/10 transition ${
-            isLiked ? 'text-[#fa2d48] opacity-100' : 'text-neutral-400 hover:text-white'
+          className={`p-1.5 rounded-full hover:bg-white/10 active:scale-90 transition ${
+            isLiked ? 'text-[#fa2d48] opacity-100' : 'text-white/40 hover:text-white'
           }`}
           aria-label="Favorite"
         >
@@ -354,15 +443,15 @@ function QuickPickRowItem({ track, onPlay, queue = [] }) {
 }
 
 /**
- * 4. Circular Artist Item
+ * 5. Apple Music Circular Artist Spotlight Card
  */
-function ArtistItem({ artist, onSelect }) {
+function AppleArtistCard({ artist, onSelect }) {
   return (
     <div
       onClick={() => onSelect(artist.name)}
-      className="group flex flex-col items-center flex-shrink-0 w-[120px] sm:w-[135px] cursor-pointer select-none text-center snap-start"
+      className="group flex flex-col items-center flex-shrink-0 w-[120px] sm:w-[135px] cursor-pointer select-none text-center snap-start apple-press"
     >
-      <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden bg-neutral-900 shadow-md group-hover:shadow-lg transition-transform duration-300 group-hover:scale-105 mb-2">
+      <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden bg-neutral-900 shadow-xl ring-2 ring-white/10 group-hover:ring-white/40 transition-all duration-300 group-hover:scale-105 mb-2.5">
         <SafeImage
           src={artist.image}
           alt={artist.name}
@@ -373,17 +462,17 @@ function ArtistItem({ artist, onSelect }) {
       <h4 className="text-xs sm:text-sm font-semibold text-white truncate w-full group-hover:underline">
         {artist.name}
       </h4>
-      <p className="text-[11px] text-neutral-400 truncate w-full mt-0.5">
-        Artist
+      <p className="text-[11px] text-white/50 truncate w-full mt-0.5">
+        {artist.role || 'Artist'}
       </p>
     </div>
   );
 }
 
 /**
- * 5. Section Header + Horizontal Slider
+ * 6. Apple Glass Horizontal Section Row
  */
-function SectionRow({ kicker, title, subtitle, onSeeAll, children, scrollRef }) {
+function AppleSectionRow({ kicker, title, subtitle, onSeeAll, children, scrollRef }) {
   const handleScroll = dir => {
     if (scrollRef?.current) {
       const offset = dir === 'left' ? -380 : 380;
@@ -393,18 +482,18 @@ function SectionRow({ kicker, title, subtitle, onSeeAll, children, scrollRef }) 
 
   return (
     <section className="space-y-3">
-      <div className="flex items-end justify-between gap-3">
+      <div className="flex items-end justify-between gap-3 px-1">
         <div className="min-w-0">
           {kicker && (
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-neutral-400 mb-0.5">
+            <p className="text-[11px] font-bold uppercase tracking-wider text-white/50 mb-0.5">
               {kicker}
             </p>
           )}
-          <h2 className="text-lg sm:text-xl font-bold text-white tracking-tight truncate">
+          <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white tracking-tight truncate">
             {title}
           </h2>
           {subtitle && (
-            <p className="text-xs text-neutral-400 truncate mt-0.5">{subtitle}</p>
+            <p className="text-xs text-white/50 truncate mt-0.5">{subtitle}</p>
           )}
         </div>
 
@@ -412,7 +501,7 @@ function SectionRow({ kicker, title, subtitle, onSeeAll, children, scrollRef }) 
           {onSeeAll && (
             <button
               onClick={onSeeAll}
-              className="text-xs font-semibold text-neutral-400 hover:text-white transition mr-1"
+              className="text-xs font-semibold text-[#fa2d48] hover:underline transition mr-1 apple-press"
             >
               See all
             </button>
@@ -421,14 +510,14 @@ function SectionRow({ kicker, title, subtitle, onSeeAll, children, scrollRef }) 
             <>
               <button
                 onClick={() => handleScroll('left')}
-                className="w-7 h-7 rounded-full hover:bg-white/10 flex items-center justify-center text-neutral-400 hover:text-white transition active:scale-95"
+                className="w-8 h-8 rounded-full apple-glass apple-press flex items-center justify-center text-white/70 hover:text-white transition"
                 aria-label="Previous"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
               <button
                 onClick={() => handleScroll('right')}
-                className="w-7 h-7 rounded-full hover:bg-white/10 flex items-center justify-center text-neutral-400 hover:text-white transition active:scale-95"
+                className="w-8 h-8 rounded-full apple-glass apple-press flex items-center justify-center text-white/70 hover:text-white transition"
                 aria-label="Next"
               >
                 <ChevronRight className="w-4 h-4" />
@@ -440,7 +529,7 @@ function SectionRow({ kicker, title, subtitle, onSeeAll, children, scrollRef }) 
 
       <div
         ref={scrollRef}
-        className="flex gap-4 overflow-x-auto pb-2 pt-1 no-scrollbar snap-x snap-mandatory scroll-smooth"
+        className="flex gap-4 sm:gap-5 overflow-x-auto pb-3 pt-1 no-scrollbar snap-x snap-mandatory scroll-smooth"
       >
         {children}
       </div>
@@ -449,10 +538,21 @@ function SectionRow({ kicker, title, subtitle, onSeeAll, children, scrollRef }) 
 }
 
 // Skeletons
+function SkeletonHero() {
+  return (
+    <div className="w-[300px] sm:w-[440px] md:w-[520px] lg:w-[580px] flex-shrink-0 animate-pulse">
+      <div className="h-3 w-24 bg-white/10 rounded mb-2" />
+      <div className="h-5 w-48 bg-white/10 rounded mb-1" />
+      <div className="h-3.5 w-32 bg-white/5 rounded mb-3" />
+      <div className="aspect-[2.1/1] w-full bg-white/[0.06] rounded-3xl" />
+    </div>
+  );
+}
+
 function SkeletonCard() {
   return (
-    <div className="w-[140px] sm:w-[165px] md:w-[180px] flex-shrink-0 flex flex-col animate-pulse">
-      <div className="aspect-square w-full rounded-md bg-white/[0.06] mb-2" />
+    <div className="w-[145px] sm:w-[170px] md:w-[185px] flex-shrink-0 flex flex-col animate-pulse rounded-2xl apple-glass-card p-2.5">
+      <div className="aspect-square w-full rounded-xl bg-white/[0.06] mb-2" />
       <div className="h-3.5 w-3/4 bg-white/10 rounded mb-1" />
       <div className="h-3 w-1/2 bg-white/5 rounded" />
     </div>
@@ -460,7 +560,7 @@ function SkeletonCard() {
 }
 
 /**
- * CLEAN, PROFESSIONAL HOME PAGE (SPOTIFY & YOUTUBE MUSIC DESIGN)
+ * MASTER HOMEPAGE (APPLE iOS GLASSMORPHISM REDESIGN)
  */
 export function HomePage({ lib, onNavigate, onOpenLanguageModal }) {
   const currentTrack = useAudioStore(s => s.currentTrack);
@@ -490,6 +590,7 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal }) {
   const [newReleases, setNewReleases] = useState(cached?.releases || []);
   const [isLoading, setIsLoading] = useState(!cached);
 
+  const heroScrollRef = useRef(null);
   const slowedScrollRef = useRef(null);
   const trendingScrollRef = useRef(null);
   const chillScrollRef = useRef(null);
@@ -678,37 +779,42 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal }) {
 
   return (
     <div className="flex-1 w-full pb-28 select-none bg-transparent text-white">
-      {/* 1. TOP HEADER & MOOD CHIPS */}
+      {/* 1. TOP DYNAMIC GLASS HEADER & MOOD BAR */}
       <div className="px-4 sm:px-8 pt-6 pb-2 space-y-4">
-        {/* Main Title & Action Buttons */}
+        {/* Main Title & Apple Glass Controls */}
         <div className="flex items-center justify-between gap-3">
-          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white font-sans">
-            {greeting}
-          </h1>
+          <div>
+            <h1 className="text-2xl sm:text-4xl font-black tracking-tight text-white font-sans">
+              {greeting}
+            </h1>
+            <p className="text-xs sm:text-sm text-white/50 hidden xs:block mt-0.5">
+              Curated playlists, Spatial audio, and fresh drops
+            </p>
+          </div>
 
           <div className="flex items-center gap-2 flex-shrink-0">
-            {/* Minimalist Refresh Icon Button */}
+            {/* Minimalist Apple Glass Refresh Button */}
             <button
               onClick={handleRefresh}
               disabled={isRefreshing}
-              className="p-2 rounded-full hover:bg-white/10 text-neutral-400 hover:text-white transition active:scale-95"
+              className="w-9 h-9 rounded-full apple-glass apple-press flex items-center justify-center text-white/70 hover:text-white transition"
               title="Refresh feed"
               aria-label="Refresh feed"
             >
               <RotateCcw
-                className={`w-4 h-4 transition-transform duration-500 ${
+                className={`w-3.5 h-3.5 transition-transform duration-500 ${
                   isRefreshing ? 'animate-spin text-white' : ''
                 }`}
               />
             </button>
 
-            {/* Language Selector Pill */}
+            {/* Apple Glass Language Pill */}
             <button
               onClick={onOpenLanguageModal}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.08] hover:bg-white/[0.14] text-xs font-medium text-white transition active:scale-95"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full apple-glass apple-press text-xs font-semibold text-white/90 hover:text-white transition"
               title="Change language"
             >
-              <Globe className="w-3.5 h-3.5 text-neutral-300" />
+              <Globe className="w-3.5 h-3.5 text-[#fa2d48]" />
               <span>{langConfig.name}</span>
             </button>
 
@@ -716,18 +822,18 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal }) {
           </div>
         </div>
 
-        {/* Clean YouTube Music / Spotify Mood Pills */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
+        {/* Apple iOS Segmented Glass Mood Bar */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 pt-1 no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
           {MOOD_CHIPS.map(chip => {
             const isActive = activeMood === chip.id;
             return (
               <button
                 key={chip.id}
                 onClick={() => setActiveMood(isActive ? 'all' : chip.id)}
-                className={`flex-shrink-0 px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all duration-150 active:scale-95 ${
+                className={`flex-shrink-0 px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 apple-press ${
                   isActive
-                    ? 'bg-white text-black font-semibold shadow'
-                    : 'bg-white/[0.08] hover:bg-white/[0.14] text-neutral-300 hover:text-white'
+                    ? 'apple-pill-active'
+                    : 'apple-pill-inactive'
                 }`}
               >
                 {chip.label}
@@ -737,15 +843,30 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal }) {
         </div>
       </div>
 
-      <div className="px-4 sm:px-8 space-y-9 mt-5">
+      <div className="px-4 sm:px-8 space-y-12 mt-6">
         {/* ========================================================================= */}
-        {/* 1. SPEED DIAL (LISTEN AGAIN / RECENT FAVORITES)                           */}
+        {/* SECTION 1: SPEED DIAL (LISTEN AGAIN / RECENT FAVORITES)                   */}
         {/* ========================================================================= */}
         {speedDialItems.length > 0 && (
-          <section>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-3">
+          <section className="space-y-3">
+            <div className="flex items-center justify-between px-1">
+              <h3 className="text-xs font-bold text-white/50 tracking-wider uppercase">
+                Listen Again & Quick Picks
+              </h3>
+              {recentlyPlayed.length > 0 && (
+                <button
+                  onClick={() => onNavigate('library')}
+                  className="text-xs font-semibold text-[#fa2d48] hover:underline flex items-center gap-0.5 apple-press"
+                >
+                  <span>History</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
               {speedDialItems.map((track, idx) => (
-                <SpeedDialItem
+                <SpeedDialWidget
                   key={`sd_${track.id}_${idx}`}
                   track={track}
                   onPlay={handlePlayTrack}
@@ -757,61 +878,120 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal }) {
         )}
 
         {/* ========================================================================= */}
-        {/* 2. SLOWED & REVERB (YOUTUBE MUSIC EXCLUSIVE)                             */}
-        {/* ========================================================================= */}
-        {(activeMood === 'all' || activeMood === 'slowed' || activeMood === 'relax' || activeMood === 'focus') && (
-          <SectionRow
-            kicker="YouTube Music"
-            title="Slowed & Reverb"
-            subtitle={`Aesthetic lofi and midnight edits in ${langConfig.name}`}
-            scrollRef={slowedScrollRef}
-            onSeeAll={() => onNavigate('search')}
-          >
-            {isLoading && slowedTracks.length === 0 ? (
-              [...Array(6)].map((_, i) => <SkeletonCard key={`sk_sl_${i}`} />)
-            ) : (
-              slowedTracks.map((t, idx) => (
-                <MusicCard
-                  key={`slow_${t.id}_${idx}`}
-                  track={t}
-                  onPlay={handlePlayTrack}
-                  queue={slowedTracks}
-                />
-              ))
-            )}
-          </SectionRow>
-        )}
-
-        {/* ========================================================================= */}
-        {/* 3. QUICK PICKS (START RADIO FROM A SONG - YTM 3-ROW COLUMNS)             */}
+        {/* SECTION 2: APPLE FEATURED EDITORIAL HERO BANNER                           */}
         {/* ========================================================================= */}
         {(activeMood === 'all' || activeMood === 'energize') && (
           <section className="space-y-3">
-            <div className="flex items-end justify-between">
+            <div className="flex items-center justify-between px-1">
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-neutral-400 mb-0.5">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-white/50 mb-0.5">
+                  Apple Music Spotlight
+                </p>
+                <h2 className="text-lg sm:text-xl md:text-2xl font-bold tracking-tight text-white">
+                  Featured
+                </h2>
+              </div>
+
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={() => heroScrollRef.current?.scrollBy({ left: -480, behavior: 'smooth' })}
+                  className="w-8 h-8 rounded-full apple-glass apple-press flex items-center justify-center text-white/70 hover:text-white transition"
+                  aria-label="Previous Featured"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => heroScrollRef.current?.scrollBy({ left: 480, behavior: 'smooth' })}
+                  className="w-8 h-8 rounded-full apple-glass apple-press flex items-center justify-center text-white/70 hover:text-white transition"
+                  aria-label="Next Featured"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            <div
+              ref={heroScrollRef}
+              className="flex gap-5 overflow-x-auto pb-3 pt-1 no-scrollbar snap-x snap-mandatory scroll-smooth"
+            >
+              {isLoading && featuredTracks.length === 0 ? (
+                <>
+                  <SkeletonHero />
+                  <SkeletonHero />
+                </>
+              ) : (
+                featuredTracks.slice(0, 8).map((t, idx) => (
+                  <AppleFeaturedHeroCard
+                    key={`hero_${t.id}_${idx}`}
+                    track={t}
+                    index={idx}
+                    onPlay={handlePlayTrack}
+                    queue={featuredTracks}
+                  />
+                ))
+              )}
+            </div>
+          </section>
+        )}
+
+        {/* ========================================================================= */}
+        {/* SECTION 3: SLOWED & REVERB (APPLE CURATED MIDNIGHT SESSION)               */}
+        {/* ========================================================================= */}
+        {(activeMood === 'all' || activeMood === 'slowed' || activeMood === 'relax' || activeMood === 'focus') && (
+          <div className="p-5 sm:p-6 rounded-3xl apple-glass shadow-2xl relative overflow-hidden">
+            <AppleSectionRow
+              kicker="Spatial Lofi"
+              title="Slowed & Reverb"
+              subtitle={`Aesthetic slowed tempo and midnight edits in ${langConfig.name}`}
+              scrollRef={slowedScrollRef}
+              onSeeAll={() => onNavigate('search')}
+            >
+              {isLoading && slowedTracks.length === 0 ? (
+                [...Array(6)].map((_, i) => <SkeletonCard key={`sk_sl_${i}`} />)
+              ) : (
+                slowedTracks.map((t, idx) => (
+                  <AppleGlassCard
+                    key={`slow_${t.id}_${idx}`}
+                    track={t}
+                    onPlay={handlePlayTrack}
+                    queue={slowedTracks}
+                  />
+                ))
+              )}
+            </AppleSectionRow>
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* SECTION 4: QUICK PICKS RADIO (APPLE 3-ROW STACKED GLASS COLUMNS)          */}
+        {/* ========================================================================= */}
+        {(activeMood === 'all' || activeMood === 'energize') && (
+          <section className="space-y-3">
+            <div className="flex items-end justify-between px-1">
+              <div>
+                <p className="text-[11px] font-bold uppercase tracking-wider text-white/50 mb-0.5">
                   Start radio from a song
                 </p>
-                <h2 className="text-lg sm:text-xl font-bold text-white tracking-tight">
+                <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white tracking-tight">
                   Quick picks
                 </h2>
               </div>
               <button
                 onClick={() => onNavigate('search')}
-                className="text-xs font-semibold text-neutral-400 hover:text-white transition"
+                className="text-xs font-semibold text-[#fa2d48] hover:underline transition apple-press"
               >
                 See all
               </button>
             </div>
 
-            <div className="flex gap-4 sm:gap-6 overflow-x-auto pb-2 pt-1 no-scrollbar snap-x snap-mandatory">
+            <div className="flex gap-4 sm:gap-6 overflow-x-auto pb-3 pt-1 no-scrollbar snap-x snap-mandatory">
               {radioColumns.map((colGroup, colIdx) => (
                 <div
                   key={`col_${colIdx}`}
-                  className="flex-shrink-0 w-[280px] sm:w-[320px] md:w-[340px] flex flex-col space-y-1 snap-start"
+                  className="flex-shrink-0 w-[290px] sm:w-[330px] md:w-[360px] p-2 rounded-2xl apple-glass-card flex flex-col space-y-1 snap-start"
                 >
                   {colGroup.map((track, rowIdx) => (
-                    <QuickPickRowItem
+                    <AppleGlassRowItem
                       key={`qp_${track.id}_${colIdx}_${rowIdx}`}
                       track={track}
                       onPlay={handlePlayTrack}
@@ -825,13 +1005,13 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal }) {
         )}
 
         {/* ========================================================================= */}
-        {/* 4. TODAY'S BIGGEST HITS / TRENDING NOW                                   */}
+        {/* SECTION 5: TODAY'S BIGGEST HITS / TRENDING NOW                            */}
         {/* ========================================================================= */}
         {(activeMood === 'all' || activeMood === 'energize' || activeMood === 'party') && (
-          <SectionRow
-            kicker="Trending"
+          <AppleSectionRow
+            kicker="Charts"
             title="Today's Biggest Hits"
-            subtitle={`The most played tracks streaming in ${langConfig.name}`}
+            subtitle={`The top streaming chartbusters in ${langConfig.name}`}
             scrollRef={trendingScrollRef}
             onSeeAll={() => onNavigate('search')}
           >
@@ -839,7 +1019,7 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal }) {
               [...Array(6)].map((_, i) => <SkeletonCard key={`sk_tr_${i}`} />)
             ) : (
               trendingTracks.slice(0, 14).map((t, idx) => (
-                <MusicCard
+                <AppleGlassCard
                   key={`trend_${t.id}_${idx}`}
                   track={t}
                   onPlay={handlePlayTrack}
@@ -847,24 +1027,24 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal }) {
                 />
               ))
             )}
-          </SectionRow>
+          </AppleSectionRow>
         )}
 
         {/* ========================================================================= */}
-        {/* 5. CHILL & RELAXING MELODIES                                              */}
+        {/* SECTION 6: CHILL & PEACEFUL MELODIES                                      */}
         {/* ========================================================================= */}
         {(activeMood === 'all' || activeMood === 'relax' || activeMood === 'focus') && (
-          <SectionRow
+          <AppleSectionRow
             kicker="Mood"
             title="Peaceful & Relaxed"
-            subtitle="Gentle melodies and acoustic flow"
+            subtitle="Gentle acoustics, melodic chill and ambient flow"
             scrollRef={chillScrollRef}
           >
             {chillTracks.length === 0 ? (
               [...Array(6)].map((_, i) => <SkeletonCard key={`sk_ch_${i}`} />)
             ) : (
               chillTracks.slice(0, 14).map((t, idx) => (
-                <MusicCard
+                <AppleGlassCard
                   key={`chill_${t.id}_${idx}`}
                   track={t}
                   onPlay={handlePlayTrack}
@@ -872,24 +1052,24 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal }) {
                 />
               ))
             )}
-          </SectionRow>
+          </AppleSectionRow>
         )}
 
         {/* ========================================================================= */}
-        {/* 6. WORKOUT ENERGY                                                         */}
+        {/* SECTION 7: WORKOUT ENERGY                                                 */}
         {/* ========================================================================= */}
         {(activeMood === 'all' || activeMood === 'workout' || activeMood === 'energize') && (
-          <SectionRow
-            kicker="Workout"
+          <AppleSectionRow
+            kicker="Activity"
             title="Energy Boost"
-            subtitle="High tempo tracks to power your workout"
+            subtitle="High-tempo workout tracks to power your session"
             scrollRef={workoutScrollRef}
           >
             {workoutTracks.length === 0 ? (
               [...Array(6)].map((_, i) => <SkeletonCard key={`sk_wo_${i}`} />)
             ) : (
               workoutTracks.slice(0, 14).map((t, idx) => (
-                <MusicCard
+                <AppleGlassCard
                   key={`work_${t.id}_${idx}`}
                   track={t}
                   onPlay={handlePlayTrack}
@@ -897,24 +1077,24 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal }) {
                 />
               ))
             )}
-          </SectionRow>
+          </AppleSectionRow>
         )}
 
         {/* ========================================================================= */}
-        {/* 7. ROMANTIC MELODIES                                                      */}
+        {/* SECTION 8: ROMANTIC MELODIES                                              */}
         {/* ========================================================================= */}
         {(activeMood === 'all' || activeMood === 'romance') && (
-          <SectionRow
+          <AppleSectionRow
             kicker="Romance"
             title="Heartfelt Melodies"
-            subtitle={`Soulful duets and love songs in ${langConfig.name}`}
+            subtitle={`Soulful duets and romantic melodies in ${langConfig.name}`}
             scrollRef={romanceScrollRef}
           >
             {romanceTracks.length === 0 ? (
               [...Array(6)].map((_, i) => <SkeletonCard key={`sk_rom_${i}`} />)
             ) : (
               romanceTracks.slice(0, 14).map((t, idx) => (
-                <MusicCard
+                <AppleGlassCard
                   key={`rom_${t.id}_${idx}`}
                   track={t}
                   onPlay={handlePlayTrack}
@@ -922,24 +1102,24 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal }) {
                 />
               ))
             )}
-          </SectionRow>
+          </AppleSectionRow>
         )}
 
         {/* ========================================================================= */}
-        {/* 8. FORGOTTEN FAVORITES (NOSTALGIA)                                        */}
+        {/* SECTION 9: FORGOTTEN FAVORITES (NOSTALGIA)                                */}
         {/* ========================================================================= */}
         {(activeMood === 'all' || activeMood === 'nostalgia') && (
-          <SectionRow
+          <AppleSectionRow
             kicker="Nostalgia"
             title="Forgotten Favorites"
-            subtitle={`Classic hits and timeless melodies in ${langConfig.name}`}
+            subtitle={`Timeless golden era classics in ${langConfig.name}`}
             scrollRef={nostalgiaScrollRef}
           >
             {nostalgiaTracks.length === 0 ? (
               [...Array(6)].map((_, i) => <SkeletonCard key={`sk_nost_${i}`} />)
             ) : (
               nostalgiaTracks.slice(0, 14).map((t, idx) => (
-                <MusicCard
+                <AppleGlassCard
                   key={`nost_${t.id}_${idx}`}
                   track={t}
                   onPlay={handlePlayTrack}
@@ -947,35 +1127,35 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal }) {
                 />
               ))
             )}
-          </SectionRow>
+          </AppleSectionRow>
         )}
 
         {/* ========================================================================= */}
-        {/* 9. POPULAR ARTISTS IN [LANGUAGE]                                         */}
+        {/* SECTION 10: POPULAR ARTISTS & COMPOSERS                                   */}
         {/* ========================================================================= */}
         {(activeMood === 'all' || activeMood === 'energize') && (
           <section className="space-y-3">
-            <div className="flex items-end justify-between">
+            <div className="flex items-end justify-between px-1">
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-neutral-400 mb-0.5">
-                  Explore
+                <p className="text-[11px] font-bold uppercase tracking-wider text-white/50 mb-0.5">
+                  Discography
                 </p>
-                <h2 className="text-lg sm:text-xl font-bold text-white tracking-tight">
-                  Popular Artists
+                <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white tracking-tight">
+                  Featured Artists
                 </h2>
               </div>
 
               <div className="flex items-center gap-1.5">
                 <button
                   onClick={() => artistsScrollRef.current?.scrollBy({ left: -320, behavior: 'smooth' })}
-                  className="w-7 h-7 rounded-full hover:bg-white/10 flex items-center justify-center text-neutral-400 hover:text-white transition active:scale-95"
+                  className="w-8 h-8 rounded-full apple-glass apple-press flex items-center justify-center text-white/70 hover:text-white transition"
                   aria-label="Previous artists"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => artistsScrollRef.current?.scrollBy({ left: 320, behavior: 'smooth' })}
-                  className="w-7 h-7 rounded-full hover:bg-white/10 flex items-center justify-center text-neutral-400 hover:text-white transition active:scale-95"
+                  className="w-8 h-8 rounded-full apple-glass apple-press flex items-center justify-center text-white/70 hover:text-white transition"
                   aria-label="Next artists"
                 >
                   <ChevronRight className="w-4 h-4" />
@@ -985,10 +1165,10 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal }) {
 
             <div
               ref={artistsScrollRef}
-              className="flex gap-4 sm:gap-6 overflow-x-auto pb-2 pt-1 no-scrollbar snap-x snap-mandatory scroll-smooth"
+              className="flex gap-4 sm:gap-6 overflow-x-auto pb-3 pt-1 no-scrollbar snap-x snap-mandatory scroll-smooth"
             >
               {currentArtists.map((artist, idx) => (
-                <ArtistItem
+                <AppleArtistCard
                   key={`art_${artist.name}_${idx}`}
                   artist={artist}
                   onSelect={artistName => onNavigate(`artist:${artistName}`)}
@@ -999,22 +1179,22 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal }) {
         )}
 
         {/* ========================================================================= */}
-        {/* 10. NEW RELEASES                                                          */}
+        {/* SECTION 11: NEW RELEASES                                                  */}
         {/* ========================================================================= */}
         {(activeMood === 'all' || activeMood === 'energize') && (
           <section className="space-y-3">
-            <div className="flex items-end justify-between">
+            <div className="flex items-end justify-between px-1">
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-neutral-400 mb-0.5">
-                  Latest
+                <p className="text-[11px] font-bold uppercase tracking-wider text-white/50 mb-0.5">
+                  Latest Drops
                 </p>
-                <h2 className="text-lg sm:text-xl font-bold text-white tracking-tight">
+                <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white tracking-tight">
                   New Releases
                 </h2>
               </div>
               <button
                 onClick={() => onNavigate('search')}
-                className="text-xs font-semibold text-neutral-400 hover:text-white transition"
+                className="text-xs font-semibold text-[#fa2d48] hover:underline transition apple-press"
               >
                 See all
               </button>
@@ -1025,7 +1205,7 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal }) {
                 [...Array(6)].map((_, i) => <SkeletonCard key={`sk_rel_${i}`} />)
               ) : (
                 (newReleases.length ? newReleases : featuredTracks).slice(0, 12).map((t, idx) => (
-                  <MusicCard
+                  <AppleGlassCard
                     key={`rel_${t.id}_${idx}`}
                     track={t}
                     onPlay={handlePlayTrack}
