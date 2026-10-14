@@ -371,9 +371,9 @@ function AlbumDirectoryView({ lib, onNavigate }) {
             <div
               key={album.name}
               onClick={() => onNavigate(`album:${encodeURIComponent(album.name)}`)}
-              className="group flex flex-col p-3 rounded-2xl amz-card cursor-pointer select-none"
+              className="group flex flex-col p-3 rounded-2xl liquid-card cursor-pointer select-none"
             >
-              <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-[#0d1117] mb-3 shadow-lg">
+              <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-white/5 border border-white/10 mb-3 shadow-lg">
                 <SafeImage
                   src={album.thumbnail}
                   alt={album.name}
@@ -382,15 +382,15 @@ function AlbumDirectoryView({ lib, onNavigate }) {
                 />
 
                 {/* Floating Play Button */}
-                <div className="absolute right-2.5 bottom-2.5 w-11 h-11 rounded-full amz-play-btn flex items-center justify-center opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all shadow-xl shadow-black/60">
-                  <Play className="w-5 h-5 fill-white ml-0.5" />
+                <div className="absolute right-2.5 bottom-2.5 w-10 h-10 rounded-full liquid-play-btn flex items-center justify-center text-black opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all shadow-xl">
+                  <Play className="w-4 h-4 fill-black stroke-black ml-0.5" />
                 </div>
               </div>
 
-              <h4 className="text-sm font-bold text-white truncate group-hover:text-[#00a8e1] transition-colors">
+              <h4 className="text-sm font-semibold text-white truncate group-hover:text-white/80 transition-colors">
                 {album.name}
               </h4>
-              <p className="text-xs text-white/50 truncate mt-1">
+              <p className="text-xs text-white/45 truncate mt-1">
                 {album.artist}
               </p>
             </div>

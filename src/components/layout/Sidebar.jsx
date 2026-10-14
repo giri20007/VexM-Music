@@ -48,7 +48,7 @@ export function Sidebar({ currentRoute, onNavigate }) {
 
   return (
     <aside
-      className={`hidden md:flex flex-col flex-shrink-0 bg-[#0c0d15]/80 backdrop-blur-2xl border-r border-white/[0.06] transition-all duration-300 select-none ${
+      className={`hidden md:flex flex-col flex-shrink-0 bg-[#08090d]/85 backdrop-blur-2xl border-r border-white/[0.08] shadow-[1px_0_0_rgba(255,255,255,0.03)] transition-all duration-300 select-none ${
         collapsed ? 'w-20' : 'w-60'
       }`}
     >
@@ -56,17 +56,17 @@ export function Sidebar({ currentRoute, onNavigate }) {
       <div className="flex items-center justify-between p-5 pb-4">
         <div
           onClick={() => onNavigate('home')}
-          className="flex items-center gap-2 cursor-pointer group select-none"
+          className="flex items-center gap-2.5 cursor-pointer group select-none"
         >
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#00a8e1] to-[#22d3ee] flex items-center justify-center text-white shadow-lg shadow-[#00a8e1]/30 flex-shrink-0">
-            <Music2 className="w-4 h-4 fill-white stroke-white" />
+          <div className="w-8 h-8 rounded-xl liquid-glass-subtle flex items-center justify-center text-white shadow-md flex-shrink-0">
+            <Music2 className="w-4 h-4 fill-white/80 stroke-white" />
           </div>
           {!collapsed && (
             <div className="flex items-baseline gap-1">
               <span className="text-lg font-black tracking-tight text-white">
-                vex<span className="text-[#00a8e1]">m</span>
+                vex<span className="text-white/70">m</span>
               </span>
-              <span className="text-[11px] font-semibold text-white/50 tracking-wider uppercase">
+              <span className="text-[10px] font-semibold text-white/40 tracking-wider uppercase">
                 music
               </span>
             </div>
@@ -93,12 +93,12 @@ export function Sidebar({ currentRoute, onNavigate }) {
               onClick={() => onNavigate(item.id)}
               className={`w-full flex items-center gap-3.5 px-3 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-150 ${
                 isActive
-                  ? 'bg-[#00a8e1]/15 text-[#00a8e1] font-bold border border-[#00a8e1]/25 shadow-sm'
+                  ? 'bg-white/10 text-white font-bold border border-white/15 shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_4px_16px_rgba(0,0,0,0.3)] backdrop-blur-md'
                   : 'text-white/60 hover:text-white hover:bg-white/[0.04]'
               }`}
               title={collapsed ? item.label : undefined}
             >
-              <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? 'text-[#00a8e1]' : 'text-white/60'}`} />
+              <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? 'text-white' : 'text-white/60'}`} />
               {!collapsed && <span>{item.label}</span>}
             </button>
           );
@@ -129,12 +129,12 @@ export function Sidebar({ currentRoute, onNavigate }) {
           onClick={() => onNavigate('liked')}
           className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs sm:text-sm transition-all duration-150 ${
             currentRoute === 'liked'
-              ? 'bg-[#00a8e1]/15 text-[#00a8e1] font-bold border border-[#00a8e1]/25'
+              ? 'bg-white/10 text-white font-bold border border-white/15 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]'
               : 'text-white/60 hover:text-white hover:bg-white/[0.04]'
           }`}
           title={collapsed ? 'Liked songs' : undefined}
         >
-          <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-[#00a8e1] to-[#8b5cf6] flex items-center justify-center text-white flex-shrink-0">
+          <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center text-white shadow-sm flex-shrink-0">
             <Heart className="w-3.5 h-3.5 fill-white stroke-white" />
           </div>
           {!collapsed && <span className="truncate">Liked Songs</span>}
@@ -152,7 +152,7 @@ export function Sidebar({ currentRoute, onNavigate }) {
               onBlur={() => {
                 if (!newPlaylistName.trim()) setIsCreatingPlaylist(false);
               }}
-              className="w-full text-xs px-2.5 py-1.5 rounded-lg bg-white/[0.06] border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:border-[#00a8e1]"
+              className="w-full text-xs px-2.5 py-1.5 rounded-lg bg-white/[0.06] border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:border-white/40"
             />
           </form>
         )}
@@ -187,12 +187,12 @@ export function Sidebar({ currentRoute, onNavigate }) {
             onClick={() => onNavigate('admin')}
             className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition ${
               currentRoute === 'admin'
-                ? 'bg-[#00a8e1] text-black font-bold shadow-md'
+                ? 'bg-white/15 text-white font-bold border border-white/20 shadow-md'
                 : 'text-white/70 hover:bg-white/5'
             }`}
             title={collapsed ? 'Admin Dashboard' : undefined}
           >
-            <Shield className="w-4 h-4 flex-shrink-0 text-[#00a8e1]" />
+            <Shield className="w-4 h-4 flex-shrink-0 text-white/80" />
             {!collapsed && <span>Admin Dashboard</span>}
           </button>
         )}

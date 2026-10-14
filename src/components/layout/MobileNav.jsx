@@ -24,23 +24,23 @@ export function MobileNav({ currentRoute, onNavigate }) {
   const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0b0e14]/95 backdrop-blur-2xl border-t border-white/[0.08] select-none pb-[env(safe-area-inset-bottom,0px)]">
+    <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 liquid-glass border-t border-white/[0.12] select-none pb-[env(safe-area-inset-bottom,0px)]">
       {/* Mobile Mini-Player Bar (shown when track is loaded) */}
       {currentTrack && (
         <div
           onClick={() => setNowPlayingOpen(true)}
-          className="relative flex items-center justify-between px-3.5 py-2.5 bg-[#121824] border-b border-white/[0.06] cursor-pointer shadow-lg active:bg-[#161e2e] transition-colors"
+          className="relative flex items-center justify-between px-3.5 py-2 bg-white/[0.04] border-b border-white/[0.08] cursor-pointer active:bg-white/[0.08] transition-colors"
         >
           {/* Top Progress Line */}
           <div className="absolute top-0 left-0 right-0 h-[2px] bg-white/10 overflow-hidden">
             <div
-              className="h-full bg-[#00a8e1] transition-all duration-150 ease-out"
+              className="h-full bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)] transition-all duration-150 ease-out"
               style={{ width: `${progressPercent}%` }}
             />
           </div>
 
           <div className="flex items-center gap-3 min-w-0 flex-1">
-            <div className="w-10 h-10 rounded-xl overflow-hidden bg-[#0d1117] flex-shrink-0 border border-white/10 shadow-md">
+            <div className="w-10 h-10 rounded-xl overflow-hidden bg-white/5 flex-shrink-0 border border-white/15 shadow-md">
               <img
                 src={getArtworkSrc(currentTrack, 120)}
                 alt={currentTrack.title}
@@ -63,7 +63,7 @@ export function MobileNav({ currentRoute, onNavigate }) {
                 e.stopPropagation();
                 prev();
               }}
-              className="w-9 h-9 flex items-center justify-center text-white/60 hover:text-white rounded-full transition active:scale-95"
+              className="w-8 h-8 flex items-center justify-center text-white/60 hover:text-white rounded-full transition active:scale-95"
               aria-label="Previous track"
             >
               <SkipBack className="w-4 h-4 fill-current" />
@@ -74,13 +74,13 @@ export function MobileNav({ currentRoute, onNavigate }) {
                 e.stopPropagation();
                 togglePlay();
               }}
-              className="w-9 h-9 rounded-full bg-[#00a8e1] hover:bg-[#22d3ee] text-white flex items-center justify-center shadow-md shadow-[#00a8e1]/30 active:scale-90 transition"
+              className="w-8 h-8 rounded-full liquid-play-btn flex items-center justify-center text-black active:scale-90 transition shadow-md"
               aria-label={isPlaying ? 'Pause' : 'Play'}
             >
               {isPlaying ? (
-                <Pause className="w-4 h-4 fill-white" />
+                <Pause className="w-3.5 h-3.5 fill-black stroke-black" />
               ) : (
-                <Play className="w-4 h-4 fill-white ml-0.5" />
+                <Play className="w-3.5 h-3.5 fill-black stroke-black ml-0.5" />
               )}
             </button>
 
@@ -89,7 +89,7 @@ export function MobileNav({ currentRoute, onNavigate }) {
                 e.stopPropagation();
                 next();
               }}
-              className="w-9 h-9 flex items-center justify-center text-white/60 hover:text-white rounded-full transition active:scale-95"
+              className="w-8 h-8 flex items-center justify-center text-white/60 hover:text-white rounded-full transition active:scale-95"
               aria-label="Next track"
             >
               <SkipForward className="w-4 h-4 fill-current" />
@@ -99,7 +99,7 @@ export function MobileNav({ currentRoute, onNavigate }) {
       )}
 
       {/* Bottom Navigation Buttons */}
-      <div className="flex items-center justify-around py-1.5 px-2">
+      <div className="flex items-center justify-around py-2 px-2">
         {navItems.map(item => {
           const Icon = item.icon;
           const isActive =
@@ -111,7 +111,7 @@ export function MobileNav({ currentRoute, onNavigate }) {
               key={item.id}
               onClick={() => onNavigate(item.id)}
               className={`flex flex-col items-center justify-center min-w-[56px] min-h-[44px] py-1 px-2 rounded-xl text-[10px] font-semibold transition active:scale-90 ${
-                isActive ? 'text-[#00a8e1] font-bold' : 'text-white/45 hover:text-white'
+                isActive ? 'text-white font-bold drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]' : 'text-white/45 hover:text-white'
               }`}
             >
               <Icon className={`w-5 h-5 mb-0.5 ${isActive ? 'stroke-[2.5]' : 'stroke-[1.8]'}`} />

@@ -132,9 +132,9 @@ const dedupeList = list => {
 };
 
 /**
- * Amazon Music Horizontal Carousel (Shelf)
+ * Liquid Glass Horizontal Carousel (Shelf)
  */
-function AmazonMusicShelf({
+function LiquidMusicShelf({
   title,
   subtitle,
   items = [],
@@ -142,7 +142,7 @@ function AmazonMusicShelf({
   isPlaying,
   onPlay,
   onNavigateAll,
-  showAtmos = true,
+  showLossless = true,
 }) {
   const scrollRef = useRef(null);
 
@@ -155,15 +155,15 @@ function AmazonMusicShelf({
   if (!items || items.length === 0) return null;
 
   return (
-    <section className="space-y-3">
-      {/* Amazon Music Shelf Header */}
+    <section className="space-y-3.5">
+      {/* Liquid Shelf Header */}
       <div className="flex items-end justify-between px-1">
         <div>
           <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-2">
             <span>{title}</span>
           </h2>
           {subtitle && (
-            <p className="text-xs text-white/55 font-normal mt-0.5">
+            <p className="text-xs text-white/50 font-normal mt-0.5">
               {subtitle}
             </p>
           )}
@@ -173,22 +173,22 @@ function AmazonMusicShelf({
           {onNavigateAll && (
             <button
               onClick={onNavigateAll}
-              className="text-xs font-bold text-[#00a8e1] hover:text-[#22d3ee] uppercase tracking-wider transition mr-1"
+              className="text-xs font-semibold text-white/60 hover:text-white transition mr-1.5"
             >
               See all
             </button>
           )}
-          <div className="hidden sm:flex items-center gap-1">
+          <div className="hidden sm:flex items-center gap-1.5">
             <button
               onClick={() => scroll('left')}
-              className="w-8 h-8 rounded-full bg-white/[0.08] hover:bg-white/[0.16] flex items-center justify-center text-white/80 hover:text-white transition active:scale-95"
+              className="w-8 h-8 rounded-full liquid-btn flex items-center justify-center text-white/70 hover:text-white transition active:scale-95"
               aria-label="Previous"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
             <button
               onClick={() => scroll('right')}
-              className="w-8 h-8 rounded-full bg-white/[0.08] hover:bg-white/[0.16] flex items-center justify-center text-white/80 hover:text-white transition active:scale-95"
+              className="w-8 h-8 rounded-full liquid-btn flex items-center justify-center text-white/70 hover:text-white transition active:scale-95"
               aria-label="Next"
             >
               <ChevronRight className="w-4 h-4" />
@@ -200,7 +200,7 @@ function AmazonMusicShelf({
       {/* Cards Row */}
       <div
         ref={scrollRef}
-        className="flex gap-4 overflow-x-auto pb-3 pt-1 no-scrollbar snap-x snap-mandatory -mx-4 px-4 sm:mx-0 sm:px-0"
+        className="flex gap-3.5 sm:gap-4 overflow-x-auto pb-3 pt-1 no-scrollbar snap-x snap-mandatory -mx-4 px-4 sm:mx-0 sm:px-0"
       >
         {items.map((track, idx) => {
           const isThisPlaying = String(currentTrackId) === String(track.id) && isPlaying;
@@ -208,12 +208,12 @@ function AmazonMusicShelf({
 
           return (
             <div
-              key={`amz_card_${track.id}_${idx}`}
+              key={`liquid_card_${track.id}_${idx}`}
               onClick={() => onPlay(track, items)}
-              className="group flex-shrink-0 w-[155px] sm:w-[178px] cursor-pointer select-none snap-start amz-card p-3"
+              className="group flex-shrink-0 w-[155px] sm:w-[178px] cursor-pointer select-none snap-start liquid-card p-3 rounded-2xl"
             >
               {/* Artwork Box */}
-              <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-[#0d1117] shadow-lg mb-2.5">
+              <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-white/5 border border-white/10 shadow-lg mb-2.5">
                 <SafeImage
                   src={cover}
                   track={track}
@@ -222,21 +222,22 @@ function AmazonMusicShelf({
                   className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                 />
 
-                {/* Amazon Music Signature Badges */}
-                <div className="absolute top-2 left-2 flex items-center gap-1">
-                  <span className="amz-badge-hd">ULTRA HD</span>
-                  {showAtmos && idx % 2 === 0 && (
-                    <span className="amz-badge-atmos">ATMOS</span>
-                  )}
-                </div>
+                {/* Minimal Lossless Badge */}
+                {showLossless && (
+                  <div className="absolute top-2 left-2 flex items-center gap-1">
+                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-black/60 backdrop-blur-md text-white/80 border border-white/10 uppercase tracking-wider">
+                      LOSSLESS
+                    </span>
+                  </div>
+                )}
 
-                {/* Amazon Music Cyan Circular Play Button */}
+                {/* Liquid Glass Play Button (White droplet) */}
                 <button
                   onClick={e => {
                     e.stopPropagation();
                     onPlay(track, items);
                   }}
-                  className={`absolute right-2.5 bottom-2.5 w-10 h-10 rounded-full amz-play-btn flex items-center justify-center ${
+                  className={`absolute right-2.5 bottom-2.5 w-10 h-10 rounded-full liquid-play-btn flex items-center justify-center text-black shadow-xl ${
                     isThisPlaying
                       ? 'opacity-100 scale-100'
                       : 'opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0'
@@ -244,19 +245,19 @@ function AmazonMusicShelf({
                   aria-label={`Play ${track.title}`}
                 >
                   {isThisPlaying ? (
-                    <Pause className="w-4 h-4 fill-white" />
+                    <Pause className="w-4 h-4 fill-black stroke-black" />
                   ) : (
-                    <Play className="w-4 h-4 fill-white ml-0.5" />
+                    <Play className="w-4 h-4 fill-black stroke-black ml-0.5" />
                   )}
                 </button>
               </div>
 
               {/* Title & Artist */}
-              <h3 className="text-xs sm:text-sm font-bold text-white truncate group-hover:text-[#00a8e1] transition-colors leading-tight">
+              <h3 className="text-xs sm:text-sm font-semibold text-white truncate group-hover:text-white/80 transition-colors leading-tight">
                 {track.title}
               </h3>
-              <p className="text-[11px] text-white/50 truncate mt-1">
-                {track.artist || 'Amazon Music Hit'}
+              <p className="text-[11px] text-white/45 truncate mt-1">
+                {track.artist || 'Featured Track'}
               </p>
             </div>
           );
@@ -489,19 +490,19 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileN
   ], [likedTrackIds, recentlyPlayed, trendingTracks, slowedTracks, chillTracks, bestSongs, langConfig, lib?.allItems]);
 
   return (
-    <div className="flex-1 w-full pb-32 select-none bg-transparent text-white font-sans">
-      <div className="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 space-y-7 pt-4">
+    <div className="flex-1 w-full pb-36 select-none bg-transparent text-white font-sans">
+      <div className="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 space-y-8 pt-4">
 
         {/* ========================================================================= */}
-        {/* 1. TOP HEADER & BRANDING (AMAZON MUSIC WEB + IOS 17)                      */}
+        {/* 1. TOP HEADER & BRANDING (LIQUID GLASS / IOS 17 ATMOSPHERE)              */}
         {/* ========================================================================= */}
         <header className="flex items-center justify-between gap-3 pb-3 border-b border-white/[0.08]">
-          {/* Left: Mobile Nav Toggle + Amazon Music Brand Mark */}
+          {/* Left: Mobile Nav Toggle + Brand Mark */}
           <div className="flex items-center gap-2.5 min-w-0">
             {onToggleMobileNav && (
               <button
                 onClick={onToggleMobileNav}
-                className="md:hidden p-2 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-white/80 hover:text-white transition flex items-center justify-center min-w-[38px] min-h-[38px]"
+                className="md:hidden p-2 rounded-xl liquid-btn text-white/80 hover:text-white transition flex items-center justify-center min-w-[38px] min-h-[38px]"
                 aria-label="Open navigation menu"
               >
                 <Menu className="w-5 h-5" />
@@ -513,9 +514,9 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileN
               className="cursor-pointer flex items-center gap-1.5 select-none"
             >
               <span className="text-xl sm:text-2xl font-black tracking-tight text-white">
-                vex<span className="text-[#00a8e1]">m</span>
+                vex<span className="text-white/70">m</span>
               </span>
-              <span className="text-xs sm:text-sm font-semibold text-white/60 tracking-wider uppercase ml-1">
+              <span className="text-xs sm:text-sm font-semibold text-white/50 tracking-wider uppercase ml-1">
                 music
               </span>
             </div>
@@ -526,10 +527,10 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileN
             {/* Search Button */}
             <button
               onClick={() => setSearchModalOpen(true)}
-              className="p-2 sm:px-3 sm:py-1.5 rounded-full bg-white/[0.08] hover:bg-white/[0.14] border border-white/5 text-white/70 hover:text-white transition active:scale-95 flex items-center gap-2"
+              className="p-2 sm:px-3.5 sm:py-1.5 rounded-full liquid-btn text-white/70 hover:text-white transition active:scale-95 flex items-center gap-2"
               title="Search music"
             >
-              <Search className="w-4 h-4" />
+              <Search className="w-4 h-4 text-white/70" />
               <span className="hidden sm:inline text-xs font-semibold">Search</span>
             </button>
 
@@ -539,8 +540,8 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileN
                 onClick={() => setSettingsMenuOpen(prev => !prev)}
                 className={`p-2 rounded-full transition active:scale-95 flex items-center justify-center min-w-[36px] min-h-[36px] ${
                   settingsMenuOpen
-                    ? 'bg-[#00a8e1] text-black shadow-lg shadow-[#00a8e1]/40'
-                    : 'bg-white/[0.08] hover:bg-white/[0.14] text-white/80 hover:text-white border border-white/5'
+                    ? 'bg-white text-black shadow-lg shadow-white/20'
+                    : 'liquid-btn text-white/80 hover:text-white'
                 }`}
                 title="Preferences & Audio Source"
                 aria-label="Preferences and Audio Source"
@@ -551,16 +552,16 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileN
 
               {/* iOS 17 Style Popover Dropdown */}
               {settingsMenuOpen && (
-                <div className="absolute right-0 top-full mt-2 w-72 sm:w-80 rounded-2xl bg-[#111622] border border-white/10 p-3 shadow-2xl z-50 animate-scale-up backdrop-blur-2xl divide-y divide-white/[0.08]">
+                <div className="absolute right-0 top-full mt-2 w-72 sm:w-80 rounded-2xl liquid-glass border border-white/15 p-3.5 shadow-2xl z-50 animate-scale-up backdrop-blur-2xl divide-y divide-white/[0.08]">
                   {/* Popover Header */}
                   <div className="pb-2.5 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <SlidersHorizontal className="w-4 h-4 text-[#00a8e1]" />
-                      <span className="text-xs font-bold uppercase tracking-wider text-white">Music Preferences</span>
+                      <SlidersHorizontal className="w-4 h-4 text-white/80" />
+                      <span className="text-xs font-bold uppercase tracking-wider text-white">Preferences</span>
                     </div>
                     <button
                       onClick={() => setSettingsMenuOpen(false)}
-                      className="text-xs font-bold text-[#00a8e1] hover:underline"
+                      className="text-xs font-bold text-white/70 hover:text-white transition"
                     >
                       Done
                     </button>
@@ -570,7 +571,7 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileN
                   <div className="py-2.5 space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-white/60 font-medium flex items-center gap-1.5">
-                        <Globe className="w-3.5 h-3.5 text-[#00a8e1]" />
+                        <Globe className="w-3.5 h-3.5 text-white/70" />
                         Language
                       </span>
                       <button
@@ -578,10 +579,10 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileN
                           setSettingsMenuOpen(false);
                           onOpenLanguageModal();
                         }}
-                        className="text-xs font-bold text-[#00a8e1] hover:underline flex items-center gap-1"
+                        className="text-xs font-bold text-white hover:text-white/80 flex items-center gap-1"
                       >
                         <span>{langConfig.name}</span>
-                        <ChevronIcon className="w-3 h-3" />
+                        <ChevronIcon className="w-3 h-3 text-white/60" />
                       </button>
                     </div>
 
@@ -593,10 +594,10 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileN
                           onClick={() => {
                             useSettingsStore.getState().setPreferredLanguage(lang.id);
                           }}
-                          className={`px-2.5 py-1 rounded-full text-[11px] font-semibold whitespace-nowrap transition ${
+                          className={`px-2.5 py-1 rounded-full text-[11px] font-semibold whitespace-nowrap transition active:scale-95 ${
                             preferredLanguage === lang.id
-                              ? 'bg-[#00a8e1] text-black font-bold'
-                              : 'bg-white/[0.06] hover:bg-white/[0.12] text-white/70'
+                              ? 'bg-white text-black font-bold shadow-md'
+                              : 'liquid-btn text-white/70'
                           }`}
                         >
                           {lang.name}
@@ -620,10 +621,10 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileN
                             onClick={() => {
                               setProviderSource(src.id);
                             }}
-                            className={`flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs font-semibold transition text-left ${
+                            className={`flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs font-semibold transition text-left active:scale-95 ${
                               isSelected
-                                ? 'bg-[#00a8e1] text-black font-bold shadow-md shadow-[#00a8e1]/30'
-                                : 'bg-white/[0.05] hover:bg-white/[0.10] text-white/80'
+                                ? 'bg-white text-black font-bold shadow-md shadow-white/20'
+                                : 'liquid-card text-white/80'
                             }`}
                           >
                             <Icon className="w-3.5 h-3.5 flex-shrink-0" />
@@ -641,9 +642,9 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileN
                         handleRefresh();
                       }}
                       disabled={isRefreshing}
-                      className="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-xs font-semibold text-white transition active:scale-95"
+                      className="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-xl liquid-btn text-xs font-semibold text-white transition active:scale-95"
                     >
-                      <RotateCcw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-[#00a8e1]' : ''}`} />
+                      <RotateCcw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-white' : ''}`} />
                       <span>{isRefreshing ? 'Refreshing...' : 'Refresh Feed'}</span>
                     </button>
 
@@ -652,7 +653,7 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileN
                         setSettingsMenuOpen(false);
                         onNavigate('settings');
                       }}
-                      className="p-2 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-white/70 hover:text-white transition"
+                      className="p-2 rounded-xl liquid-btn text-white/70 hover:text-white transition active:scale-95"
                       title="Open full settings"
                       aria-label="Open full settings"
                     >
@@ -664,7 +665,7 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileN
             </div>
 
             {/* User Avatar Action */}
-            <div className="w-8 h-8 rounded-full overflow-hidden bg-white/[0.10] border border-white/10 flex items-center justify-center text-xs font-bold text-white shadow-sm flex-shrink-0 ring-2 ring-[#00a8e1]/40">
+            <div className="w-8 h-8 rounded-full overflow-hidden bg-white/[0.10] border border-white/20 flex items-center justify-center text-xs font-bold text-white shadow-sm flex-shrink-0 ring-2 ring-white/20">
               {user?.photoUrl ? (
                 <img src={user.photoUrl} alt={displayName} className="w-full h-full object-cover" />
               ) : (
@@ -675,56 +676,57 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileN
         </header>
 
         {/* ========================================================================= */}
-        {/* 2. FEATURED SPOTLIGHT BANNER (AMAZON MUSIC ORIGINAL HERO)                 */}
+        {/* 2. ATMOSPHERIC SPOTLIGHT HERO                                             */}
         {/* ========================================================================= */}
         {currentHeroTrack && (
-          <section className="relative rounded-2xl md:rounded-3xl overflow-hidden bg-[#111622] border border-white/10 shadow-2xl">
-            {/* Background Artwork Stage with Dark Right-to-Left Gradient Overlay */}
+          <section className="relative rounded-3xl overflow-hidden liquid-card p-6 sm:p-8 md:p-10 border border-white/15 shadow-2xl group">
+            {/* Ambient Refractive Background Stage */}
             {heroCover && (
-              <div className="absolute inset-0">
+              <div className="absolute inset-0 pointer-events-none">
                 <img
                   src={heroCover}
                   alt={currentHeroTrack.title}
-                  className="w-full h-full object-cover opacity-25 filter blur-xs sm:blur-none sm:opacity-30 object-right"
+                  className="w-full h-full object-cover opacity-20 filter blur-xl sm:blur-2xl object-right scale-110"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t sm:bg-gradient-to-r from-[#0b0e14] via-[#0b0e14]/90 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t sm:bg-gradient-to-r from-[#07080a] via-[#07080a]/90 to-transparent" />
               </div>
             )}
 
-            <div className="relative z-10 p-6 sm:p-8 md:p-10 flex flex-col sm:flex-row items-center justify-between gap-6 sm:gap-8">
-              {/* Left Column: Metadata & CTAs */}
-              <div className="flex-1 space-y-3.5 text-center sm:text-left">
+            <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-6 sm:gap-10">
+              {/* Left Column: Metadata & Liquid CTAs */}
+              <div className="flex-1 space-y-4 text-center sm:text-left">
                 <div className="inline-flex items-center gap-2">
-                  <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-[#00a8e1]">
-                    FEATURED SPOTLIGHT
+                  <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-white/50">
+                    CURATED ATMOSPHERE
                   </span>
-                  <span className="amz-badge-hd">ULTRA HD</span>
-                  <span className="amz-badge-atmos">DOLBY ATMOS</span>
+                  <span className="text-[9px] font-bold px-2 py-0.5 rounded-md bg-white/10 backdrop-blur-md text-white/90 border border-white/15 uppercase tracking-wider">
+                    LOSSLESS AUDIO
+                  </span>
                 </div>
 
-                <div className="space-y-1">
+                <div className="space-y-1.5">
                   <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white tracking-tight leading-tight line-clamp-2">
                     {currentHeroTrack.title}
                   </h2>
-                  <p className="text-sm sm:text-base text-white/70 font-medium truncate">
+                  <p className="text-sm sm:text-base text-white/65 font-medium truncate">
                     {currentHeroTrack.artist || 'Featured Artist'} • {currentHeroTrack.album || 'Single'}
                   </p>
                 </div>
 
-                {/* Primary & Secondary Action Buttons */}
+                {/* Primary & Secondary Liquid Action Buttons */}
                 <div className="flex items-center justify-center sm:justify-start gap-3 pt-2">
                   <button
                     onClick={() => handlePlayTrack(currentHeroTrack, heroSpotlightTracks)}
-                    className="flex items-center gap-2 px-6 py-3 rounded-full amz-play-btn font-bold text-xs sm:text-sm active:scale-95"
+                    className="flex items-center gap-2 px-6 py-3 rounded-full liquid-play-btn font-bold text-xs sm:text-sm active:scale-95 text-black shadow-xl"
                   >
                     {isHeroPlaying ? (
                       <>
-                        <Pause className="w-4 h-4 fill-white" />
+                        <Pause className="w-4 h-4 fill-black stroke-black" />
                         <span>Pause</span>
                       </>
                     ) : (
                       <>
-                        <Play className="w-4 h-4 fill-white ml-0.5" />
+                        <Play className="w-4 h-4 fill-black stroke-black ml-0.5" />
                         <span>Listen Now</span>
                       </>
                     )}
@@ -732,12 +734,12 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileN
 
                   <button
                     onClick={() => toggleLike(currentHeroTrack.id)}
-                    className="flex items-center gap-1.5 px-4 py-3 rounded-full bg-white/[0.08] hover:bg-white/[0.14] border border-white/10 text-white font-semibold text-xs sm:text-sm transition active:scale-95"
+                    className="flex items-center gap-1.5 px-5 py-3 rounded-full liquid-btn text-white font-semibold text-xs sm:text-sm transition active:scale-95"
                   >
                     <Heart
                       className={`w-4 h-4 ${
                         likedTrackIds.includes(String(currentHeroTrack.id))
-                          ? 'fill-[#fa2d48] text-[#fa2d48]'
+                          ? 'fill-rose-500 text-rose-500'
                           : 'text-white/80'
                       }`}
                     />
@@ -746,8 +748,8 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileN
                 </div>
               </div>
 
-              {/* Right Column: Square Artwork with Spotlight Controls */}
-              <div className="w-40 sm:w-48 md:w-56 aspect-square rounded-2xl overflow-hidden shadow-2xl border border-white/10 flex-shrink-0 relative group">
+              {/* Right Column: Square Artwork with Carousel Dots */}
+              <div className="w-44 sm:w-52 md:w-60 aspect-square rounded-2xl overflow-hidden shadow-2xl border border-white/20 flex-shrink-0 relative group">
                 <SafeImage
                   src={heroCover}
                   alt={currentHeroTrack.title}
@@ -755,9 +757,9 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileN
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
 
-                {/* Carousel Dots */}
+                {/* Minimal Carousel Dots */}
                 {heroSpotlightTracks.length > 1 && (
-                  <div className="absolute bottom-2 inset-x-0 flex items-center justify-center gap-1.5 z-10">
+                  <div className="absolute bottom-2.5 inset-x-0 flex items-center justify-center gap-1.5 z-10">
                     {heroSpotlightTracks.map((_, i) => (
                       <button
                         key={`dot_${i}`}
@@ -766,7 +768,7 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileN
                           setFeaturedHeroIndex(i);
                         }}
                         className={`h-1.5 rounded-full transition-all ${
-                          i === featuredHeroIndex ? 'w-5 bg-[#00a8e1]' : 'w-1.5 bg-white/40'
+                          i === featuredHeroIndex ? 'w-5 bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)]' : 'w-1.5 bg-white/35'
                         }`}
                         aria-label={`Go to slide ${i + 1}`}
                       />
@@ -779,14 +781,14 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileN
         )}
 
         {/* ========================================================================= */}
-        {/* 3. JUMP BACK IN / LISTEN AGAIN (AMAZON MUSIC 6-CARD GRID)                 */}
+        {/* 3. LISTEN AGAIN / JUMP BACK IN (6-CARD LIQUID GRID)                       */}
         {/* ========================================================================= */}
-        <section className="space-y-3">
+        <section className="space-y-3.5">
           <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight px-1">
             Listen Again
           </h2>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-2.5 sm:gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-2.5 sm:gap-3.5">
             {quickJumpItems.map(item => {
               const cover = item.track ? getArtworkSrc(item.track, 140) : null;
               const isPlayingItem = item.track && currentTrack?.id === item.track.id && isPlaying;
@@ -795,12 +797,12 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileN
                 <div
                   key={item.id}
                   onClick={item.playAction || item.action}
-                  className="group relative h-15 sm:h-16 rounded-xl amz-card flex items-center overflow-hidden cursor-pointer select-none pr-3"
+                  className="group relative h-16 rounded-2xl liquid-card flex items-center overflow-hidden cursor-pointer select-none pr-3"
                 >
                   {/* Artwork on Left */}
-                  <div className="w-15 sm:w-16 h-full flex-shrink-0 bg-[#0d1117] relative">
+                  <div className="w-16 h-full flex-shrink-0 bg-white/5 relative border-r border-white/10">
                     {item.isLikedSpecial ? (
-                      <div className="w-full h-full bg-gradient-to-br from-[#00a8e1] to-[#8b5cf6] flex items-center justify-center text-white">
+                      <div className="w-full h-full bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center text-white shadow-sm">
                         <Heart className="w-5 h-5 fill-white" />
                       </div>
                     ) : cover ? (
@@ -811,7 +813,7 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileN
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <div className="w-full h-full bg-neutral-800 flex items-center justify-center text-white/40">
+                      <div className="w-full h-full bg-white/5 flex items-center justify-center text-white/40">
                         <Music2 className="w-5 h-5" />
                       </div>
                     )}
@@ -819,15 +821,15 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileN
 
                   {/* Metadata */}
                   <div className="min-w-0 flex-1 px-3">
-                    <p className="text-xs sm:text-sm font-bold text-white truncate group-hover:text-[#00a8e1] transition-colors">
+                    <p className="text-xs sm:text-sm font-semibold text-white truncate group-hover:text-white/80 transition-colors">
                       {item.title}
                     </p>
-                    <p className="text-[10px] sm:text-[11px] text-white/50 truncate">
+                    <p className="text-[10px] sm:text-[11px] text-white/50 truncate mt-0.5">
                       {item.sub}
                     </p>
                   </div>
 
-                  {/* Play Button */}
+                  {/* Tactile Play Button */}
                   <div className="flex-shrink-0 ml-1">
                     <button
                       onClick={e => {
@@ -835,7 +837,7 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileN
                         if (item.playAction) item.playAction();
                         else item.action();
                       }}
-                      className={`w-8 h-8 rounded-full amz-play-btn flex items-center justify-center ${
+                      className={`w-8 h-8 rounded-full liquid-play-btn flex items-center justify-center text-black shadow-md ${
                         isPlayingItem
                           ? 'opacity-100 scale-100'
                           : 'opacity-0 scale-90 group-hover:opacity-100 group-hover:scale-100'
@@ -843,9 +845,9 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileN
                       aria-label={`Play ${item.title}`}
                     >
                       {isPlayingItem ? (
-                        <Pause className="w-3.5 h-3.5 fill-white" />
+                        <Pause className="w-3.5 h-3.5 fill-black stroke-black" />
                       ) : (
-                        <Play className="w-3.5 h-3.5 fill-white ml-0.5" />
+                        <Play className="w-3.5 h-3.5 fill-black stroke-black ml-0.5" />
                       )}
                     </button>
                   </div>
@@ -856,11 +858,11 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileN
         </section>
 
         {/* ========================================================================= */}
-        {/* 4. TRENDING SONGS IN {LANGUAGE} (AMAZON MUSIC HORIZONTAL SHELF)           */}
+        {/* 4. TRENDING SONGS IN {LANGUAGE}                                          */}
         {/* ========================================================================= */}
-        <AmazonMusicShelf
-          title={`Trending Songs in ${langConfig.name}`}
-          subtitle="The most-streamed tracks on Amazon Music this week"
+        <LiquidMusicShelf
+          title={`Trending in ${langConfig.name}`}
+          subtitle={`The most streamed tracks in ${langConfig.name} right now`}
           items={trendingTracks}
           currentTrackId={currentTrack?.id}
           isPlaying={isPlaying}
@@ -869,45 +871,45 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileN
         />
 
         {/* ========================================================================= */}
-        {/* 5. SLOWED + REVERB STATIONS (SIGNATURE AMZ STATION SHELF)                 */}
+        {/* 5. SLOWED + REVERB LOUNGE                                                */}
         {/* ========================================================================= */}
         {slowedTracks.length > 0 && (
-          <AmazonMusicShelf
-            title="Slowed + Reverb Stations"
-            subtitle="Endless aesthetic lofi, midnight chill, and slowed mixes"
+          <LiquidMusicShelf
+            title="Slowed + Reverb Lounge"
+            subtitle="Atmospheric lofi, midnight reverbs, and slowed mixes"
             items={slowedTracks}
             currentTrackId={currentTrack?.id}
             isPlaying={isPlaying}
             onPlay={handlePlayTrack}
-            showAtmos={false}
+            showLossless={false}
           />
         )}
 
         {/* ========================================================================= */}
-        {/* 6. POPULAR ARTISTS (AMAZON MUSIC VERIFIED ARTIST ROW)                     */}
+        {/* 6. POPULAR ARTISTS                                                        */}
         {/* ========================================================================= */}
-        <section className="space-y-3">
+        <section className="space-y-3.5">
           <div className="flex items-end justify-between px-1">
             <div>
               <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
                 Popular Artists
               </h2>
-              <p className="text-xs text-white/55 font-normal mt-0.5">
-                Top composers, singers, and creators in {langConfig.name}
+              <p className="text-xs text-white/50 font-normal mt-0.5">
+                Top composers, vocalists, and creators in {langConfig.name}
               </p>
             </div>
 
-            <div className="hidden sm:flex items-center gap-1">
+            <div className="hidden sm:flex items-center gap-1.5">
               <button
                 onClick={() => artistsScrollRef.current?.scrollBy({ left: -360, behavior: 'smooth' })}
-                className="w-8 h-8 rounded-full bg-white/[0.08] hover:bg-white/[0.16] flex items-center justify-center text-white/80 hover:text-white transition active:scale-95"
+                className="w-8 h-8 rounded-full liquid-btn flex items-center justify-center text-white/70 hover:text-white transition active:scale-95"
                 aria-label="Previous artists"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
               <button
                 onClick={() => artistsScrollRef.current?.scrollBy({ left: 360, behavior: 'smooth' })}
-                className="w-8 h-8 rounded-full bg-white/[0.08] hover:bg-white/[0.16] flex items-center justify-center text-white/80 hover:text-white transition active:scale-95"
+                className="w-8 h-8 rounded-full liquid-btn flex items-center justify-center text-white/70 hover:text-white transition active:scale-95"
                 aria-label="Next artists"
               >
                 <ChevronRight className="w-4 h-4" />
@@ -921,11 +923,11 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileN
           >
             {currentArtists.map((artist, idx) => (
               <div
-                key={`amz_artist_${artist.name}_${idx}`}
+                key={`liquid_artist_${artist.name}_${idx}`}
                 onClick={() => onNavigate(`artist:${artist.name}`)}
                 className="group flex flex-col items-center flex-shrink-0 w-[110px] sm:w-[130px] cursor-pointer select-none text-center snap-start"
               >
-                <div className="relative w-22 h-22 sm:w-26 sm:h-26 rounded-full overflow-hidden bg-[#0d1117] shadow-lg ring-2 ring-white/10 group-hover:ring-[#00a8e1] transition-all duration-300 group-hover:scale-105 mb-2">
+                <div className="relative w-22 h-22 sm:w-26 sm:h-26 rounded-full overflow-hidden bg-white/5 shadow-xl ring-2 ring-white/10 group-hover:ring-white/40 transition-all duration-300 group-hover:scale-105 mb-2.5">
                   <SafeImage
                     src={artist.image}
                     alt={artist.name}
@@ -933,7 +935,7 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileN
                     className="w-full h-full object-cover"
                   />
                 </div>
-                <h3 className="text-xs sm:text-sm font-bold text-white truncate w-full group-hover:text-[#00a8e1] transition-colors">
+                <h3 className="text-xs sm:text-sm font-semibold text-white truncate w-full group-hover:text-white/80 transition-colors">
                   {artist.name}
                 </h3>
                 <p className="text-[10px] text-white/45 truncate w-full mt-0.5">
@@ -945,27 +947,27 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileN
         </section>
 
         {/* ========================================================================= */}
-        {/* 7. TOP 10 CHARTBUSTERS (AMAZON MUSIC NUMBERED TRACK LIST)                 */}
+        {/* 7. TOP CHARTBUSTERS (NUMBERED TRACK LIST)                                 */}
         {/* ========================================================================= */}
-        <section className="space-y-3">
+        <section className="space-y-3.5">
           <div className="flex items-end justify-between px-1">
             <div>
               <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
                 Top Chartbusters
               </h2>
-              <p className="text-xs text-white/55 font-normal mt-0.5">
-                Stream in Ultra HD Lossless Audio
+              <p className="text-xs text-white/50 font-normal mt-0.5">
+                Streamed in High-Fidelity Lossless
               </p>
             </div>
             <button
               onClick={() => onNavigate('search')}
-              className="text-xs font-bold text-[#00a8e1] hover:text-[#22d3ee] uppercase tracking-wider transition"
+              className="text-xs font-semibold text-white/60 hover:text-white transition"
             >
               Explore More
             </button>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-2.5">
             {(trendingTracks.length ? trendingTracks.slice(0, 8) : []).map((track, idx) => {
               const isThisPlaying = String(currentTrack?.id) === String(track.id) && isPlaying;
               const isLiked = likedTrackIds.includes(String(track.id));
@@ -975,17 +977,17 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileN
                 <div
                   key={`chart_row_${track.id}_${idx}`}
                   onClick={() => handlePlayTrack(track, trendingTracks)}
-                  className={`group flex items-center justify-between h-15 px-3 rounded-xl amz-card cursor-pointer select-none ${
-                    currentTrack?.id === track.id ? 'border-[#00a8e1]/40 bg-[#00a8e1]/10' : ''
+                  className={`group flex items-center justify-between h-15 px-3.5 rounded-2xl liquid-card cursor-pointer select-none ${
+                    currentTrack?.id === track.id ? 'border-white/30 bg-white/10 shadow-lg' : ''
                   }`}
                 >
                   {/* Left: Number + Thumbnail + Info */}
                   <div className="flex items-center gap-3 min-w-0 flex-1 pr-2">
-                    <span className="w-5 text-center text-xs font-bold text-white/40 group-hover:text-[#00a8e1] font-mono">
+                    <span className="w-5 text-center text-xs font-mono text-white/40 group-hover:text-white">
                       {idx + 1}
                     </span>
 
-                    <div className="relative w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 bg-[#0d1117] shadow-sm">
+                    <div className="relative w-10 h-10 rounded-xl overflow-hidden flex-shrink-0 bg-white/5 border border-white/10 shadow-sm">
                       <SafeImage
                         src={thumb}
                         track={track}
@@ -1000,9 +1002,9 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileN
                       >
                         {isThisPlaying ? (
                           <div className="flex items-end gap-0.5 h-3">
-                            <span className="w-1 h-2 bg-[#00a8e1] animate-pulse rounded-full" />
-                            <span className="w-1 h-3.5 bg-[#00a8e1] animate-pulse delay-75 rounded-full" />
-                            <span className="w-1 h-2 bg-[#00a8e1] animate-pulse delay-150 rounded-full" />
+                            <span className="w-1 h-2 bg-white animate-pulse rounded-full" />
+                            <span className="w-1 h-3.5 bg-white animate-pulse delay-75 rounded-full" />
+                            <span className="w-1 h-2 bg-white animate-pulse delay-150 rounded-full" />
                           </div>
                         ) : (
                           <Play className="w-3.5 h-3.5 fill-white text-white ml-0.5" />
@@ -1012,15 +1014,15 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileN
 
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-1.5">
-                        <p className={`text-xs sm:text-sm font-bold truncate ${
-                          currentTrack?.id === track.id ? 'text-[#00a8e1]' : 'text-white'
-                        }`}>
+                        <p className="text-xs sm:text-sm font-semibold truncate text-white">
                           {track.title}
                         </p>
-                        <span className="amz-badge-hd hidden sm:inline-flex">ULTRA HD</span>
+                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-white/10 text-white/70 border border-white/10 hidden sm:inline-flex">
+                          LOSSLESS
+                        </span>
                       </div>
                       <p className="text-[11px] text-white/50 truncate mt-0.5">
-                        {track.artist || 'Amazon Music Hit'}
+                        {track.artist || 'Featured Track'}
                       </p>
                     </div>
                   </div>
@@ -1035,8 +1037,8 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileN
                         e.stopPropagation();
                         toggleLike(track.id);
                       }}
-                      className={`p-1.5 rounded-lg hover:bg-white/10 transition ${
-                        isLiked ? 'text-[#fa2d48]' : 'text-white/30 hover:text-white'
+                      className={`p-1.5 rounded-lg hover:bg-white/10 transition active:scale-95 ${
+                        isLiked ? 'text-rose-500' : 'text-white/30 hover:text-white'
                       }`}
                       aria-label="Like track"
                     >
@@ -1053,7 +1055,7 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileN
         {/* 8. RECENTLY PLAYED SHELF                                                  */}
         {/* ========================================================================= */}
         {recentlyPlayed.length > 0 && (
-          <AmazonMusicShelf
+          <LiquidMusicShelf
             title="Recently Played"
             subtitle="Pick up where you left off"
             items={recentlyPlayed}
@@ -1061,7 +1063,7 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileN
             isPlaying={isPlaying}
             onPlay={handlePlayTrack}
             onNavigateAll={() => onNavigate('library')}
-            showAtmos={false}
+            showLossless={false}
           />
         )}
 

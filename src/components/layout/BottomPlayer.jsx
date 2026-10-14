@@ -75,10 +75,10 @@ const BottomScrubber = memo(function BottomScrubber() {
         onMouseLeave={handleMouseLeave}
       >
         {/* Track Bar Background */}
-        <div className="relative w-full h-1 bg-white/20 rounded-full overflow-hidden transition-all group-hover:h-1.5">
+        <div className="relative w-full h-1 bg-white/15 rounded-full overflow-hidden transition-all group-hover:h-1.5">
           {/* Active Fill */}
           <div
-            className="absolute top-0 left-0 bottom-0 bg-white group-hover:bg-[#00a8e1] rounded-full transition-all duration-75"
+            className="absolute top-0 left-0 bottom-0 bg-white group-hover:bg-white shadow-[0_0_8px_rgba(255,255,255,0.6)] rounded-full transition-all duration-75"
             style={{ width: `${percent}%` }}
           />
           {/* Hover Fill */}
@@ -109,14 +109,14 @@ const BottomScrubber = memo(function BottomScrubber() {
 
         {/* Scrubber Thumb */}
         <div
-          className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-3.5 h-3.5 rounded-full bg-white shadow-md shadow-[#00a8e1]/60 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"
+          className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-3.5 h-3.5 rounded-full bg-white shadow-[0_2px_8px_rgba(0,0,0,0.6),0_0_8px_rgba(255,255,255,0.8)] border border-white/80 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"
           style={{ left: `${percent}%` }}
         />
 
         {/* Hover Time Tooltip */}
         {hoverPercent !== null && duration > 0 && (
           <div
-            className="absolute -top-7 -translate-x-1/2 px-2 py-0.5 rounded-md bg-black/90 backdrop-blur-md border border-white/15 text-[10px] font-mono text-white pointer-events-none shadow-xl"
+            className="absolute -top-7 -translate-x-1/2 px-2 py-0.5 rounded-md bg-[#0e1017]/95 backdrop-blur-md border border-white/20 text-[10px] font-mono text-white pointer-events-none shadow-xl"
             style={{ left: `${hoverPercent * 100}%` }}
           >
             {formatDuration(hoverPercent * duration)}
@@ -137,7 +137,7 @@ const MobileProgressLine = memo(function MobileProgressLine() {
   return (
     <div className="md:hidden absolute top-0 left-0 right-0 h-[2px] bg-white/10">
       <div
-        className="h-full bg-[#00a8e1] transition-all duration-100"
+        className="h-full bg-white transition-all duration-100"
         style={{ width: `${progressPercent}%` }}
       />
     </div>
@@ -172,28 +172,23 @@ export const BottomPlayer = memo(function BottomPlayer() {
 
   if (!currentTrack) {
     return (
-      <footer className="h-20 bg-[#0b0e14]/95 backdrop-blur-2xl border-t border-white/[0.08] flex items-center justify-center px-4 text-xs text-white/50 select-none">
-        <div className="flex items-center gap-2">
-          <Music2 className="w-4 h-4 text-[#00a8e1] animate-pulse" />
-          <span>Select a track from your library to start listening</span>
-        </div>
-      </footer>
+      <aside className="hidden md:flex fixed bottom-5 left-6 right-6 md:left-[260px] z-40 max-w-md mx-auto py-2 px-5 rounded-full liquid-glass-subtle items-center justify-center gap-2.5 text-xs text-white/50 select-none shadow-xl pointer-events-none">
+        <Music2 className="w-3.5 h-3.5 text-white/40 animate-pulse" />
+        <span className="text-[11px] font-medium tracking-wide text-white/60">Select a track to start listening</span>
+      </aside>
     );
   }
 
   const coverSrc = getArtworkSrc(currentTrack);
 
   return (
-    <footer className="fixed bottom-0 left-0 right-0 z-30 h-22 md:h-20 bg-[#0b0e14]/95 backdrop-blur-2xl border-t border-white/[0.08] flex flex-col justify-center px-3 sm:px-6 select-none shadow-2xl">
-      {/* Mobile Top Scrubber Line */}
-      <MobileProgressLine />
-
-      <div className="flex items-center justify-between gap-2 sm:gap-4 max-w-7xl mx-auto w-full">
+    <footer className="hidden md:flex fixed bottom-5 left-6 right-6 md:left-[260px] z-40 max-w-4xl mx-auto h-[74px] rounded-2xl liquid-glass px-4 select-none items-center shadow-[0_20px_50px_rgba(0,0,0,0.7),inset_0_1px_0_rgba(255,255,255,0.22)]">
+      <div className="flex items-center justify-between gap-4 w-full">
         {/* Left: Track Information & Like Button */}
         <div className="flex items-center gap-3 min-w-0 w-1/4 sm:w-1/3">
           <div
             onClick={() => setNowPlayingOpen(true)}
-            className="relative w-12 h-12 rounded-xl overflow-hidden bg-[#111622] border border-white/10 flex-shrink-0 cursor-pointer shadow-md group"
+            className="relative w-11 h-11 rounded-xl overflow-hidden bg-white/5 border border-white/15 flex-shrink-0 cursor-pointer shadow-md group"
           >
             <SafeImage
               src={coverSrc}
@@ -203,15 +198,20 @@ export const BottomPlayer = memo(function BottomPlayer() {
               className="w-full h-full object-cover transition duration-300 group-hover:scale-105"
             />
             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
-              <Maximize2 className="w-4 h-4 text-white" />
+              <Maximize2 className="w-3.5 h-3.5 text-white" />
             </div>
           </div>
 
           <div className="min-w-0 flex-1 cursor-pointer overflow-hidden" onClick={() => setNowPlayingOpen(true)}>
-            <h3 className="truncate text-xs sm:text-sm font-bold text-white hover:text-[#00a8e1] transition-colors">
-              {currentTrack.title}
-            </h3>
-            <p className="truncate text-[11px] sm:text-xs text-white/50">
+            <div className="flex items-center gap-1.5">
+              <h3 className="truncate text-xs sm:text-sm font-bold text-white hover:text-white/80 transition-colors">
+                {currentTrack.title}
+              </h3>
+              <span className="hidden xl:inline-flex text-[9px] font-bold px-1.5 py-0.5 rounded bg-white/10 text-white/70 border border-white/10 tracking-wider">
+                LOSSLESS
+              </span>
+            </div>
+            <p className="truncate text-[11px] text-white/50 hover:text-white/70 transition-colors">
               {currentTrack.artist}
             </p>
           </div>
@@ -230,31 +230,33 @@ export const BottomPlayer = memo(function BottomPlayer() {
         {/* Center: Playback Controls & Isolated Scrubber */}
         <div className="flex flex-col items-center justify-center flex-1 max-w-lg min-w-0 px-2">
           {/* Controls Row */}
-          <div className="flex items-center gap-3 sm:gap-5 mb-1">
+          <div className="flex items-center gap-4 mb-0.5">
             <button
               onClick={toggleShuffle}
-              className={`p-1.5 rounded-full transition ${
-                shuffle ? 'text-[#00a8e1] bg-[#00a8e1]/15 shadow-sm shadow-[#00a8e1]/20' : 'text-white/50 hover:text-white'
+              className={`p-1.5 rounded-full transition active:scale-95 ${
+                shuffle
+                  ? 'bg-white/20 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.3)]'
+                  : 'text-white/45 hover:text-white'
               }`}
               title={`Shuffle ${shuffle ? 'On' : 'Off'}`}
               aria-label="Shuffle"
             >
-              <Shuffle className="w-4 h-4" />
+              <Shuffle className="w-3.5 h-3.5" />
             </button>
 
             <button
               onClick={prev}
-              className="p-1.5 text-white/60 hover:text-white transition hover:scale-110 active:scale-95"
+              className="p-1.5 text-white/70 hover:text-white transition hover:scale-110 active:scale-95"
               title="Previous track"
               aria-label="Previous track"
             >
-              <SkipBack className="w-4 h-4 sm:w-5 sm:h-5 fill-current" />
+              <SkipBack className="w-4 h-4 fill-current" />
             </button>
 
-            {/* Main Round Play/Pause Button */}
+            {/* Main Round Play/Pause Button with Liquid Droplet Effect */}
             <button
               onClick={togglePlay}
-              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-md shadow-white/20"
+              className="w-9 h-9 rounded-full liquid-play-btn flex items-center justify-center active:scale-95 transition-all shadow-[0_4px_16px_rgba(255,255,255,0.25)]"
               aria-label={isBuffering ? 'Buffering' : isPlaying ? 'Pause' : 'Play'}
             >
               {isBuffering ? (
@@ -268,22 +270,24 @@ export const BottomPlayer = memo(function BottomPlayer() {
 
             <button
               onClick={next}
-              className="p-1.5 text-white/60 hover:text-white transition hover:scale-110 active:scale-95"
+              className="p-1.5 text-white/70 hover:text-white transition hover:scale-110 active:scale-95"
               title="Next track"
               aria-label="Next track"
             >
-              <SkipForward className="w-4 h-4 sm:w-5 sm:h-5 fill-current" />
+              <SkipForward className="w-4 h-4 fill-current" />
             </button>
 
             <button
               onClick={cycleRepeat}
-              className={`p-1.5 rounded-full transition ${
-                repeatMode !== 'off' ? 'text-[#00a8e1] bg-[#00a8e1]/15 shadow-sm shadow-[#00a8e1]/20' : 'text-white/50 hover:text-white'
+              className={`p-1.5 rounded-full transition active:scale-95 ${
+                repeatMode !== 'off'
+                  ? 'bg-white/20 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.3)]'
+                  : 'text-white/45 hover:text-white'
               }`}
               title={`Repeat: ${repeatMode}`}
               aria-label={`Repeat: ${repeatMode}`}
             >
-              {repeatMode === 'one' ? <Repeat1 className="w-4 h-4" /> : <Repeat className="w-4 h-4" />}
+              {repeatMode === 'one' ? <Repeat1 className="w-3.5 h-3.5" /> : <Repeat className="w-3.5 h-3.5" />}
             </button>
           </div>
 
@@ -292,10 +296,10 @@ export const BottomPlayer = memo(function BottomPlayer() {
         </div>
 
         {/* Right: Extra Controls */}
-        <div className="hidden md:flex items-center justify-end gap-2.5 w-1/4 sm:w-1/3 text-warm-muted">
+        <div className="flex items-center justify-end gap-1.5 w-1/4 sm:w-1/3 text-white/50">
           <button
             onClick={() => setNowPlayingOpen(true)}
-            className="p-2 rounded-xl hover:bg-white/5 hover:text-warm-white transition"
+            className="p-2 rounded-xl hover:bg-white/10 hover:text-white transition active:scale-95"
             title="Lyrics & Track Details"
             aria-label="Open lyrics"
           >
@@ -304,7 +308,7 @@ export const BottomPlayer = memo(function BottomPlayer() {
 
           <button
             onClick={() => setEqualizerOpen(true)}
-            className="p-2 rounded-xl hover:bg-white/5 hover:text-warm-white transition"
+            className="p-2 rounded-xl hover:bg-white/10 hover:text-white transition active:scale-95"
             title="Audio Equalizer & Spatializer"
             aria-label="Equalizer"
           >
@@ -313,13 +317,13 @@ export const BottomPlayer = memo(function BottomPlayer() {
 
           <button
             onClick={() => setQueueOpen(true)}
-            className="relative p-2 rounded-xl hover:bg-white/5 hover:text-warm-white transition"
+            className="relative p-2 rounded-xl hover:bg-white/10 hover:text-white transition active:scale-95"
             title="Play Queue"
             aria-label="Open queue"
           >
             <ListMusic className="w-4 h-4" />
             {queue.length > 1 && (
-              <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-accent" />
+              <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_6px_rgba(255,255,255,0.8)]" />
             )}
           </button>
 
@@ -327,7 +331,7 @@ export const BottomPlayer = memo(function BottomPlayer() {
           <div className="flex items-center gap-1.5 ml-1">
             <button
               onClick={toggleMute}
-              className="p-1.5 rounded-lg hover:text-warm-white transition"
+              className="p-1.5 rounded-lg hover:text-white transition"
               aria-label={isMuted ? 'Unmute' : 'Mute'}
             >
               {isMuted || volume === 0 ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
@@ -340,13 +344,13 @@ export const BottomPlayer = memo(function BottomPlayer() {
               value={isMuted ? 0 : volume}
               onChange={e => setVolume(Number(e.target.value))}
               aria-label="Volume slider"
-              className="w-20 h-1 bg-white/10 rounded-full appearance-none cursor-pointer"
+              className="w-16 lg:w-20 h-1 bg-white/15 rounded-full appearance-none cursor-pointer accent-white"
             />
           </div>
 
           <button
             onClick={() => setNowPlayingOpen(true)}
-            className="p-2 rounded-xl hover:bg-white/5 hover:text-warm-white transition ml-1"
+            className="p-2 rounded-xl hover:bg-white/10 hover:text-white transition ml-0.5 active:scale-95"
             title="Full Screen View"
             aria-label="Fullscreen view"
           >
