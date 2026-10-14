@@ -11,17 +11,11 @@ import {
   Search,
   Menu,
   Clock,
-  Compass,
-  Radio,
   Flame,
-  Volume2,
-  Headphones,
-  Zap,
   Coffee,
   Waves,
-  Disc3,
-  Moon,
-  Library,
+  Music2,
+  Compass,
 } from 'lucide-react';
 import { useAudioStore } from '../store/useAudioStore';
 import { useAuthStore } from '../store/useAuthStore';
@@ -89,7 +83,6 @@ const LANGUAGE_ARTISTS = {
   ],
 };
 
-// Seed variations for natural feed rotation
 const getQueryVariants = (lang, category, seed = 0) => {
   const seeds = {
     slowed: [
@@ -109,21 +102,6 @@ const getQueryVariants = (lang, category, seed = 0) => {
       `Best of ${lang} songs radio`,
       `${lang} all time top songs`,
     ],
-    nostalgia: [
-      `Evergreen 90s 2000s ${lang} golden hits`,
-      `Classic old ${lang} melodies`,
-      `Nostalgic retro ${lang} super hits`,
-    ],
-    workout: [
-      `${lang} gym workout motivation high energy`,
-      `${lang} bass boosted workout songs`,
-      `${lang} energetic workout hits`,
-    ],
-    romance: [
-      `${lang} romantic soulful love melody songs`,
-      `${lang} acoustic romantic duets love`,
-      `${lang} heart touching love melodies`,
-    ],
     chill: [
       `${lang} peaceful calm acoustic melodies`,
       `${lang} relaxed morning coffee songs`,
@@ -135,7 +113,6 @@ const getQueryVariants = (lang, category, seed = 0) => {
   return list[seed % list.length];
 };
 
-// Deduplicate helper
 const dedupeList = list => {
   const seen = new Set();
   const res = [];
@@ -150,7 +127,6 @@ const dedupeList = list => {
   return res;
 };
 
-// Human-like time-of-day greeting
 const getGreetingTime = () => {
   const hour = new Date().getHours();
   if (hour >= 5 && hour < 12) return 'Good morning';
@@ -160,7 +136,125 @@ const getGreetingTime = () => {
 };
 
 /**
- * MASTER HOMEPAGE: "VEX-M ATMOSPHERE"
+ * Clean Horizontal Carousel with smooth desktop arrows and native touch scroll
+ */
+function CleanCarousel({ title, subtitle, items = [], currentTrackId, isPlaying, onPlay, onNavigateAll }) {
+  const scrollRef = useRef(null);
+
+  const scroll = direction => {
+    if (!scrollRef.current) return;
+    const offset = direction === 'left' ? -380 : 380;
+    scrollRef.current.scrollBy({ left: offset, behavior: 'smooth' });
+  };
+
+  if (!items || items.length === 0) return null;
+
+  return (
+    <section className="space-y-3">
+      {/* Header */}
+      <div className="flex items-end justify-between px-1">
+        <div>
+          <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white tracking-tight">
+            {title}
+          </h2>
+          {subtitle && (
+            <p className="text-xs text-white/50 mt-0.5 font-medium">
+              {subtitle}
+            </p>
+          )}
+        </div>
+
+        <div className="flex items-center gap-2">
+          {onNavigateAll && (
+            <button
+              onClick={onNavigateAll}
+              className="text-xs font-semibold text-white/60 hover:text-white transition mr-1"
+            >
+              See all
+            </button>
+          )}
+          <div className="hidden sm:flex items-center gap-1">
+            <button
+              onClick={() => scroll('left')}
+              className="w-7 h-7 rounded-full bg-white/[0.06] hover:bg-white/[0.12] flex items-center justify-center text-white/70 hover:text-white transition"
+              aria-label="Scroll left"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => scroll('right')}
+              className="w-7 h-7 rounded-full bg-white/[0.06] hover:bg-white/[0.12] flex items-center justify-center text-white/70 hover:text-white transition"
+              aria-label="Scroll right"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Cards Row */}
+      <div
+        ref={scrollRef}
+        className="flex gap-4 overflow-x-auto pb-3 pt-1 no-scrollbar snap-x snap-mandatory -mx-4 px-4 sm:mx-0 sm:px-0"
+      >
+        {items.map((track, idx) => {
+          const isThisPlaying = String(currentTrackId) === String(track.id) && isPlaying;
+          const cover = getArtworkSrc(track, 300);
+
+          return (
+            <div
+              key={`card_${track.id}_${idx}`}
+              onClick={() => onPlay(track, items)}
+              className="group flex-shrink-0 w-[145px] sm:w-[170px] cursor-pointer select-none snap-start clean-card rounded-xl p-3"
+            >
+              {/* Artwork Box */}
+              <div className="relative aspect-square w-full rounded-lg overflow-hidden bg-neutral-900 shadow-md mb-2.5">
+                <SafeImage
+                  src={cover}
+                  track={track}
+                  alt={track.title}
+                  size={300}
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                />
+
+                {/* Clean Floating Play Button */}
+                <button
+                  onClick={e => {
+                    e.stopPropagation();
+                    onPlay(track, items);
+                  }}
+                  className={`absolute right-2.5 bottom-2.5 w-10 h-10 rounded-full bg-[#fa2d48] text-white flex items-center justify-center shadow-lg transition-all duration-200 hover:scale-110 active:scale-95 ${
+                    isThisPlaying
+                      ? 'opacity-100 scale-100'
+                      : 'opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0'
+                  }`}
+                  aria-label={`Play ${track.title}`}
+                >
+                  {isThisPlaying ? (
+                    <Pause className="w-4 h-4 fill-white" />
+                  ) : (
+                    <Play className="w-4 h-4 fill-white ml-0.5" />
+                  )}
+                </button>
+              </div>
+
+              {/* Title & Artist */}
+              <h3 className="text-xs sm:text-sm font-semibold text-white truncate group-hover:text-[#fa2d48] transition-colors leading-snug">
+                {track.title}
+              </h3>
+              <p className="text-[11px] text-white/50 truncate mt-0.5">
+                {track.artist || 'Unknown Artist'}
+              </p>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+/**
+ * HOMEPAGE - Clean, Simple, Ultra-Fast & Modern
  */
 export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileNav }) {
   const currentTrack = useAudioStore(s => s.currentTrack);
@@ -183,15 +277,10 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileN
   const cacheKey = `${preferredLanguage}_${providerSource}_${seed}`;
   const cached = feedCache[cacheKey];
 
-  const [featuredTracks, setFeaturedTracks] = useState(cached?.featured || []);
-  const [slowedTracks, setSlowedTracks] = useState(cached?.slowed || []);
-  const [bestSongs, setBestSongs] = useState(cached?.best || []);
   const [trendingTracks, setTrendingTracks] = useState(cached?.trending || []);
+  const [slowedTracks, setSlowedTracks] = useState(cached?.slowed || []);
   const [chillTracks, setChillTracks] = useState(cached?.chill || []);
-  const [workoutTracks, setWorkoutTracks] = useState(cached?.workout || []);
-  const [romanceTracks, setRomanceTracks] = useState(cached?.romance || []);
-  const [nostalgiaTracks, setNostalgiaTracks] = useState(cached?.nostalgia || []);
-  const [newReleases, setNewReleases] = useState(cached?.releases || []);
+  const [bestSongs, setBestSongs] = useState(cached?.best || []);
   const [isLoading, setIsLoading] = useState(!cached);
 
   const artistsScrollRef = useRef(null);
@@ -199,38 +288,26 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileN
   const greetingTime = useMemo(() => getGreetingTime(), []);
   const displayName = user?.displayName || user?.username || 'Listener';
 
-  // Load language tailored content
+  // Fetch clean language-tailored music feed
   useEffect(() => {
     let isMounted = true;
 
-    // 1. If OwnTg selected: load from local storage library
     if (providerSource === 'owntg') {
       const all = lib?.allItems || [];
-      setFeaturedTracks(all.slice(0, 8));
+      setTrendingTracks(all.slice(0, 16));
       setSlowedTracks([]);
-      setBestSongs(all.slice(8, 20).length ? all.slice(8, 20) : all.slice(0, 12));
-      setTrendingTracks(all.slice(0, 12));
-      setChillTracks(all.slice(4, 16));
-      setWorkoutTracks(all.slice(8, 20));
-      setRomanceTracks(all.slice(12, 24));
-      setNostalgiaTracks(all.slice(16, 28));
-      setNewReleases(all.slice(20, 32).length ? all.slice(20, 32) : all.slice(0, 12));
+      setChillTracks(all.slice(6, 20));
+      setBestSongs(all.slice(12, 28));
       setIsLoading(false);
       return;
     }
 
-    // 2. Cache hit
     if (feedCache[cacheKey]) {
       const c = feedCache[cacheKey];
-      setFeaturedTracks(c.featured || []);
-      setSlowedTracks(c.slowed || []);
-      setBestSongs(c.best || []);
       setTrendingTracks(c.trending || []);
+      setSlowedTracks(c.slowed || []);
       setChillTracks(c.chill || []);
-      setWorkoutTracks(c.workout || []);
-      setRomanceTracks(c.romance || []);
-      setNostalgiaTracks(c.nostalgia || []);
-      setNewReleases(c.releases || []);
+      setBestSongs(c.best || []);
       setIsLoading(false);
       return;
     }
@@ -238,16 +315,12 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileN
     setIsLoading(true);
 
     const langName = langConfig.name;
-    const slowedQuery = getQueryVariants(langName, 'slowed', seed);
     const trendingQuery = getQueryVariants(langName, 'trending', seed);
-    const bestQuery = getQueryVariants(langName, 'radio', seed);
+    const slowedQuery = getQueryVariants(langName, 'slowed', seed);
     const chillQuery = getQueryVariants(langName, 'chill', seed);
-    const workoutQuery = getQueryVariants(langName, 'workout', seed);
-    const romanceQuery = getQueryVariants(langName, 'romance', seed);
-    const nostalgiaQuery = getQueryVariants(langName, 'nostalgia', seed);
-    const releaseQuery = `Latest ${langName} Movie Songs 2026 Releases`;
+    const bestQuery = getQueryVariants(langName, 'radio', seed);
 
-    const fetchWithFallback = async (saavnPromise, ytQuery, count = 14) => {
+    const fetchFast = async (saavnPromise, ytQuery, count = 14) => {
       try {
         const saavnItems = await saavnPromise;
         if (saavnItems && saavnItems.length >= 6) return saavnItems.slice(0, count);
@@ -258,67 +331,31 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileN
       }
     };
 
-    const fetchSlowedYTM = async () => {
-      try {
-        const items = await searchYouTube(slowedQuery, 16);
-        return dedupeList(items);
-      } catch {
-        return [];
-      }
-    };
-
-    // Tier 1: Primary rows (Trending, Slowed, Radio, Releases)
     Promise.allSettled([
-      fetchWithFallback(fetchSaavnTrending(preferredLanguage, 16), trendingQuery, 14),
-      fetchSlowedYTM(),
-      fetchWithFallback(searchSaavn(bestQuery, 16), bestQuery, 14),
-      fetchWithFallback(searchSaavn(releaseQuery, 16), releaseQuery, 14),
-    ]).then(([trendRes, slowedRes, bestRes, relRes]) => {
+      fetchFast(fetchSaavnTrending(preferredLanguage, 16), trendingQuery, 14),
+      searchYouTube(slowedQuery, 16).then(dedupeList).catch(() => []),
+      fetchFast(searchSaavn(chillQuery, 14), chillQuery, 14),
+      fetchFast(searchSaavn(bestQuery, 14), bestQuery, 14),
+    ]).then(([trendRes, slowedRes, chillRes, bestRes]) => {
       if (!isMounted) return;
 
       const trend = trendRes.status === 'fulfilled' ? dedupeList(trendRes.value) : [];
       const slowed = slowedRes.status === 'fulfilled' ? dedupeList(slowedRes.value) : [];
+      const chill = chillRes.status === 'fulfilled' ? dedupeList(chillRes.value) : [];
       const best = bestRes.status === 'fulfilled' ? dedupeList(bestRes.value) : [];
-      const rel = relRes.status === 'fulfilled' ? dedupeList(relRes.value) : [];
 
-      setFeaturedTracks(trend);
-      setSlowedTracks(slowed);
-      setBestSongs(best);
       setTrendingTracks(trend);
-      setNewReleases(rel);
+      setSlowedTracks(slowed);
+      setChillTracks(chill);
+      setBestSongs(best);
       setIsLoading(false);
 
-      // Tier 2: Mood rows (Chill, Workout, Romance, Nostalgia)
-      Promise.allSettled([
-        fetchWithFallback(searchSaavn(chillQuery, 14), chillQuery, 14),
-        fetchWithFallback(searchSaavn(workoutQuery, 14), workoutQuery, 14),
-        fetchWithFallback(searchSaavn(romanceQuery, 14), romanceQuery, 14),
-        fetchWithFallback(searchSaavn(nostalgiaQuery, 14), nostalgiaQuery, 14),
-      ]).then(([chillRes, workRes, romRes, nostRes]) => {
-        if (!isMounted) return;
-
-        const chill = chillRes.status === 'fulfilled' ? dedupeList(chillRes.value) : [];
-        const work = workRes.status === 'fulfilled' ? dedupeList(workRes.value) : [];
-        const rom = romRes.status === 'fulfilled' ? dedupeList(romRes.value) : [];
-        const nost = nostRes.status === 'fulfilled' ? dedupeList(nostRes.value) : [];
-
-        setChillTracks(chill);
-        setWorkoutTracks(work);
-        setRomanceTracks(rom);
-        setNostalgiaTracks(nost);
-
-        feedCache[cacheKey] = {
-          featured: trend,
-          slowed,
-          best,
-          trending: trend,
-          releases: rel,
-          chill,
-          workout: work,
-          romance: rom,
-          nostalgia: nost,
-        };
-      });
+      feedCache[cacheKey] = {
+        trending: trend,
+        slowed,
+        chill,
+        best,
+      };
     });
 
     return () => {
@@ -342,146 +379,140 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileN
     setSeed(s => s + 1);
     setTimeout(() => {
       setIsRefreshing(false);
-    }, 600);
+    }, 500);
   };
-
-  // Hero Spotlight Track (featured track or top trending)
-  const heroTrack = useMemo(() => {
-    if (featuredTracks.length > 0) return featuredTracks[0];
-    if (trendingTracks.length > 0) return trendingTracks[0];
-    return currentTrack;
-  }, [featuredTracks, trendingTracks, currentTrack]);
-
-  const isHeroPlaying = heroTrack && currentTrack?.id === heroTrack.id && isPlaying;
-  const heroCover = heroTrack ? getArtworkSrc(heroTrack, 800) : null;
-
-  // Curated Focus Collections
-  const focusCollections = useMemo(() => [
-    {
-      id: 'late_night',
-      title: 'Late Night Drive',
-      description: 'Atmospheric midnight synth & slow reverb',
-      mood: 'Midnight Beats',
-      tracks: slowedTracks.length ? slowedTracks : trendingTracks,
-      gradient: 'from-purple-900/40 via-indigo-950/30 to-black',
-      cover: slowedTracks[0] ? getArtworkSrc(slowedTracks[0], 400) : heroCover,
-    },
-    {
-      id: 'deep_focus',
-      title: 'Deep Focus',
-      description: 'Ambient acoustic flow for uninterrupted coding',
-      mood: 'Calm Flow',
-      tracks: chillTracks.length ? chillTracks : bestSongs,
-      gradient: 'from-cyan-950/40 via-slate-900/30 to-black',
-      cover: chillTracks[0] ? getArtworkSrc(chillTracks[0], 400) : heroCover,
-    },
-    {
-      id: 'studio_energy',
-      title: 'Studio Energy',
-      description: 'High-voltage basslines and festival adrenaline',
-      mood: 'Adrenaline',
-      tracks: workoutTracks.length ? workoutTracks : trendingTracks,
-      gradient: 'from-rose-950/40 via-red-950/30 to-black',
-      cover: workoutTracks[0] ? getArtworkSrc(workoutTracks[0], 400) : heroCover,
-    },
-    {
-      id: 'neon_rain',
-      title: 'Neon Rain',
-      description: 'Lofi chill and deep spatial resonance',
-      mood: 'Spatial Audio',
-      tracks: slowedTracks.length > 3 ? slowedTracks.slice(3) : trendingTracks,
-      gradient: 'from-violet-950/40 via-blue-950/30 to-black',
-      cover: slowedTracks[1] ? getArtworkSrc(slowedTracks[1], 400) : heroCover,
-    },
-  ], [slowedTracks, chillTracks, workoutTracks, trendingTracks, bestSongs, heroCover]);
 
   const currentArtists = useMemo(() => {
     return LANGUAGE_ARTISTS[preferredLanguage] || LANGUAGE_ARTISTS.tamil;
   }, [preferredLanguage]);
 
+  // Quick Pick shortcut items
+  const quickItems = useMemo(() => [
+    {
+      id: 'liked',
+      title: 'Liked Songs',
+      sub: `${likedTrackIds.length} tracks`,
+      isLikedSpecial: true,
+      action: () => onNavigate('liked'),
+      playAction: () => {
+        const likedSongs = (lib?.allItems || []).filter(t => likedTrackIds.includes(String(t.id)));
+        if (likedSongs[0]) handlePlayTrack(likedSongs[0], likedSongs);
+        else onNavigate('liked');
+      },
+    },
+    {
+      id: 'recent',
+      title: 'Recently Played',
+      sub: `${recentlyPlayed.length} tracks`,
+      track: recentlyPlayed[0] || trendingTracks[0],
+      action: () => {
+        if (recentlyPlayed[0]) handlePlayTrack(recentlyPlayed[0], recentlyPlayed);
+        else onNavigate('library');
+      },
+    },
+    {
+      id: 'slowed',
+      title: 'Slowed & Reverb',
+      sub: `${langConfig.name} Lofi`,
+      track: slowedTracks[0] || trendingTracks[1],
+      action: () => {
+        if (slowedTracks[0]) handlePlayTrack(slowedTracks[0], slowedTracks);
+      },
+    },
+    {
+      id: 'trending',
+      title: 'Top Hits',
+      sub: `${langConfig.name} Top 20`,
+      track: trendingTracks[0],
+      action: () => {
+        if (trendingTracks[0]) handlePlayTrack(trendingTracks[0], trendingTracks);
+      },
+    },
+    {
+      id: 'chill',
+      title: 'Acoustic Chill',
+      sub: 'Relaxing Vibes',
+      track: chillTracks[0] || trendingTracks[2],
+      action: () => {
+        if (chillTracks[0]) handlePlayTrack(chillTracks[0], chillTracks);
+      },
+    },
+    {
+      id: 'radio',
+      title: 'All-Time Melodies',
+      sub: 'Evergreen Radio',
+      track: bestSongs[0] || trendingTracks[3],
+      action: () => {
+        if (bestSongs[0]) handlePlayTrack(bestSongs[0], bestSongs);
+      },
+    },
+  ], [likedTrackIds, recentlyPlayed, trendingTracks, slowedTracks, chillTracks, bestSongs, langConfig, lib?.allItems]);
+
   return (
-    <div className="flex-1 w-full pb-36 select-none bg-transparent text-white font-sans">
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-8 lg:px-12 space-y-12">
+    <div className="flex-1 w-full pb-32 select-none bg-transparent text-white font-sans">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 space-y-9 pt-5">
+
         {/* ========================================================================= */}
-        {/* SECTION 1: TOP HEADER                                                     */}
+        {/* 1. CLEAN TOP HEADER                                                       */}
         {/* ========================================================================= */}
-        <header className="pt-6 pb-2 flex items-center justify-between gap-4 border-b border-white/[0.08]">
-          {/* Left: Mobile Nav Toggle + Contextual Greeting & Atmosphere Subtitle */}
-          <div className="flex items-center gap-3 min-w-0">
+        <header className="flex items-center justify-between gap-3 pb-2 border-b border-white/[0.06]">
+          {/* Left: Mobile Nav Toggle + Greeting */}
+          <div className="flex items-center gap-2.5 min-w-0">
             {onToggleMobileNav && (
               <button
                 onClick={onToggleMobileNav}
-                className="md:hidden p-2 rounded-xl vexm-glass vexm-press text-white/70 hover:text-white flex items-center justify-center min-w-[40px] min-h-[40px]"
-                aria-label="Open navigation menu"
+                className="md:hidden p-2 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-white/70 hover:text-white transition flex items-center justify-center min-w-[38px] min-h-[38px]"
+                aria-label="Open menu"
               >
                 <Menu className="w-5 h-5" />
               </button>
             )}
 
             <div className="min-w-0">
-              <p className="text-[10px] sm:text-[11px] font-bold tracking-widest uppercase text-white/40">
-                Your Listening Atmosphere
-              </p>
-              <h1 className="text-xl sm:text-2xl font-black tracking-tight text-white truncate">
-                {greetingTime}, <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-white/70">{displayName}</span>
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight text-white truncate">
+                {greetingTime}, {displayName}
               </h1>
             </div>
           </div>
 
-          {/* Center: Desktop Integrated Glass Search Field */}
-          <div className="hidden md:flex flex-1 max-w-md mx-4">
-            <button
-              onClick={() => setSearchModalOpen(true)}
-              className="w-full h-10 px-4 rounded-full vexm-glass hover:bg-white/[0.09] hover:border-white/20 transition-all flex items-center justify-between text-white/40 hover:text-white/80 group shadow-sm"
-            >
-              <div className="flex items-center gap-2.5 min-w-0">
-                <Search className="w-4 h-4 text-white/40 group-hover:text-[#fa2d48] transition-colors" />
-                <span className="text-xs truncate">Search songs, artists, albums...</span>
-              </div>
-              <kbd className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-white/[0.06] border border-white/10 text-white/40">
-                ⌘K
-              </kbd>
-            </button>
-          </div>
-
-          {/* Right: Actions (Mobile Search Button + Source Button + Language Pill + Refresh + Avatar) */}
+          {/* Right: Search, Language, Provider, Refresh & Profile */}
           <div className="flex items-center gap-2 sm:gap-2.5 flex-shrink-0">
-            {/* Mobile Search Icon Button */}
+            {/* Search Pill */}
             <button
               onClick={() => setSearchModalOpen(true)}
-              className="md:hidden p-2.5 rounded-full vexm-glass vexm-press text-white/70 hover:text-white"
-              title="Search"
-              aria-label="Search"
+              className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.06] hover:bg-white/[0.10] border border-white/5 text-xs text-white/60 hover:text-white transition"
+              title="Search music"
             >
-              <Search className="w-4 h-4" />
+              <Search className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Search</span>
             </button>
 
-            {/* Provider Source Selector */}
+            {/* Provider Selector */}
             <ProviderSourceButton />
 
             {/* Language Selector Pill */}
             <button
               onClick={onOpenLanguageModal}
-              className="hidden sm:flex items-center gap-1.5 px-3.5 py-1.5 rounded-full vexm-glass vexm-press text-xs font-semibold text-white/90 hover:text-white hover:border-white/20"
-              title="Change music language"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.06] hover:bg-white/[0.10] border border-white/5 text-xs font-semibold text-white/80 hover:text-white transition"
+              title="Switch language"
             >
               <Globe className="w-3.5 h-3.5 text-[#fa2d48]" />
-              <span>{langConfig.name}</span>
+              <span className="hidden xs:inline">{langConfig.name}</span>
             </button>
 
-            {/* Minimal Refresh Button */}
+            {/* Refresh Feed */}
             <button
               onClick={handleRefresh}
               disabled={isRefreshing}
-              className="p-2.5 rounded-full vexm-glass vexm-press text-white/60 hover:text-white"
-              title="Refresh recommendations"
-              aria-label="Refresh recommendations"
+              className="p-2 rounded-full bg-white/[0.06] hover:bg-white/[0.10] text-white/60 hover:text-white transition"
+              title="Refresh feed"
+              aria-label="Refresh feed"
             >
               <RotateCcw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-white' : ''}`} />
             </button>
 
-            {/* User Avatar Action */}
-            <div className="w-8 h-8 rounded-full overflow-hidden vexm-glass border border-white/15 flex items-center justify-center text-xs font-bold text-white shadow-sm flex-shrink-0">
+            {/* User Avatar */}
+            <div className="w-8 h-8 rounded-full overflow-hidden bg-white/[0.08] border border-white/10 flex items-center justify-center text-xs font-bold text-white flex-shrink-0">
               {user?.photoUrl ? (
                 <img src={user.photoUrl} alt={displayName} className="w-full h-full object-cover" />
               ) : (
@@ -492,424 +523,131 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileN
         </header>
 
         {/* ========================================================================= */}
-        {/* SECTION 2: HERO SECTION ("VEX-M ATMOSPHERE" PERSONALIZED LISTENING STAGE) */}
+        {/* 2. QUICK PLAY GRID (SPOTIFY 6-TILE SHORTCUTS - 1 TAP PLAY)               */}
         {/* ========================================================================= */}
-        {heroTrack && (
-          <section className="relative rounded-3xl p-6 sm:p-8 md:p-10 vexm-glass-strong overflow-hidden shadow-2xl">
-            {/* Ambient Blurred Artwork Lighting */}
-            {heroCover && (
-              <div
-                className="absolute -right-16 -top-16 w-[450px] h-[450px] rounded-full filter blur-[120px] opacity-25 pointer-events-none bg-cover bg-center"
-                style={{ backgroundImage: `url(${heroCover})` }}
-              />
-            )}
+        <section>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-2.5 sm:gap-3">
+            {quickItems.map(item => {
+              const cover = item.track ? getArtworkSrc(item.track, 120) : null;
+              const isPlayingItem = item.track && currentTrack?.id === item.track.id && isPlaying;
 
-            <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8 sm:gap-10">
-              {/* Left Side: Editorial Typography & Actions */}
-              <div className="flex-1 space-y-5 text-center lg:text-left">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.08] border border-white/10 text-[10px] sm:text-[11px] font-bold tracking-widest uppercase text-white/70">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#fa2d48] animate-pulse" />
-                  Your Current Atmosphere
-                </div>
-
-                <div className="space-y-2">
-                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white leading-tight">
-                    Find your next frequency.
-                  </h2>
-                  <p className="text-sm sm:text-base text-white/60 max-w-xl mx-auto lg:mx-0 leading-relaxed">
-                    A curated space for the sounds you keep coming back to. Precision-mastered 320 kbps audio streaming in {langConfig.name}.
-                  </p>
-                </div>
-
-                {/* Primary & Secondary Call to Actions */}
-                <div className="flex items-center justify-center lg:justify-start gap-3.5 pt-1">
-                  <button
-                    onClick={() => handlePlayTrack(heroTrack, featuredTracks)}
-                    className="flex items-center gap-2.5 px-6 py-3 rounded-full bg-[#fa2d48] hover:bg-[#ff3b53] text-white font-bold text-xs sm:text-sm shadow-xl shadow-[#fa2d48]/25 vexm-press"
-                  >
-                    {isHeroPlaying ? (
-                      <>
-                        <Pause className="w-4 h-4 fill-white" />
-                        <span>Pause Session</span>
-                      </>
-                    ) : (
-                      <>
-                        <Play className="w-4 h-4 fill-white ml-0.5" />
-                        <span>Start Listening</span>
-                      </>
-                    )}
-                  </button>
-
-                  <button
-                    onClick={() => onNavigate('library')}
-                    className="flex items-center gap-2 px-5 py-3 rounded-full vexm-glass hover:bg-white/[0.12] text-white/90 hover:text-white font-semibold text-xs sm:text-sm vexm-press"
-                  >
-                    <Library className="w-4 h-4 text-white/70" />
-                    <span>Explore Library</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Right Side: Large Rounded Artwork Stage with Glass Metadata Strip */}
-              <div className="w-full sm:w-[360px] md:w-[400px] flex-shrink-0">
+              return (
                 <div
-                  onClick={() => handlePlayTrack(heroTrack, featuredTracks)}
-                  className="group relative aspect-square w-full rounded-2xl overflow-hidden vexm-glass border border-white/15 shadow-2xl cursor-pointer"
+                  key={item.id}
+                  onClick={item.playAction || item.action}
+                  className="group relative h-14 sm:h-16 rounded-xl clean-card-compact flex items-center overflow-hidden cursor-pointer select-none pr-3"
                 >
-                  <SafeImage
-                    src={heroCover}
-                    track={heroTrack}
-                    alt={heroTrack.title}
-                    size={600}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-
-                  {/* Glass Metadata Strip Overlapping Artwork Bottom */}
-                  <div className="absolute inset-x-3 bottom-3 p-3.5 rounded-xl bg-black/60 backdrop-blur-2xl border border-white/15 flex items-center justify-between gap-3 shadow-2xl">
-                    <div className="flex items-center gap-3 min-w-0">
-                      {/* Mini Vinyl Spin Detail */}
-                      <div className="w-9 h-9 rounded-full bg-neutral-900 border border-white/20 flex items-center justify-center flex-shrink-0 shadow-inner">
-                        <Disc3 className={`w-5 h-5 text-[#fa2d48] ${isHeroPlaying ? 'animate-spin' : ''}`} />
+                  {/* Thumbnail */}
+                  <div className="w-14 sm:w-16 h-full flex-shrink-0 bg-neutral-900 relative">
+                    {item.isLikedSpecial ? (
+                      <div className="w-full h-full bg-gradient-to-br from-[#fa2d48] to-[#8b5cf6] flex items-center justify-center text-white">
+                        <Heart className="w-5 h-5 fill-white" />
                       </div>
-
-                      <div className="min-w-0 flex-1">
-                        <p className="text-xs sm:text-sm font-bold text-white truncate group-hover:text-[#fa2d48] transition-colors">
-                          {heroTrack.title}
-                        </p>
-                        <p className="text-[11px] text-white/50 truncate">
-                          {heroTrack.artist}
-                        </p>
+                    ) : cover ? (
+                      <SafeImage
+                        src={cover}
+                        alt={item.title}
+                        size={120}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-neutral-800 flex items-center justify-center text-white/40">
+                        <Music2 className="w-5 h-5" />
                       </div>
-                    </div>
+                    )}
+                  </div>
 
-                    {/* Quality Badge & Play Icon */}
-                    <div className="flex items-center gap-2 flex-shrink-0">
-                      <span className="hidden xs:inline-block px-1.5 py-0.5 rounded text-[9px] font-bold tracking-wider uppercase bg-white/10 text-white/80 border border-white/10">
-                        320 KBPS
-                      </span>
-                      <button
-                        onClick={e => {
-                          e.stopPropagation();
-                          handlePlayTrack(heroTrack, featuredTracks);
-                        }}
-                        className="w-8 h-8 rounded-full bg-[#fa2d48] text-white flex items-center justify-center shadow-lg hover:scale-105 active:scale-90 transition"
-                        aria-label="Play spotlight track"
-                      >
-                        {isHeroPlaying ? (
-                          <Pause className="w-3.5 h-3.5 fill-white" />
-                        ) : (
-                          <Play className="w-3.5 h-3.5 fill-white ml-0.5" />
-                        )}
-                      </button>
-                    </div>
+                  {/* Title & Subtitle */}
+                  <div className="min-w-0 flex-1 px-3">
+                    <p className="text-xs sm:text-sm font-bold text-white truncate group-hover:text-[#fa2d48] transition-colors">
+                      {item.title}
+                    </p>
+                    <p className="text-[10px] sm:text-[11px] text-white/45 truncate">
+                      {item.sub}
+                    </p>
+                  </div>
+
+                  {/* Instant Play Button */}
+                  <div className="flex-shrink-0 ml-1">
+                    <button
+                      onClick={e => {
+                        e.stopPropagation();
+                        if (item.playAction) item.playAction();
+                        else item.action();
+                      }}
+                      className={`w-8 h-8 rounded-full bg-[#fa2d48] text-white flex items-center justify-center shadow-md transition-all duration-150 ${
+                        isPlayingItem
+                          ? 'opacity-100 scale-100'
+                          : 'opacity-0 scale-90 group-hover:opacity-100 group-hover:scale-100'
+                      }`}
+                      aria-label={`Play ${item.title}`}
+                    >
+                      {isPlayingItem ? (
+                        <Pause className="w-3.5 h-3.5 fill-white" />
+                      ) : (
+                        <Play className="w-3.5 h-3.5 fill-white ml-0.5" />
+                      )}
+                    </button>
                   </div>
                 </div>
-              </div>
-            </div>
-          </section>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* ========================================================================= */}
+        {/* 3. TRENDING NOW (CLEAN ALBUM ART CAROUSEL)                                */}
+        {/* ========================================================================= */}
+        <CleanCarousel
+          title={`Trending in ${langConfig.name}`}
+          subtitle="Top viral and most played songs right now"
+          items={trendingTracks}
+          currentTrackId={currentTrack?.id}
+          isPlaying={isPlaying}
+          onPlay={handlePlayTrack}
+          onNavigateAll={() => onNavigate('search')}
+        />
+
+        {/* ========================================================================= */}
+        {/* 4. SLOWED & REVERB HITS (REQUESTED BY USER)                              */}
+        {/* ========================================================================= */}
+        {slowedTracks.length > 0 && (
+          <CleanCarousel
+            title="Slowed + Reverb"
+            subtitle="Aesthetic lofi and midnight chill vibes"
+            items={slowedTracks}
+            currentTrackId={currentTrack?.id}
+            isPlaying={isPlaying}
+            onPlay={handlePlayTrack}
+          />
         )}
 
         {/* ========================================================================= */}
-        {/* SECTION 3: QUICK LISTENING ROW (COMPACT SHORTCUTS)                        */}
+        {/* 5. TOP ARTISTS (CLEAN CIRCULAR AVATARS)                                   */}
         {/* ========================================================================= */}
         <section className="space-y-3">
-          <h3 className="text-xs font-bold text-white/40 tracking-wider uppercase px-1">
-            Quick Shortcuts
-          </h3>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3">
-            {[
-              {
-                label: 'Recently Played',
-                sub: `${recentlyPlayed.length} Tracks`,
-                icon: Clock,
-                color: 'text-cyan-400',
-                action: () => onNavigate('library'),
-              },
-              {
-                label: 'Liked Songs',
-                sub: `${likedTrackIds.length} Favorites`,
-                icon: Heart,
-                color: 'text-[#fa2d48]',
-                action: () => onNavigate('liked'),
-              },
-              {
-                label: 'Slowed & Reverb',
-                sub: 'Midnight Lofi',
-                icon: Waves,
-                color: 'text-purple-400',
-                action: () => {
-                  if (slowedTracks[0]) handlePlayTrack(slowedTracks[0], slowedTracks);
-                },
-              },
-              {
-                label: 'Trending Hits',
-                sub: `${langConfig.name} Top 20`,
-                icon: Flame,
-                color: 'text-amber-400',
-                action: () => {
-                  if (trendingTracks[0]) handlePlayTrack(trendingTracks[0], trendingTracks);
-                },
-              },
-              {
-                label: 'Pure Chill',
-                sub: 'Acoustic Beats',
-                icon: Coffee,
-                color: 'text-emerald-400',
-                action: () => {
-                  if (chillTracks[0]) handlePlayTrack(chillTracks[0], chillTracks);
-                },
-              },
-              {
-                label: 'New Drops',
-                sub: 'Fresh Releases',
-                icon: Sparkles,
-                color: 'text-rose-400',
-                action: () => {
-                  if (newReleases[0]) handlePlayTrack(newReleases[0], newReleases);
-                },
-              },
-            ].map((shortcut, idx) => {
-              const Icon = shortcut.icon;
-              return (
-                <div
-                  key={`sc_${idx}`}
-                  onClick={shortcut.action}
-                  className="h-14 px-3 rounded-2xl vexm-glass-card vexm-press flex items-center gap-3 cursor-pointer select-none group"
-                >
-                  <div className="w-8 h-8 rounded-xl bg-white/[0.06] border border-white/10 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
-                    <Icon className={`w-4 h-4 ${shortcut.color}`} />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-xs font-bold text-white truncate group-hover:text-[#fa2d48] transition-colors">
-                      {shortcut.label}
-                    </p>
-                    <p className="text-[10px] text-white/40 truncate">
-                      {shortcut.sub}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-
-        {/* ========================================================================= */}
-        {/* SECTION 4: FOCUS SECTION ("MADE FOR YOUR FOCUS" SESSIONS)                 */}
-        {/* ========================================================================= */}
-        <section className="space-y-4">
           <div className="flex items-end justify-between px-1">
             <div>
-              <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-white/40 mb-0.5">
-                Session Curation
-              </p>
-              <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-                Made for your focus
+              <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white tracking-tight">
+                Popular Artists
               </h2>
-            </div>
-            <p className="text-xs text-white/40 hidden sm:block">
-              Soundscapes designed to lock you into deep flow
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {focusCollections.map((col, idx) => {
-              const isColPlaying = col.tracks.some(t => t.id === currentTrack?.id) && isPlaying;
-              return (
-                <div
-                  key={col.id}
-                  onClick={() => {
-                    if (col.tracks[0]) handlePlayTrack(col.tracks[0], col.tracks);
-                  }}
-                  className="group relative aspect-[1.4/1] rounded-2xl overflow-hidden vexm-glass-card vexm-press p-5 flex flex-col justify-between cursor-pointer border border-white/10 shadow-lg"
-                >
-                  {/* Subtle Background Glow Tint */}
-                  <div className={`absolute inset-0 bg-gradient-to-br ${col.gradient} opacity-80 group-hover:opacity-100 transition-opacity`} />
-                  
-                  {/* Background Artwork Silhouette */}
-                  {col.cover && (
-                    <div
-                      className="absolute inset-0 bg-cover bg-center opacity-15 filter blur-sm scale-110 group-hover:scale-105 transition-transform duration-700"
-                      style={{ backgroundImage: `url(${col.cover})` }}
-                    />
-                  )}
-
-                  {/* Header: Mood Tag */}
-                  <div className="relative z-10 flex items-center justify-between">
-                    <span className="px-2.5 py-0.5 rounded-full bg-white/10 backdrop-blur-md text-[10px] font-bold text-white/80 border border-white/10 uppercase tracking-wider">
-                      {col.mood}
-                    </span>
-                    <button
-                      className={`w-9 h-9 rounded-full bg-[#fa2d48] text-white flex items-center justify-center shadow-xl transition-all duration-200 ${
-                        isColPlaying ? 'opacity-100 scale-100' : 'opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0'
-                      }`}
-                      aria-label={`Play ${col.title}`}
-                    >
-                      {isColPlaying ? <Pause className="w-4 h-4 fill-white" /> : <Play className="w-4 h-4 fill-white ml-0.5" />}
-                    </button>
-                  </div>
-
-                  {/* Footer Details */}
-                  <div className="relative z-10 space-y-1">
-                    <h4 className="text-base font-bold text-white tracking-tight group-hover:text-[#fa2d48] transition-colors">
-                      {col.title}
-                    </h4>
-                    <p className="text-xs text-white/60 line-clamp-1 leading-relaxed">
-                      {col.description}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-
-        {/* ========================================================================= */}
-        {/* SECTION 5: TRENDING / NEW MUSIC TRACK LIST                                */}
-        {/* ========================================================================= */}
-        <section className="space-y-4">
-          <div className="flex items-end justify-between px-1">
-            <div>
-              <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-white/40 mb-0.5">
-                Top Chartbusters
+              <p className="text-xs text-white/50 mt-0.5 font-medium">
+                Top visionaries and composers in {langConfig.name}
               </p>
-              <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-                Trending now
-              </h2>
-            </div>
-            <button
-              onClick={() => onNavigate('search')}
-              className="text-xs font-semibold text-[#fa2d48] hover:underline transition"
-            >
-              See all
-            </button>
-          </div>
-
-          <div className="rounded-2xl vexm-glass border border-white/10 p-2 sm:p-3 divide-y divide-white/[0.04]">
-            {isLoading && trendingTracks.length === 0 ? (
-              [...Array(6)].map((_, i) => (
-                <div key={`sk_tr_${i}`} className="h-14 flex items-center gap-3 px-3 animate-pulse">
-                  <div className="w-10 h-10 rounded-xl bg-white/[0.06]" />
-                  <div className="flex-1 space-y-1.5">
-                    <div className="h-3 w-40 bg-white/[0.06] rounded" />
-                    <div className="h-2.5 w-24 bg-white/[0.04] rounded" />
-                  </div>
-                </div>
-              ))
-            ) : (
-              trendingTracks.slice(0, 8).map((track, idx) => {
-                const isThisPlaying = currentTrack?.id === track.id && isPlaying;
-                const isLiked = likedTrackIds.includes(String(track.id));
-                const thumb = getArtworkSrc(track, 120);
-
-                return (
-                  <div
-                    key={`tr_${track.id}_${idx}`}
-                    onClick={() => handlePlayTrack(track, trendingTracks)}
-                    className={`group flex items-center justify-between h-15 px-3 py-2 rounded-xl transition-all cursor-pointer ${
-                      currentTrack?.id === track.id
-                        ? 'bg-white/[0.08] shadow-sm'
-                        : 'hover:bg-white/[0.04]'
-                    }`}
-                  >
-                    {/* Left: Thumbnail & Song / Artist */}
-                    <div className="flex items-center gap-3.5 min-w-0 flex-1 pr-3">
-                      <div className="relative w-11 h-11 rounded-xl overflow-hidden flex-shrink-0 bg-neutral-900 shadow">
-                        <SafeImage
-                          src={thumb}
-                          track={track}
-                          alt={track.title}
-                          size={120}
-                          className="w-full h-full object-cover"
-                        />
-                        <div
-                          className={`absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity ${
-                            isThisPlaying ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
-                          }`}
-                        >
-                          {isThisPlaying ? (
-                            <div className="flex items-end gap-0.5 h-3">
-                              <span className="w-1 h-2 bg-[#fa2d48] animate-pulse rounded-full" />
-                              <span className="w-1 h-3.5 bg-[#fa2d48] animate-pulse delay-75 rounded-full" />
-                              <span className="w-1 h-2 bg-[#fa2d48] animate-pulse delay-150 rounded-full" />
-                            </div>
-                          ) : (
-                            <Play className="w-3.5 h-3.5 fill-white text-white ml-0.5" />
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="min-w-0 flex-1">
-                        <p className={`text-xs sm:text-sm font-semibold truncate ${
-                          currentTrack?.id === track.id ? 'text-[#fa2d48]' : 'text-white'
-                        }`}>
-                          {track.title}
-                        </p>
-                        <p className="text-[11px] text-white/50 truncate mt-0.5">
-                          {track.artist}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Center: Album Name (Desktop) */}
-                    <div className="hidden md:block w-1/4 text-xs text-white/40 truncate pr-4">
-                      {track.album || 'Single'}
-                    </div>
-
-                    {/* Right: Quality Badge, Duration, and Favorite Button */}
-                    <div className="flex items-center gap-3 flex-shrink-0">
-                      <span className="hidden sm:inline-block px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-white/[0.06] text-white/60 border border-white/5">
-                        320K
-                      </span>
-                      <span className="text-xs text-white/40 font-mono">
-                        {formatDuration(track.duration || 210)}
-                      </span>
-                      <button
-                        onClick={e => {
-                          e.stopPropagation();
-                          toggleLike(track.id);
-                        }}
-                        className={`p-1.5 rounded-full hover:bg-white/10 transition ${
-                          isLiked ? 'text-[#fa2d48]' : 'text-white/40 hover:text-white'
-                        }`}
-                        aria-label="Favorite"
-                      >
-                        <Heart className={`w-3.5 h-3.5 ${isLiked ? 'fill-current' : ''}`} />
-                      </button>
-                    </div>
-                  </div>
-                );
-              })
-            )}
-          </div>
-        </section>
-
-        {/* ========================================================================= */}
-        {/* SECTION 6: FEATURED ARTISTS DISCOVERY                                     */}
-        {/* ========================================================================= */}
-        <section className="space-y-4">
-          <div className="flex items-end justify-between px-1">
-            <div>
-              <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-white/40 mb-0.5">
-                Artists & Visionaries
-              </p>
-              <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-                Featured Artists
-              </h2>
             </div>
 
-            <div className="flex items-center gap-1.5">
+            <div className="hidden sm:flex items-center gap-1">
               <button
                 onClick={() => artistsScrollRef.current?.scrollBy({ left: -320, behavior: 'smooth' })}
-                className="w-8 h-8 rounded-full vexm-glass vexm-press flex items-center justify-center text-white/60 hover:text-white"
-                aria-label="Previous artists"
+                className="w-7 h-7 rounded-full bg-white/[0.06] hover:bg-white/[0.12] flex items-center justify-center text-white/70 hover:text-white transition"
+                aria-label="Scroll left"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
               <button
                 onClick={() => artistsScrollRef.current?.scrollBy({ left: 320, behavior: 'smooth' })}
-                className="w-8 h-8 rounded-full vexm-glass vexm-press flex items-center justify-center text-white/60 hover:text-white"
-                aria-label="Next artists"
+                className="w-7 h-7 rounded-full bg-white/[0.06] hover:bg-white/[0.12] flex items-center justify-center text-white/70 hover:text-white transition"
+                aria-label="Scroll right"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
@@ -918,26 +656,26 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileN
 
           <div
             ref={artistsScrollRef}
-            className="flex gap-4 sm:gap-6 overflow-x-auto pb-2 pt-1 no-scrollbar snap-x snap-mandatory -mx-4 px-4 sm:mx-0 sm:px-0"
+            className="flex gap-4 sm:gap-6 overflow-x-auto pb-3 pt-1 no-scrollbar snap-x snap-mandatory -mx-4 px-4 sm:mx-0 sm:px-0"
           >
             {currentArtists.map((artist, idx) => (
               <div
-                key={`art_${artist.name}_${idx}`}
+                key={`artist_${artist.name}_${idx}`}
                 onClick={() => onNavigate(`artist:${artist.name}`)}
-                className="group flex flex-col items-center flex-shrink-0 w-[115px] sm:w-[135px] cursor-pointer select-none text-center snap-start vexm-press"
+                className="group flex flex-col items-center flex-shrink-0 w-[105px] sm:w-[125px] cursor-pointer select-none text-center snap-start"
               >
-                <div className="relative w-22 h-22 sm:w-28 sm:h-28 rounded-full overflow-hidden bg-neutral-900 shadow-xl ring-2 ring-white/10 group-hover:ring-white/40 transition-all duration-300 group-hover:scale-105 mb-2.5">
+                <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden bg-neutral-900 shadow-md ring-2 ring-white/10 group-hover:ring-[#fa2d48]/60 transition-all duration-300 group-hover:scale-105 mb-2">
                   <SafeImage
                     src={artist.image}
                     alt={artist.name}
-                    size={280}
+                    size={240}
                     className="w-full h-full object-cover"
                   />
                 </div>
-                <h4 className="text-xs sm:text-sm font-semibold text-white truncate w-full group-hover:text-[#fa2d48] transition-colors">
+                <h3 className="text-xs sm:text-sm font-semibold text-white truncate w-full group-hover:text-[#fa2d48] transition-colors">
                   {artist.name}
-                </h4>
-                <p className="text-[11px] text-white/40 truncate w-full mt-0.5">
+                </h3>
+                <p className="text-[10px] text-white/40 truncate w-full mt-0.5">
                   {artist.role || 'Artist'}
                 </p>
               </div>
@@ -946,104 +684,128 @@ export function HomePage({ lib, onNavigate, onOpenLanguageModal, onToggleMobileN
         </section>
 
         {/* ========================================================================= */}
-        {/* SECTION 7: RECENTLY PLAYED SECTION (WITH DESIGNED EMPTY STATE)             */}
+        {/* 6. RECOMMENDED TRACKS (CLEAN, COMPACT SONG LIST)                          */}
         {/* ========================================================================= */}
-        <section className="space-y-4">
+        <section className="space-y-3">
           <div className="flex items-end justify-between px-1">
             <div>
-              <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-white/40 mb-0.5">
-                Playback History
-              </p>
-              <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-                Recently played
+              <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white tracking-tight">
+                Recommended For You
               </h2>
+              <p className="text-xs text-white/50 mt-0.5 font-medium">
+                Fresh picks based on what's trending right now
+              </p>
             </div>
-            {recentlyPlayed.length > 0 && (
-              <button
-                onClick={() => onNavigate('library')}
-                className="text-xs font-semibold text-[#fa2d48] hover:underline transition"
-              >
-                View all in library
-              </button>
-            )}
+            <button
+              onClick={() => onNavigate('search')}
+              className="text-xs font-semibold text-white/60 hover:text-white transition"
+            >
+              Search more
+            </button>
           </div>
 
-          {recentlyPlayed.length === 0 ? (
-            /* Clear, Designed Empty State */
-            <div className="rounded-3xl vexm-glass border border-white/10 p-8 sm:p-12 text-center space-y-4 shadow-xl">
-              <div className="w-14 h-14 rounded-2xl bg-white/[0.06] border border-white/10 flex items-center justify-center mx-auto text-[#fa2d48] shadow-inner">
-                <Compass className="w-7 h-7" />
-              </div>
-              <div className="space-y-1 max-w-sm mx-auto">
-                <h4 className="text-base font-bold text-white">
-                  No listening history yet
-                </h4>
-                <p className="text-xs text-white/50 leading-relaxed">
-                  Songs you play will appear here so you can pick up your session right where you left off.
-                </p>
-              </div>
-              <button
-                onClick={() => {
-                  if (featuredTracks[0]) handlePlayTrack(featuredTracks[0], featuredTracks);
-                }}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#fa2d48] text-white text-xs font-bold shadow-lg shadow-[#fa2d48]/20 hover:scale-105 active:scale-95 transition"
-              >
-                <Play className="w-3.5 h-3.5 fill-white" />
-                <span>Start exploring music</span>
-              </button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3.5 sm:gap-4">
-              {recentlyPlayed.slice(0, 6).map((track, idx) => {
-                const isThisPlaying = currentTrack?.id === track.id && isPlaying;
-                const cover = getArtworkSrc(track, 360);
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+            {(trendingTracks.length ? trendingTracks.slice(0, 8) : []).map((track, idx) => {
+              const isThisPlaying = String(currentTrack?.id) === String(track.id) && isPlaying;
+              const isLiked = likedTrackIds.includes(String(track.id));
+              const thumb = getArtworkSrc(track, 100);
 
-                return (
-                  <div
-                    key={`rec_${track.id}_${idx}`}
-                    onClick={() => handlePlayTrack(track, recentlyPlayed)}
-                    className="group flex flex-col cursor-pointer select-none vexm-glass-card vexm-press rounded-2xl p-2.5"
-                  >
-                    <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-neutral-900 shadow mb-2">
+              return (
+                <div
+                  key={`rec_${track.id}_${idx}`}
+                  onClick={() => handlePlayTrack(track, trendingTracks)}
+                  className={`group flex items-center justify-between h-14 px-3 rounded-xl clean-card-compact cursor-pointer select-none ${
+                    currentTrack?.id === track.id ? 'border-[#fa2d48]/30 bg-[#fa2d48]/5' : ''
+                  }`}
+                >
+                  {/* Left: Thumbnail & Song / Artist */}
+                  <div className="flex items-center gap-3 min-w-0 flex-1 pr-2">
+                    <div className="relative w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 bg-neutral-900 shadow-sm">
                       <SafeImage
-                        src={cover}
+                        src={thumb}
                         track={track}
                         alt={track.title}
-                        size={360}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        size={100}
+                        className="w-full h-full object-cover"
                       />
-                      <button
-                        onClick={e => {
-                          e.stopPropagation();
-                          handlePlayTrack(track, recentlyPlayed);
-                        }}
-                        className={`absolute right-2 bottom-2 w-9 h-9 rounded-full bg-[#fa2d48] text-white flex items-center justify-center shadow-xl transition-all duration-200 hover:scale-105 active:scale-90 ${
-                          isThisPlaying
-                            ? 'opacity-100 scale-100'
-                            : 'opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0'
+                      <div
+                        className={`absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity ${
+                          isThisPlaying ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
                         }`}
-                        aria-label={`Play ${track.title}`}
                       >
                         {isThisPlaying ? (
-                          <Pause className="w-4 h-4 fill-white" />
+                          <div className="flex items-end gap-0.5 h-3">
+                            <span className="w-1 h-2 bg-[#fa2d48] animate-pulse rounded-full" />
+                            <span className="w-1 h-3.5 bg-[#fa2d48] animate-pulse delay-75 rounded-full" />
+                            <span className="w-1 h-2 bg-[#fa2d48] animate-pulse delay-150 rounded-full" />
+                          </div>
                         ) : (
-                          <Play className="w-4 h-4 fill-white ml-0.5" />
+                          <Play className="w-3.5 h-3.5 fill-white text-white ml-0.5" />
                         )}
-                      </button>
+                      </div>
                     </div>
 
-                    <h4 className="text-xs sm:text-sm font-semibold text-white truncate group-hover:text-[#fa2d48] transition-colors px-0.5">
-                      {track.title}
-                    </h4>
-                    <p className="text-[11px] text-white/50 truncate mt-0.5 px-0.5">
-                      {track.artist}
-                    </p>
+                    <div className="min-w-0 flex-1">
+                      <p className={`text-xs sm:text-sm font-semibold truncate ${
+                        currentTrack?.id === track.id ? 'text-[#fa2d48]' : 'text-white'
+                      }`}>
+                        {track.title}
+                      </p>
+                      <p className="text-[11px] text-white/50 truncate mt-0.5">
+                        {track.artist || 'Unknown'}
+                      </p>
+                    </div>
                   </div>
-                );
-              })}
-            </div>
-          )}
+
+                  {/* Right: Duration & Like button */}
+                  <div className="flex items-center gap-3 flex-shrink-0">
+                    <span className="text-xs text-white/40 font-mono">
+                      {formatDuration(track.duration || 210)}
+                    </span>
+                    <button
+                      onClick={e => {
+                        e.stopPropagation();
+                        toggleLike(track.id);
+                      }}
+                      className={`p-1.5 rounded-lg hover:bg-white/10 transition ${
+                        isLiked ? 'text-[#fa2d48]' : 'text-white/30 hover:text-white'
+                      }`}
+                      aria-label="Like track"
+                    >
+                      <Heart className={`w-3.5 h-3.5 ${isLiked ? 'fill-current' : ''}`} />
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </section>
+
+        {/* ========================================================================= */}
+        {/* 7. RECENTLY PLAYED                                                        */}
+        {/* ========================================================================= */}
+        {recentlyPlayed.length > 0 ? (
+          <CleanCarousel
+            title="Recently Played"
+            subtitle="Pick up where you left off"
+            items={recentlyPlayed}
+            currentTrackId={currentTrack?.id}
+            isPlaying={isPlaying}
+            onPlay={handlePlayTrack}
+            onNavigateAll={() => onNavigate('library')}
+          />
+        ) : (
+          <section className="clean-card rounded-2xl p-6 text-center space-y-2">
+            <div className="w-10 h-10 rounded-full bg-white/[0.06] flex items-center justify-center mx-auto text-[#fa2d48]">
+              <Compass className="w-5 h-5" />
+            </div>
+            <h3 className="text-sm font-bold text-white">No listening history yet</h3>
+            <p className="text-xs text-white/50 max-w-sm mx-auto">
+              Any song you play will appear here so you can easily jump back in anytime.
+            </p>
+          </section>
+        )}
+
       </div>
     </div>
   );

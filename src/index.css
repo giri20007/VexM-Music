@@ -546,42 +546,63 @@
 }
 
 /* ========================================================================= */
-/* VEX-M ATMOSPHERE GLASSMORPHISM SYSTEM                                    */
+/* CLEAN & SIMPLE HIGH-PERFORMANCE SYSTEM                                   */
 /* ========================================================================= */
 
+.clean-surface {
+  background: #12141a;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.clean-card {
+  background: #14161f;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: background-color 0.2s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.clean-card:hover {
+  background: #1c1f2b;
+  border-color: rgba(255, 255, 255, 0.14);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+}
+
+.clean-card-compact {
+  background: #151720;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.clean-card-compact:hover {
+  background: #1f222e;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+/* Backwards-compatible optimized glass tokens (reduced blur for 60fps) */
 .vexm-glass {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.10);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
+  background: #13151d;
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .vexm-glass-strong {
-  background: rgba(255, 255, 255, 0.10);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  backdrop-filter: blur(28px);
-  -webkit-backdrop-filter: blur(28px);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+  background: #171922;
+  border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .vexm-glass-card {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  background: #14161f;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: background-color 0.2s ease, transform 0.2s ease;
 }
 
 .vexm-glass-card:hover {
-  background: rgba(255, 255, 255, 0.09);
-  border-color: rgba(255, 255, 255, 0.18);
+  background: #1c1f2b;
+  border-color: rgba(255, 255, 255, 0.14);
   transform: translateY(-2px);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
 }
 
 .vexm-press {
-  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.15s ease, border-color 0.15s ease;
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.15s ease;
 }
 
 .vexm-press:active {
