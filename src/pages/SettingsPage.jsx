@@ -69,9 +69,9 @@ export function SettingsPage({ initialTab = 'appearance', onNavigate }) {
   ];
 
   const accents = [
+    { id: 'cyan', name: 'Amazon Cyan (Default)', hex: '#00a8e1', bg: 'bg-[#00a8e1]' },
     { id: 'coral', name: 'Coral Pink', hex: '#ff7b72', bg: 'bg-[#ff7b72]' },
     { id: 'amber', name: 'Amber Gold', hex: '#f59e0b', bg: 'bg-[#f59e0b]' },
-    { id: 'cyan', name: 'Neon Cyan', hex: '#06b6d4', bg: 'bg-[#06b6d4]' },
     { id: 'violet', name: 'Electric Violet', hex: '#8b5cf6', bg: 'bg-[#8b5cf6]' },
     { id: 'emerald', name: 'Emerald', hex: '#10b981', bg: 'bg-[#10b981]' },
     { id: 'rose', name: 'Rose Crimson', hex: '#f43f5e', bg: 'bg-[#f43f5e]' },
@@ -80,7 +80,8 @@ export function SettingsPage({ initialTab = 'appearance', onNavigate }) {
   ];
 
   const themeList = [
-    { id: 'warm-espresso', name: 'Warm Espresso (Default)', desc: 'Rich espresso brown surface with warm tones', border: 'border-[#38231a]' },
+    { id: 'ios-atmosphere', name: 'iOS 17 Atmosphere (Default)', desc: 'Amazon Music style midnight blue-black with electric cyan', border: 'border-[#00a8e1]/40' },
+    { id: 'warm-espresso', name: 'Warm Espresso', desc: 'Rich espresso brown surface with warm tones', border: 'border-[#38231a]' },
     { id: 'cyberpunk-neon', name: 'Cyberpunk Neon', desc: 'Dark slate with electric neon accents', border: 'border-[#1e293b]' },
     { id: 'midnight-navy', name: 'Midnight Navy', desc: 'Deep sapphire navy with cold ambient', border: 'border-[#152042]' },
     { id: 'pure-black', name: 'OLED Pure Black', desc: 'Pitch black #000000 for battery saving & contrast', border: 'border-zinc-800' },

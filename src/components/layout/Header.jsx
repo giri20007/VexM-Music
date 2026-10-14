@@ -33,18 +33,18 @@ export function Header({ title = 'Home', currentRoute = 'home', onToggleMobileNa
   }, [menuOpen]);
 
   return (
-    <header className="sticky top-0 z-40 flex items-center justify-between gap-2.5 sm:gap-4 px-4 sm:px-8 py-3 bg-[#0a0b12]/80 backdrop-blur-2xl border-b border-white/[0.06] select-none font-sans">
+    <header className="sticky top-0 z-40 flex items-center justify-between gap-2.5 sm:gap-4 px-4 sm:px-8 py-3 bg-[#0b0e14]/95 backdrop-blur-2xl border-b border-white/[0.08] select-none font-sans">
       {/* Left: Mobile Menu button + Title */}
       <div className="flex items-center gap-2.5 sm:gap-3 flex-shrink-0">
         <button
           onClick={onToggleMobileNav}
-          className="md:hidden p-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/60 hover:text-white border border-white/5 transition flex items-center justify-center min-w-[38px] min-h-[38px]"
+          className="md:hidden p-2 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-white/80 hover:text-white border border-white/5 transition flex items-center justify-center min-w-[38px] min-h-[38px]"
           aria-label="Toggle navigation menu"
         >
           <Menu className="w-5 h-5" />
         </button>
 
-        <h1 className="text-lg sm:text-xl font-bold tracking-tight text-white capitalize truncate max-w-[140px] sm:max-w-none">
+        <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white capitalize truncate max-w-[140px] sm:max-w-none">
           {title}
         </h1>
       </div>
@@ -53,10 +53,10 @@ export function Header({ title = 'Home', currentRoute = 'home', onToggleMobileNa
       <div className={`hidden md:flex flex-1 max-w-md mx-2 min-w-0 ${currentRoute === 'search' ? 'invisible pointer-events-none' : ''}`}>
         <button
           onClick={() => setSearchModalOpen(true)}
-          className="w-full flex items-center justify-between gap-2 px-3.5 py-2 rounded-full bg-white/[0.05] hover:bg-white/[0.09] border border-white/[0.08] text-white/40 hover:text-white/70 transition text-left group shadow-sm"
+          className="w-full flex items-center justify-between gap-2 px-3.5 py-2 rounded-full bg-white/[0.06] hover:bg-white/[0.10] border border-white/[0.08] text-white/50 hover:text-white/80 transition text-left group shadow-sm"
         >
           <div className="flex items-center gap-2.5 min-w-0">
-            <Search className="w-4 h-4 text-white/40 group-hover:text-white transition-colors flex-shrink-0" />
+            <Search className="w-4 h-4 text-white/50 group-hover:text-[#00a8e1] transition-colors flex-shrink-0" />
             <span className="truncate text-xs">
               Search songs, artists, albums...
             </span>
@@ -72,10 +72,10 @@ export function Header({ title = 'Home', currentRoute = 'home', onToggleMobileNa
         {isAdmin && (
           <button
             onClick={() => onNavigate('admin')}
-            className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 hover:bg-white/15 border border-white/10 text-white font-bold text-xs transition"
+            className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#00a8e1]/15 hover:bg-[#00a8e1]/25 border border-[#00a8e1]/30 text-[#00a8e1] font-bold text-xs transition"
             title="Open Admin Dashboard"
           >
-            <Shield className="w-3.5 h-3.5 text-[#fa2d48]" />
+            <Shield className="w-3.5 h-3.5 text-[#00a8e1]" />
             <span>Admin</span>
           </button>
         )}
@@ -86,7 +86,7 @@ export function Header({ title = 'Home', currentRoute = 'home', onToggleMobileNa
           title={`Signed in as ${user?.displayName || user?.username || 'Listener'}`}
           aria-label="Account menu"
         >
-          <div className="w-8 h-8 rounded-full overflow-hidden bg-white/10 flex items-center justify-center text-white font-bold text-xs">
+          <div className="w-8 h-8 rounded-full overflow-hidden bg-white/10 flex items-center justify-center text-white font-bold text-xs ring-2 ring-[#00a8e1]/40">
             {user?.photoUrl ? (
               <img src={user.photoUrl} alt={user.username} className="w-full h-full object-cover" />
             ) : (
@@ -97,7 +97,7 @@ export function Header({ title = 'Home', currentRoute = 'home', onToggleMobileNa
 
         {/* User Dropdown Menu */}
         {menuOpen && (
-          <div className="absolute right-0 top-12 w-64 rounded-2xl bg-[#11131e]/95 backdrop-blur-2xl border border-white/10 p-2 shadow-2xl space-y-1.5 animate-scale-up z-50">
+          <div className="absolute right-0 top-12 w-64 rounded-2xl bg-[#111622]/98 backdrop-blur-2xl border border-white/10 p-2 shadow-2xl space-y-1.5 animate-scale-up z-50">
             {/* Header / User Badge */}
             <div className="px-3 py-2 rounded-xl bg-white/5 space-y-0.5">
               <p className="text-xs font-bold text-white truncate">
@@ -145,7 +145,7 @@ export function Header({ title = 'Home', currentRoute = 'home', onToggleMobileNa
                   }}
                   className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-white hover:bg-white/5 transition text-left"
                 >
-                  <Shield className="w-4 h-4 text-[#fa2d48]" />
+                  <Shield className="w-4 h-4 text-[#00a8e1]" />
                   <span>Admin Dashboard</span>
                 </button>
               )}

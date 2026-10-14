@@ -115,12 +115,12 @@ export function GlobalSearchModal({ allTracks = [], onNavigate }) {
       onClick={() => setSearchModalOpen(false)}
     >
       <div
-        className="w-full max-w-2xl rounded-2xl bg-[#181818] border border-white/10 shadow-2xl overflow-hidden animate-scale-up"
+        className="w-full max-w-2xl rounded-2xl bg-[#111622] border border-white/[0.08] shadow-2xl overflow-hidden animate-scale-up"
         onClick={e => e.stopPropagation()}
       >
         {/* Search Header */}
-        <div className="relative flex items-center px-4 py-3 border-b border-white/5 bg-[#1a1a1a] gap-2">
-          <Search className="w-4 h-4 text-[#fa2d48] flex-shrink-0" />
+        <div className="relative flex items-center px-4 py-3 border-b border-white/[0.06] bg-[#141a29] gap-2">
+          <Search className="w-4 h-4 text-[#00a8e1] flex-shrink-0" />
           <input
             ref={inputRef}
             type="search"
@@ -131,7 +131,7 @@ export function GlobalSearchModal({ allTracks = [], onNavigate }) {
             className="flex-1 bg-transparent text-sm sm:text-base text-white placeholder-white/40 focus:outline-none min-w-0"
           />
           {isSearchingYt && (
-            <Loader2 className="w-4 h-4 text-[#fa2d48] animate-spin flex-shrink-0" />
+            <Loader2 className="w-4 h-4 text-[#00a8e1] animate-spin flex-shrink-0" />
           )}
           {query && (
             <button
@@ -155,15 +155,15 @@ export function GlobalSearchModal({ allTracks = [], onNavigate }) {
 
         {/* Suggestions chips */}
         {suggestions.length > 0 && (
-          <div className="flex items-center gap-1.5 px-4 py-2 bg-[#0e0e0e] overflow-x-auto border-b border-white/5 no-scrollbar">
+          <div className="flex items-center gap-1.5 px-4 py-2 bg-[#0d121c] overflow-x-auto border-b border-white/[0.06] no-scrollbar">
             <span className="text-[11px] text-white/40 font-medium mr-1 flex items-center gap-1">
-              <Sparkles className="w-3 h-3 text-[#fa2d48]" /> Suggest:
+              <Sparkles className="w-3 h-3 text-[#00a8e1]" /> Suggest:
             </span>
             {suggestions.map(s => (
               <button
                 key={s}
                 onClick={() => setQuery(s)}
-                className="px-2.5 py-1 rounded-full bg-white/5 hover:bg-white/10 text-xs text-white/70 hover:text-white transition whitespace-nowrap"
+                className="px-2.5 py-1 rounded-full bg-white/5 hover:bg-[#00a8e1]/15 hover:border-[#00a8e1]/30 border border-white/5 text-xs text-white/70 hover:text-white transition whitespace-nowrap"
               >
                 {s}
               </button>

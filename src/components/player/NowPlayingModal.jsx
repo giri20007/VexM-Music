@@ -85,7 +85,7 @@ const AppleScrubber = memo(function AppleScrubber() {
         <div className="relative w-full h-1 sm:h-1.5 bg-white/20 rounded-full overflow-hidden transition-all group-hover:h-2">
           {/* Active progress fill */}
           <div
-            className="absolute top-0 left-0 bottom-0 bg-white group-hover:bg-[#fa2d48] rounded-full transition-all duration-75"
+            className="absolute top-0 left-0 bottom-0 bg-white group-hover:bg-[#00a8e1] rounded-full transition-all duration-75"
             style={{ width: `${percent}%` }}
           />
 
@@ -255,7 +255,7 @@ export function NowPlayingModal() {
 
         {/* Center Now Playing Pill */}
         <div className="flex items-center gap-2 px-3.5 sm:px-4 py-1.5 rounded-full bg-white/[0.08] border border-white/10 backdrop-blur-md">
-          <span className="w-2 h-2 rounded-full bg-[#fa2d48] animate-pulse" />
+          <span className="w-2 h-2 rounded-full bg-[#00a8e1] animate-pulse" />
           <span className="text-xs font-bold text-white tracking-wide">
             NOW PLAYING
           </span>
@@ -280,7 +280,7 @@ export function NowPlayingModal() {
             onClick={() => setSleepTimerOpen(true)}
             className={`p-2 rounded-full transition border border-white/10 ${
               sleepTimer
-                ? 'text-[#fa2d48] bg-[#fa2d48]/20 border-[#fa2d48]/40'
+                ? 'text-[#00a8e1] bg-[#00a8e1]/20 border-[#00a8e1]/40'
                 : 'text-white/70 hover:text-white bg-white/10 hover:bg-white/20'
             }`}
             title="Sleep Timer"
@@ -354,7 +354,7 @@ export function NowPlayingModal() {
                     onClick={() => setViewMode('lyrics')}
                     className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 text-white transition active:scale-95 text-xs font-semibold"
                   >
-                    <Mic2 className="w-4 h-4 text-[#fa2d48]" />
+                    <Mic2 className="w-4 h-4 text-[#00a8e1]" />
                     <span>Lyrics</span>
                   </button>
 
@@ -437,7 +437,7 @@ export function NowPlayingModal() {
               <div className="flex-1 w-full h-full rounded-3xl bg-black/40 border border-white/10 p-4 sm:p-6 backdrop-blur-xl overflow-hidden flex flex-col">
                 <div className="flex items-center justify-between pb-3 border-b border-white/[0.08] mb-3">
                   <div className="flex items-center gap-2">
-                    <Mic2 className="w-4 h-4 text-[#fa2d48]" />
+                    <Mic2 className="w-4 h-4 text-[#00a8e1]" />
                     <span className="text-xs font-bold uppercase tracking-wider text-white">
                       Time-Synced Lyrics
                     </span>
@@ -462,7 +462,7 @@ export function NowPlayingModal() {
             <div className="flex flex-col h-full max-h-[65vh] rounded-3xl bg-black/40 border border-white/10 p-5 sm:p-6 backdrop-blur-xl">
               <div className="flex items-center justify-between pb-3 border-b border-white/[0.08] mb-3">
                 <div className="flex items-center gap-2">
-                  <ListMusic className="w-4 h-4 text-[#fa2d48]" />
+                  <ListMusic className="w-4 h-4 text-[#00a8e1]" />
                   <span className="text-sm font-bold text-white">
                     Up Next ({queue.length} songs)
                   </span>
@@ -494,7 +494,7 @@ export function NowPlayingModal() {
                       onClick={() => playTrack(t, queue)}
                       className={`flex items-center justify-between p-2.5 rounded-2xl transition cursor-pointer ${
                         isCurrent
-                          ? 'bg-[#fa2d48]/20 border border-[#fa2d48]/40 text-white'
+                          ? 'bg-[#00a8e1]/20 border border-[#00a8e1]/40 text-white'
                           : 'hover:bg-white/[0.08] text-white/80'
                       }`}
                     >
@@ -518,7 +518,7 @@ export function NowPlayingModal() {
 
                       <div className="flex items-center gap-2 flex-shrink-0">
                         {isCurrent && (
-                          <span className="text-[10px] font-bold text-[#fa2d48] uppercase">
+                          <span className="text-[10px] font-bold text-[#00a8e1] uppercase">
                             Playing
                           </span>
                         )}
@@ -553,7 +553,7 @@ export function NowPlayingModal() {
             onClick={toggleShuffle}
             className={`p-3 rounded-full transition relative ${
               shuffle
-                ? 'text-[#fa2d48] bg-[#fa2d48]/15'
+                ? 'text-[#00a8e1] bg-[#00a8e1]/15'
                 : 'text-white/60 hover:text-white'
             }`}
             title="Shuffle"
@@ -561,7 +561,7 @@ export function NowPlayingModal() {
           >
             <Shuffle className="w-5 h-5" />
             {shuffle && (
-              <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#fa2d48]" />
+              <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#00a8e1]" />
             )}
           </button>
 
@@ -604,7 +604,7 @@ export function NowPlayingModal() {
             onClick={cycleRepeat}
             className={`p-3 rounded-full transition relative ${
               repeatMode !== 'off'
-                ? 'text-[#fa2d48] bg-[#fa2d48]/15'
+                ? 'text-[#00a8e1] bg-[#00a8e1]/15'
                 : 'text-white/60 hover:text-white'
             }`}
             title={`Repeat: ${repeatMode}`}
@@ -616,7 +616,7 @@ export function NowPlayingModal() {
               <Repeat className="w-5 h-5" />
             )}
             {repeatMode !== 'off' && (
-              <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#fa2d48]" />
+              <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#00a8e1]" />
             )}
           </button>
         </div>
@@ -642,7 +642,7 @@ export function NowPlayingModal() {
             step="0.01"
             value={isMuted ? 0 : volume}
             onChange={e => setVolume(Number(e.target.value))}
-            className="w-full h-1 bg-white/20 rounded-full appearance-none cursor-pointer accent-[#fa2d48]"
+            className="w-full h-1 bg-white/20 rounded-full appearance-none cursor-pointer accent-[#00a8e1]"
             aria-label="Volume"
           />
         </div>

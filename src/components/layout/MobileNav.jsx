@@ -24,23 +24,23 @@ export function MobileNav({ currentRoute, onNavigate }) {
   const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0a0a0a]/98 backdrop-blur-xl border-t border-white/10 select-none pb-[env(safe-area-inset-bottom,0px)]">
+    <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0b0e14]/95 backdrop-blur-2xl border-t border-white/[0.08] select-none pb-[env(safe-area-inset-bottom,0px)]">
       {/* Mobile Mini-Player Bar (shown when track is loaded) */}
       {currentTrack && (
         <div
           onClick={() => setNowPlayingOpen(true)}
-          className="relative flex items-center justify-between px-3.5 py-2.5 bg-bg-card/90 border-b border-white/5 cursor-pointer shadow-lg"
+          className="relative flex items-center justify-between px-3.5 py-2.5 bg-[#121824] border-b border-white/[0.06] cursor-pointer shadow-lg active:bg-[#161e2e] transition-colors"
         >
           {/* Top Progress Line */}
-          <div className="absolute top-0 left-0 right-0 h-1 bg-white/10 overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-[2px] bg-white/10 overflow-hidden">
             <div
-              className="h-full bg-accent transition-all duration-150 ease-out"
+              className="h-full bg-[#00a8e1] transition-all duration-150 ease-out"
               style={{ width: `${progressPercent}%` }}
             />
           </div>
 
           <div className="flex items-center gap-3 min-w-0 flex-1">
-            <div className="w-10 h-10 rounded-xl overflow-hidden bg-bg-secondary flex-shrink-0 border border-white/10 shadow-md">
+            <div className="w-10 h-10 rounded-xl overflow-hidden bg-[#0d1117] flex-shrink-0 border border-white/10 shadow-md">
               <img
                 src={getArtworkSrc(currentTrack, 120)}
                 alt={currentTrack.title}
@@ -48,22 +48,22 @@ export function MobileNav({ currentRoute, onNavigate }) {
               />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-xs font-bold text-warm-white leading-tight">
+              <p className="truncate text-xs font-bold text-white leading-tight">
                 {currentTrack.title}
               </p>
-              <p className="truncate text-[11px] text-warm-muted leading-tight mt-0.5">
+              <p className="truncate text-[11px] text-white/50 leading-tight mt-0.5">
                 {currentTrack.artist}
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-1 flex-shrink-0 ml-2">
+          <div className="flex items-center gap-1.5 flex-shrink-0 ml-2">
             <button
               onClick={e => {
                 e.stopPropagation();
                 prev();
               }}
-              className="w-9 h-9 flex items-center justify-center text-warm-muted hover:text-white rounded-full transition active:scale-95"
+              className="w-9 h-9 flex items-center justify-center text-white/60 hover:text-white rounded-full transition active:scale-95"
               aria-label="Previous track"
             >
               <SkipBack className="w-4 h-4 fill-current" />
@@ -74,7 +74,7 @@ export function MobileNav({ currentRoute, onNavigate }) {
                 e.stopPropagation();
                 togglePlay();
               }}
-              className="w-10 h-10 rounded-full bg-[#fa2d48] text-white flex items-center justify-center shadow-md shadow-[#fa2d48]/25 active:scale-90 transition"
+              className="w-9 h-9 rounded-full bg-[#00a8e1] hover:bg-[#22d3ee] text-white flex items-center justify-center shadow-md shadow-[#00a8e1]/30 active:scale-90 transition"
               aria-label={isPlaying ? 'Pause' : 'Play'}
             >
               {isPlaying ? (
@@ -110,11 +110,11 @@ export function MobileNav({ currentRoute, onNavigate }) {
             <button
               key={item.id}
               onClick={() => onNavigate(item.id)}
-              className={`flex flex-col items-center justify-center min-w-[56px] min-h-[44px] py-1 px-2 rounded-xl text-[10px] font-bold transition ${
-                isActive ? 'text-[#fa2d48]' : 'text-white/50 hover:text-white'
+              className={`flex flex-col items-center justify-center min-w-[56px] min-h-[44px] py-1 px-2 rounded-xl text-[10px] font-semibold transition active:scale-90 ${
+                isActive ? 'text-[#00a8e1] font-bold' : 'text-white/45 hover:text-white'
               }`}
             >
-              <Icon className={`w-5 h-5 mb-0.5 ${isActive ? 'stroke-[2.5]' : ''}`} />
+              <Icon className={`w-5 h-5 mb-0.5 ${isActive ? 'stroke-[2.5]' : 'stroke-[1.8]'}`} />
               <span>{item.label}</span>
             </button>
           );

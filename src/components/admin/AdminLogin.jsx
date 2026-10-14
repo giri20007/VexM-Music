@@ -45,7 +45,7 @@ export function AdminLogin({ onBackToApp }) {
             <Shield className="w-7 h-7 fill-bg-primary stroke-bg-primary" />
           </div>
           <h2 className="text-2xl font-black tracking-tight text-warm-white">
-            Vex<span className="text-[#fa2d48]">-</span>M
+            Vex<span className="text-[#00a8e1]">-</span>M
           </h2>
           <p className="text-xs uppercase tracking-widest font-semibold text-accent">
             Owner Admin Panel

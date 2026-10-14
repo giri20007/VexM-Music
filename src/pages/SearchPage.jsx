@@ -128,11 +128,11 @@ export function SearchPage({ lib, onNavigate }) {
             placeholder="Search songs, artists, or albums..."
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            className="w-full pl-11 pr-12 py-3 rounded-2xl bg-white/[0.06] hover:bg-white/[0.09] focus:bg-white/[0.10] border border-white/10 text-xs sm:text-sm text-white placeholder-white/40 focus:outline-none focus:border-white/30 focus:ring-1 focus:ring-white/20 transition shadow-lg backdrop-blur-md"
+            className="w-full pl-11 pr-12 py-3 rounded-2xl bg-white/[0.06] hover:bg-white/[0.09] focus:bg-white/[0.10] border border-white/10 text-xs sm:text-sm text-white placeholder-white/40 focus:outline-none focus:border-[#00a8e1] focus:ring-1 focus:ring-[#00a8e1]/30 transition shadow-lg backdrop-blur-md"
           />
           {isSearching && (
             <div className="absolute right-10 top-1/2 -translate-y-1/2">
-              <Loader2 className="w-4 h-4 text-[#fa2d48] animate-spin" />
+              <Loader2 className="w-4 h-4 text-[#00a8e1] animate-spin" />
             </div>
           )}
           {searchQuery && (
@@ -153,13 +153,13 @@ export function SearchPage({ lib, onNavigate }) {
       {suggestions.length > 0 && (
         <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
           <span className="text-xs text-white/60 font-semibold mr-1 flex items-center gap-1">
-            <Sparkles className="w-3.5 h-3.5 text-[#fa2d48]" /> Related:
+            <Sparkles className="w-3.5 h-3.5 text-[#00a8e1]" /> Related:
           </span>
           {suggestions.map(s => (
             <button
               key={s}
               onClick={() => setSearchQuery(s)}
-              className="px-3.5 py-1.5 rounded-full bg-white/[0.08] hover:bg-white/[0.16] border border-white/10 text-xs font-semibold text-white transition whitespace-nowrap"
+              className="px-3.5 py-1.5 rounded-full bg-white/[0.08] hover:bg-[#00a8e1]/15 hover:border-[#00a8e1]/40 border border-white/10 text-xs font-semibold text-white transition whitespace-nowrap"
             >
               {s}
             </button>
@@ -174,10 +174,10 @@ export function SearchPage({ lib, onNavigate }) {
           {trendingTracks.length > 0 && (
             <section className="space-y-4">
               <div className="flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-[#fa2d48]" />
+                <TrendingUp className="w-5 h-5 text-[#00a8e1]" />
                 <h3 className="text-xl sm:text-2xl font-black text-white">Trending Hits</h3>
               </div>
-              <div className="bg-white/[0.03] backdrop-blur-md p-2 rounded-2xl border border-white/[0.06] space-y-1">
+              <div className="bg-[#111622] p-2.5 rounded-2xl border border-white/[0.06] space-y-1">
                 {trendingTracks.slice(0, 10).map((t, idx) => (
                   <TrackRow
                     key={`trend_${t.id}_${idx}`}
@@ -246,10 +246,10 @@ export function SearchPage({ lib, onNavigate }) {
           {allSongResults.length > 0 && (
             <section className="space-y-4">
               <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                <Music2 className="w-5 h-5 text-[#fa2d48]" />
+                <Music2 className="w-5 h-5 text-[#00a8e1]" />
                 <span>Songs ({allSongResults.length})</span>
               </h3>
-              <div className="bg-white/[0.03] backdrop-blur-md p-2 rounded-2xl border border-white/[0.06] space-y-1">
+              <div className="bg-[#111622] p-2.5 rounded-2xl border border-white/[0.06] space-y-1">
                 {allSongResults.map((t, idx) => (
                   <TrackRow
                     key={`search_${t.id}_${idx}`}
@@ -268,7 +268,7 @@ export function SearchPage({ lib, onNavigate }) {
           {matchingAlbums.length > 0 && (
             <section className="space-y-4">
               <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                <Disc3 className="w-5 h-5 text-[#fa2d48]" />
+                <Disc3 className="w-5 h-5 text-[#00a8e1]" />
                 <span>Albums ({matchingAlbums.length})</span>
               </h3>
               <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3">
@@ -287,7 +287,7 @@ export function SearchPage({ lib, onNavigate }) {
           {matchingArtists.length > 0 && (
             <section className="space-y-4">
               <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                <Users className="w-5 h-5 text-[#fa2d48]" />
+                <Users className="w-5 h-5 text-[#00a8e1]" />
                 <span>Artists ({matchingArtists.length})</span>
               </h3>
               <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3">

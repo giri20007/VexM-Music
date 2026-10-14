@@ -107,9 +107,9 @@ export function LibraryPage({ lib, onNavigate }) {
           <div className="flex items-center gap-2.5">
             <button
               onClick={() => setIsCreatePlaylistOpen(true)}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#fa2d48] hover:bg-[#ff3b53] text-white font-bold text-xs shadow-lg shadow-[#fa2d48]/20 hover:scale-105 active:scale-95 transition"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#00a8e1] hover:bg-[#22d3ee] text-black font-bold text-xs shadow-lg shadow-[#00a8e1]/30 hover:scale-105 active:scale-95 transition"
             >
-              <Plus className="w-4 h-4" />
+              <Plus className="w-4 h-4 stroke-[2.5]" />
               <span>New Playlist</span>
             </button>
 
@@ -119,7 +119,7 @@ export function LibraryPage({ lib, onNavigate }) {
               title="Refresh library"
               aria-label="Refresh library"
             >
-              <RefreshCw className={`w-4 h-4 ${lib?.state === 'connecting' ? 'animate-spin text-[#fa2d48]' : ''}`} />
+              <RefreshCw className={`w-4 h-4 ${lib?.state === 'connecting' ? 'animate-spin text-[#00a8e1]' : ''}`} />
             </button>
           </div>
         </div>
@@ -197,12 +197,12 @@ export function LibraryPage({ lib, onNavigate }) {
               {/* Highlight Card 2: Create Playlist Card */}
               <div
                 onClick={() => setIsCreatePlaylistOpen(true)}
-                className="group flex flex-col items-center justify-center p-6 rounded-2xl border-2 border-dashed border-white/15 hover:border-white/30 bg-[#121212]/50 hover:bg-[#1a1a1a] cursor-pointer transition-all text-center min-h-[160px]"
+                className="group flex flex-col items-center justify-center p-6 rounded-2xl border-2 border-dashed border-white/15 hover:border-[#00a8e1]/40 bg-[#111622]/60 hover:bg-[#161c2b] cursor-pointer transition-all text-center min-h-[160px]"
               >
-                <div className="w-12 h-12 rounded-full bg-white/5 group-hover:bg-[#fa2d48]/20 group-hover:text-[#fa2d48] border border-white/10 flex items-center justify-center text-white/60 mb-3 transition-colors">
+                <div className="w-12 h-12 rounded-full bg-white/5 group-hover:bg-[#00a8e1]/20 group-hover:text-[#00a8e1] border border-white/10 flex items-center justify-center text-white/60 mb-3 transition-colors">
                   <Plus className="w-6 h-6" />
                 </div>
-                <h4 className="text-sm font-bold text-white">Create Playlist</h4>
+                <h4 className="text-sm font-bold text-white group-hover:text-[#00a8e1] transition-colors">Create Playlist</h4>
                 <p className="text-xs text-white/40 mt-1">Add your favorite tracks</p>
               </div>
 
@@ -232,9 +232,9 @@ export function LibraryPage({ lib, onNavigate }) {
                   <>
                     <button
                       onClick={() => handlePlayAll(filteredLibraryItems)}
-                      className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#fa2d48] hover:bg-[#ff3b53] text-white font-bold text-xs shadow-md shadow-[#fa2d48]/25 hover:scale-105 active:scale-95 transition"
+                      className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#00a8e1] hover:bg-[#22d3ee] text-black font-bold text-xs shadow-md shadow-[#00a8e1]/30 hover:scale-105 active:scale-95 transition"
                     >
-                      <Play className="w-4 h-4 fill-white ml-0.5" />
+                      <Play className="w-4 h-4 fill-black stroke-black ml-0.5" />
                       <span>Play All</span>
                     </button>
 
@@ -291,7 +291,7 @@ export function LibraryPage({ lib, onNavigate }) {
                 </p>
                 <button
                   onClick={() => onNavigate('home')}
-                  className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-[#fa2d48] text-white font-bold text-xs hover:bg-[#ff3b53] transition mt-2"
+                  className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-[#00a8e1] text-black font-bold text-xs hover:bg-[#22d3ee] transition mt-2 shadow-md shadow-[#00a8e1]/25 hover:scale-105 active:scale-95"
                 >
                   <span>Explore Music</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -325,7 +325,7 @@ export function LibraryPage({ lib, onNavigate }) {
                 </p>
                 <button
                   onClick={() => onNavigate('albums')}
-                  className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-[#fa2d48] text-white font-bold text-xs hover:bg-[#ff3b53] transition mt-2"
+                  className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-[#00a8e1] text-black font-bold text-xs hover:bg-[#22d3ee] transition mt-2 shadow-md shadow-[#00a8e1]/25 hover:scale-105 active:scale-95"
                 >
                   <span>Browse Albums</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -359,7 +359,7 @@ export function LibraryPage({ lib, onNavigate }) {
                 </p>
                 <button
                   onClick={() => onNavigate('artists')}
-                  className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-[#fa2d48] text-white font-bold text-xs hover:bg-[#ff3b53] transition mt-2"
+                  className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-[#00a8e1] text-black font-bold text-xs hover:bg-[#22d3ee] transition mt-2 shadow-md shadow-[#00a8e1]/25 hover:scale-105 active:scale-95"
                 >
                   <span>Explore Artists</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -374,7 +374,7 @@ export function LibraryPage({ lib, onNavigate }) {
         {/* ======================================================== */}
         {activeTab === 'cloud' && (
           <div className="space-y-6">
-            <div className="p-5 sm:p-6 rounded-2xl bg-white/[0.04] backdrop-blur-md border border-white/[0.08] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="p-5 sm:p-6 rounded-2xl bg-[#111622] border border-white/[0.06] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <h3 className="text-base sm:text-lg font-bold text-white">
                   Cloud Audio Storage
@@ -382,7 +382,7 @@ export function LibraryPage({ lib, onNavigate }) {
                 <p className="text-xs text-white/50 mt-1 max-w-xl">
                   High-fidelity audio files stored directly in your connected Telegram cloud vault channel.
                 </p>
-                <p className="text-xs text-[#fa2d48] font-semibold mt-2">
+                <p className="text-xs text-[#00a8e1] font-semibold mt-2">
                   {ownTgTracks.length} cloud tracks connected
                 </p>
               </div>
@@ -391,9 +391,9 @@ export function LibraryPage({ lib, onNavigate }) {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => handlePlayAll(ownTgTracks)}
-                    className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#fa2d48] hover:bg-[#ff3b53] text-white font-bold text-xs shadow-md shadow-[#fa2d48]/25 hover:scale-105 active:scale-95 transition"
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#00a8e1] hover:bg-[#22d3ee] text-black font-bold text-xs shadow-md shadow-[#00a8e1]/30 hover:scale-105 active:scale-95 transition"
                   >
-                    <Play className="w-3.5 h-3.5 fill-white ml-0.5" />
+                    <Play className="w-3.5 h-3.5 fill-black stroke-black ml-0.5" />
                     <span>Play Cloud Vault</span>
                   </button>
 

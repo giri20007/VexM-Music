@@ -3,16 +3,17 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
-    --bg-primary: #090a10;
-    --bg-secondary: #11131c;
+  :root,
+  body.theme-ios-atmosphere {
+    --bg-primary: #0b0e14;
+    --bg-secondary: #111622;
     --bg-card: rgba(255, 255, 255, 0.04);
     --bg-card-hover: rgba(255, 255, 255, 0.08);
-    --bg-active: rgba(255, 255, 255, 0.12);
-    --accent-color: #fa2d48;
-    --accent-hover: #ff3b53;
-    --accent-glow: rgba(250, 45, 72, 0.35);
-    --accent-muted: rgba(250, 45, 72, 0.15);
+    --bg-active: rgba(0, 168, 225, 0.15);
+    --accent-color: #00a8e1;
+    --accent-hover: #22d3ee;
+    --accent-glow: rgba(0, 168, 225, 0.35);
+    --accent-muted: rgba(0, 168, 225, 0.15);
   }
 
   body.theme-spotify-dark {
@@ -102,10 +103,10 @@
   }
 
   body.accent-cyan {
-    --accent-color: #06b6d4;
+    --accent-color: #00a8e1;
     --accent-hover: #22d3ee;
-    --accent-glow: rgba(6, 182, 212, 0.35);
-    --accent-muted: rgba(6, 182, 212, 0.15);
+    --accent-glow: rgba(0, 168, 225, 0.35);
+    --accent-muted: rgba(0, 168, 225, 0.15);
   }
 
   body.accent-violet {
@@ -146,7 +147,8 @@
   html, body {
     background-color: var(--bg-primary);
     color: #f7eee9;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "SF Pro", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    letter-spacing: -0.011em;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;

@@ -78,7 +78,7 @@ const BottomScrubber = memo(function BottomScrubber() {
         <div className="relative w-full h-1 bg-white/20 rounded-full overflow-hidden transition-all group-hover:h-1.5">
           {/* Active Fill */}
           <div
-            className="absolute top-0 left-0 bottom-0 bg-white group-hover:bg-[#fa2d48] rounded-full transition-all duration-75"
+            className="absolute top-0 left-0 bottom-0 bg-white group-hover:bg-[#00a8e1] rounded-full transition-all duration-75"
             style={{ width: `${percent}%` }}
           />
           {/* Hover Fill */}
@@ -109,14 +109,14 @@ const BottomScrubber = memo(function BottomScrubber() {
 
         {/* Scrubber Thumb */}
         <div
-          className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-white shadow-md shadow-cyan-400/60 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"
+          className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-3.5 h-3.5 rounded-full bg-white shadow-md shadow-[#00a8e1]/60 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"
           style={{ left: `${percent}%` }}
         />
 
         {/* Hover Time Tooltip */}
         {hoverPercent !== null && duration > 0 && (
           <div
-            className="absolute -top-7 -translate-x-1/2 px-2 py-0.5 rounded-md bg-black/90 backdrop-blur-md border border-white/15 text-[10px] font-mono text-warm-white pointer-events-none shadow-xl"
+            className="absolute -top-7 -translate-x-1/2 px-2 py-0.5 rounded-md bg-black/90 backdrop-blur-md border border-white/15 text-[10px] font-mono text-white pointer-events-none shadow-xl"
             style={{ left: `${hoverPercent * 100}%` }}
           >
             {formatDuration(hoverPercent * duration)}
@@ -135,9 +135,9 @@ const MobileProgressLine = memo(function MobileProgressLine() {
   const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   return (
-    <div className="md:hidden absolute top-0 left-0 right-0 h-1 bg-white/10">
+    <div className="md:hidden absolute top-0 left-0 right-0 h-[2px] bg-white/10">
       <div
-        className="h-full bg-gradient-to-r from-[#00f2fe] via-[#4facfe] to-[#f093fb] transition-all duration-100"
+        className="h-full bg-[#00a8e1] transition-all duration-100"
         style={{ width: `${progressPercent}%` }}
       />
     </div>
@@ -172,9 +172,9 @@ export const BottomPlayer = memo(function BottomPlayer() {
 
   if (!currentTrack) {
     return (
-      <footer className="h-20 bg-bg-secondary/95 backdrop-blur-xl border-t border-white/8 flex items-center justify-center px-4 text-xs text-warm-muted select-none">
+      <footer className="h-20 bg-[#0b0e14]/95 backdrop-blur-2xl border-t border-white/[0.08] flex items-center justify-center px-4 text-xs text-white/50 select-none">
         <div className="flex items-center gap-2">
-          <Music2 className="w-4 h-4 text-accent animate-pulse" />
+          <Music2 className="w-4 h-4 text-[#00a8e1] animate-pulse" />
           <span>Select a track from your library to start listening</span>
         </div>
       </footer>
@@ -184,7 +184,7 @@ export const BottomPlayer = memo(function BottomPlayer() {
   const coverSrc = getArtworkSrc(currentTrack);
 
   return (
-    <footer className="fixed bottom-0 left-0 right-0 z-30 h-22 md:h-20 bg-bg-secondary/98 backdrop-blur-2xl border-t border-white/8 flex flex-col justify-center px-3 sm:px-6 select-none shadow-2xl">
+    <footer className="fixed bottom-0 left-0 right-0 z-30 h-22 md:h-20 bg-[#0b0e14]/95 backdrop-blur-2xl border-t border-white/[0.08] flex flex-col justify-center px-3 sm:px-6 select-none shadow-2xl">
       {/* Mobile Top Scrubber Line */}
       <MobileProgressLine />
 
@@ -193,7 +193,7 @@ export const BottomPlayer = memo(function BottomPlayer() {
         <div className="flex items-center gap-3 min-w-0 w-1/4 sm:w-1/3">
           <div
             onClick={() => setNowPlayingOpen(true)}
-            className="relative w-12 h-12 rounded-xl overflow-hidden bg-bg-card border border-white/10 flex-shrink-0 cursor-pointer shadow-md group"
+            className="relative w-12 h-12 rounded-xl overflow-hidden bg-[#111622] border border-white/10 flex-shrink-0 cursor-pointer shadow-md group"
           >
             <SafeImage
               src={coverSrc}
@@ -208,10 +208,10 @@ export const BottomPlayer = memo(function BottomPlayer() {
           </div>
 
           <div className="min-w-0 flex-1 cursor-pointer overflow-hidden" onClick={() => setNowPlayingOpen(true)}>
-            <h3 className="truncate text-xs sm:text-sm font-bold text-warm-white hover:text-accent transition-colors">
+            <h3 className="truncate text-xs sm:text-sm font-bold text-white hover:text-[#00a8e1] transition-colors">
               {currentTrack.title}
             </h3>
-            <p className="truncate text-[11px] sm:text-xs text-warm-muted/80">
+            <p className="truncate text-[11px] sm:text-xs text-white/50">
               {currentTrack.artist}
             </p>
           </div>
@@ -219,11 +219,11 @@ export const BottomPlayer = memo(function BottomPlayer() {
           <button
             onClick={() => toggleLike(currentTrack.id)}
             className={`p-1.5 rounded-full transition-transform hover:scale-125 active:scale-95 flex-shrink-0 ${
-              isLiked ? 'text-accent' : 'text-warm-muted hover:text-warm-white'
+              isLiked ? 'text-[#fa2d48]' : 'text-white/40 hover:text-white'
             }`}
             aria-label={isLiked ? 'Unlike' : 'Like'}
           >
-            <Heart className={`w-4 h-4 ${isLiked ? 'fill-accent' : ''}`} />
+            <Heart className={`w-4 h-4 ${isLiked ? 'fill-[#fa2d48]' : ''}`} />
           </button>
         </div>
 
@@ -234,7 +234,7 @@ export const BottomPlayer = memo(function BottomPlayer() {
             <button
               onClick={toggleShuffle}
               className={`p-1.5 rounded-full transition ${
-                shuffle ? 'text-accent bg-accent/15 shadow-sm shadow-accent/20' : 'text-warm-muted hover:text-white'
+                shuffle ? 'text-[#00a8e1] bg-[#00a8e1]/15 shadow-sm shadow-[#00a8e1]/20' : 'text-white/50 hover:text-white'
               }`}
               title={`Shuffle ${shuffle ? 'On' : 'Off'}`}
               aria-label="Shuffle"
@@ -244,7 +244,7 @@ export const BottomPlayer = memo(function BottomPlayer() {
 
             <button
               onClick={prev}
-              className="p-1.5 text-warm-muted hover:text-warm-white transition hover:scale-110 active:scale-95"
+              className="p-1.5 text-white/60 hover:text-white transition hover:scale-110 active:scale-95"
               title="Previous track"
               aria-label="Previous track"
             >
@@ -254,7 +254,7 @@ export const BottomPlayer = memo(function BottomPlayer() {
             {/* Main Round Play/Pause Button */}
             <button
               onClick={togglePlay}
-              className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-md"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-md shadow-white/20"
               aria-label={isBuffering ? 'Buffering' : isPlaying ? 'Pause' : 'Play'}
             >
               {isBuffering ? (
@@ -268,7 +268,7 @@ export const BottomPlayer = memo(function BottomPlayer() {
 
             <button
               onClick={next}
-              className="p-1.5 text-warm-muted hover:text-warm-white transition hover:scale-110 active:scale-95"
+              className="p-1.5 text-white/60 hover:text-white transition hover:scale-110 active:scale-95"
               title="Next track"
               aria-label="Next track"
             >
@@ -278,7 +278,7 @@ export const BottomPlayer = memo(function BottomPlayer() {
             <button
               onClick={cycleRepeat}
               className={`p-1.5 rounded-full transition ${
-                repeatMode !== 'off' ? 'text-accent bg-accent/15 shadow-sm shadow-accent/20' : 'text-warm-muted hover:text-white'
+                repeatMode !== 'off' ? 'text-[#00a8e1] bg-[#00a8e1]/15 shadow-sm shadow-[#00a8e1]/20' : 'text-white/50 hover:text-white'
               }`}
               title={`Repeat: ${repeatMode}`}
               aria-label={`Repeat: ${repeatMode}`}

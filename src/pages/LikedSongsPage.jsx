@@ -35,15 +35,15 @@ export function LikedSongsPage({ allTracks = [], onNavigate }) {
       <div className="max-w-7xl mx-auto px-4 sm:px-8 pt-6 pb-12 space-y-6">
         {/* Header Banner */}
         <div className="flex flex-col sm:flex-row sm:items-end gap-6 pt-4 pb-2">
-          <div className="w-36 h-36 sm:w-44 sm:h-44 rounded-2xl bg-gradient-to-br from-[#fa2d48] to-[#670014] flex items-center justify-center text-white shadow-2xl flex-shrink-0">
+          <div className="w-36 h-36 sm:w-44 sm:h-44 rounded-2xl bg-gradient-to-br from-[#00a8e1] to-[#8b5cf6] flex items-center justify-center text-white shadow-2xl flex-shrink-0">
             <Heart className="w-16 h-16 fill-white stroke-white" />
           </div>
 
           <div className="space-y-3 flex-1">
-            <span className="text-xs font-bold uppercase tracking-wider text-white/50">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#00a8e1]">
               Playlist
             </span>
-            <h1 className="text-3xl sm:text-6xl font-black text-white tracking-tight">
+            <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
               Liked Songs
             </h1>
             <p className="text-xs sm:text-sm text-white/50">
@@ -55,7 +55,7 @@ export function LikedSongsPage({ allTracks = [], onNavigate }) {
               <div className="flex items-center gap-3 pt-2">
                 <button
                   onClick={handlePlayAll}
-                  className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#fa2d48] hover:bg-[#ff3b53] text-white font-bold text-xs shadow-lg shadow-[#fa2d48]/30 hover:scale-105 active:scale-95 transition"
+                  className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#00a8e1] hover:bg-[#22d3ee] text-white font-bold text-xs shadow-lg shadow-[#00a8e1]/30 hover:scale-105 active:scale-95 transition"
                 >
                   <Play className="w-4 h-4 fill-white ml-0.5" />
                   <span>{isLikedPlaying ? 'Pause' : 'Play All'}</span>
@@ -63,7 +63,7 @@ export function LikedSongsPage({ allTracks = [], onNavigate }) {
 
                 <button
                   onClick={handleShuffleAll}
-                  className="p-2.5 rounded-full bg-white/10 hover:bg-white/15 text-white border border-white/10 transition"
+                  className="p-2.5 rounded-full bg-white/10 hover:bg-white/15 text-white border border-white/10 transition active:scale-95"
                   title="Shuffle liked tracks"
                 >
                   <Shuffle className="w-4 h-4" />
@@ -75,7 +75,7 @@ export function LikedSongsPage({ allTracks = [], onNavigate }) {
 
         {/* Track List */}
         {likedTracks.length > 0 ? (
-          <div className="bg-white/[0.03] backdrop-blur-md p-2 rounded-2xl border border-white/[0.06] space-y-1">
+          <div className="bg-[#111622] p-2 rounded-2xl border border-white/[0.06] space-y-1">
             {likedTracks.map((track, idx) => (
               <TrackRow
                 key={track.id}

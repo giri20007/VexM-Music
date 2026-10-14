@@ -92,11 +92,11 @@ export function LanguagePreferenceModal({ isOpen, onClose, onLanguageChange }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-2xl animate-fade-in select-none">
-      <div className="relative w-full max-w-xl rounded-3xl bg-[#161618] border border-white/10 shadow-[0_24px_60px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col max-h-[90vh]">
+      <div className="relative w-full max-w-xl rounded-3xl bg-[#111622] border border-white/[0.08] shadow-[0_24px_60px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col max-h-[90vh]">
         {/* Header */}
         <div className="p-6 pb-4 border-b border-white/[0.08] flex items-start justify-between gap-4">
           <div className="space-y-1">
-            <div className="flex items-center gap-2 text-[#fa2d48] text-xs font-bold tracking-wider uppercase">
+            <div className="flex items-center gap-2 text-[#00a8e1] text-xs font-bold tracking-wider uppercase">
               <Globe className="w-4 h-4" />
               <span>Music Preferences</span>
             </div>
@@ -129,7 +129,7 @@ export function LanguagePreferenceModal({ isOpen, onClose, onLanguageChange }) {
                 onClick={() => setSelected(lang.id)}
                 className={`group relative p-3.5 rounded-2xl border transition-all duration-200 cursor-pointer flex items-center justify-between gap-3 ${
                   isSelected
-                    ? 'bg-[#fa2d48]/15 border-[#fa2d48] shadow-lg shadow-[#fa2d48]/20'
+                    ? 'bg-[#00a8e1]/15 border-[#00a8e1] shadow-lg shadow-[#00a8e1]/20'
                     : 'bg-white/[0.04] hover:bg-white/[0.08] border-white/[0.06] hover:border-white/20'
                 }`}
               >
@@ -150,7 +150,7 @@ export function LanguagePreferenceModal({ isOpen, onClose, onLanguageChange }) {
                 <div
                   className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 transition-all ${
                     isSelected
-                      ? 'bg-[#fa2d48] text-white scale-100 shadow-md'
+                      ? 'bg-[#00a8e1] text-black font-bold scale-100 shadow-md'
                       : 'border border-white/20 group-hover:border-white/40 scale-90 opacity-60'
                   }`}
                 >
@@ -169,7 +169,7 @@ export function LanguagePreferenceModal({ isOpen, onClose, onLanguageChange }) {
 
           <button
             onClick={handleSave}
-            className="px-6 py-2.5 rounded-full bg-[#fa2d48] hover:bg-[#fc3c44] text-white font-bold text-xs sm:text-sm shadow-xl shadow-[#fa2d48]/30 transition hover:scale-105 active:scale-95"
+            className="px-6 py-2.5 rounded-full bg-[#00a8e1] hover:bg-[#22d3ee] text-black font-bold text-xs sm:text-sm shadow-xl shadow-[#00a8e1]/30 transition hover:scale-105 active:scale-95"
           >
             Continue
           </button>

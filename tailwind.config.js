@@ -6,17 +6,17 @@ module.exports = {
     extend: {
       colors: {
         bg: {
-          primary: 'var(--bg-primary, #090a10)',
-          secondary: 'var(--bg-secondary, #11131c)',
+          primary: 'var(--bg-primary, #0b0e14)',
+          secondary: 'var(--bg-secondary, #111622)',
           card: 'var(--bg-card, rgba(255, 255, 255, 0.04))',
           cardHover: 'var(--bg-card-hover, rgba(255, 255, 255, 0.08))',
           active: 'var(--bg-active, rgba(255, 255, 255, 0.12))',
         },
         accent: {
-          DEFAULT: 'var(--accent-color, #fa2d48)',
-          hover: 'var(--accent-hover, #ff3b53)',
-          glow: 'var(--accent-glow, rgba(250, 45, 72, 0.35))',
-          muted: 'var(--accent-muted, rgba(250, 45, 72, 0.15))',
+          DEFAULT: 'var(--accent-color, #00a8e1)',
+          hover: 'var(--accent-hover, #22d3ee)',
+          glow: 'var(--accent-glow, rgba(0, 168, 225, 0.35))',
+          muted: 'var(--accent-muted, rgba(0, 168, 225, 0.15))',
         },
         warm: {
           white: '#ffffff',
@@ -26,7 +26,7 @@ module.exports = {
         },
       },
       fontFamily: {
-        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        sans: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Display"', '"SF Pro Text"', '"SF Pro"', 'system-ui', 'sans-serif'],
       },
       animation: {
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',

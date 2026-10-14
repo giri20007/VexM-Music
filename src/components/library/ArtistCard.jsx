@@ -27,10 +27,10 @@ export const ArtistCard = memo(function ArtistCard({ artist, onClick }) {
   return (
     <div
       onClick={onClick}
-      className="group relative flex flex-col p-3 rounded-2xl bg-white/[0.04] backdrop-blur-md hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/20 transition-all duration-300 hover:-translate-y-1 cursor-pointer shadow-md hover:shadow-2xl text-center"
+      className="group relative flex flex-col p-3 rounded-2xl bg-[#111622] hover:bg-[#161c2b] border border-white/[0.06] hover:border-[#00a8e1]/30 transition-all duration-300 hover:-translate-y-1 cursor-pointer shadow-md hover:shadow-2xl text-center"
     >
       {/* Circular Artist Avatar */}
-      <div className="relative aspect-square w-full rounded-full overflow-hidden bg-[#202020] shadow-xl mb-3">
+      <div className="relative aspect-square w-full rounded-full overflow-hidden bg-[#182030] shadow-xl mb-3">
         <SafeImage
           src={avatarSrc}
           fallbackType="artist"
@@ -40,10 +40,10 @@ export const ArtistCard = memo(function ArtistCard({ artist, onClick }) {
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
 
-        {/* Floating Red Play Button on Avatar Hover */}
+        {/* Floating Accent Play Button on Avatar Hover */}
         <button
           onClick={handlePlayArtist}
-          className={`absolute right-2.5 bottom-2.5 w-11 h-11 rounded-full bg-[#fa2d48] hover:bg-[#ff3b53] text-white flex items-center justify-center shadow-xl shadow-[#fa2d48]/40 transition-all duration-300 hover:scale-105 active:scale-95 z-10 ${
+          className={`absolute right-2.5 bottom-2.5 w-11 h-11 rounded-full bg-[#00a8e1] hover:bg-[#22d3ee] text-black flex items-center justify-center shadow-xl shadow-[#00a8e1]/40 transition-all duration-300 hover:scale-105 active:scale-95 z-10 ${
             isThisArtistPlaying
               ? 'opacity-100 translate-y-0 scale-100'
               : 'opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0'
@@ -51,15 +51,15 @@ export const ArtistCard = memo(function ArtistCard({ artist, onClick }) {
           aria-label={`Play artist ${artist.name}`}
         >
           {isThisArtistPlaying ? (
-            <Pause className="w-5 h-5 fill-white stroke-white" />
+            <Pause className="w-5 h-5 fill-black stroke-black" />
           ) : (
-            <Play className="w-5 h-5 fill-white stroke-white ml-0.5" />
+            <Play className="w-5 h-5 fill-black stroke-black ml-0.5" />
           )}
         </button>
       </div>
 
       {/* Artist Name & Tag */}
-      <h4 className="truncate text-sm font-bold text-white group-hover:text-[#fa2d48] transition-colors">
+      <h4 className="truncate text-sm font-bold text-white group-hover:text-[#00a8e1] transition-colors">
         {artist.name}
       </h4>
       <p className="truncate text-xs text-white/50 mt-0.5">

@@ -185,7 +185,7 @@ function AlbumDetailView({ lib, albumName, onNavigate, onBack }) {
           {/* Album Metadata & Actions */}
           <div className="space-y-4 flex-1 min-w-0 text-center md:text-left">
             <div>
-              <span className="text-xs font-bold uppercase tracking-widest text-[#fa2d48]">
+              <span className="text-xs font-bold uppercase tracking-widest text-[#00a8e1]">
                 Album
               </span>
               <h1 className="text-2xl sm:text-4xl md:text-5xl font-black text-white tracking-tight leading-tight mt-1">
@@ -197,7 +197,7 @@ function AlbumDetailView({ lib, albumName, onNavigate, onBack }) {
             <div className="flex items-center justify-center md:justify-start gap-2 text-sm text-white/60 flex-wrap">
               <button
                 onClick={() => onNavigate && onNavigate(`artist:${encodeURIComponent(artistName)}`)}
-                className="text-white font-bold hover:text-[#fa2d48] transition-colors"
+                className="text-white font-bold hover:text-[#00a8e1] transition-colors"
               >
                 {artistName}
               </button>
@@ -217,7 +217,7 @@ function AlbumDetailView({ lib, albumName, onNavigate, onBack }) {
             <div className="flex items-center justify-center md:justify-start gap-3 pt-2">
               <button
                 onClick={handlePlayAlbum}
-                className="flex items-center gap-2 px-8 py-3 rounded-full bg-[#fa2d48] hover:bg-[#ff3b53] text-white font-bold text-sm shadow-xl shadow-[#fa2d48]/25 hover:scale-105 active:scale-95 transition"
+                className="flex items-center gap-2 px-8 py-3 rounded-full bg-[#00a8e1] hover:bg-[#22d3ee] text-white font-bold text-sm shadow-xl shadow-[#00a8e1]/25 hover:scale-105 active:scale-95 transition"
               >
                 {isAlbumPlaying ? (
                   <Pause className="w-4 h-4 fill-white" />
@@ -229,7 +229,7 @@ function AlbumDetailView({ lib, albumName, onNavigate, onBack }) {
 
               <button
                 onClick={handleShuffleAlbum}
-                className="flex items-center gap-2 px-6 py-3 rounded-full bg-white/10 hover:bg-white/15 text-white font-semibold text-sm transition hover:scale-105"
+                className="flex items-center gap-2 px-6 py-3 rounded-full bg-white/10 hover:bg-white/15 text-white font-semibold text-sm transition hover:scale-105 active:scale-95"
                 title="Shuffle album"
               >
                 <Shuffle className="w-4 h-4" />
@@ -238,10 +238,10 @@ function AlbumDetailView({ lib, albumName, onNavigate, onBack }) {
 
               <button
                 onClick={handleShare}
-                className="p-3 rounded-full bg-white/5 hover:bg-white/10 text-white/70 hover:text-white border border-white/10 transition"
+                className="p-3 rounded-full bg-white/5 hover:bg-white/10 text-white/70 hover:text-white border border-white/10 transition active:scale-95"
                 title="Share Album"
               >
-                {copied ? <Check className="w-4 h-4 text-[#fa2d48]" /> : <Share2 className="w-4 h-4" />}
+                {copied ? <Check className="w-4 h-4 text-[#00a8e1]" /> : <Share2 className="w-4 h-4" />}
               </button>
             </div>
           </div>
@@ -259,7 +259,7 @@ function AlbumDetailView({ lib, albumName, onNavigate, onBack }) {
 
           {isLoadingAlbum && albumTracks.length === 0 ? (
             <div className="flex items-center justify-center p-12 text-white/40">
-              <Loader2 className="w-6 h-6 animate-spin text-[#fa2d48] mr-2" />
+              <Loader2 className="w-6 h-6 animate-spin text-[#00a8e1] mr-2" />
               <span className="text-sm">Loading album tracks...</span>
             </div>
           ) : albumTracks.length > 0 ? (
@@ -371,9 +371,9 @@ function AlbumDirectoryView({ lib, onNavigate }) {
             <div
               key={album.name}
               onClick={() => onNavigate(`album:${encodeURIComponent(album.name)}`)}
-              className="group flex flex-col p-3 rounded-2xl bg-white/[0.04] backdrop-blur-md hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl cursor-pointer"
+              className="group flex flex-col p-3 rounded-2xl amz-card cursor-pointer select-none"
             >
-              <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-[#202020] mb-3 shadow-lg">
+              <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-[#0d1117] mb-3 shadow-lg">
                 <SafeImage
                   src={album.thumbnail}
                   alt={album.name}
@@ -382,15 +382,15 @@ function AlbumDirectoryView({ lib, onNavigate }) {
                 />
 
                 {/* Floating Play Button */}
-                <div className="absolute right-2.5 bottom-2.5 w-11 h-11 rounded-full bg-[#fa2d48] text-white flex items-center justify-center opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all shadow-xl shadow-black/60">
+                <div className="absolute right-2.5 bottom-2.5 w-11 h-11 rounded-full amz-play-btn flex items-center justify-center opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all shadow-xl shadow-black/60">
                   <Play className="w-5 h-5 fill-white ml-0.5" />
                 </div>
               </div>
 
-              <h4 className="text-sm font-bold text-white truncate group-hover:text-[#fa2d48] transition-colors">
+              <h4 className="text-sm font-bold text-white truncate group-hover:text-[#00a8e1] transition-colors">
                 {album.name}
               </h4>
-              <p className="text-xs text-white/40 truncate mt-1">
+              <p className="text-xs text-white/50 truncate mt-1">
                 {album.artist}
               </p>
             </div>

@@ -160,7 +160,7 @@ export function FullscreenVisualizerModal({ isOpen, onClose }) {
         <div className="flex items-center gap-3">
           <div className="brand-neon-container flex items-center gap-2">
             <span className="brand-text-neon text-sm sm:text-base font-black">
-              Vex<span className="text-[#fa2d48]">-</span>M
+              Vex<span className="text-[#00a8e1]">-</span>M
             </span>
             <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-accent/15 border border-accent/30 text-accent">
               Immersive Mode

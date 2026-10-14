@@ -26,10 +26,10 @@ export function AlbumCard({ album, onClick }) {
   return (
     <div
       onClick={onClick}
-      className="group relative flex flex-col p-3 rounded-2xl bg-white/[0.04] backdrop-blur-md hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/20 transition-all duration-300 hover:-translate-y-1 cursor-pointer shadow-md hover:shadow-2xl"
+      className="group relative flex flex-col p-3 rounded-2xl bg-[#111622] hover:bg-[#161c2b] border border-white/[0.06] hover:border-[#00a8e1]/30 transition-all duration-300 hover:-translate-y-1 cursor-pointer shadow-md hover:shadow-2xl"
     >
       {/* Artwork Container */}
-      <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-[#202020] shadow-lg mb-3">
+      <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-[#182030] shadow-lg mb-3">
         <SafeImage
           src={album.thumbnail}
           track={sampleTrack}
@@ -41,7 +41,7 @@ export function AlbumCard({ album, onClick }) {
         {/* Vex-M Floating Accent Play Button */}
         <button
           onClick={handlePlayAlbum}
-          className={`absolute right-2.5 bottom-2.5 w-11 h-11 rounded-full bg-[#fa2d48] hover:bg-[#ff3b53] text-white flex items-center justify-center shadow-xl shadow-[#fa2d48]/40 transition-all duration-300 hover:scale-105 active:scale-95 z-10 ${
+          className={`absolute right-2.5 bottom-2.5 w-11 h-11 rounded-full bg-[#00a8e1] hover:bg-[#22d3ee] text-black flex items-center justify-center shadow-xl shadow-[#00a8e1]/40 transition-all duration-300 hover:scale-105 active:scale-95 z-10 ${
             isThisAlbumPlaying
               ? 'opacity-100 translate-y-0 scale-100'
               : 'opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0'
@@ -49,9 +49,9 @@ export function AlbumCard({ album, onClick }) {
           aria-label={`Play album ${album.name}`}
         >
           {isThisAlbumPlaying ? (
-            <Pause className="w-5 h-5 fill-white stroke-white" />
+            <Pause className="w-5 h-5 fill-black stroke-black" />
           ) : (
-            <Play className="w-5 h-5 fill-white stroke-white ml-0.5" />
+            <Play className="w-5 h-5 fill-black stroke-black ml-0.5" />
           )}
         </button>
 
@@ -63,7 +63,7 @@ export function AlbumCard({ album, onClick }) {
       </div>
 
       {/* Album Info */}
-      <h4 className="truncate text-sm font-bold text-white group-hover:text-[#fa2d48] transition-colors">
+      <h4 className="truncate text-sm font-bold text-white group-hover:text-[#00a8e1] transition-colors">
         {album.name}
       </h4>
       <p className="truncate text-xs text-white/50 mt-1">

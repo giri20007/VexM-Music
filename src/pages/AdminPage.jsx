@@ -116,7 +116,7 @@ export function AdminPage({ onBackToApp }) {
               </div>
               <div>
                 <span className="font-black text-xs tracking-wide text-warm-white block">
-                  Vex<span className="text-[#fa2d48]">-</span>M ADMIN
+                  Vex<span className="text-[#00a8e1]">-</span>M ADMIN
                 </span>
                 <div className="flex items-center gap-1.5 mt-0.5">
                   <span className="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 text-[9px] font-black tracking-wider border border-amber-500/30">

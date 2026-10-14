@@ -112,7 +112,7 @@ export function AuthScreen() {
 
           <div className="brand-neon-container inline-block">
             <h1 className="brand-text-neon text-3xl font-black tracking-wider">
-              Vex<span className="text-[#fa2d48]">-</span>M
+              Vex<span className="text-[#00a8e1]">-</span>M
             </h1>
           </div>
 

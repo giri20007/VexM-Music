@@ -53,9 +53,9 @@ export const TrackRow = memo(function TrackRow({
               <span className="group-hover:hidden">
                 {isCurrentPlaying ? (
                   <span className="flex items-end justify-center gap-0.5 h-3.5 w-3.5 pb-0.5">
-                    <span className="w-0.5 bg-[#fa2d48] rounded-full animate-eq-1" />
-                    <span className="w-0.5 bg-[#fa2d48] rounded-full animate-eq-2" />
-                    <span className="w-0.5 bg-[#fa2d48] rounded-full animate-eq-3" />
+                    <span className="w-0.5 bg-[#00a8e1] rounded-full animate-eq-1" />
+                    <span className="w-0.5 bg-[#00a8e1] rounded-full animate-eq-2" />
+                    <span className="w-0.5 bg-[#00a8e1] rounded-full animate-eq-3" />
                   </span>
                 ) : index !== undefined ? (
                   index + 1
@@ -65,7 +65,7 @@ export const TrackRow = memo(function TrackRow({
               </span>
               <button
                 onClick={handlePlayClick}
-                className="hidden group-hover:inline-flex items-center justify-center text-[#fa2d48] transition-transform hover:scale-125"
+                className="hidden group-hover:inline-flex items-center justify-center text-[#00a8e1] transition-transform hover:scale-125"
                 aria-label={isCurrentPlaying ? 'Pause' : 'Play'}
               >
                 {isCurrentPlaying ? <Pause className="w-4 h-4 fill-current" /> : <Play className="w-4 h-4 fill-current ml-0.5" />}
@@ -83,13 +83,13 @@ export const TrackRow = memo(function TrackRow({
                 className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/cover:opacity-100 flex items-center justify-center transition-opacity">
-                {isCurrentPlaying ? <Pause className="w-3.5 h-3.5 text-accent fill-current" /> : <Play className="w-3.5 h-3.5 text-white fill-current ml-0.5" />}
+                {isCurrentPlaying ? <Pause className="w-3.5 h-3.5 text-[#00a8e1] fill-current" /> : <Play className="w-3.5 h-3.5 text-white fill-current ml-0.5" />}
               </div>
             </div>
           )}
 
           <div className="min-w-0 flex-1">
-            <p className={`truncate font-medium text-sm ${isCurrent ? 'text-[#fa2d48]' : 'text-white'}`}>
+            <p className={`truncate font-semibold text-sm ${isCurrent ? 'text-[#00a8e1]' : 'text-white'}`}>
               {track.title}
             </p>
             <p className="truncate text-xs text-white/50">

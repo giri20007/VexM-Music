@@ -20,18 +20,18 @@ export function QueueDrawer() {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm animate-fade-in"
+      className="fixed inset-0 z-50 flex justify-end bg-black/70 backdrop-blur-sm animate-fade-in"
       onClick={() => setQueueOpen(false)}
     >
       <div
-        className="w-full max-w-md h-full bg-bg-secondary border-l border-white/10 shadow-2xl flex flex-col animate-scale-up"
+        className="w-full max-w-md h-full bg-[#111622] border-l border-white/10 shadow-2xl flex flex-col animate-scale-up"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-white/5 bg-bg-card">
+        <div className="flex items-center justify-between p-4 border-b border-white/[0.08] bg-[#141a29]">
           <div className="flex items-center gap-2">
-            <h2 className="text-base font-bold text-warm-white">Play Queue</h2>
-            <span className="text-xs px-2 py-0.5 rounded-full bg-accent/20 text-accent font-semibold">
+            <h2 className="text-base font-bold text-white">Play Queue</h2>
+            <span className="text-xs px-2 py-0.5 rounded-full bg-[#00a8e1]/20 text-[#00a8e1] font-semibold">
               {queue.length}
             </span>
           </div>
@@ -41,7 +41,7 @@ export function QueueDrawer() {
               <>
                 <button
                   onClick={shuffleQueue}
-                  className="p-1.5 rounded-lg text-warm-muted hover:text-white hover:bg-white/5 transition"
+                  className="p-1.5 rounded-lg text-white/50 hover:text-white hover:bg-white/5 transition"
                   title="Shuffle queue"
                   aria-label="Shuffle queue"
                 >
@@ -49,7 +49,7 @@ export function QueueDrawer() {
                 </button>
                 <button
                   onClick={clearQueue}
-                  className="p-1.5 rounded-lg text-warm-muted hover:text-red-400 hover:bg-white/5 transition"
+                  className="p-1.5 rounded-lg text-white/50 hover:text-red-400 hover:bg-white/5 transition"
                   title="Clear queue"
                   aria-label="Clear queue"
                 >
@@ -59,7 +59,7 @@ export function QueueDrawer() {
             )}
             <button
               onClick={() => setQueueOpen(false)}
-              className="p-1.5 rounded-lg text-warm-muted hover:text-white hover:bg-white/5 transition"
+              className="p-1.5 rounded-lg text-white/50 hover:text-white hover:bg-white/5 transition"
               aria-label="Close queue"
             >
               <X className="w-5 h-5" />
@@ -72,11 +72,11 @@ export function QueueDrawer() {
           {/* Now Playing section */}
           {currentTrack && (
             <div>
-              <p className="text-[11px] font-bold tracking-wider text-accent uppercase mb-2">
+              <p className="text-[11px] font-bold tracking-wider text-[#00a8e1] uppercase mb-2">
                 Now Playing
               </p>
-              <div className="flex items-center gap-3 p-3 rounded-xl bg-bg-active border border-accent/20">
-                <div className="w-10 h-10 rounded-lg overflow-hidden bg-bg-card flex-shrink-0">
+              <div className="flex items-center gap-3 p-3 rounded-2xl bg-[#00a8e1]/10 border border-[#00a8e1]/30">
+                <div className="w-10 h-10 rounded-xl overflow-hidden bg-[#0d1117] flex-shrink-0">
                   <SafeImage
                     src={getArtworkSrc(currentTrack, 80)}
                     track={currentTrack}
@@ -86,10 +86,10 @@ export function QueueDrawer() {
                   />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-xs font-semibold text-accent">{currentTrack.title}</p>
-                  <p className="truncate text-[11px] text-warm-muted">{currentTrack.artist}</p>
+                  <p className="truncate text-xs font-bold text-[#00a8e1]">{currentTrack.title}</p>
+                  <p className="truncate text-[11px] text-white/50">{currentTrack.artist}</p>
                 </div>
-                <span className="text-xs text-warm-muted tabular-nums">
+                <span className="text-xs text-white/40 tabular-nums">
                   {formatDuration(currentTrack.duration)}
                 </span>
               </div>

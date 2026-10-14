@@ -79,8 +79,8 @@ export function PlaylistPage({ playlistId, allTracks = [], onBack, onNavigate })
 
         {/* Playlist Banner */}
         <div className="flex flex-col sm:flex-row sm:items-end gap-6 pt-2 pb-2">
-          <div className="w-36 h-36 sm:w-44 sm:h-44 rounded-2xl bg-[#181818] border border-white/10 flex items-center justify-center text-white shadow-2xl flex-shrink-0">
-            <ListMusic className="w-16 h-16 text-[#fa2d48]" />
+          <div className="w-36 h-36 sm:w-44 sm:h-44 rounded-2xl bg-gradient-to-br from-[#00a8e1]/25 to-[#111622] border border-white/10 flex items-center justify-center text-white shadow-2xl flex-shrink-0">
+            <ListMusic className="w-16 h-16 text-[#00a8e1]" />
           </div>
 
           <div className="space-y-3 flex-1">
@@ -99,9 +99,9 @@ export function PlaylistPage({ playlistId, allTracks = [], onBack, onNavigate })
                 <>
                   <button
                     onClick={handlePlayAll}
-                    className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#fa2d48] hover:bg-[#ff3b53] text-white font-bold text-xs shadow-lg shadow-[#fa2d48]/30 hover:scale-105 active:scale-95 transition"
+                    className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#00a8e1] hover:bg-[#22d3ee] text-black font-bold text-xs shadow-lg shadow-[#00a8e1]/30 hover:scale-105 active:scale-95 transition"
                   >
-                    <Play className="w-4 h-4 fill-white ml-0.5" />
+                    <Play className="w-4 h-4 fill-black stroke-black ml-0.5" />
                     <span>{isPlaylistPlaying ? 'Pause' : 'Play'}</span>
                   </button>
                   <button
@@ -142,7 +142,7 @@ export function PlaylistPage({ playlistId, allTracks = [], onBack, onNavigate })
 
         {/* Playlist Tracks */}
         {tracks.length > 0 ? (
-          <div className="bg-white/[0.03] backdrop-blur-md p-2 rounded-2xl border border-white/[0.06] space-y-1">
+          <div className="bg-[#111622] p-2.5 rounded-2xl border border-white/[0.06] space-y-1">
             {tracks.map((track, idx) => (
               <TrackRow
                 key={`${track.id}_${idx}`}

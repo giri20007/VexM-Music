@@ -47,7 +47,7 @@ export function ProviderSourceButton({ compact = false, className = '', onSource
         aria-label="Select audio provider source"
         aria-expanded={isOpen}
       >
-        <CurrentIcon className="w-3.5 h-3.5 text-[#fa2d48] flex-shrink-0" />
+        <CurrentIcon className="w-3.5 h-3.5 text-[#00a8e1] flex-shrink-0" />
         <span className="truncate max-w-[90px] sm:max-w-none">
           {compact ? currentSource.shortLabel : currentSource.label}
         </span>
@@ -60,7 +60,7 @@ export function ProviderSourceButton({ compact = false, className = '', onSource
 
       {/* Sleek Popover Dropdown */}
       {isOpen && (
-        <div className="absolute right-0 top-full mt-2 w-56 rounded-2xl bg-[#141414] border border-white/10 p-1.5 shadow-2xl z-50 animate-scale-up backdrop-blur-xl">
+        <div className="absolute right-0 top-full mt-2 w-56 rounded-2xl bg-[#111622] border border-white/[0.08] p-1.5 shadow-2xl z-50 animate-scale-up backdrop-blur-xl">
           <div className="px-2.5 py-1.5 text-[10px] uppercase font-bold tracking-wider text-white/40 border-b border-white/[0.06] mb-1">
             Audio Source
           </div>
@@ -84,7 +84,7 @@ export function ProviderSourceButton({ compact = false, className = '', onSource
                     <div
                       className={`w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 ${
                         isSelected
-                          ? 'bg-[#fa2d48] text-white'
+                          ? 'bg-[#00a8e1] text-black font-bold'
                           : 'bg-white/5 text-white/50 group-hover:text-white'
                       }`}
                     >
@@ -96,7 +96,7 @@ export function ProviderSourceButton({ compact = false, className = '', onSource
                     </div>
                   </div>
 
-                  {isSelected && <Check className="w-3.5 h-3.5 text-[#fa2d48] flex-shrink-0 ml-2" />}
+                  {isSelected && <Check className="w-3.5 h-3.5 text-[#00a8e1] flex-shrink-0 ml-2 stroke-[3]" />}
                 </button>
               );
             })}

@@ -56,15 +56,20 @@ export function Sidebar({ currentRoute, onNavigate }) {
       <div className="flex items-center justify-between p-5 pb-4">
         <div
           onClick={() => onNavigate('home')}
-          className="flex items-center gap-2.5 cursor-pointer group"
+          className="flex items-center gap-2 cursor-pointer group select-none"
         >
-          <div className="w-8 h-8 rounded-lg bg-[#fa2d48] flex items-center justify-center text-white shadow-lg shadow-[#fa2d48]/20 flex-shrink-0">
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#00a8e1] to-[#22d3ee] flex items-center justify-center text-white shadow-lg shadow-[#00a8e1]/30 flex-shrink-0">
             <Music2 className="w-4 h-4 fill-white stroke-white" />
           </div>
           {!collapsed && (
-            <span className="text-base font-black tracking-tight text-white">
-              Vex<span className="text-[#fa2d48]">-</span>M
-            </span>
+            <div className="flex items-baseline gap-1">
+              <span className="text-lg font-black tracking-tight text-white">
+                vex<span className="text-[#00a8e1]">m</span>
+              </span>
+              <span className="text-[11px] font-semibold text-white/50 tracking-wider uppercase">
+                music
+              </span>
+            </div>
           )}
         </div>
 
@@ -86,14 +91,14 @@ export function Sidebar({ currentRoute, onNavigate }) {
             <button
               key={item.id}
               onClick={() => onNavigate(item.id)}
-              className={`w-full flex items-center gap-3.5 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-150 ${
+              className={`w-full flex items-center gap-3.5 px-3 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-150 ${
                 isActive
-                  ? 'bg-white/10 text-white font-bold'
+                  ? 'bg-[#00a8e1]/15 text-[#00a8e1] font-bold border border-[#00a8e1]/25 shadow-sm'
                   : 'text-white/60 hover:text-white hover:bg-white/[0.04]'
               }`}
               title={collapsed ? item.label : undefined}
             >
-              <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? 'text-[#fa2d48]' : 'text-white/60'}`} />
+              <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? 'text-[#00a8e1]' : 'text-white/60'}`} />
               {!collapsed && <span>{item.label}</span>}
             </button>
           );
@@ -124,12 +129,12 @@ export function Sidebar({ currentRoute, onNavigate }) {
           onClick={() => onNavigate('liked')}
           className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs sm:text-sm transition-all duration-150 ${
             currentRoute === 'liked'
-              ? 'bg-white/10 text-white font-bold'
+              ? 'bg-[#00a8e1]/15 text-[#00a8e1] font-bold border border-[#00a8e1]/25'
               : 'text-white/60 hover:text-white hover:bg-white/[0.04]'
           }`}
           title={collapsed ? 'Liked songs' : undefined}
         >
-          <div className="w-6 h-6 rounded-md bg-gradient-to-br from-[#fa2d48] to-[#670014] flex items-center justify-center text-white flex-shrink-0">
+          <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-[#00a8e1] to-[#8b5cf6] flex items-center justify-center text-white flex-shrink-0">
             <Heart className="w-3.5 h-3.5 fill-white stroke-white" />
           </div>
           {!collapsed && <span className="truncate">Liked Songs</span>}
@@ -147,7 +152,7 @@ export function Sidebar({ currentRoute, onNavigate }) {
               onBlur={() => {
                 if (!newPlaylistName.trim()) setIsCreatingPlaylist(false);
               }}
-              className="w-full text-xs px-2.5 py-1.5 rounded-lg bg-white/[0.06] border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:border-[#fa2d48]"
+              className="w-full text-xs px-2.5 py-1.5 rounded-lg bg-white/[0.06] border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:border-[#00a8e1]"
             />
           </form>
         )}
@@ -182,12 +187,12 @@ export function Sidebar({ currentRoute, onNavigate }) {
             onClick={() => onNavigate('admin')}
             className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition ${
               currentRoute === 'admin'
-                ? 'bg-[#fa2d48] text-white shadow-md'
+                ? 'bg-[#00a8e1] text-black font-bold shadow-md'
                 : 'text-white/70 hover:bg-white/5'
             }`}
             title={collapsed ? 'Admin Dashboard' : undefined}
           >
-            <Shield className="w-4 h-4 flex-shrink-0 text-[#fa2d48]" />
+            <Shield className="w-4 h-4 flex-shrink-0 text-[#00a8e1]" />
             {!collapsed && <span>Admin Dashboard</span>}
           </button>
         )}

@@ -372,13 +372,13 @@ function ArtistDetailView({ lib, artistName, onNavigate, onBack }) {
           {/* Play / Pause Primary Action */}
           <button
             onClick={handlePlayArtist}
-            className="flex items-center gap-2.5 px-6 py-3 rounded-full bg-[#fa2d48] hover:bg-[#ff3b53] text-white font-bold text-xs shadow-lg shadow-[#fa2d48]/25 hover:scale-105 active:scale-95 transition"
+            className="flex items-center gap-2.5 px-6 py-3 rounded-full bg-[#00a8e1] hover:bg-[#22d3ee] text-black font-bold text-xs shadow-lg shadow-[#00a8e1]/30 hover:scale-105 active:scale-95 transition"
             aria-label={`Play artist ${artistName}`}
           >
             {isCurrentArtistPlaying ? (
-              <Pause className="w-4 h-4 fill-white" />
+              <Pause className="w-4 h-4 fill-black stroke-black" />
             ) : (
-              <Play className="w-4 h-4 fill-white ml-0.5" />
+              <Play className="w-4 h-4 fill-black stroke-black ml-0.5" />
             )}
             <span>{isCurrentArtistPlaying ? 'Pause' : 'Play All'}</span>
           </button>
@@ -389,7 +389,7 @@ function ArtistDetailView({ lib, artistName, onNavigate, onBack }) {
             className="flex items-center gap-2 px-5 py-3 rounded-full bg-white/10 hover:bg-white/15 text-white font-semibold text-xs border border-white/10 transition hover:scale-105"
             title="Start Artist Radio"
           >
-            <Radio className="w-3.5 h-3.5 text-[#fa2d48]" />
+            <Radio className="w-3.5 h-3.5 text-[#00a8e1]" />
             <span>Radio</span>
           </button>
 
@@ -412,7 +412,7 @@ function ArtistDetailView({ lib, artistName, onNavigate, onBack }) {
             className="p-3 rounded-full bg-white/5 hover:bg-white/10 text-white/80 hover:text-white border border-white/10 transition"
             title="Share Artist"
           >
-            {copied ? <Check className="w-4 h-4 text-[#fa2d48]" /> : <Share2 className="w-4 h-4" />}
+            {copied ? <Check className="w-4 h-4 text-[#00a8e1]" /> : <Share2 className="w-4 h-4" />}
           </button>
         </div>
       </div>
@@ -439,11 +439,11 @@ function ArtistDetailView({ lib, artistName, onNavigate, onBack }) {
 
           {isLoadingArtist && artistTracks.length === 0 ? (
             <div className="flex items-center justify-center p-12 text-white/40">
-              <Loader2 className="w-6 h-6 animate-spin text-[#fa2d48] mr-2" />
+              <Loader2 className="w-6 h-6 animate-spin text-[#00a8e1] mr-2" />
               <span className="text-sm">Loading songs...</span>
             </div>
           ) : artistTracks.length > 0 ? (
-            <div className="space-y-1 bg-[#0e0e0e] p-2 rounded-2xl border border-white/[0.06]">
+            <div className="space-y-1 bg-[#111622] p-2.5 rounded-2xl border border-white/[0.06]">
               {displayedTracks.map((t, idx) => (
                 <TrackRow
                   key={`${t.id || 'trk'}_${idx}`}
@@ -477,9 +477,9 @@ function ArtistDetailView({ lib, artistName, onNavigate, onBack }) {
                 <div
                   key={`${alb.name}_${i}`}
                   onClick={() => onNavigate(`album:${encodeURIComponent(alb.name)}`)}
-                  className="group flex flex-col p-3 rounded-2xl bg-[#121212] hover:bg-[#1a1a1a] transition-all cursor-pointer border border-white/[0.04] hover:border-white/10"
+                  className="group flex flex-col p-3 rounded-2xl bg-[#111622] hover:bg-[#161c2b] transition-all cursor-pointer border border-white/[0.06] hover:border-[#00a8e1]/30 hover:-translate-y-1 hover:shadow-xl"
                 >
-                  <div className="aspect-square w-full rounded-xl overflow-hidden bg-[#202020] mb-3 relative shadow-md">
+                  <div className="aspect-square w-full rounded-xl overflow-hidden bg-[#182030] mb-3 relative shadow-md">
                     <SafeImage
                       src={alb.thumbnail}
                       alt={alb.name}
@@ -487,7 +487,7 @@ function ArtistDetailView({ lib, artistName, onNavigate, onBack }) {
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                   </div>
-                  <h4 className="text-sm font-semibold text-white truncate group-hover:text-[#fa2d48] transition-colors">
+                  <h4 className="text-sm font-semibold text-white truncate group-hover:text-[#00a8e1] transition-colors">
                     {alb.name}
                   </h4>
                   <p className="text-xs text-white/40 truncate mt-0.5">
@@ -511,9 +511,9 @@ function ArtistDetailView({ lib, artistName, onNavigate, onBack }) {
                 <div
                   key={artist.name}
                   onClick={() => onNavigate(`artist:${encodeURIComponent(artist.name)}`)}
-                  className="group flex flex-col items-center p-4 rounded-2xl bg-[#121212] hover:bg-[#1a1a1a] transition-all cursor-pointer border border-white/[0.04] hover:border-white/10 text-center"
+                  className="group flex flex-col items-center p-4 rounded-2xl bg-[#111622] hover:bg-[#161c2b] transition-all cursor-pointer border border-white/[0.06] hover:border-[#00a8e1]/30 hover:-translate-y-1 hover:shadow-xl text-center"
                 >
-                  <div className="relative aspect-square w-full rounded-full overflow-hidden bg-[#202020] mb-3.5 shadow-lg">
+                  <div className="relative aspect-square w-full rounded-full overflow-hidden bg-[#182030] mb-3.5 shadow-lg">
                     <SafeImage
                       src={artist.image}
                       fallbackType="artist"
@@ -523,7 +523,7 @@ function ArtistDetailView({ lib, artistName, onNavigate, onBack }) {
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                   </div>
-                  <h4 className="text-sm font-bold text-white truncate w-full group-hover:text-[#fa2d48] transition-colors">
+                  <h4 className="text-sm font-bold text-white truncate w-full group-hover:text-[#00a8e1] transition-colors">
                     {artist.name}
                   </h4>
                   <p className="text-xs text-white/40 mt-0.5">
@@ -537,9 +537,9 @@ function ArtistDetailView({ lib, artistName, onNavigate, onBack }) {
 
         {/* Section D: About The Artist */}
         {feat?.bio && (
-          <div className="p-6 rounded-2xl bg-[#121212] border border-white/[0.06] space-y-3">
+          <div className="p-6 rounded-2xl bg-[#111622] border border-white/[0.06] space-y-3">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#fa2d48]">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#00a8e1]">
                 About
               </span>
               <span className="text-xs text-white/40">•</span>
@@ -611,7 +611,7 @@ function ArtistDirectoryView({ lib, onNavigate }) {
               placeholder="Search any artist..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-9 py-2.5 rounded-full bg-white/[0.05] border border-white/10 text-xs text-white placeholder:text-white/40 focus:outline-none focus:border-white/30"
+              className="w-full pl-9 pr-9 py-2.5 rounded-full bg-white/[0.05] border border-white/10 text-xs text-white placeholder:text-white/40 focus:outline-none focus:border-[#00a8e1] focus:ring-1 focus:ring-[#00a8e1]/30 transition"
             />
             {searchQuery && (
               <button
@@ -630,10 +630,10 @@ function ArtistDirectoryView({ lib, onNavigate }) {
             <div
               key={artist.name}
               onClick={() => onNavigate(`artist:${encodeURIComponent(artist.name)}`)}
-              className="group flex flex-col items-center p-4 rounded-2xl bg-white/[0.04] backdrop-blur-md hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl cursor-pointer text-center"
+              className="group flex flex-col items-center p-4 rounded-2xl bg-[#111622] hover:bg-[#161c2b] border border-white/[0.06] hover:border-[#00a8e1]/30 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl cursor-pointer text-center"
             >
               {/* Circular Avatar */}
-              <div className="relative aspect-square w-full rounded-full overflow-hidden bg-[#202020] mb-3.5 shadow-lg">
+              <div className="relative aspect-square w-full rounded-full overflow-hidden bg-[#182030] mb-3.5 shadow-lg">
                 <SafeImage
                   src={artist.image}
                   fallbackType="artist"
@@ -644,13 +644,13 @@ function ArtistDirectoryView({ lib, onNavigate }) {
                 />
 
                 {/* Hover Play Button */}
-                <div className="absolute right-2.5 bottom-2.5 w-11 h-11 rounded-full bg-[#fa2d48] text-white flex items-center justify-center opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all shadow-xl shadow-black/60">
-                  <Play className="w-5 h-5 fill-white ml-0.5" />
+                <div className="absolute right-2.5 bottom-2.5 w-11 h-11 rounded-full bg-[#00a8e1] hover:bg-[#22d3ee] text-black flex items-center justify-center opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all shadow-xl shadow-[#00a8e1]/30">
+                  <Play className="w-5 h-5 fill-black stroke-black ml-0.5" />
                 </div>
               </div>
 
               {/* Artist Name & Type */}
-              <h4 className="text-sm font-bold text-white truncate w-full group-hover:text-[#fa2d48] transition-colors">
+              <h4 className="text-sm font-bold text-white truncate w-full group-hover:text-[#00a8e1] transition-colors">
                 {artist.name}
               </h4>
               <p className="text-xs text-white/40 mt-0.5">

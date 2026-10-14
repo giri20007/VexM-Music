@@ -52,7 +52,7 @@ class ErrorBoundary extends React.Component {
     if (this.state.hasError) {
       return (
         <div className="flex-1 flex flex-col items-center justify-center min-h-[50vh] p-8 text-center text-white space-y-4">
-          <div className="w-14 h-14 rounded-2xl bg-[#fa2d48]/15 border border-[#fa2d48]/30 flex items-center justify-center text-[#fa2d48]">
+          <div className="w-14 h-14 rounded-2xl bg-[#00a8e1]/15 border border-[#00a8e1]/30 flex items-center justify-center text-[#00a8e1]">
             <Radio className="w-7 h-7" />
           </div>
           <h2 className="text-xl font-bold">Something went wrong</h2>
@@ -64,7 +64,7 @@ class ErrorBoundary extends React.Component {
               this.setState({ hasError: false, error: null });
               if (this.props.onReset) this.props.onReset();
             }}
-            className="px-5 py-2.5 rounded-full bg-[#fa2d48] text-white text-xs font-bold hover:bg-[#ff3b53] transition"
+            className="px-5 py-2.5 rounded-full bg-[#00a8e1] hover:bg-[#22d3ee] text-black text-xs font-bold transition shadow-md shadow-[#00a8e1]/25"
           >
             Return to Home
           </button>
@@ -399,17 +399,22 @@ export default function App() {
                 }}
                 className="flex items-center gap-2.5 cursor-pointer"
               >
-                <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-accent to-[#f43f5e] flex items-center justify-center text-bg-primary font-black shadow-md">
-                  <Radio className="w-4 h-4 fill-bg-primary stroke-bg-primary" />
+                <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#00a8e1] to-[#22d3ee] flex items-center justify-center text-white font-black shadow-md shadow-[#00a8e1]/30">
+                  <Radio className="w-4 h-4 fill-white stroke-white" />
                 </div>
-                <span className="font-black text-sm text-warm-white tracking-tight">
-                  Vex<span className="text-[#fa2d48]">-</span>M
-                </span>
+                <div className="flex items-baseline gap-1">
+                  <span className="font-black text-base text-white tracking-tight">
+                    vex<span className="text-[#00a8e1]">m</span>
+                  </span>
+                  <span className="text-[10px] font-semibold text-white/50 tracking-wider uppercase">
+                    music
+                  </span>
+                </div>
               </div>
 
               <button
                 onClick={() => setMobileNavOpen(false)}
-                className="p-1.5 rounded-lg text-warm-muted hover:text-white hover:bg-white/5 transition"
+                className="p-1.5 rounded-lg text-white/50 hover:text-white hover:bg-white/5 transition"
                 aria-label="Close menu"
               >
                 <ArrowLeft className="w-5 h-5" />
@@ -438,12 +443,12 @@ export default function App() {
                     }}
                     className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold transition ${
                       isActive
-                        ? 'bg-accent text-bg-primary font-bold shadow-md'
-                        : 'text-warm-muted hover:text-warm-white hover:bg-white/5'
+                        ? 'bg-[#00a8e1]/15 text-[#00a8e1] font-bold border border-[#00a8e1]/25'
+                        : 'text-white/60 hover:text-white hover:bg-white/5'
                     }`}
                   >
                     <span>{item.label}</span>
-                    {isActive && <span className="w-1.5 h-1.5 rounded-full bg-bg-primary" />}
+                    {isActive && <span className="w-1.5 h-1.5 rounded-full bg-[#00a8e1]" />}
                   </button>
                 );
               })}
@@ -458,8 +463,8 @@ export default function App() {
                     }}
                     className={`w-full flex items-center gap-2 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition ${
                       currentRoute === 'admin'
-                        ? 'bg-accent text-bg-primary'
-                        : 'bg-accent/15 border border-accent/30 text-accent hover:bg-accent/25'
+                        ? 'bg-[#00a8e1] text-black'
+                        : 'bg-[#00a8e1]/15 border border-[#00a8e1]/30 text-[#00a8e1] hover:bg-[#00a8e1]/25'
                     }`}
                   >
                     <span>Admin Dashboard</span>
@@ -470,9 +475,9 @@ export default function App() {
 
             {/* Drawer User Footer */}
             {user && (
-              <div className="p-3 border-t border-white/5 flex items-center justify-between bg-bg-card/40">
+              <div className="p-3 border-t border-white/5 flex items-center justify-between bg-[#111622]">
                 <div className="flex items-center gap-2 min-w-0">
-                  <div className="w-7 h-7 rounded-full overflow-hidden bg-accent/20 flex items-center justify-center text-accent text-xs font-bold border border-white/10">
+                  <div className="w-7 h-7 rounded-full overflow-hidden bg-[#00a8e1]/20 flex items-center justify-center text-[#00a8e1] text-xs font-bold border border-white/10">
                     {(user.displayName?.[0] || user.username?.[0] || 'U').toUpperCase()}
                   </div>
                   <div className="min-w-0">
